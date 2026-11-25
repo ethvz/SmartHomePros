@@ -893,16 +893,35 @@ const MODELS = {
     add(g, new THREE.Mesh(new THREE.SphereGeometry(.0105,32,20),PM.white), ...SO.toArray());
     add(g, head, ...HP.toArray()); head.rotation.x = .1;
     return g; },
-  ocspot(){ const g=G();                                // Spotlight Pro: light bar with six LEDs, speaker neck, camera head
-    add(g, rslab(.1,.09,.016,.01,.005,PM.white),0,.0,.008);
-    add(g, rslab(.25,.072,.085,.024,.012,PM.white),0,-.025,.0585);
-    for(let r=0;r<2;r++) for(let c=0;c<3;c++){
-      const x=-.072+c*.072, y=-.009-r*.032;
-      add(g, faceZ(cyl(.0135,.004,PM.white,48)),x,y,.102);
-      add(g, dome(.0105,.006,PM.led),x,y,.104);
-    }
-    add(g, rslab(.064,.07,.06,.012,.008,grilleMat(0xe9e9e7,[62,62])),0,.045,.06);
-    const h = camHead(.8, PM.white); add(g, h,0,.115,.075); h.rotation.x = .12;
+  ocspot(){ const g=G();                                // Spotlight Pro (Gen 3): tall back column with a speaker grille, sweeping forward
+    // at the bottom into a three-sided light bar (clear trim top and bottom, 2x3 LEDs per face); the Gen 3 camera head on top
+    const colH = .124, colY = .018;                                         // column spans y -.044 … .080
+    add(g, rslab(.064, colH, .044, .018, .008, PM.whiteM), 0, colY, .022);
+    add(g, rslab(.056, .044, .0016, .008, .0006, grilleMat(0xdcdddc,[48,38])), 0, -.009, .0444);
+    // light bar: trapezoid in plan (wide at the wall, narrower front face), extruded up through its height
+    const BH = .058, by = -.044 - BH/2, Wb = .15, Wf = .088, Z1 = .082, ch = .03;
+    const plan = new THREE.Shape([V(-Wb/2,0), V(Wb/2,0), V(Wb/2,Z1-ch), V(Wf/2,Z1), V(-Wf/2,Z1), V(-Wb/2,Z1-ch)].map(v=>new THREE.Vector2(v.x,v.y)));
+    const barG = new THREE.ExtrudeGeometry(plan, {depth:BH-.006, bevelEnabled:true, bevelThickness:.003, bevelSize:.003, bevelOffset:-.003, bevelSegments:4});
+    barG.rotateX(Math.PI/2); barG.translate(0, by+BH/2-.003, 0);
+    const bar = new THREE.Mesh(barG, PM.whiteM); g.add(bar);
+    const clear = new THREE.MeshPhysicalMaterial({color:0xc9cdd0, roughness:.15, transmission:.5, thickness:.003, clearcoat:1, transparent:true, opacity:.85});
+    for(const y of [by+BH/2-.0012, by-BH/2+.0012]){                         // clear trim bands at the top and bottom edges
+      const tg = new THREE.ExtrudeGeometry(plan, {depth:.0024, bevelEnabled:false}); tg.rotateX(Math.PI/2); tg.translate(0, y+.0012, 0); tg.scale(1.012,1,1.012);
+      g.add(new THREE.Mesh(tg, clear)); }
+    // LEDs: clear domes in shallow vertical pill recesses, 2 rows x 3 on the front and on each angled side
+    const ledM = new THREE.MeshPhysicalMaterial({color:0xe9edf0, roughness:.06, metalness:.15, clearcoat:1, clearcoatRoughness:.02, iridescence:.3});
+    const pill = mat(0xe3e4e3,{r:.5});
+    const faces = [[0, Z1, 0, Wf], [-(Wb+Wf)/4, Z1-ch/2, -Math.atan2(Wb/2-Wf/2, ch), Math.hypot(Wb/2-Wf/2, ch)], [(Wb+Wf)/4, Z1-ch/2, Math.atan2(Wb/2-Wf/2, ch), Math.hypot(Wb/2-Wf/2, ch)]];
+    for(const [fx, fz, ry, fw] of faces){
+      const f = G(); f.position.set(fx, by, fz); f.rotation.y = ry; g.add(f);
+      for(let c=0;c<3;c++){ const x = (c-1)*fw*.28;
+        add(f, rslab(.0115, .036, .0012, .0057, .0005, pill), x, 0, -.0002);
+        for(const y of [-.0095, .0095]) add(f, dome(.0046, .003, ledM), x, y, .0004); } }
+    // head on a stem from the column's upper front, through a knurled collar
+    add(g, faceZ(cyl(.0165, .01, PM.whiteM, 48)), 0, .058, .049);
+    const head = ocpHead(); add(g, head, 0, .092, .09); head.rotation.x = .1;
+    const s0 = V(0,.058,.05), s1 = V(0,.075,.072), d = s1.clone().sub(s0);
+    const st = add(g, cyl(.0095, d.length(), PM.white, 40), ...s0.clone().addScaledVector(d,.5).toArray()); st.quaternion.setFromUnitVectors(V(0,1,0), d.normalize());
     return g; },
   hub(){ const g=G();                                   // Smart Hub Pro 2: built from the engineering CAD (STEP → exterior shell only)
     if(!HUB){                                          // offline fallback: procedural stand-in
