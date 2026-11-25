@@ -182,7 +182,7 @@ import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
-const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=9'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
+const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=10'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
   for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const b=document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.min(92,Math.round(92*got/tot))+'%'); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
@@ -190,6 +190,9 @@ const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=9'); const t
 const PK = p => __PK[p] || p;
 /* Smart Hub Pro 2 mesh (quantised, from CAD): header json + int16 positions, int8 normals, indices */
 const HUB = await (async()=>{ try{ if(!__PK['mdl/hub.bin']) return null; const buf=await (await fetch(__PK['mdl/hub.bin'])).arrayBuffer(); const n=new DataView(buf).getUint32(0,true);
+  const h=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), b=buf.slice(4+n); return {s:h.s, parts:h.parts, buf:b}; }catch(e){ return null; } })();
+
+const OCPM = await (async()=>{ try{ if(!__PK['mdl/ocp.bin']) return null; const buf=await (await fetch(__PK['mdl/ocp.bin'])).arrayBuffer(); const n=new DataView(buf).getUint32(0,true);
   const h=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), b=buf.slice(4+n); return {s:h.s, parts:h.parts, buf:b}; }catch(e){ return null; } })();
 
 /* ------------------------------------------------------------------ data */
@@ -832,12 +835,28 @@ const MODELS = {
     add(g, faceZ(cyl(.011,.03,PM.blackM)),0,-.15,.024);
     add(g, rslab(.12,.022,.018,.009,.006,PM.blackM),-.05,-.15,.042);
     return g; },
-  ocp(){ const g=G();                                   // Outdoor Camera Pro 3: grey mount with speaker, ball joint, black head
-    add(g, rslab(.062,.11,.035,.016,.008,PM.mount),0,0,.0175);
-    add(g, rslab(.05,.045,.004,.008,.0015,grilleMat(0xcfd0d0,[62,62])),0,-.025,.036);
-    add(g, faceZ(cyl(.015,.05,PM.mount,48)),0,.03,.058);
-    add(g, new THREE.Mesh(new THREE.SphereGeometry(.019,40,28),PM.mount),0,.03,.084);
-    const h = camHead(); add(g, h,0,.035,.13); h.rotation.set(.24,-.12,0);
+  ocp(){ const g=G();                                   // Outdoor Camera Pro 3: mount from the engineering CAD (STEP), ball joint, black head
+    if(!OCPM){                                         // offline fallback: procedural stand-in
+      add(g, rslab(.062,.11,.035,.016,.008,PM.mount),0,0,.0175);
+      add(g, rslab(.05,.045,.004,.008,.0015,grilleMat(0xcfd0d0,[62,62])),0,-.025,.036);
+      add(g, faceZ(cyl(.015,.05,PM.mount,48)),0,.03,.058);
+      add(g, new THREE.Mesh(new THREE.SphereGeometry(.019,40,28),PM.mount),0,.03,.084);
+      const h = camHead(); add(g, h,0,.035,.13); h.rotation.set(.24,-.12,0);
+      return g; }
+    const ring = PM.mount.clone(); ring.color.multiplyScalar(.82);
+    const M = [PM.mount.clone(), grilleMat(0xcfd0d0,[84,56]), ring]; M.forEach(m=>m.side=THREE.DoubleSide);
+    for(const p of OCPM.parts){
+      const geo = new THREE.BufferGeometry();
+      const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
+      for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
+      geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+      geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
+      geo.setIndex(new THREE.BufferAttribute(p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni),1));
+      if(p.g===1){ const uv = new Float32Array(p.nv*2); for(let i=0;i<p.nv;i++){ uv[2*i]=(pos[3*i]+.0354)/.0708; uv[2*i+1]=(pos[3*i+1]+.0493)/.0475; } geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
+      const m = new THREE.Mesh(geo, M[p.g]); m.castShadow = true; g.add(m);
+    }
+    add(g, new THREE.Mesh(new THREE.SphereGeometry(.019,40,28),PM.mount),0,.0193,.052);
+    const h = camHead(); add(g, h,0,.046,.1); h.rotation.set(.3,-.12,0);
     return g; },
   ocspot(){ const g=G();                                // Spotlight Pro: light bar with six LEDs, speaker neck, camera head
     add(g, rslab(.1,.09,.016,.01,.005,PM.white),0,.0,.008);
