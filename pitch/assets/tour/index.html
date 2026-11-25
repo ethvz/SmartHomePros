@@ -127,6 +127,49 @@ body.focus #brand{display:none}
 </style>
 
 
+
+<style id="refLook">
+/* ===== look of the Vivint "smart home" reference: thin blue rings, small two-line tags, tall product card ===== */
+:root{--ring:#a9cdf5}
+.hs{width:36px;height:36px;margin:-18px 0 0 -18px}
+.hs .dot{inset:3px;background:rgba(150,190,235,.10);border:1.5px solid var(--ring);box-shadow:0 0 0 1px rgba(0,0,0,.25),0 0 16px rgba(140,190,245,.22);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);transition:transform .35s var(--ease),background .25s}
+.hs .dot::before{width:6px;height:6px;margin:-3px 0 0 -3px;background:#e9f3ff;box-shadow:0 0 8px rgba(190,220,255,.9)}
+.hs .dot::after{inset:-5px;border:1px solid var(--ring);animation:pulse 3s var(--ease) infinite}
+.hs:hover .dot{transform:scale(1.12);background:rgba(150,190,235,.22)}
+.hs .lbl{left:40px;max-width:118px;white-space:normal;text-align:center;padding:5px 8px;border-radius:3px;font-size:9.5px;font-weight:600;letter-spacing:.09em;line-height:1.35;color:#eef2f6;background:rgba(14,16,18,.86);border:0;box-shadow:0 2px 10px rgba(0,0,0,.35);-webkit-backdrop-filter:none;backdrop-filter:none}
+.hs.l .lbl{right:40px}
+/* product card: tall panel on the left, product on a blue-grey stage, three icon features, "Next" at the foot */
+#card{left:max(18px,env(safe-area-inset-left,0px));right:auto;top:calc(env(safe-area-inset-top,0px) + 82px);width:min(372px,34vw);border-radius:6px;background:#141618;border:0;box-shadow:0 30px 70px rgba(0,0,0,.6);-webkit-backdrop-filter:none;backdrop-filter:none}
+#card.away{transform:translateX(-26px)}
+.c-media{flex:1 1 auto;min-height:150px;height:auto;background:radial-gradient(90% 70% at 50% 42%,#3a4b5b 0%,#24313d 45%,#131a21 100%);padding:54px 20px 6px;overflow:hidden}
+.c-media img{position:absolute;left:20px;right:20px;top:56px;bottom:12px;width:calc(100% - 40px);height:calc(100% - 68px);max-width:none;max-height:none;object-fit:contain;filter:drop-shadow(0 18px 26px rgba(0,0,0,.55))}
+#cHead{position:absolute;left:20px;right:60px;top:18px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;line-height:1.3;color:#fff;z-index:1}
+#cX{position:absolute;right:14px;top:12px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.35);z-index:1}
+#cX svg{width:13px;height:13px;stroke:#fff;stroke-width:2.4;stroke-linecap:round;fill:none}
+.c-body{flex:0 0 auto;padding:0;overflow:visible;background:linear-gradient(180deg,#1b232b,#141618)}
+.c-where,.c-name{display:none}
+#cFeats{display:grid;grid-template-columns:repeat(3,1fr);padding:16px 8px 18px}
+.feat{border:0;padding:0 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+.feat + .feat{border-left:1px solid rgba(255,255,255,.12)}
+.feat i{width:20px;height:20px;color:var(--ring)}
+.feat i svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.feat b{font-size:12px;font-weight:500;line-height:1.3;margin:0;color:#e9edf1}
+.feat p{display:none}
+.c-nav{background:#141618;border-top:1px solid rgba(255,255,255,.08);justify-content:center;position:relative;padding:14px}
+.c-count{display:none}
+#prev{position:absolute;left:12px;top:50%;translate:0 -50%;background:rgba(255,255,255,.06)}
+#next{align-items:center;padding:6px 14px}
+#next small{font-size:10px;color:#9aa3ab}
+#next b{font-size:12.5px;letter-spacing:.08em;font-weight:600}
+.emb #cOpen{display:block;margin:0 auto 16px!important;height:38px!important;font-size:13.5px!important;padding:0 16px!important}
+body.focus #back{display:none}
+@media (max-width:760px), (max-aspect-ratio:1/1){
+  #card{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;height:min(58vh,520px)}
+  #card.away{transform:translateY(30px)}
+  .c-media{min-height:120px;padding-top:46px}
+  .c-media img{max-height:100%}
+}
+</style>
 <script>
 (()=>{ if(window.parent===window) return; document.documentElement.classList.add('emb');
   const st=document.createElement('style'); st.textContent='.emb #brand{display:none}.emb #top{padding-top:22px}#cOpen{margin:14px 0 6px;height:44px;padding:0 18px;border-radius:22px;background:var(--mint);color:var(--ink);font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px}';
@@ -153,7 +196,7 @@ body.focus #brand{display:none}
 </header>
 
 <aside id="card" class="glass away" aria-live="polite">
-  <div class="c-media"><img id="cImg" alt=""></div>
+  <div class="c-media"><div id="cHead"></div><button id="cX" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><img id="cImg" alt=""></div>
   <div class="c-body">
     <div class="c-where" id="cWhere"></div>
     <h2 class="c-name" id="cName"></h2>
@@ -334,7 +377,7 @@ const M = {
   ceil:   mat(0xf4f2ee, {r:.95}),
   cut:    mat(0xf6f4f0, {r:.9}),          // section faces where the house is cut open
   trim:   phys(0x1c1e20, {r:.42, m:.35}),
-  roof:   phys(0xffffff, {r:.85, x:{map:TX.roof, normalMap:TX.roofN, roughnessMap:TX.roofR, color:0x8d9196}}),
+  roof:   phys(0xffffff, {r:.85, x:{map:TX.roof, normalMap:TX.roofN, roughnessMap:TX.roofR, color:0x4b4f55}}),
   fascia: phys(0x1d1f21, {r:.5, m:.2}),
   floor:  phys(0xffffff, {r:1, x:{map:TX.floor, normalMap:TX.floorN, roughnessMap:TX.floorR, clearcoat:.25, clearcoatRoughness:.35}}),
   conc:   mat(0xffffff, {r:1, x:{map:TX.conc, normalMap:TX.concN, roughnessMap:TX.concR, color:0xd2d0cb}}),
@@ -1140,10 +1183,38 @@ for(const [n,ks] of RAILG){ const g = document.createElement('div'); g.className
 function railTo(el){ const r = railIn.getBoundingClientRect(), e = el.getBoundingClientRect();
   railIn.scrollTo({left: railIn.scrollLeft + (e.left + e.width/2) - (r.left + r.width/2), behavior: reduceMotion?'auto':'smooth'}); }
 function setHint(t){ hint.textContent = t; hint.classList.remove('gone'); clearTimeout(setHint.t); setHint.t = setTimeout(()=>hint.classList.add('gone'), 4200); }
+/* small line icons for the card's three features, picked by what the feature is about */
+const FI = {
+  shield:'<path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  cam:'<rect x="3" y="6.5" width="13" height="11" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/>',
+  light:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  run:'<circle cx="14" cy="4.5" r="1.8"/><path d="M8 21l3-6 3 2v5M6 11l3-3 4 1 2 4 3 1"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+  phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  battery:'<rect x="2.5" y="7.5" width="17" height="9" rx="2"/><path d="M21.5 10.5v3M6 10.5v3M9 10.5v3"/>',
+  temp:'<path d="M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/>',
+  drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  wifi:'<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.8 16a5 5 0 0 1 6.4 0"/><circle cx="12" cy="19.2" r="1"/>',
+  home:'<path d="M3.5 11L12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/>',
+  fire:'<path d="M12 21a6 6 0 0 0 6-6c0-4-3-6-4-10-2 2-3 4-3 6-1-1-1.5-2-1.5-3C7 10 6 12.5 6 15a6 6 0 0 0 6 6z"/>',
+  wave:'<path d="M3 12h3l2.5-6 5 12 2.5-6h5"/>',
+  tap:'<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11l4.5.8a2 2 0 0 1 1.6 2.3L17 20H10l-4-5 1-1.2a1.6 1.6 0 0 1 2.2-.2z"/>'
+};
+function ficon(t){ t=t.toLowerCase();
+  const k = /deter|protect|secur|monitor|sign|layer/.test(t) ? 'shield' : /track|person|lurker|pet|motion/.test(t) ? 'run'
+    : /lumen|light|spotlight|lamp/.test(t) ? 'light' : /view|4k|sensor|hd|privacy|see|video|record|pre-roll/.test(t) ? (/privacy/.test(t)?'eye':'cam')
+    : /lock|code|door|unlock|close/.test(t) ? 'lock' : /anywhere|app|phone|control/.test(t) ? 'phone' : /battery|power/.test(t) ? 'battery'
+    : /temp|thermo|freeze|heat/.test(t) ? 'temp' : /water|leak|weather/.test(t) ? 'drop' : /smoke|fire|co /.test(t) ? 'fire'
+    : /alert|alarm|chime|notif|audible|help/.test(t) ? 'bell' : /connect|cellular|wi-?fi/.test(t) ? 'wifi' : /schedul|night|time|auto/.test(t) ? 'clock'
+    : /button|press|tap|touch|display/.test(t) ? 'tap' : 'home';
+  return '<svg viewBox="0 0 24 24">'+FI[k]+'</svg>'; }
 function fillCard(p){ document.body.dataset.fk=p.k;
-  $('#cImg').src = PK('chip/'+p.img+'.webp'); $('#cImg').alt = p.name;
-  $('#cWhere').textContent = p.where; $('#cName').textContent = p.name;
-  $('#cFeats').innerHTML = p.feats.map(([t,b])=>`<div class="feat"><b>${t}</b><p>${b}</p></div>`).join('');
+  const im = $('#cImg'); im.onerror = () => { im.onerror = null; im.src = PK('chip/'+p.img+'.webp'); }; im.src = '../cat/'+p.img+'.webp?v=176'; im.alt = p.name;
+  $('#cWhere').textContent = p.where; $('#cName').textContent = p.name; $('#cHead').textContent = p.name;
+  $('#cFeats').innerHTML = p.feats.slice(0,3).map(([t,b])=>`<div class="feat"><i>${ficon(t+' '+b)}</i><b>${t}</b><p>${b}</p></div>`).join('');
   const L = vis(), i = L.indexOf(p); $('#cCount').textContent = `${i+1} of ${L.length}`;
   $('#nextName').textContent = L[(i+1)%L.length].name;
   card.querySelector('.c-body').scrollTop = 0;
@@ -1168,7 +1239,7 @@ function overview(fresh){
   const pose = poseFor(HOME, fresh ? HOME.theta : THREE.MathUtils.clamp(cur.theta, HOME.lim.minA, HOME.lim.maxA));
   flyTo(pose, {lim:HOME.lim, dur:1.3, done:()=>{ state.idleAt=performance.now(); }});
 }
-$('#back').addEventListener('click', () => overview());
+$('#back').addEventListener('click', () => overview()); $('#cX').addEventListener('click', () => overview());
 const vis = () => PRODUCTS.filter(shown);
 const step = d => { const L = vis(); if(!L.length) return; const i = state.focus ? L.indexOf(state.focus) : -1; const n = L[(i+d+L.length)%L.length]; if(n!==state.focus) focus(n); };
 /* Fast Pitch's bottom tabs (All / Sensors / Smart Home / Cameras) decide which products the house shows */
