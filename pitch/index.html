@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SHP Connect">
+<script src="../dock.js" defer></script>
+
 <script>window.SHPC = { app: 'pitch', picker: '../index.html?pick' }; try { localStorage.setItem('shpc_last', 'pitch'); } catch (e) {}
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-shpc-switch]')) { e.preventDefault(); e.stopPropagation(); location.href = window.SHPC.picker; } }, true);</script>
 

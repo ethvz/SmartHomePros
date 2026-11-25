@@ -43,6 +43,9 @@ def sub(s, old, new, label, count=1):
 TITLE = '<meta name="apple-mobile-web-app-title" content="SHP Connect">'
 
 
+DOCK = '<script src="../dock.js" defer></script>\n'   # the shared editor dock (Edit layout + Screens)
+
+
 def head_hook(app):
     return ("<script>window.SHPC = { app: '%s', picker: '../index.html?pick' }; try { localStorage.setItem('shpc_last', '%s'); } catch (e) {}\n"
             "document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-shpc-switch]')) { e.preventDefault(); e.stopPropagation(); location.href = window.SHPC.picker; } }, true);</script>\n" % (app, app))
@@ -59,6 +62,8 @@ def patch_recruit():
     s = sub(s, '<meta name="apple-mobile-web-app-title" content="Vivint Recruiting">', '<meta name="apple-mobile-web-app-title" content="SHP Connect">', 'fr title')
     if 'window.SHPC' not in s:
         s = s.replace(TITLE, TITLE + '\n' + head_hook('recruit'), 1)
+    if 'dock.js' not in s:
+        s = s.replace(TITLE, TITLE + '\n' + DOCK, 1)
     # menu: a full-width "Switch app" row above the menu's bottom buttons
     btn = ("'<div class=\"dw-foot\">' + (window.SHPC ? '<button type=\"button\" class=\"dw-u dw-app\" data-shpc-switch title=\"Switch app\" aria-label=\"Switch app\">"
            + GRID.replace('class="ic" width="20" height="20" ', '') + "<span>Switch app</span></button>' : '') + '<button type=\"button\" class=\"dw-u dw-social\"")
@@ -78,6 +83,8 @@ def patch_pitch():
     s = sub(s, '<meta name="apple-mobile-web-app-title" content="Fast Pitch 2027">', '<meta name="apple-mobile-web-app-title" content="SHP Connect">', 'fp title')
     if 'window.SHPC' not in s:
         s = s.replace(TITLE, TITLE + '\n' + head_hook('pitch'), 1)
+    if 'dock.js' not in s:
+        s = s.replace(TITLE, TITLE + '\n' + DOCK, 1)
     s = sub(s, "col=db.collection('layout');", "col=db.collection('fp_layout');", 'fp layout db')
     s = s.replace("db.collection('nav')", "db.collection('fp_nav')")
     s = sub(s, '<i id="dlBar"></i></button>', '<i id="dlBar"></i></button><button class="m2-dl m2-app" data-shpc-switch>' + GRID + '<span>Switch app</span></button>', 'fp menu foot')

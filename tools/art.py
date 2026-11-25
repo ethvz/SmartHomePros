@@ -100,10 +100,10 @@ def recruit():
 if __name__ == '__main__':
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
-    for f in ['index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-32.png']:
+    for f in ['index.html', 'dock.js', 'screens.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-32.png']:
         copy(f)
     np, nr = pitch(), recruit()
-    for f in LANDING_KEEP | {'recruit/devices.html'} | {'pitch/assets/fonts/' + x for x in os.listdir(os.path.join(ROOT, 'pitch/assets/fonts'))}:
+    for f in LANDING_KEEP | {'pitch/assets/fonts/' + x for x in os.listdir(os.path.join(ROOT, 'pitch/assets/fonts'))}:
         if os.path.exists(os.path.join(ROOT, f)):
             copy(f)
     n = sum(1 for _ in files_under(OUT))
