@@ -2636,9 +2636,9 @@ body.hd3 #gTitle{opacity:0!important}
     <section class="page" id="p-videos"><div class="vl2">
       <div class="vl2-h"><div class="eb">Video Library</div><h2>Watch it work.</h2><div class="vl2-chips"><b class="on" data-vlf="All">All</b><b class="" data-vlf="Products">Products</b><b class="" data-vlf="App">App</b><b class="" data-vlf="Installation">Installation</b><b class="" data-vlf="Monitoring">Monitoring</b><b class="" data-vlf="Customer stories">Customer stories</b></div></div>
       <div class="vl2-g">
-        <div class="vl2-c big" data-cat="Products" data-toast="Video coming soon"><img src="assets/ph/couch.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Featured · Coming soon</em><b>The Vivint Smart Home</b></div></div>
+        <div class="vl2-c big" data-cat="Products" data-vid="assets/vl/imagine.mp4?v=1" data-vt="Imagine"><img src="assets/vl/imagine.webp?v=1" alt=""><video class="vl2-pv" src="assets/vl/imagine_loop.mp4?v=1" muted playsinline loop autoplay preload="metadata"></video><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Featured · Commercial · 0:30</em><b>Imagine</b></div></div>
         <div class="vl2-c" data-cat="Installation" data-toast="Video coming soon"><img src="assets/ph/install.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Installation · Coming soon</em><b>What install day looks like</b></div></div><div class="vl2-c" data-cat="Products" data-toast="Video coming soon"><img src="assets/ph/hubtouch.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Products · Coming soon</em><b>Smart Hub Pro II tour</b></div></div><div class="vl2-c" data-cat="Products" data-toast="Video coming soon"><img src="assets/ph/dusk.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Products · Coming soon</em><b>Outdoor Camera Pro III at night</b></div></div><div class="vl2-c" data-cat="App" data-toast="Video coming soon"><img src="assets/ph/lock.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>App · Coming soon</em><b>Locks & garage from the app</b></div></div><div class="vl2-c" data-cat="Products" data-toast="Video coming soon"><img src="assets/ph/kitchen.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Products · Coming soon</em><b>Smoke, CO & water protection</b></div></div><div class="vl2-c" data-cat="Customer stories" data-toast="Video coming soon"><img src="assets/ph/delivery.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Customer stories · Coming soon</em><b>Package protection</b></div></div><div class="vl2-c" data-cat="Monitoring" data-toast="Video coming soon"><img src="assets/ph/office.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Monitoring · Coming soon</em><b>24/7 monitoring, behind the scenes</b></div></div>
-      </div></div>
+      <div class="vl2-c" data-cat="Products" data-toast="Video coming soon"><img src="assets/ph/couch.webp?v=87" alt=""><i class="sc"></i><span class="pl"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M4 2.5l13.5 8.5L4 19.5z" fill="#fff"/></svg></span><div class="mt"><em>Featured · Coming soon</em><b>The Vivint Smart Home</b></div></div></div></div>
     </section>
 
     <!-- AI -->
@@ -6095,3 +6095,21 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 /* 3D Home fills the screen, edge to edge (the footer floats over it) */
 #p-home #tour3d{left:0!important;right:0!important;top:0!important;bottom:0!important;border-radius:0!important}
 </style>
+<style>
+/* video library: playable tiles + full-screen player (SmartHomePros Connect) */
+.vl2-c .vl2-pv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#vlp{position:fixed;inset:0;z-index:9000;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
+#vlp.on{opacity:1;visibility:visible;transition:opacity .35s}
+#vlp video{width:100%;height:100%;object-fit:contain;background:#000;transform:scale(.96);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+#vlp.on video{transform:none}
+#vlp .x{position:absolute;top:calc(env(safe-area-inset-top) + 18px);right:calc(env(safe-area-inset-right) + 18px);width:48px;height:48px;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(40,40,42,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);cursor:pointer;z-index:2}
+#vlp .x svg{width:16px;height:16px;stroke:#fff;stroke-width:2.4;stroke-linecap:round;fill:none}
+</style>
+<script>
+/* video library player: a tile with data-vid opens it full screen, with sound */
+document.addEventListener('click',e=>{ const t=e.target.closest&&e.target.closest('#p-videos [data-vid]'); if(!t) return; e.preventDefault(); e.stopPropagation();
+  let o=document.getElementById('vlp'); if(!o){ o=document.createElement('div'); o.id='vlp'; o.innerHTML='<video playsinline controls preload="auto"></video><button class="x" aria-label="Close video"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'; document.body.appendChild(o);
+    const v=o.querySelector('video'), close=()=>{ o.classList.remove('on'); v.pause(); };
+    o.querySelector('.x').addEventListener('click',close); v.addEventListener('ended',close); addEventListener('keydown',k=>{ if(k.key==='Escape'&&o.classList.contains('on')) close(); }); }
+  const v=o.querySelector('video'); if(v.getAttribute('src')!==t.dataset.vid) v.src=t.dataset.vid; v.currentTime=0; v.muted=false; o.classList.add('on'); v.play().catch(()=>{}); },true);
+</script>
