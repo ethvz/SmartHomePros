@@ -899,6 +899,45 @@ function weaveTex(){
     x.beginPath(); x.ellipse(j*8+4, i*8+4, o?3.6:2.4, o?2.4:3.6, 0, 0, Math.PI*2); x.fill(); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
 }
+/* a transparent plane with printing drawn on it (10 px per mm), for labels on keys and badges */
+function printPlane(wm, hm, draw){
+  const W = Math.round(wm*10000), H = Math.round(hm*10000), c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  draw(x, (mx, my) => [W/2 + mx*10000, H/2 - my*10000]);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso);
+  return new THREE.Mesh(new THREE.PlaneGeometry(wm, hm), new THREE.MeshStandardMaterial({map:t, transparent:true, roughness:.5, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3}));
+}
+/* a rounded rectangle with its own radius at each corner [top-right, top-left, bottom-left, bottom-right] */
+function rr4(w, h, R, cx=0, cy=0){ const [a,b,c,d] = R, x0=cx-w/2, x1=cx+w/2, y0=cy-h/2, y1=cy+h/2, s = new THREE.Shape();
+  s.moveTo(x0+c, y0); s.lineTo(x1-d, y0); d ? s.absarc(x1-d, y0+d, d, -Math.PI/2, 0) : 0; s.lineTo(x1, y1-a); a ? s.absarc(x1-a, y1-a, a, 0, Math.PI/2) : 0;
+  s.lineTo(x0+b, y1); b ? s.absarc(x0+b, y1-b, b, Math.PI/2, Math.PI) : 0; s.lineTo(x0, y0+c); c ? s.absarc(x0+c, y0+c, c, Math.PI, 1.5*Math.PI) : 0; return s; }
+function ext(shape, d, b, m){ const g = new THREE.ExtrudeGeometry(shape, {depth:d-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:5, curveSegments:24});
+  g.translate(0,0,b); const x = new THREE.Mesh(g, m); x.castShadow = x.receiveShadow = true; return x; }
+/* Key Fob face-on (back at z=0, face toward +z): the slot sits at y = -.0245 */
+function fobBody(){
+  const g = G(), w = .033, d = .013, dark = mat(0x3b3d40,{r:.55,m:.1}), light = mat(0xbfc2c4,{r:.55}), key = mat(0x46494c,{r:.45,m:.1});
+  add(g, ext(rr4(w, .044, [.012,.012,0,0], 0, .011), d, .0028, dark));
+  const lo = rr4(w, .022, [0,0,.011,.011], 0, -.022), slot = new THREE.Path(); slot.absarc(-.005, -.0245, .003, Math.PI/2, 1.5*Math.PI); slot.absarc(.005, -.0245, .003, -Math.PI/2, Math.PI/2); lo.holes.push(slot);
+  add(g, ext(lo, d, .0028, light));
+  for(const y of [.024, .0125, .001]){ add(g, rslab(.0245, .0088, .0022, .0044, .0009, mat(0x2c2e30,{r:.5})), 0, y, d-.0003); add(g, rslab(.0225, .0072, .0024, .0036, .0011, key), 0, y, d+.0004); }
+  add(g, printPlane(.03, .04, (x, P) => { x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#c9cccf'; x.font = '400 46px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    x.fillText('DISARM', ...P(.0015, .0115)); x.fillText('STAY', ...P(0, 0)); x.fillText('AWAY', ...P(.0012, -.0115));
+    x.fillStyle = '#d0262b'; for(const [mx,my] of [[-.0085,.0115],[-.0072,-.0115]]){ const [px,py] = P(mx,my); x.beginPath(); x.arc(px, py, 8, 0, Math.PI*2); x.fill(); } }), 0, .0125, d+.00165);
+  add(g, printPlane(.02, .006, (x, P) => { x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#9fa3a6'; x.font = '600 44px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('vivint', ...P(0,0)); }), 0, -.0145, d+.0001);
+  return g;
+}
+/* Emergency Pendant face-on (back at z=0): white body with a dished button, grey top cap with the lanyard hole at y = .024 */
+function pendantBody(){
+  const g = G(), w = .035, d = .015, grey = mat(0xa9adb0,{r:.5}), wht = PM.whiteM;
+  const lo = rr4(w, .046, [0,0,.014,.014], 0, -.011), dh = new THREE.Path(); dh.absellipse(0, -.012, .0135*.86, .0135, 0, Math.PI*2, true); lo.holes.push(dh);
+  add(g, ext(lo, d, .0035, wht));
+  const top = rr4(w, .022, [.014,.014,0,0], 0, .023), hole = new THREE.Path(); hole.absarc(0, .024, .004, 0, Math.PI*2, true); top.holes.push(hole);
+  add(g, ext(top, d, .0035, grey));
+  const dish = new THREE.LatheGeometry([[.0135,0],[.012,-.0012],[.0095,-.0026],[.0082,-.003]].map(([r,z])=>new THREE.Vector2(r,z)), 64);
+  const dm = new THREE.Mesh(dish, mat(0xe1e2e1,{r:.5,x:{side:THREE.DoubleSide}})); dm.rotation.x = Math.PI/2; dm.scale.set(.86,1,1); add(g, dm, 0, -.012, d);
+  add(g, faceZ(cyl(.0082, .001, grey, 48)), 0, -.012, d-.0026).scale.set(.86,1,1);
+  add(g, printPlane(.02, .006, (x, P) => { x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#7d8184'; x.font = '600 44px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('vivint', ...P(0,0)); }), 0, .0155, d+.0001);
+  return g;
+}
 const MODELS = {
   dbcp(){ const g=G(), W = .043, H = .132;              // Doorbell Camera Pro (Gen 2): 43 x 132 x 35 mm. White body on a recessed back plate,
                                     // a full-face black glass front with eased edges, lens up top, red-ring button below
@@ -913,8 +952,22 @@ const MODELS = {
     add(g, torus(.0098, .0017, PM.ring), 0, -.043, fz+.0004);
     add(g, faceZ(cyl(.0083,.0012,PM.gloss,48)), 0, -.043, fz+.0006);
     return g; },
-  lock(){ const g=G();                                  // Kwikset keypad deadbolt (photo-accurate face, bevelled body) + passage lever below
-    add(g, photoSolid('lock',.074,.026));
+  lock(){ const g=G();                                  // Kwikset keypad deadbolt, matte black: 71 x 116 mm escutcheon with eased edges, silver badge,
+    const blk = mat(0x1b1c1e,{r:.5,m:.35}), blk2 = mat(0x141517,{r:.42,m:.45});       // ten backlit keys in two rows, raised round deadbolt rose and keyway;
+    add(g, rslab(.071, .116, .012, .0035, .0016, blk), 0, 0, .006);                  // the passage lever sits below it on the door
+    add(g, rslab(.019, .0087, .0016, .0022, .0006, PM.silver), 0, .042, .0128);
+    add(g, decal(DEC.kwik, .016, .0045, {color:0x1a1a1a}), 0, .042, .0137);
+    const keyM = new THREE.MeshPhysicalMaterial({color:0xf2f2ee, roughness:.3, clearcoat:.5, emissive:0xfff6e6, emissiveIntensity:.18});
+    for(let r=0;r<2;r++) for(let c=0;c<5;c++) add(g, rslab(.0095, .0118, .002, .0026, .0008, keyM), (c-2)*.01065, .0276-r*.0153, .0128);
+    add(g, printPlane(.06, .03, (x, P) => { x.fillStyle = '#222'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.font = '500 72px "Helvetica Neue", Helvetica, Arial, sans-serif';
+      for(let r=0;r<2;r++) for(let c=0;c<5;c++) x.fillText(String((r*5+c+1)%10), ...P((c-2)*.01065, .0075-r*.0153)); }), 0, .0201, .01382);
+    add(g, faceZ(cyl(.025, .004, blk, 72)), 0, -.022, .014);
+    add(g, torus(.025, .0016, blk), 0, -.022, .016);
+    add(g, faceZ(cyl(.0175, .006, blk2, 72)), 0, -.022, .019);
+    add(g, torus(.0175, .0012, blk2), 0, -.022, .022);
+    add(g, faceZ(cyl(.0088, .0016, blk, 48)), 0, -.022, .0228);
+    add(g, decal(DEC.keyway, .0105, .0105, {color:0x444444}), 0, -.022, .0237);
     add(g, faceZ(cyl(.028,.01,PM.blackM)),0,-.15,.005);
     add(g, faceZ(cyl(.011,.03,PM.blackM)),0,-.15,.024);
     add(g, rslab(.12,.022,.018,.009,.006,PM.blackM),-.05,-.15,.042);
@@ -1034,10 +1087,13 @@ const MODELS = {
     for(const x of [-.024,.024]) add(g, faceZ(cyl(.0007,.0004,PM.dot,12)), x, hy+.004, hz+.0008);
     add(g, decal(DEC.logo, .016, .004), 0, hy-.0215, hz+.0009);
     return g; },
-  window(){ const g=G();                                // Door & Window Sensor: sensor on the sash's bottom rail, magnet on the sill edge right below it
-    add(g, rslab(.078,.028,.016,.007,.004,PM.whiteM),0,0,.008);
-    add(g, rslab(.01,.003,.0008,.0012,.0003,mat(0xb9bdbf,{r:.5})),.03,.008,.0162);
-    add(g, rslab(.05,.012,.014,.004,.003,PM.whiteM),.004,-.0215,.007);
+  window(){ const g=G();                                // Door & Window Sensor (69 x 25 x 13 mm) on the sash's bottom rail, its magnet (36 x 15 x 10 mm)
+    const base = mat(0xb9bcbe,{r:.45,m:.15});                                         // on the sill edge right below it: grey bases under soft white caps
+    add(g, rslab(.068, .024, .006, .0075, .0018, base), 0, 0, .003);
+    add(g, rslab(.069, .025, .0074, .0095, .0033, PM.whiteM), 0, 0, .0093);
+    add(g, rslab(.0006, .0242, .0062, .0003, .0001, mat(0x8d9093,{r:.5})), .012, 0, .0031);
+    add(g, rslab(.035, .014, .0045, .005, .0014, base), .004, -.0215, .00225);
+    add(g, rslab(.036, .015, .0058, .0068, .0025, PM.whiteM), .004, -.0215, .0074);
     return g; },
   motion(){ const g=G();                                // Motion Sensor: 71 x 81 x 51 mm. Grey back body, a pillowy white front cover with deeply rounded
     add(g, rslab(.066, .076, .026, .013, .004, mat(0xdcdddd,{r:.5})), 0, -.001, .013);   // edges, a large frosted lens window, TEST button on the side
@@ -1123,9 +1179,9 @@ const MODELS = {
     add(g, torus(.0056, .00035, mat(0xa7abae,{r:.4})), 0, -.012, .0342);
     add(g, faceZ(cyl(.0054, .0005, mat(0xf1f1ef,{r:.45}), 40)), 0, -.012, .0341);
     return g; },
-  fob(){ const g=G();                                   // Key Fob on a split ring with the house keys, lying on the counter
-    const w=.035, d=.012; add(g, photoSolid('fob',w,d,true));
-    const [hx,hy] = holeCenter('fob',w), ring = mat(0xb8bcc0,{r:.25,m:1});
+  fob(){ const g=G();                                   // Key Fob (33 x 66 x 13 mm) lying on the counter on a split ring with the house keys:
+    const w=.033, d=.013, F = fobBody(); F.rotation.x = -Math.PI/2; g.add(F);       // dark grey top with DISARM / STAY / AWAY keys, light grey base with the ring slot
+    const hx = 0, hy = -.0245, ring = mat(0xb8bcc0,{r:.25,m:1});
     const rc = new THREE.Vector3(hx, d*.55, -hy+.011);
     const r = add(g, new THREE.Mesh(new THREE.TorusGeometry(.0125,.0011,10,48), ring), rc.x, rc.y, rc.z); r.rotation.set(Math.PI/2-.18,0,0);
     const brass = mat(0xc9a86a,{r:.3,m:1}), nickel = mat(0xc4c7ca,{r:.28,m:1});
@@ -1133,8 +1189,8 @@ const MODELS = {
     const k2 = add(g, keyMesh(nickel), rc.x-.008, .0009, rc.z+.014); k2.rotation.y = -2.25;
     return g; },
   pendant(){ const g=G();                               // Emergency Pendant on its black lanyard, hanging from a wall hook
-    const w=.035, d=.014, drop=.14, P = photoSolid('pendant',w,d);
-    const [hx,hy,hd] = holeCenter('pendant',w), py = -drop - hy;              // pendant placed so its hole sits `drop` below the hook
+    const w=.035, d=.015, drop=.14, P = pendantBody();
+    const hx = 0, hy = .024, hd = .008, py = -drop - hy;              // pendant placed so its hole sits `drop` below the hook
     add(g, P, 0, py, .004); P.rotation.z = .04;
     const blk = mat(0x161718,{r:.45,m:.5});
     add(g, rslab(.016,.034,.004,.003,.0012,blk),0,0,.002);                    // hook plate
@@ -1158,33 +1214,6 @@ const MODELS = {
 };
 const PHT = {};
 function photoTex(k){ if(PHT[k]) return PHT[k]; const t = texLoader.load(PK('ph/'+k+'.webp')); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return PHT[k] = t; }
-const PH_ASPECT = new Proxy({}, {get:(_,k)=>(PHS[k] && PHS[k].aspect) || 1});
-function photoFace(k, w, h){ return new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshPhysicalMaterial({map:photoTex(k), transparent:true, alphaTest:.04, roughness:.42, clearcoat:.35, clearcoatRoughness:.3, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})); }
-/* photoSolid: the product's real outline (traced from its photo) extruded to its true thickness with rounded edges.
-   The photo sits on a flat front face that matches the outline exactly; the photo also drives a bump map so keys,
-   grilles and seams catch the light. Sides take the product's own edge colour. */
-const PHS = await fetch(PK('ph/shapes.json')).then(r=>r.json()).catch(()=>({}));
-function photoSolid(k, w, d, flat=false){
-  const S = PHS[k], h = w*(S ? S.aspect : 1), shape = new THREE.Shape();
-  if(!S || S.pts.length <= 4){ const r = Math.min(w,h)*.07, x0=-w/2, y0=-h/2;      // rectangle: rounded corners
-    shape.moveTo(x0+r,y0); shape.lineTo(x0+w-r,y0); shape.quadraticCurveTo(x0+w,y0,x0+w,y0+r); shape.lineTo(x0+w,y0+h-r); shape.quadraticCurveTo(x0+w,y0+h,x0+w-r,y0+h);
-    shape.lineTo(x0+r,y0+h); shape.quadraticCurveTo(x0,y0+h,x0,y0+h-r); shape.lineTo(x0,y0+r); shape.quadraticCurveTo(x0,y0,x0+r,y0); }
-  else S.pts.forEach(([u,v],i) => { const x=(u-.5)*w, y=(v-.5)*h; i ? shape.lineTo(x,y) : shape.moveTo(x,y); });
-  if(S && S.holes) for(const hl of S.holes){ const p = new THREE.Path(); hl.forEach(([u,v],i) => { const x=(u-.5)*w, y=(v-.5)*h; i ? p.lineTo(x,y) : p.moveTo(x,y); }); shape.holes.push(p); }
-  const b = Math.min(d*.32, Math.min(w,h)*.09, .006, S && S.holes && S.holes.length ? .0025 : 1);
-  const uvg = { generateTopUV(g,v,a,bb,c){ const f=i=>new THREE.Vector2(v[i*3]/w+.5, v[i*3+1]/h+.5); return [f(a),f(bb),f(c)]; },
-                generateSideWallUV(){ return [new THREE.Vector2(0,0),new THREE.Vector2(1,0),new THREE.Vector2(1,1),new THREE.Vector2(0,1)]; } };
-  const geo = new THREE.ExtrudeGeometry(shape, {depth:Math.max(.001,d-2*b), bevelEnabled:true, bevelThickness:b, bevelSize:b*.85, bevelOffset:-b*.85, bevelSegments:8, curveSegments:24, UVGenerator:uvg});
-  geo.translate(0,0,b); geo.computeVertexNormals();
-  if(flat) geo.rotateX(-Math.PI/2);
-  const t = photoTex(k);
-  const face = new THREE.MeshPhysicalMaterial({map:t, bumpMap:t, bumpScale:.35, roughness:.42, clearcoat:.35, clearcoatRoughness:.28});
-  const side = new THREE.MeshPhysicalMaterial({color:new THREE.Color(S ? S.edge : '#dddddd'), roughness:.45, clearcoat:.35, clearcoatRoughness:.3});
-  const m = new THREE.Mesh(geo, [face, side]); m.castShadow = m.receiveShadow = true;
-  const g = G(); g.add(m); return g; }
-function holeCenter(k, w){ const S = PHS[k]; if(!S || !S.holes || !S.holes[0]) return [0,0]; const h = w*S.aspect, pts = S.holes[0];
-  const u = pts.reduce((s,p)=>s+p[0],0)/pts.length, v = pts.reduce((s,p)=>s+p[1],0)/pts.length, vmax = Math.max(...pts.map(p=>p[1])), vmin = Math.min(...pts.map(p=>p[1]));
-  return [(u-.5)*w, (v-.5)*h, (vmax-vmin)*h]; }
 /* a plain house key, lying flat (blade along +x) */
 function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*2,false);
   const hole = new THREE.Path(); hole.absarc(-.005,0,.0028,0,Math.PI*2,true); s.holes.push(hole);
@@ -1193,16 +1222,6 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
   const g = new THREE.Group();
   for(const sh of [s,bl]){ const geo = new THREE.ExtrudeGeometry(sh,{depth:.0016,bevelEnabled:true,bevelThickness:.0003,bevelSize:.0003,bevelSegments:2,curveSegments:24}); geo.rotateX(-Math.PI/2);
     const mm = new THREE.Mesh(geo, mat); mm.castShadow = true; g.add(mm); }
-  return g; }
-/* wall-mounted: back on the wall at z=0, face toward +z */
-function photoBody(k, w, d, r){ const g=G(), h = w*PH_ASPECT[k];
-  add(g, rbox(w*.97,h*.97,d,r,PM.whiteM),0,0,d/2);
-  add(g, photoFace(k,w,h),0,0,d+.0004);
-  return g; }
-/* lying flat on a table: origin at the base, face toward +y (photo's top edge points to -z) */
-function photoFlat(k, w, d, r){ const g=G(), h = w*PH_ASPECT[k];
-  add(g, rbox(w*.97,d,h*.97,r,k==='fob'?mat(0x3a3d40,{r:.5}):PM.whiteM),0,d/2,0);
-  const f = add(g, photoFace(k,w,h),0,d+.0004,0); f.rotation.x = -Math.PI/2;
   return g; }
 /* soft fill light that follows the camera to the focused product, like a photographer's key light */
 const prodLight = new THREE.SpotLight(0xffffff, 0, 3.2, .42, .85, 1.2);

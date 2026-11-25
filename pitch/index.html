@@ -5475,7 +5475,7 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
 { const pg=$('#p-home'), pill=$('#hmode'), box=$('#tour3d');
   const set=m=>{ const d3=m==='3d'; pg.classList.toggle('d3',d3); pill.classList.toggle('d3',d3); document.body.classList.toggle('hd3',d3);
     pill.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.hm===m));
-    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=19&fb=76';   /* (Connect: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
+    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=20&fb=76';   /* (Connect: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
   /* run the 3D scene only while it is on screen (3D view picked and the home page showing) */
