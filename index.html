@@ -15,10 +15,12 @@
 <script>
 /* launch: reopen the app used last; "?pick" (the in-app Switch app button) shows the picker */
 (function () {
-  var last = null; try { last = localStorage.getItem('shpc_last'); } catch (e) {}
-  if (!/[?&]pick\b/.test(location.search) && (last === 'pitch' || last === 'recruit')) {
+  /* launch setting (Settings → Open on launch): 'last' (default), 'home', or an app */
+  var last = null, mode = 'last'; try { last = localStorage.getItem('shpc_last'); mode = localStorage.getItem('shpc_launch') || 'last'; } catch (e) {}
+  var to = mode === 'last' ? last : mode;
+  if (!/[?&]pick\b/.test(location.search) && (to === 'pitch' || to === 'recruit')) {
     document.documentElement.style.background = '#000';
-    location.replace(last + '/index.html' + location.hash);
+    location.replace(to + '/index.html' + location.hash);
   }
 })();
 </script>
@@ -129,6 +131,37 @@ a.card { display: block; text-decoration: none; }
   .card.mini .nm { font-size: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { .pl-line, .pb-route { animation-duration: .01s; animation-delay: 0s; } }
+
+/* ---- settings ---- */
+.brand .q { margin-left: auto; }
+.gear { flex: none; width: clamp(42px, 5.6vmin, 50px); height: clamp(42px, 5.6vmin, 50px); margin-left: clamp(10px, 1.6vmin, 16px); border: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; background: rgba(255,255,255,.08); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); transition: background .25s, transform .35s var(--ease); }
+.gear svg { width: 48%; height: 48%; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .6s var(--ease); }
+.gear:hover { background: rgba(255,255,255,.14); } .gear:hover svg { transform: rotate(60deg); } .gear:active { transform: scale(.92); }
+.sheet { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; visibility: hidden; }
+.sheet .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.5); opacity: 0; transition: opacity .35s; }
+.sheet .panel { position: relative; width: min(440px, 100%); max-height: calc(100% - 20px); overflow: auto; border-radius: 28px; padding: 22px 18px 18px; background: rgba(28,28,30,.78); -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 40px 80px -20px rgba(0,0,0,.8); opacity: 0; transform: translateY(18px) scale(.96); transition: opacity .3s, transform .45s var(--ease); }
+.sheet.on { visibility: visible; } .sheet.on .scrim { opacity: 1; } .sheet.on .panel { opacity: 1; transform: none; }
+.sheet .hd { display: flex; align-items: center; padding: 0 4px 0 6px; }
+.sheet h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+.sheet .x { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); display: grid; place-items: center; cursor: pointer; }
+.sheet .x svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; fill: none; }
+.sheet .lb { margin: 20px 6px 8px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.sheet .grp { border-radius: 18px; background: rgba(255,255,255,.06); overflow: hidden; }
+.opt { width: 100%; display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 0; background: none; color: #fff; font: inherit; text-align: left; cursor: pointer; transition: background .2s; }
+.opt + .opt { box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+.opt:hover { background: rgba(255,255,255,.05); } .opt:active { background: rgba(255,255,255,.1); }
+.opt .oi { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; overflow: hidden; }
+.opt .oi img { width: 100%; height: 100%; }
+.opt .oi svg { width: 58%; height: 58%; fill: none; stroke: #000; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.opt .ot { flex: 1; min-width: 0; } .opt .ot b { display: block; font-size: 17px; font-weight: 500; } .opt .ot small { display: block; font-size: 13px; color: rgba(255,255,255,.5); margin-top: 2px; }
+.opt .ck { width: 24px; height: 24px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.6px rgba(255,255,255,.25); display: grid; place-items: center; transition: background .25s, box-shadow .25s; }
+.opt .ck svg { width: 13px; height: 13px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(.5); transition: opacity .2s, transform .35s var(--ease); }
+.opt[aria-checked="true"] .ck { background: rgb(var(--g)); box-shadow: none; } .opt[aria-checked="true"] .ck svg { opacity: 1; transform: none; }
+.opt[disabled] { cursor: default; opacity: .45; } .opt[disabled]:hover { background: none; }
+.opt .soon { font-size: 11px; font-weight: 500; padding: 4px 9px; border-radius: 10px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+.sheet .note { margin: 12px 8px 2px; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,.45); }
+@media (orientation: portrait) { .gear { margin-left: auto; } }
+@media (orientation: portrait) and (max-width: 600px) { .sheet { place-items: end center; padding: 10px; } .sheet .panel { width: 100%; } }
 </style>
 </head>
 <body>
@@ -138,6 +171,7 @@ a.card { display: block; text-decoration: none; }
     <img src="icon-192.png" alt="">
     <div class="t"><small>SmartHomePros</small><b>Connect</b></div>
     <div class="q">Choose an app</div>
+    <button class="gear" aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1z"/></svg></button>
   </header>
   <section class="cards">
     <button class="card pitch" data-app="pitch" aria-label="Open Fast Pitch">
@@ -180,6 +214,21 @@ a.card { display: block; text-decoration: none; }
     </button>
   </section>
 </main>
+<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="stT">
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="hd"><h2 id="stT">Settings</h2><button class="x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="lb">Open on launch</div>
+    <div class="grp" role="radiogroup" aria-label="Open on launch">
+      <button class="opt" role="radio" data-v="last"><span class="oi" style="background:rgba(255,255,255,.9)"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/><path d="M12 8v4.5l3 1.8"/></svg></span><span class="ot"><b>Last used</b><small id="stLast">Whichever app you had open</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+      <button class="opt" role="radio" data-v="home"><span class="oi"><img src="icon-192.png" alt=""></span><span class="ot"><b>Connect home</b><small>Choose an app every time</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+      <button class="opt" role="radio" data-v="pitch"><span class="oi"><img src="pitch/assets/icon-192.png" alt=""></span><span class="ot"><b>Fast Pitch</b></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+      <button class="opt" role="radio" data-v="recruit"><span class="oi"><img src="recruit/icon.png" alt=""></span><span class="ot"><b>Fast Recruit</b></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+      <button class="opt" role="radio" disabled><span class="oi" style="background:linear-gradient(135deg,#ffad6e,rgb(255,135,54) 55%,#e6743e)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg></span><span class="ot"><b>The Playbook</b></span><span class="soon">Coming soon</span></button>
+    </div>
+    <p class="note">The Vivint logo or Switch app button inside any app always brings you back here.</p>
+  </div>
+</div>
 <script>
 (function () {
   var last = null; try { last = localStorage.getItem('shpc_last'); } catch (e) {}
@@ -207,6 +256,17 @@ a.card { display: block; text-decoration: none; }
       setTimeout(function () { location.href = app + '/index.html'; }, 560);
     });
   });
+  /* settings sheet */
+  var sh = document.querySelector('.sheet'), NAMES = { pitch: 'Fast Pitch', recruit: 'Fast Recruit' };
+  function mode() { try { return localStorage.getItem('shpc_launch') || 'last'; } catch (e) { return 'last'; } }
+  function paint() { var m = mode(); sh.querySelectorAll('.opt[data-v]').forEach(function (o) { o.setAttribute('aria-checked', String(o.dataset.v === m)); });
+    var l = null; try { l = localStorage.getItem('shpc_last'); } catch (e) {} document.getElementById('stLast').textContent = NAMES[l] ? 'Right now: ' + NAMES[l] : 'Whichever app you had open'; }
+  function open() { paint(); sh.classList.add('on'); setTimeout(function () { var c = sh.querySelector('.opt[aria-checked="true"]'); (c || sh.querySelector('.x')).focus(); }, 50); }
+  function close() { sh.classList.remove('on'); document.querySelector('.gear').focus(); }
+  document.querySelector('.gear').addEventListener('click', open);
+  sh.querySelector('.x').addEventListener('click', close); sh.querySelector('.scrim').addEventListener('click', close);
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && sh.classList.contains('on')) close(); });
+  sh.querySelectorAll('.opt[data-v]').forEach(function (o) { o.addEventListener('click', function () { try { localStorage.setItem('shpc_launch', o.dataset.v); } catch (e) {} paint(); }); });
   /* coming back with the browser's back button: put the picker back */
   addEventListener('pageshow', function (e) { if (e.persisted) { busy = false; document.querySelectorAll('.zoom').forEach(function (z) { z.remove(); }); } });
   if ('serviceWorker' in navigator && location.protocol === 'https:' && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});
