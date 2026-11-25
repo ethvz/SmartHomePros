@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>SmartHomePros Connect</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SHP Connect">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<script>
+/* launch: reopen the app used last; "?pick" (the in-app Switch app button) shows the picker */
+(function () {
+  var last = null; try { last = localStorage.getItem('shpc_last'); } catch (e) {}
+  if (!/[?&]pick\b/.test(location.search) && (last === 'pitch' || last === 'recruit')) {
+    document.documentElement.style.background = '#000';
+    location.replace(last + '/index.html' + location.hash);
+  }
+})();
+</script>
+<style>
+@font-face { font-family: 'Vivint Sans'; src: url(pitch/assets/fonts/VivintSans-Light.woff) format('woff'); font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Vivint Sans'; src: url(pitch/assets/fonts/VivintSans-Regular.woff) format('woff'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Vivint Sans'; src: url(pitch/assets/fonts/VivintSans-Medium.woff) format('woff'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Vivint Sans'; src: url(pitch/assets/fonts/VivintSans-Bold.woff) format('woff'); font-weight: 700; font-display: swap; }
+:root { --g: 5, 229, 175; --y: 223, 255, 26; --pad: clamp(16px, 3.2vmin, 40px); --gap: clamp(12px, 2.4vmin, 28px); --ease: cubic-bezier(.2, .8, .2, 1); }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: #000; color: #fff; overflow: hidden; overscroll-behavior: none; }
+body { font-family: 'Vivint Sans', -apple-system, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none; }
+.bg { position: fixed; inset: 0; pointer-events: none; background:
+  radial-gradient(60vmax 50vmax at 18% 0%, rgba(var(--g), .10), transparent 70%),
+  radial-gradient(60vmax 50vmax at 85% 100%, rgba(var(--y), .07), transparent 70%); }
+.app { position: fixed; inset: 0; display: flex; flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + var(--pad)) calc(env(safe-area-inset-right) + var(--pad)) calc(env(safe-area-inset-bottom) + var(--pad)) calc(env(safe-area-inset-left) + var(--pad)); gap: var(--gap); }
+
+/* brand */
+.brand { flex: none; display: flex; align-items: center; gap: 14px; opacity: 0; transform: translateY(-8px); animation: in .7s var(--ease) .05s forwards; }
+.brand img { width: clamp(38px, 6vmin, 56px); height: clamp(38px, 6vmin, 56px); border-radius: 24%; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
+.brand .t { display: flex; flex-direction: column; line-height: 1; }
+.brand .t small { font-size: clamp(11px, 1.5vmin, 14px); font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.brand .t b { font-size: clamp(26px, 4.4vmin, 44px); font-weight: 700; letter-spacing: -.02em; margin-top: 5px; }
+.brand .q { margin-left: auto; font-size: clamp(13px, 1.8vmin, 17px); color: rgba(255,255,255,.5); text-align: right; }
+
+/* the two apps */
+.cards { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+@media (orientation: portrait) { .cards { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } .brand .q { display: none; } }
+.card { position: relative; overflow: hidden; border: 0; padding: 0; margin: 0; border-radius: clamp(22px, 3.4vmin, 34px); background: #0c0f0e; color: #fff; text-align: left; cursor: pointer; font: inherit;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 30px 60px -30px rgba(0,0,0,.9);
+  opacity: 0; transform: translateY(24px) scale(.98); animation: in .8s var(--ease) forwards; transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+.card:nth-child(1) { animation-delay: .15s; } .card:nth-child(2) { animation-delay: .27s; }
+.card .ph { position: absolute; inset: 0; background-size: cover; background-position: center; transform: scale(1.04); transition: transform 1.2s var(--ease); }
+.card.pitch .ph { background-image: url(pitch/assets/home2.webp); }
+.card.recruit .ph { background-image: url(recruit/a_470ace19f4f41e262a08af30291d0034.webp); background-position: 38% 40%; }
+.card .sh { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.55) 62%, rgba(0,0,0,.92) 100%); }
+.card.pitch .sh { background: linear-gradient(180deg, rgba(0,0,0,0) 22%, rgba(0,0,0,.7) 58%, rgba(0,0,0,.95) 100%); }
+.card .bd { position: absolute; left: 0; right: 0; bottom: 0; padding: clamp(18px, 3.2vmin, 34px); display: flex; align-items: flex-end; gap: clamp(12px, 2vmin, 20px); }
+.card .ic { width: clamp(46px, 7.4vmin, 72px); height: clamp(46px, 7.4vmin, 72px); border-radius: 24%; flex: none; box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 10px 24px rgba(0,0,0,.5); }
+.card .tx { flex: 1; min-width: 0; }
+.card .ey { display: block; font-size: clamp(11px, 1.5vmin, 14px); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.card.pitch .ey { color: rgb(var(--g)); } .card.recruit .ey { color: rgb(var(--y)); }
+.card .nm { display: block; font-size: clamp(28px, 5.2vmin, 54px); font-weight: 700; letter-spacing: -.02em; line-height: 1.02; margin-top: 4px; }
+.card .ln { display: block; font-size: clamp(14px, 2vmin, 19px); font-weight: 400; color: rgba(255,255,255,.72); margin-top: 6px; }
+.card .go { width: clamp(44px, 6.6vmin, 60px); height: clamp(44px, 6.6vmin, 60px); border-radius: 50%; flex: none; display: grid; place-items: center; background: rgba(255,255,255,.12); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); transition: background .3s, transform .35s var(--ease); }
+.card .go svg { width: 38%; height: 38%; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: stroke .3s; }
+.card.pitch:hover .go, .card.pitch:focus-visible .go { background: rgb(var(--g)); } .card.recruit:hover .go, .card.recruit:focus-visible .go { background: rgb(var(--y)); }
+.card:hover .go svg, .card:focus-visible .go svg { stroke: #000; }
+.card .last { position: absolute; top: clamp(14px, 2.4vmin, 24px); left: clamp(14px, 2.4vmin, 24px); height: 28px; padding: 0 12px; border-radius: 14px; display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; background: rgba(0,0,0,.45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); }
+.card .last i { width: 6px; height: 6px; border-radius: 3px; }
+.card.pitch .last i { background: rgb(var(--g)); } .card.recruit .last i { background: rgb(var(--y)); }
+.card.was .last { display: inline-flex; }
+@media (hover: hover) { .card:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 40px 70px -30px rgba(0,0,0,.95); } .card:hover .ph { transform: scale(1.08); } }
+.card:active { transform: scale(.975); transition-duration: .12s; }
+.card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* open: the card grows to the whole screen, then the app loads */
+.zoom { position: fixed; z-index: 10; border-radius: 30px; overflow: hidden; pointer-events: none; transition: all .5s var(--ease); background: #000; }
+.zoom .ph, .zoom .sh { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.zoom::after { content: ''; position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity .35s ease .22s; }
+.zoom.full::after { opacity: 1; }
+@keyframes in { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .brand, .card { animation-duration: .01s; animation-delay: 0s !important; } .zoom { transition-duration: .01s; } }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<main class="app">
+  <header class="brand">
+    <img src="icon-192.png" alt="">
+    <div class="t"><small>SmartHomePros</small><b>Connect</b></div>
+    <div class="q">Choose an app</div>
+  </header>
+  <section class="cards">
+    <button class="card pitch" data-app="pitch" aria-label="Open Fast Pitch">
+      <span class="ph"></span><span class="sh"></span>
+      <span class="last"><i></i>Last used</span>
+      <span class="bd">
+        <img class="ic" src="pitch/assets/icon-192.png" alt="">
+        <span class="tx"><span class="ey">Sell</span><span class="nm">Fast Pitch</span><span class="ln">Win the door. Build the package.</span></span>
+        <span class="go"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+      </span>
+    </button>
+    <button class="card recruit" data-app="recruit" aria-label="Open Fast Recruit">
+      <span class="ph"></span><span class="sh"></span>
+      <span class="last"><i></i>Last used</span>
+      <span class="bd">
+        <img class="ic" src="recruit/icon.png" alt="">
+        <span class="tx"><span class="ey">Recruit</span><span class="nm">Fast Recruit</span><span class="ln">Show them the opportunity.</span></span>
+        <span class="go"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+      </span>
+    </button>
+  </section>
+</main>
+<script>
+(function () {
+  var last = null; try { last = localStorage.getItem('shpc_last'); } catch (e) {}
+  var c = last && document.querySelector('.card[data-app="' + last + '"]'); if (c) c.classList.add('was');
+  var busy = false;
+  document.querySelectorAll('.card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      if (busy) return; busy = true;
+      var app = card.dataset.app; try { localStorage.setItem('shpc_last', app); } catch (e) {}
+      var r = card.getBoundingClientRect(), z = document.createElement('div'), ph = card.querySelector('.ph');
+      z.className = 'zoom'; z.innerHTML = '<div class="ph"></div><div class="sh"></div>';
+      z.firstChild.style.backgroundImage = getComputedStyle(ph).backgroundImage; z.firstChild.style.backgroundPosition = getComputedStyle(ph).backgroundPosition;
+      z.style.left = r.left + 'px'; z.style.top = r.top + 'px'; z.style.width = r.width + 'px'; z.style.height = r.height + 'px';
+      document.body.appendChild(z);
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        z.style.left = '0px'; z.style.top = '0px'; z.style.width = innerWidth + 'px'; z.style.height = innerHeight + 'px'; z.style.borderRadius = '0px'; z.classList.add('full');
+      }); });
+      setTimeout(function () { location.href = app + '/index.html'; }, 560);
+    });
+  });
+  /* coming back with the browser's back button: put the picker back */
+  addEventListener('pageshow', function (e) { if (e.persisted) { busy = false; document.querySelectorAll('.zoom').forEach(function (z) { z.remove(); }); } });
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});
+})();
+</script>
+</body>
+</html>
