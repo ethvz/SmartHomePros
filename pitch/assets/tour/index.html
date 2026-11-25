@@ -246,7 +246,7 @@ import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
-const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=15'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
+const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=18'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
   for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const b=document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.min(92,Math.round(92*got/tot))+'%'); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
@@ -398,7 +398,7 @@ const M = {
   ceil:   mat(0xf4f2ee, {r:.95}),
   cut:    mat(0xf6f4f0, {r:.9}),          // section faces where the house is cut open
   trim:   phys(0x1c1e20, {r:.42, m:.35}),
-  roof:   phys(0xffffff, {r:.85, x:{map:TX.roof, normalMap:TX.roofN, roughnessMap:TX.roofR, color:0x9aa0a8}}),
+  roof:   phys(0xffffff, {r:.85, x:{map:TX.roof, normalMap:TX.roofN, roughnessMap:TX.roofR, color:0x6a7078}}),
   soffit: mat(0xe9e7e2, {r:.9}),
   ground: mat(0x060707, {r:1}),
   fence:  phys(0x2a2c2e, {r:.7}),
@@ -427,24 +427,6 @@ const EH = 6.3;            // eave / ceiling height of the two-storey volume
 // black void with the house on a concrete pad, like a model on a table (reference look)
 { const g = new THREE.PlaneGeometry(60, 60); g.rotateX(-Math.PI/2); worldUV(g);
   const ground = new THREE.Mesh(g, M.ground); ground.userData.plane = true; ground.position.set(0,-.36,2); ground.receiveShadow = true; scene.add(ground); }
-const concDark = mat(0x3f4140, {r:.95});
-slab(-11.2,12.9,-.35,.03,-7.2,6.6,M.conc);                                  // the pad (its front edge shows)
-slab(-10.6,-4.9,-.35,.045,6.6,11.2,M.conc);                                 // driveway runs on past the pad
-slab(-10.6,-4.9,.03,.045,3.9,6.6,M.conc);
-for(const z of [7.6,9.4]) slab(-10.6,-4.9,.045,.047,z-.008,z+.008,concDark,null,false);
-slab(7.15,9.05,0,.13,4.0,5.25,M.conc); slab(7.15,9.05,0,.075,5.25,5.65,M.conc);   // stoop + step at the front door
-slab(7.25,8.95,.03,.05,5.65,6.6,M.conc);                                    // walk to the street
-slab(-10.4,10.2,0,FL-.02,-6.2,4.2,M.plinth);                               // foundation
-const steel = phys(0x23201d, {r:.6, m:.6});
-const bed = (x1,x2,z1,z2) => { slab(x1,x2,0,.055,z1,z2,M.mulch,null,false);
-  slab(x1,x2,0,.07,z2-.012,z2,steel,null,false); slab(x1-.012,x1,0,.07,z1,z2,steel,null,false); slab(x2,x2+.012,0,.07,z1,z2,steel,null,false); };
-bed(-4.9,1.4,4.2,5.4);
-slab(-4.9,7.15,.03,.06,5.4,6.6,M.grass); slab(9.05,12.1,.03,.06,5.4,6.6,M.grass);   // lawn strips out front
-// pea-gravel strip along the great room and tower
-{ const gravel = mat(0x8b8780, {r:1, x:{normalMap:TX.concN, normalScale:new THREE.Vector2(3,3), map:TX.conc}});
-  slab(1.4,7.15,0,.04,4.2,4.75,gravel,null,false); slab(9.05,12.05,0,.04,4.2,4.75,gravel,null,false);
-  slab(11.5,12.05,0,.04,-6.2,4.2,gravel,null,false); }
-slab(12.1,12.9,.03,.06,-7.2,6.6,M.grass);                                   // side yard behind the fence
 
 /* ------------------------------------------------------------------ walls with openings */
 /* A wall along X (fixed z=at) or along Z (fixed x=at). Openings {a,b,lo,hi,kind:'window'|'door'|'none', lit} */
@@ -480,47 +462,21 @@ const setMat = (g, m) => g.traverse(o=>{ if(o.isMesh && o.material===M.siding) o
 
 /* Garage: x -10..-5.2, z -6..4 */
 const GH = 3.05;
-wall({axis:'x', at:3.9, from:-10.2, to:-5.2, h:GH, y0:.04, open:[{a:-9.55,b:-5.85,lo:0,hi:2.45,kind:'none'}]});
-wall({axis:'z', at:-10.1, from:-6, to:3.8, h:GH, y0:.04, open:[{a:-3,b:-1.2,lo:1.1,hi:2.2,kind:'window'}]});
-wall({axis:'x', at:-5.9, from:-10.2, to:-5.2, h:GH, y0:.04});
 const GDM = {door:phys(0x3a3d40,{r:.5,m:.3}), groove:phys(0x1c1e20,{r:.42,m:.35})};   // garage door fades when a garage product is open
 { const gd = new THREE.Group(); scene.add(gd);
   slab(-9.55,-5.85,.04,2.49,3.86,3.92,GDM.door,gd);
   for(let i=1;i<5;i++) slab(-9.55,-5.85,.04+i*.49-.012,.04+i*.49+.012,3.92,3.935,GDM.groove,gd);
   // garage interior: slab, entry door to the house, opener on the ceiling
-  slab(-10,-5.2,.04,.06,-5.8,3.8,mat(0x8f8e8a,{r:.9,x:{map:TX.conc,normalMap:TX.concN}}));
   slab(-5.24,-5.2,.06,2.1,1.0,1.92,M.door); slab(-5.26,-5.2,.06,2.16,.94,1.0,M.trim); slab(-5.26,-5.2,.06,2.16,1.92,1.98,M.trim); slab(-5.26,-5.2,2.1,2.16,.94,1.98,M.trim);
   slab(-7.95,-7.45,2.62,2.82,-1.2,-.6,mat(0xe9e8e4,{r:.6}));                // opener motor
   slab(-7.73,-7.67,2.82,2.86,-.6,3.7,M.blackM);                            // rail
   { const l = new THREE.PointLight(0xfff0dc, 3, 6, 2); l.position.set(-7.7,2.5,-.9); scene.add(l); }
-  slab(-9.62,-5.78,2.49,2.57,3.8,4.02,M.trim,gd); slab(-9.62,-9.55,.04,2.57,3.8,4.02,M.trim,gd); slab(-5.85,-5.78,.04,2.57,3.8,4.02,M.trim,gd);
-  // shed roof sloping away from the main house
-  const r = new THREE.Mesh(new THREE.BoxGeometry(5.9,.2,11), M.roof); worldUV(r.geometry); r.userData.box = true;
-  r.position.set(-7.75,3.45,-1); r.rotation.z = .11; r.castShadow = r.receiveShadow = true; scene.add(r);
-  slab(-10.75,-10.6,2.9,3.25,-6.5,4.5,M.fascia); }
+  slab(-9.62,-5.78,2.49,2.57,3.79,4.02,M.trim,gd); slab(-9.62,-9.55,.06,2.57,3.79,4.02,M.trim,gd); slab(-5.85,-5.78,.06,2.57,3.79,4.02,M.trim,gd);
+}
 
-/* Floor plan (reference house): garage | two-storey volume | great room. The front door is in the great room's front
-   wall, and the house is cut open on the right SIDE (x = 9.9), so from the cut you look into the living room and see
-   the inside of the front door. One long side-gable roof per volume; the great room is vaulted, so the cut shows the "A". */
-/* Two-storey volume: x -5.2..1.6, z -6..4 (closed; windows glow) */
-const front = wall({axis:'x', at:3.9, from:-5.2, to:1.6, h:EH, open:[
-  {a:-4.35,b:-2.65,lo:.85,hi:2.55,kind:'window',lit:true,mull:[.5]},
-  {a:-1.75,b:-0.35,lo:.85,hi:2.55,kind:'window',lit:true,mull:[.5]},
-  {a:-4.25,b:-2.75,lo:3.95,hi:5.45,kind:'window',lit:true},
-  {a:-2.05,b:-0.55,lo:3.95,hi:5.45,kind:'window',lit:true}]});
-wall({axis:'z', at:-5.1, from:-6, to:3.8, h:EH, open:[{a:-3.6,b:-1.6,lo:3.95,hi:5.3,kind:'window',lit:true}]});
-wall({axis:'x', at:-5.9, from:-5.2, to:1.6, h:EH});
-slab(-5,1.4,EH+FL-.02,EH+FL+.2,-5.8,3.8,M.ceil);   // lid
-
-/* Great room: x 1.6..9.9, z -6..4, double height, cut open on the right side */
+/* The house itself (walls, gables, roofs, porch roof, garage, tower, fence, pad, drive, lawns) is a solid model built in
+   Blender (mdl/house.glb) with real openings and a lightmap of its own; it loads further down. Here: only the live parts. */
 const DOOR = [7.6, 8.6], SASH = [2.9, 4.8];
-const shared = wall({axis:'z', at:1.5, from:-6, to:4, h:EH+.6, m:M.paint});   // shared with the two-storey volume; painted room side
-wall({axis:'x', at:-5.9, from:1.4, to:9.9, h:EH+.12, faces:{pos:M.paint, neg:M.siding, side:M.cut}});
-wall({axis:'x', at:3.9, from:1.6, to:9.9, h:EH+.12, faces:{pos:M.siding, neg:M.paint, side:M.cut}, open:[
-  {a:SASH[0],b:SASH[1],lo:.85,hi:2.45,kind:'none'},
-  {a:DOOR[0],b:DOOR[1],lo:0,hi:2.35,kind:'none'},
-  {a:3.0,b:4.5,lo:3.95,hi:5.45,kind:'window',lit:true},
-  {a:6.0,b:7.5,lo:3.95,hi:5.45,kind:'window',lit:true}]});
 /* front door: slab door, glass sidelight strip, trim, lever inside and out */
 { const [a,b] = DOOR, d = new THREE.Group(); scene.add(d);
   slab(a,b,FL,FL+2.35,3.84,3.9,M.door,d);
@@ -538,48 +494,9 @@ wall({axis:'x', at:3.9, from:1.6, to:9.9, h:EH+.12, faces:{pos:M.siding, neg:M.p
   slab(a-.08,b+.08,lo+.035,lo+.055,3.665,3.835,M.cab);
   slab(a-.04,b+.04,lo-.12,lo+.035,3.7,3.84,M.paint); }
 slab(1.6,9.9,FL-.02,FL,-5.8,3.8,M.floor);                  // floor
-slab(1.4,9.92,FL-.12,FL-.02,-6,4,M.cut);                   // floor section edge (shows along the cut)
-slab(9.8,9.92,FL-.12,FL,-6,4,M.cut);
-
-/* porch roof across the whole front: dark shingles sloping out over the entry (reference house) */
-{ const len = 1.75, a = .24, x0 = -5.6, x1 = 9.95, g = new THREE.BoxGeometry(x1-x0,.16,len); worldUV(g);
-  const r = new THREE.Mesh(g, [M.roof,M.roof,M.roof,M.soffit,M.roof,M.roof]); r.userData.box = true;
-  r.position.set((x0+x1)/2, 3.42, 3.9+len/2*Math.cos(a)); r.rotation.x = a; r.castShadow = r.receiveShadow = true; scene.add(r);
-  slab(x0,x1+.05,3.0,3.24,5.6,5.72,M.fascia); }
-
-/* Dark board-and-batten volume at the back right corner (the Outdoor Camera Pro is on it) */
-slab(10.0,11.0,0,7.2,-6.2,-4.6,M.batten);
-slab(9.95,11.1,7.2,7.35,-6.3,-4.5,M.fascia);
-
-/* a gable wall built from thin horizontal boxes (so it bakes like the other walls); profile(y) gives [a,b] at height y */
-function gable(axis, at, y0, y1, prof, m, t=.2, step=.14){
-  for(let y=y0; y<y1-1e-3; y+=step){ const yt = Math.min(y+step, y1), [a,b] = prof(yt); if(b-a < .02) break;
-    if(axis==='x') slab(a,b,y,yt,at-t/2,at+t/2,m); else slab(at-t/2,at+t/2,y,yt,a,b,m); } }
-/* side-gable roof (ridge along x at z = -1): x from xa to xb, rise; underside painted where it is a vaulted ceiling */
-const ROOF = {z0:-6.6, z1:4.6, zr:-1, eY:EH+FL+.22};
-function sideGable(xa, xb, rise, inner, cutEnd){
-  const {z0, z1, zr, eY} = ROOF, ridgeY = eY+rise, pitch = Math.atan2(rise, zr-z0);
-  for(const [zA,zB,sgn] of [[z0,zr,-1],[zr,z1,1]]){ const len = Math.hypot(zB-zA, rise)+.1;
-    const ms = [cutEnd ? M.cut : M.roof, M.roof, M.roof, inner ? M.ceil : M.roof, M.roof, M.roof];
-    const r = new THREE.Mesh(new THREE.BoxGeometry(xb-xa,.2,len), ms); worldUV(r.geometry); r.userData.box = true;
-    r.position.set((xa+xb)/2, (eY+ridgeY)/2+.07, (zA+zB)/2); r.rotation.x = sgn*pitch; r.castShadow = r.receiveShadow = true; scene.add(r); }
-  slab(xa,xb,eY-.18,eY+.02,z1-.22,z1,M.fascia); slab(xa,xb,eY-.18,eY+.02,z0,z0+.22,M.fascia);
-  return ridgeY; }
-const RIDGE_L = 1.35, RIDGE_G = 3.1;
-{ const ridgeY = sideGable(-5.75, 1.42, RIDGE_L, false, false), {z0,z1,zr,eY} = ROOF;
-  gable('z', -5.0, eY-.02, ridgeY, y => { const f = (y-eY)/(ridgeY-eY); return [z0+.4+(zr-z0-.4)*f, z1-.4-(z1-.4-zr)*f]; }, M.siding); }
-{ const ridgeY = sideGable(1.4, 10.3, RIDGE_G, true, true), {z0,zr,eY} = ROOF, half = zr-z0;
-  // far gable over the shared wall (painted inside), with a row of small clerestory windows above the lower roof
-  const y0 = EH+FL+.6;
-  gable('z', 1.5, y0, ridgeY, y => { const h = half*(ridgeY-y+.12)/(ridgeY-eY); return [Math.max(-6, zr-h), Math.min(4, zr+h)]; }, M.paint);
-  for(const zc of [-2.55,-1.55,-.45,.55]){ const lo = 8.15, hi = 8.7, w = .26;
-    for(const [x0,x1,g] of [[1.6,1.63,M.glassDark],[1.37,1.4,M.glassDark]]) slab(x0,x1,lo,hi,zc-w,zc+w,g,null,false);
-    for(const x of [1.6,1.37]){ slab(x,x+.04,lo-.04,lo,zc-w-.04,zc+w+.04,M.trim,null,false); slab(x,x+.04,hi,hi+.04,zc-w-.04,zc+w+.04,M.trim,null,false);
-      slab(x,x+.04,lo,hi,zc-w-.04,zc-w,M.trim,null,false); slab(x,x+.04,lo,hi,zc+w,zc+w+.04,M.trim,null,false); } } }
-/* dark fence and a tree off the back right */
-{ for(let z=-6.9; z<-2.2; z+=.16) slab(12.25,12.31,.03,1.85,z,z+.13,M.fence,null,false);
-  slab(12.2,12.36,1.85,1.9,-6.95,-2.1,M.fence,null,false);
-  const leaf = new THREE.MeshStandardMaterial({color:0x2e4a2c, roughness:.9, flatShading:true}), bark = mat(0x3b2f27,{r:1});
+slab(9.8,9.92,FL-.12,FL,-6,4,M.cut);                       // the floor's cut edge
+/* a tree off the back right */
+{  const leaf = new THREE.MeshStandardMaterial({color:0x2e4a2c, roughness:.9, flatShading:true}), bark = mat(0x3b2f27,{r:1});
   const tree = new THREE.Group(); tree.position.set(13.2,0,-4.6); scene.add(tree);
   const tr = cyl(.14,3.2,bark,10); tr.position.y = 1.6; tree.add(tr);
   for(const [x,y,z,r] of [[0,3.6,0,1.5],[.7,4.4,.3,1.1],[-.6,4.6,-.2,1.15],[.1,5.4,.1,1.0],[.4,3.2,-.7,1.0],[-.5,3.4,.6,1.0]]){
@@ -710,7 +627,26 @@ for(const [x,z,r] of [[-4.2,4.95,.3],[-3.0,5.05,2.1],[.5,4.85,1.2]]) model('fern
 for(const [x,z,r,w] of [[-4.75,5.0,0,.9],[-2.65,4.55,1.4,.8],[1.05,5.0,2.2,.8],[-.15,4.55,.6,.7],[11.75,3.9,1,.8],[11.75,1.8,2.5,.9],[11.75,-.6,4,.8],[2.8,4.5,1.2,.8],[5.6,4.5,3.3,.8],[8.4,4.5,.4,.8]])
   model('grass_tuft', {pos:V(x,.02,z), rotY:r, fit:{w:w}, shadow:false});
 // an economy car parked straight on the drive, nose to the garage
-model('car2', {pos:V(-7.7,.045,6.4), rotY:-Math.PI/2, fit:{w:2.69}});
+model('car4', {pos:V(-7.75,.045,7.5), rotY:Math.PI, tweak:o=>o.traverse(m=>{ const a = m.material; if(!m.isMesh || !a) return;
+  if(/glass/i.test(a.name||'')){ a.transparent = true; a.opacity = .82; }
+  if(/tail|brake|rear.?light/i.test(a.name||'')){ a.emissive && a.emissive.set(0x8a0c0c); a.emissiveIntensity = 1.2; } })});   // grey sedan: "Tesla 2018 Model 3" by Ameer Studio (CC BY 4.0), modified   // sleek grey sedan ("Car Concept", CC BY 4.0); glass made cheap for iPads
+/* the house: one solid model (Blender) with its own baked lightmap */
+M.gravel = mat(0x8b8780, {r:1});
+const SH_MAP = {stucco:M.siding, paint:M.paint, cut:M.cut, roof:M.roof, soffit:M.soffit, fascia:M.fascia, trim:M.trim, conc:M.conc, grass:M.grass,
+  mulch:M.mulch, gravel:M.gravel, batten:M.batten, fence:M.fence, ceil:M.ceil, plinth:M.plinth, garage:M.garage, glassLit:M.glassLit, glassDark:M.glassDark};
+{ let done; MODEL_P.push(new Promise(r => { done = r; setTimeout(r, 25000); }));
+  const shLM = (__PK['bake/shell.webp'] && !/nobake|bakeexport/.test(location.search)) ? texLoader.load(PK('bake/shell.webp')) : null;
+  const shK = shLM ? fetch(PK('bake/shell.json')).then(r=>r.json()).then(j=>j.k).catch(()=>2.5) : Promise.resolve(1);
+  if(shLM){ shLM.channel = 1; shLM.colorSpace = THREE.SRGBColorSpace; shLM.flipY = false; }
+  Promise.all([glb('house'), shK]).then(([g, k]) => { const o = g.scene, cache = new Map();
+    o.traverse(m => { if(!m.isMesh) return; m.userData.shell = true;
+      const base = SH_MAP[(m.material.name||'').replace(/\.\d+$/,'')] || M.siding;
+      if(shLM && base !== M.glassLit && base !== M.glassDark){
+        if(!cache.has(base)) cache.set(base, new THREE.MeshBasicMaterial({color:base.color.clone(), map:base.map||null, lightMap:shLM, lightMapIntensity:k*Math.PI}));
+        m.material = cache.get(base); m.castShadow = m.receiveShadow = false;
+      } else { m.material = base; m.castShadow = true; m.receiveShadow = true; } });
+    scene.add(o); done(); }).catch(e => { console.warn('house', e); done(); });
+}
 
 /* ------------------------------------------------------------------ baked lighting
    Every large diffuse surface (walls, floors, roof, lawn, hardscape, cabinets) gets a second UV set packed into one
@@ -1384,6 +1320,8 @@ if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).th
   const hide = [];
   scene.traverse(o => { if(o.isMesh && (o.material.type==='MeshBasicMaterial' || (o.material.transparent && o.material.opacity < .9 && !o.material.map))) hide.push(o); });
   for(const p of PRODUCTS) hide.push(p.model); for(const h of hitMeshes) hide.push(h);
+  scene.traverse(o => { if(o.isMesh && o.userData.shell) hide.push(o); });
+  BAKE.meshes.forEach((o,i) => { o.name = 'bk_'+i; });   // the Blender side bakes only these (cars etc. also carry a 2nd UV set)   // the house model is baked from its Blender file
   hide.forEach(o => { o.userData._v = o.visible; o.visible = false; });
   const lights = []; scene.updateMatrixWorld(true);
   scene.traverse(o => { if(!o.isLight || !o.visible || o===prodLight) return; const L = {type:o.type, color:o.color.toArray(), intensity:o.intensity, pos:o.getWorldPosition(new THREE.Vector3()).toArray()};
@@ -1396,5 +1334,5 @@ if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).th
 // test hooks for review
 window.__tour = { focus:k=>focus(byKey[k]), overview, state, camera, controls, scene, THREE };
 </script>
-<p id="credits" style="position:fixed;left:12px;bottom:4px;margin:0;font-size:9px;color:rgba(255,255,255,.28);z-index:1;pointer-events:none">Sofa: Wayfair (CC BY 4.0) · Car: “Compact ’07” by Daniel Zhabotinsky (CC BY 4.0) · Furniture &amp; textures: Poly Haven (CC0)</p>
+<p id="credits" style="position:fixed;left:12px;bottom:4px;margin:0;font-size:9px;color:rgba(255,255,255,.28);z-index:1;pointer-events:none">Sofa: Wayfair (CC BY 4.0) · Car: “Tesla 2018 Model 3” by Ameer Studio (CC BY 4.0, modified) · Furniture &amp; textures: Poly Haven (CC0)</p>
 </body></html>
