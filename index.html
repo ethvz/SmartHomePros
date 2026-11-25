@@ -121,7 +121,7 @@ a.card { display: block; text-decoration: none; }
 @keyframes dot { 0%, 100% { opacity: .35; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.15); } }
 @keyframes blink { 50% { opacity: .3; } }
 @keyframes nope { 0%, 100% { translate: 0; } 20% { translate: -7px; } 40% { translate: 6px; } 60% { translate: -4px; } 80% { translate: 2px; } }
-.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 28px); translate: -50% 20px; opacity: 0; z-index: 20; padding: 12px 18px; border-radius: 16px; font-size: 15px; background: rgba(28,28,30,.82); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: opacity .3s, translate .4s var(--ease); pointer-events: none; }
+.toast { position: fixed; z-index: 40 !important; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 28px); translate: -50% 20px; opacity: 0; z-index: 20; padding: 12px 18px; border-radius: 16px; font-size: 15px; background: rgba(28,28,30,.82); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: opacity .3s, translate .4s var(--ease); pointer-events: none; }
 .toast.on { opacity: 1; translate: -50% 0; }
 @media (orientation: portrait) and (max-width: 600px) {
   .cards { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto auto; }
@@ -137,23 +137,25 @@ a.card { display: block; text-decoration: none; }
 .gear { flex: none; width: clamp(42px, 5.6vmin, 50px); height: clamp(42px, 5.6vmin, 50px); margin-left: clamp(10px, 1.6vmin, 16px); border: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; background: rgba(255,255,255,.08); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); transition: background .25s, transform .35s var(--ease); }
 .gear svg { width: 48%; height: 48%; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .6s var(--ease); }
 .gear:hover { background: rgba(255,255,255,.14); } .gear:hover svg { transform: rotate(60deg); } .gear:active { transform: scale(.92); }
-.sheet { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 20px; visibility: hidden; }
+.sheet { position: fixed; inset: 0; z-index: 30; padding: calc(env(safe-area-inset-top) + clamp(14px, 3.6vmin, 44px)) calc(env(safe-area-inset-right) + clamp(14px, 3.6vmin, 44px)) calc(env(safe-area-inset-bottom) + clamp(14px, 3.6vmin, 44px)) calc(env(safe-area-inset-left) + clamp(14px, 3.6vmin, 44px)); visibility: hidden; }
 .sheet .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.5); opacity: 0; transition: opacity .35s; }
-.sheet .panel { position: relative; width: min(440px, 100%); max-height: calc(100% - 20px); overflow: auto; border-radius: 28px; padding: 22px 18px 18px; background: rgba(28,28,30,.78); -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 40px 80px -20px rgba(0,0,0,.8); opacity: 0; transform: translateY(18px) scale(.96); transition: opacity .3s, transform .45s var(--ease); }
+.sheet .panel { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; border-radius: clamp(24px, 3.6vmin, 36px); background: rgba(24,24,26,.74); -webkit-backdrop-filter: blur(34px) saturate(1.4); backdrop-filter: blur(34px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 40px 80px -20px rgba(0,0,0,.8); opacity: 0; transform: translateY(22px) scale(.97); transition: opacity .3s, transform .5s var(--ease); }
 .sheet.on { visibility: visible; } .sheet.on .scrim { opacity: 1; } .sheet.on .panel { opacity: 1; transform: none; }
-.sheet .hd { display: flex; align-items: center; padding: 0 4px 0 6px; }
-.sheet h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
-.sheet .x { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); display: grid; place-items: center; cursor: pointer; }
+.sheet .hd { flex: none; display: flex; align-items: center; padding: clamp(18px, 3vmin, 30px) clamp(18px, 3vmin, 30px) 6px; }
+.sheet .bdy { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; padding: 0 clamp(18px, 3vmin, 30px) clamp(18px, 3vmin, 30px); display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(18px, 3vmin, 34px); align-content: start; }
+@media (max-width: 760px) { .sheet .bdy { grid-template-columns: 1fr; } }
+.sheet h2 { margin: 0; font-size: clamp(26px, 4vmin, 38px); font-weight: 700; letter-spacing: -.02em; }
+.sheet .x { margin-left: auto; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); display: grid; place-items: center; cursor: pointer; transition: background .2s, transform .3s var(--ease); } .sheet .x:hover { background: rgba(255,255,255,.18); } .sheet .x:active { transform: scale(.9); }
 .sheet .x svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; fill: none; }
 .sheet .lb { margin: 20px 6px 8px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.5); }
 .sheet .grp { border-radius: 18px; background: rgba(255,255,255,.06); overflow: hidden; }
 .opt { width: 100%; display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 0; background: none; color: #fff; font: inherit; text-align: left; cursor: pointer; transition: background .2s; }
 .opt + .opt { box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
 .opt:hover { background: rgba(255,255,255,.05); } .opt:active { background: rgba(255,255,255,.1); }
-.opt .oi { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; overflow: hidden; }
-.opt .oi img { width: 100%; height: 100%; }
+.opt .oi, .dlrow .oi { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; overflow: hidden; }
+.opt .oi img, .dlrow .oi img { width: 100%; height: 100%; }
 .opt .oi svg { width: 58%; height: 58%; fill: none; stroke: #000; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.opt .ot { flex: 1; min-width: 0; } .opt .ot b { display: block; font-size: 17px; font-weight: 500; } .opt .ot small { display: block; font-size: 13px; color: rgba(255,255,255,.5); margin-top: 2px; }
+.opt .ot, .dlrow .ot { flex: 1; min-width: 0; } .opt .ot b, .dlrow .ot b { display: block; font-size: 17px; font-weight: 500; } .opt .ot small, .dlrow .ot small { display: block; font-size: 13px; color: rgba(255,255,255,.5); margin-top: 2px; }
 .opt .ck { width: 24px; height: 24px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.6px rgba(255,255,255,.25); display: grid; place-items: center; transition: background .25s, box-shadow .25s; }
 .opt .ck svg { width: 13px; height: 13px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(.5); transition: opacity .2s, transform .35s var(--ease); }
 .opt[aria-checked="true"] .ck { background: rgb(var(--g)); box-shadow: none; } .opt[aria-checked="true"] .ck svg { opacity: 1; transform: none; }
@@ -161,7 +163,34 @@ a.card { display: block; text-decoration: none; }
 .opt .soon { font-size: 11px; font-weight: 500; padding: 4px 9px; border-radius: 10px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
 .sheet .note { margin: 12px 8px 2px; font-size: 13px; line-height: 1.4; color: rgba(255,255,255,.45); }
 @media (orientation: portrait) { .gear { margin-left: auto; } }
-@media (orientation: portrait) and (max-width: 600px) { .sheet { place-items: end center; padding: 10px; } .sheet .panel { width: 100%; } }
+
+
+/* offline downloads */
+.dlrow { display: flex; align-items: center; gap: 14px; padding: 13px 16px; position: relative; }
+.dlrow + .dlrow { box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+.dlrow .st { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 2px; display: block; }
+.dlrow.ready .st { color: rgb(var(--g)); }
+.dlrow .bar { position: absolute; left: 16px; right: 16px; bottom: 6px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.08); overflow: hidden; opacity: 0; transition: opacity .3s; }
+.dlrow .bar i { display: block; height: 100%; width: 0; background: rgb(var(--g)); border-radius: 2px; transition: width .35s var(--ease); }
+.dlrow.busy .bar { opacity: 1; }
+.dlrow .pct { font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; color: rgba(255,255,255,.75); }
+.dlrow .ok { width: 24px; height: 24px; border-radius: 50%; background: rgb(var(--g)); display: none; place-items: center; }
+.dlrow .ok svg { width: 13px; height: 13px; fill: none; stroke: #000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.dlrow.ready .ok { display: grid; }
+.dlw { position: relative; margin-top: 12px; }
+.dlb { width: 100%; height: 54px; border: 0; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 10px; font: inherit; font-size: 17px; font-weight: 700; color: #000; background: rgb(var(--g)); cursor: pointer; transition: transform .25s var(--ease), filter .2s, opacity .2s; }
+.dlb svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.dlb .cv { transition: transform .35s var(--ease); } .dlw.open .dlb .cv { transform: rotate(180deg); }
+.dlb:hover { filter: brightness(1.06); } .dlb:active { transform: scale(.97); }
+.dlb[disabled] { opacity: .35; cursor: default; transform: none; }
+.dlm { position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 2; border-radius: 18px; padding: 6px; background: rgba(44,44,46,.92); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 24px 50px rgba(0,0,0,.6); opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top center; pointer-events: none; transition: opacity .2s, transform .3s var(--ease); }
+.dlw.open .dlm { opacity: 1; transform: none; pointer-events: auto; }
+.dlm button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: 0; border-radius: 12px; background: none; color: #fff; font: inherit; font-size: 16px; text-align: left; cursor: pointer; }
+.dlm button:hover { background: rgba(255,255,255,.08); } .dlm button:active { background: rgba(255,255,255,.14); }
+.dlm button img, .dlm button .ai { width: 28px; height: 28px; border-radius: 8px; flex: none; }
+.dlm button .ai { display: grid; place-items: center; background: rgb(var(--g)); } .dlm button .ai svg { width: 60%; height: 60%; fill: none; stroke: #000; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.dlm button small { margin-left: auto; font-size: 13px; color: rgba(255,255,255,.45); }
+.dlm button[disabled] { opacity: .4; cursor: default; } .dlm button[disabled]:hover { background: none; }
 </style>
 </head>
 <body>
@@ -218,15 +247,35 @@ a.card { display: block; text-decoration: none; }
   <div class="scrim"></div>
   <div class="panel">
     <div class="hd"><h2 id="stT">Settings</h2><button class="x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="bdy"><div>
     <div class="lb">Open on launch</div>
-    <div class="grp" role="radiogroup" aria-label="Open on launch">
+<div class="grp" role="radiogroup" aria-label="Open on launch">
       <button class="opt" role="radio" data-v="last"><span class="oi" style="background:rgba(255,255,255,.9)"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/><path d="M12 8v4.5l3 1.8"/></svg></span><span class="ot"><b>Last used</b><small id="stLast">Whichever app you had open</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
       <button class="opt" role="radio" data-v="home"><span class="oi"><img src="icon-192.png" alt=""></span><span class="ot"><b>Connect home</b><small>Choose an app every time</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-      <button class="opt" role="radio" data-v="pitch"><span class="oi"><img src="pitch/assets/icon-192.png" alt=""></span><span class="ot"><b>Fast Pitch</b></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-      <button class="opt" role="radio" data-v="recruit"><span class="oi"><img src="recruit/icon.png" alt=""></span><span class="ot"><b>Fast Recruit</b></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-      <button class="opt" role="radio" disabled><span class="oi" style="background:linear-gradient(135deg,#ffad6e,rgb(255,135,54) 55%,#e6743e)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg></span><span class="ot"><b>The Playbook</b></span><span class="soon">Coming soon</span></button>
+      <button class="opt" role="radio" data-v="pitch"><span class="oi"><img src="pitch/assets/icon-192.png" alt=""></span><span class="ot"><b>Fast Pitch</b><small>Sell</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+      <button class="opt" role="radio" data-v="recruit"><span class="oi"><img src="recruit/icon.png" alt=""></span><span class="ot"><b>Fast Recruit</b><small>Recruit</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+      <button class="opt" role="radio" disabled><span class="oi" style="background:linear-gradient(135deg,#ffad6e,rgb(255,135,54) 55%,#e6743e)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg></span><span class="ot"><b>The Playbook</b><small>Train</small></span><span class="soon">Coming soon</span></button>
     </div>
-    <p class="note">The Vivint logo or Switch app button inside any app always brings you back here.</p>
+        <p class="note">The Vivint logo or Switch app button inside any app always brings you back here.</p>
+    </div>
+    <div>
+    <div class="lb">Offline downloads</div>
+    <div class="grp">
+      <div class="dlrow" data-k="pitch"><span class="oi"><img src="pitch/assets/icon-192.png" alt=""></span><span class="ot"><b>Fast Pitch</b><span class="st">Checking…</span></span><span class="pct"></span><span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="bar"><i></i></span></div>
+      <div class="dlrow" data-k="recruit"><span class="oi"><img src="recruit/icon.png" alt=""></span><span class="ot"><b>Fast Recruit</b><span class="st">Checking…</span></span><span class="pct"></span><span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="bar"><i></i></span></div>
+    </div>
+    <div class="dlw">
+      <button class="dlb" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg><span>Download for offline</span><svg class="cv" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></button>
+      <div class="dlm" role="menu">
+        <button role="menuitem" data-dl="all"><span class="ai"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg></span>All apps</button>
+        <button role="menuitem" data-dl="pitch"><img src="pitch/assets/icon-192.png" alt="">Fast Pitch<small></small></button>
+        <button role="menuitem" data-dl="recruit"><img src="recruit/icon.png" alt="">Fast Recruit<small></small></button>
+      </div>
+    </div>
+    <p class="note" id="dlNote">Saves every page, photo and video so the apps work with no signal. Downloads stay up to date when the apps change.</p>
+    </div>
+    </div>
+
   </div>
 </div>
 <script>
@@ -265,8 +314,68 @@ a.card { display: block; text-decoration: none; }
   function close() { sh.classList.remove('on'); document.querySelector('.gear').focus(); }
   document.querySelector('.gear').addEventListener('click', open);
   sh.querySelector('.x').addEventListener('click', close); sh.querySelector('.scrim').addEventListener('click', close);
-  addEventListener('keydown', function (e) { if (e.key === 'Escape' && sh.classList.contains('on')) close(); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && sh.classList.contains('on')) { if (dlw.classList.contains('open')) menu(false); else close(); } });
   sh.querySelectorAll('.opt[data-v]').forEach(function (o) { o.addEventListener('click', function () { try { localStorage.setItem('shpc_launch', o.dataset.v); } catch (e) {} paint(); }); });
+  /* offline downloads: the apps' own offline helpers (pitch/sw.js, recruit/sw.js), driven from here */
+  var OK = 'serviceWorker' in navigator && location.protocol === 'https:' && /github\.io$/.test(location.hostname);
+  var D = { pitch: { st: 'idle', f: 0 }, recruit: { st: 'idle', f: 0 } }, fpLatest = null, fpHave = null;
+  var dlw = sh.querySelector('.dlw'), dlb = sh.querySelector('.dlb');
+  function row(k) { return sh.querySelector('.dlrow[data-k="' + k + '"]'); }
+  function paintDl() {
+    ['pitch', 'recruit'].forEach(function (k) {
+      var d = D[k], r = row(k), t = '', p = '';
+      if (!OK) t = 'Available in the Home Screen app';
+      else if (d.st === 'busy') { t = 'Downloading…'; p = Math.round(d.f * 100) + '%'; }
+      else if (d.st === 'ready') t = 'Ready offline';
+      else if (d.st === 'update') t = 'Update available';
+      else if (d.st === 'error') t = 'Download failed. Try again.';
+      else t = 'Not downloaded';
+      r.className = 'dlrow' + (d.st === 'busy' ? ' busy' : d.st === 'ready' ? ' ready' : '');
+      r.querySelector('.st').textContent = t; r.querySelector('.pct').textContent = p; r.querySelector('.bar i').style.width = (d.f * 100).toFixed(1) + '%';
+      var m = sh.querySelector('.dlm [data-dl="' + k + '"]'); m.disabled = d.st === 'ready' || d.st === 'busy'; m.querySelector('small').textContent = d.st === 'ready' ? 'Saved' : d.st === 'busy' ? 'Downloading' : d.st === 'update' ? 'Update' : '';
+    });
+    var all = D.pitch.st === 'ready' && D.recruit.st === 'ready';
+    sh.querySelector('.dlm [data-dl="all"]').disabled = all;
+    dlb.disabled = !OK || all; dlb.querySelector('span').textContent = !OK ? 'Download for offline' : all ? 'Everything is saved ✓' : 'Download for offline';
+    document.getElementById('dlNote').textContent = OK ? 'Saves every page, photo and video so the apps work with no signal. Downloads stay up to date when the apps change.' : 'Add Connect to your Home Screen, open it from there, then download the apps here to use them with no signal.';
+  }
+  var REG = {};
+  function reg(k) { /* the same helper each app registers for itself (same file, same scope) */
+    if (!REG[k]) REG[k] = navigator.serviceWorker.register(k + '/sw.js', { scope: k + '/', updateViaCache: 'none' }).then(function (r) {
+      var w = r.active || r.waiting || r.installing; if (r.active) return r.active;
+      return new Promise(function (res) { w.addEventListener('statechange', function () { if (w.state === 'activated') res(w); }); });
+    });
+    return REG[k];
+  }
+  function ask(k, msg) { return reg(k).then(function (w) { w.postMessage(msg); }); }
+  function fpPaint() { if (D.pitch.st === 'busy') return; D.pitch.st = fpHave ? (fpLatest && String(fpLatest) !== fpHave ? 'update' : 'ready') : (D.pitch.st === 'error' ? 'error' : 'idle'); D.pitch.f = 0; paintDl(); }
+  if (OK) {
+    navigator.serviceWorker.addEventListener('message', function (e) { var d = e.data || {};
+      if (d.t === 'dlp') { D.recruit.f = d.total ? d.done / d.total : 0; D.recruit.st = d.busy ? 'busy' : d.ready ? 'ready' : D.recruit.st === 'busy' && !d.ready ? 'error' : 'idle'; paintDl(); }
+      else if (d.type === 'status') { fpHave = d.done; fpPaint(); }
+      else if (d.type === 'progress') { D.pitch.st = 'busy'; D.pitch.f = d.N ? d.n / d.N : 0; paintDl(); }
+      else if (d.type === 'done') { fpHave = String(d.v); fpLatest = fpLatest || d.v; D.pitch.st = 'idle'; fpPaint(); toast('Fast Pitch is ready to use offline'); }
+      else if (d.type === 'error') { D.pitch.st = 'error'; D.pitch.f = 0; paintDl(); }
+    });
+    navigator.serviceWorker.startMessages && navigator.serviceWorker.startMessages();
+  }
+  function refreshDl() { paintDl(); if (!OK) return;
+    fetch('pitch/offline.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { fpLatest = j.v; fpPaint(); }).catch(function () {});
+    ['pitch', 'recruit'].forEach(function (k) { navigator.serviceWorker.getRegistration(k + '/').then(function (r) { if (r && r.scope.indexOf('/' + k + '/') > 0) ask(k, k === 'pitch' ? { type: 'status' } : { t: 'dlq' }); }); });
+  }
+  function start(k) {
+    if (!navigator.onLine) { toast('Connect to WiFi to download'); return; }
+    if (D[k].st === 'ready' || D[k].st === 'busy') return;
+    D[k].st = 'busy'; D[k].f = 0; paintDl();
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+    ask(k, k === 'pitch' ? { type: 'download' } : { t: 'dl' }).catch(function () { D[k].st = 'error'; paintDl(); });
+  }
+  function menu(open) { dlw.classList.toggle('open', open); dlb.setAttribute('aria-expanded', String(open)); }
+  dlb.addEventListener('click', function (e) { e.stopPropagation(); if (!OK) return; menu(!dlw.classList.contains('open')); });
+  sh.querySelectorAll('.dlm [data-dl]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); menu(false); var k = b.dataset.dl; (k === 'all' ? ['pitch', 'recruit'] : [k]).forEach(start); }); });
+  sh.querySelector('.panel').addEventListener('click', function () { menu(false); });
+  document.querySelector('.gear').addEventListener('click', refreshDl);
+  function toast(msg) { var t = document.querySelector('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); } t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, 2400); }
   /* coming back with the browser's back button: put the picker back */
   addEventListener('pageshow', function (e) { if (e.persisted) { busy = false; document.querySelectorAll('.zoom').forEach(function (z) { z.remove(); }); } });
   if ('serviceWorker' in navigator && location.protocol === 'https:' && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});

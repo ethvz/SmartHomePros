@@ -68,6 +68,8 @@ def patch_recruit():
     btn = ("'<div class=\"dw-foot\">' + (window.SHPC ? '<button type=\"button\" class=\"dw-u dw-app\" data-shpc-switch title=\"Switch app\" aria-label=\"Switch app\">"
            + GRID.replace('class="ic" width="20" height="20" ', '') + "<span>Switch app</span></button>' : '') + '<button type=\"button\" class=\"dw-u dw-social\"")
     s = sub(s, "'<div class=\"dw-foot\"><button type=\"button\" class=\"dw-u dw-social\"", btn, 'fr menu foot')
+    if '.dw-foot .dw-dl {' not in s:   # offline download lives in Connect → Settings now
+        s = s.replace('</style>', '  .dw-foot .dw-dl { display: none !important; } .dw-foot { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* SmartHomePros Connect: download is in Connect Settings */\n</style>', 1)
     if '.dw-foot .dw-app' not in s:
         s = s.replace('</style>', '  .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* SmartHomePros Connect */\n</style>', 1)
     open(p, 'w', encoding='utf-8').write(s)
