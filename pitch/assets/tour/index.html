@@ -849,14 +849,18 @@ function ocpHead(){
   return h;
 }
 const MODELS = {
-  dbcp(){ const g=G();                                 // Doorbell Camera Pro: white shell, black glass face, glowing ring button
-    add(g, rslab(.058,.172,.03,.026,.008,PM.white),0,0,.015);
-    add(g, rslab(.052,.166,.006,.023,.0025,PM.gloss),0,0,.033);
-    add(g, lens(.0105),0,.058,.036);
-    for(const x of [-.009,.009]) add(g, faceZ(cyl(.0016,.001,PM.dot,16)),x,.036,.0362);
-    add(g, decal(DEC.logo,.03,.0075),0,-.004,.0362);
-    add(g, torus(.0145,.0029,PM.ring),0,-.055,.0366);
-    add(g, faceZ(cyl(.0118,.002,PM.gloss,48)),0,-.055,.0372);
+  dbcp(){ const g=G(), W = .043, H = .132;              // Doorbell Camera Pro (Gen 2): 43 x 132 x 35 mm. White body on a recessed back plate,
+                                    // a full-face black glass front with eased edges, lens up top, red-ring button below
+    add(g, rslab(W-.005, H-.006, .007, .0135, .002, PM.whiteM), 0, 0, .0035);        // back plate (slightly inset)
+    add(g, rslab(W, H, .025, .0155, .005, PM.whiteM), 0, 0, .0185);                  // body
+    add(g, rslab(W-.0004, H-.0004, .005, .015, .0018, PM.gloss), 0, 0, .0325);       // glass front
+    const fz = .035;
+    add(g, faceZ(cyl(.0078,.0006,PM.bezel,48)), 0, .046, fz+.0003);                  // lens surround
+    add(g, lens(.0062), 0, .046, fz);
+    for(const x of [-.0055,.0055]) add(g, faceZ(cyl(.0009,.0004,PM.dot,16)), x, .029, fz+.0002);
+    add(g, decal(DEC.logo,.019,.0048), 0, -.017, fz+.0003);
+    add(g, torus(.0098, .0017, PM.ring), 0, -.043, fz+.0004);
+    add(g, faceZ(cyl(.0083,.0012,PM.gloss,48)), 0, -.043, fz+.0006);
     return g; },
   lock(){ const g=G();                                  // Kwikset keypad deadbolt (photo-accurate face, bevelled body) + passage lever below
     add(g, photoSolid('lock',.074,.026));
@@ -951,16 +955,26 @@ const MODELS = {
     add(g, faceZ(cyl(.0013,.0004,PM.lens,24)),0,.0705,.0228);   // camera pinhole above the screen
     return g; },
   therm(){ return photoSolid('therm',.085,.024); },
-  icp(){ const g=G();                                   // Indoor Camera Pro: round base, loop arm, square glossy head (origin at base)
-    add(g, cyl(.043,.01,PM.blackM,64),0,.005,0);
-    const rim = add(g, torus(.043,.005,PM.blackM),0,.005,0); rim.rotation.x = Math.PI/2;
-    add(g, rbox(.03,.018,.026,.006,PM.blackM),0,.019,-.006);
-    add(g, rring(.05,.07,.014,.007,.006,PM.blackM),0,.062,-.012);
-    add(g, rslab(.078,.078,.06,.018,.01,PM.gloss),0,.118,0);
-    add(g, faceZ(cyl(.022,.003,PM.bezel,64)),0,.122,.0305);
-    add(g, lens(.012),0,.122,.032);
-    for(const x of [-.028,.028]) add(g, faceZ(cyl(.0014,.001,PM.dot,16)),x,.148,.0302);
-    add(g, decal(DEC.logo,.022,.0055),0,.089,.0303);
+  icp(){ const g=G();                                   // Indoor Camera Pro: 66 x 107 x 66 mm. Rounded-square base, S-bent strap loop from a hinge
+    const shell = mat(0x27282a,{r:.62,m:.05,x:{envMapIntensity:.6}});  // on the base up to a pivot disc on the back of a soft-backed head (origin at the base)
+    add(g, rslab(.062, .062, .009, .013, .0035, shell), 0, .0045, 0).rotation.x = -Math.PI/2;
+    add(g, rslab(.054, .054, .0006, .01, .0002, mat(0x1d1e20,{r:.4})), 0, .0092, 0).rotation.x = -Math.PI/2;   // top inset panel
+    const hinge = add(g, cyl(.0052, .016, shell, 32), 0, .0135, 0); hinge.rotation.z = Math.PI/2;
+    add(g, rslab(.012, .01, .012, .003, .002, shell), 0, .011, 0);
+    // strap: two flat bars following the side profile, closed round the hinge at the bottom
+    const path = new THREE.CatmullRomCurve3([V(0,.0135,0), V(0,.024,-.004), V(0,.033,-.0095), V(0,.046,-.0155), V(0,.062,-.0175), V(0,.073,-.0182)]);
+    for(const x of [-.0105,.0105]){ const t = new THREE.Mesh(new THREE.TubeGeometry(path, 40, .0024, 10, false), shell); t.position.x = x; t.scale.set(.75,1,1); g.add(t); }
+    const loop = add(g, new THREE.Mesh(new THREE.TorusGeometry(.0105,.0024,10,24,Math.PI), shell), 0, .0135, 0); loop.rotation.set(0, 0, Math.PI);
+    add(g, faceZ(cyl(.014, .005, shell, 48)), 0, .073, -.0195);                 // pivot disc on the head's back
+    // head: 60 mm rounded-square face, 37 mm deep, back rounded off
+    const hz = .0226, hy = .073;
+    add(g, loft(roundBack(hz, .037, .06, .06, .057, .057, 5, 4.4, .02, .4), shell), 0, hy, 0);
+    add(g, rslab(.0585, .0585, .003, .0145, .0012, PM.gloss), 0, hy, hz-.0008);
+    add(g, faceZ(cyl(.0125, .0008, mat(0x0c0d0e,{r:.25}), 64)), 0, hy+.002, hz+.0008);      // lens well
+    add(g, lens(.0062), 0, hy+.002, hz+.0006);
+    add(g, faceZ(cyl(.0011, .0004, PM.green, 16)), 0, hy+.0235, hz+.0008);                  // status light
+    for(const x of [-.024,.024]) add(g, faceZ(cyl(.0007,.0004,PM.dot,12)), x, hy+.004, hz+.0008);
+    add(g, decal(DEC.logo, .016, .004), 0, hy-.0215, hz+.0009);
     return g; },
   window(){ const g=G();                                // Door & Window Sensor: sensor on the sash's bottom rail, magnet on the sill edge right below it
     add(g, rslab(.078,.028,.016,.007,.004,PM.whiteM),0,0,.008);
