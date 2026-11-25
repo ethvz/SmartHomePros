@@ -745,7 +745,7 @@ const PM = {
   mount: new THREE.MeshPhysicalMaterial({color:0xdcdddd, roughness:.5, clearcoat:.15}),
   lens: new THREE.MeshPhysicalMaterial({color:0x04060b, roughness:.02, metalness:.2, clearcoat:1, clearcoatRoughness:.0, iridescence:.9, iridescenceIOR:1.7, iridescenceThicknessRange:[260,480]}),
   bezel: new THREE.MeshPhysicalMaterial({color:0x26292c, roughness:.35, metalness:.6}),
-  ring: new THREE.MeshStandardMaterial({color:0xe8141a, roughness:.3, emissive:0xff0c12, emissiveIntensity:.95}),
+  ring: new THREE.MeshStandardMaterial({color:0x1a0203, roughness:.3, emissive:0xff1418, emissiveIntensity:1.35, envMapIntensity:0}),   // Vivint red light ring (dark base so it stays red, not orange)
   led: new THREE.MeshPhysicalMaterial({color:0xfffcf2, roughness:.25, emissive:0xfff2d8, emissiveIntensity:.55, clearcoat:1}),
   keyCap: new THREE.MeshPhysicalMaterial({color:0xe6e6e3, roughness:.32, clearcoat:.6, clearcoatRoughness:.2}),
   dot: mat(0x2a2d30,{r:.3}), grey: mat(0x8e9296,{r:.35,m:.5}),
@@ -788,6 +788,28 @@ function rring(w,h,r,t,d,m){
   const s = rrShape(w,h,r); s.holes.push(rrShape(w-2*t,h-2*t,r-t));
   return new THREE.Mesh(new THREE.ExtrudeGeometry(s,{depth:d, bevelEnabled:false, curveSegments:32}), m);
 }
+/* loft: a smooth shell through superellipse sections [z, w, h, p] (p≈2 round … 8+ square), closed at both ends.
+   Used for camera heads and other moulded bodies that taper or round off toward the back. */
+function sqPt(w,h,p,t){ const c=Math.cos(t), s=Math.sin(t); return [w/2*Math.sign(c)*Math.abs(c)**(2/p), h/2*Math.sign(s)*Math.abs(s)**(2/p)]; }
+function loft(secs, m, n=72){
+  const pos=[], idx=[], R=secs.length;
+  for(const [z,w,h,p] of secs) for(let i=0;i<n;i++){ const [x,y] = sqPt(w,h,p,i/n*Math.PI*2+Math.PI/4); pos.push(x,y,z); }
+  for(let r=0;r<R-1;r++) for(let i=0;i<n;i++){ const a=r*n+i, b=r*n+(i+1)%n, c=a+n, d=b+n; idx.push(a,c,b, b,c,d); }
+  for(const [r,flip] of [[0,true],[R-1,false]]){ const z=secs[r][0], ci=pos.length/3; pos.push(0,0,z);
+    for(let i=0;i<n;i++){ const a=r*n+i, b=r*n+(i+1)%n; flip ? idx.push(ci,b,a) : idx.push(ci,a,b); } }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals();
+  return new THREE.Mesh(g, m);
+}
+/* sections for a body that starts at the front (z=zf) with a small rounded lip, runs back (toward -z) for L with its sides
+   easing from (w0,h0) to (w1,h1), then rounds off into a soft back over the last rd. keep = how much of the back stays flat */
+function roundBack(zf, L, w0, h0, w1, h1, p0, p1, rd, keep=.3, lip=.0015, steps=12){
+  const S = [];
+  for(let i=0;i<=4;i++){ const a=i/4*Math.PI/2; S.push([zf-lip+lip*Math.cos(a), w0-2*lip*(1-Math.sin(a)), h0-2*lip*(1-Math.sin(a)), p0]); }
+  const straight = 10;
+  for(let i=1;i<=straight;i++){ const t=i/straight, e=t*t*(3-2*t); S.push([zf-lip-(L-rd-lip)*t, w0+(w1-w0)*e, h0+(h1-h0)*e, p0+(p1-p0)*e]); }
+  for(let i=1;i<=steps;i++){ const a=i/steps*Math.PI/2, k=Math.cos(a), f=keep+(1-keep)*k; S.push([zf-(L-rd)-rd*Math.sin(a), Math.max(1e-4,w1*f), Math.max(1e-4,h1*f), p1]); }
+  return S;
+}
 function dome(r,h,m){ const x = new THREE.Mesh(new THREE.SphereGeometry(r,48,16,0,Math.PI*2,0,Math.PI/2), m); x.scale.set(1,h/r,1); x.rotation.x = Math.PI/2; return x; }
 function decal(t, w, h, o={}){
   const m = new THREE.MeshStandardMaterial({map:t, transparent:true, color:o.color ?? 0xffffff, roughness:o.r ?? .5, opacity:o.op ?? 1, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2, ...(o.x||{})});
@@ -813,6 +835,19 @@ function camHead(s=1, shell=PM.gloss){
   return h;
 }
 
+/* Outdoor Camera Pro (Gen 3) head: 80 mm rounded-square face, ~60 mm deep, soft rounded back. Face at z=0. */
+function ocpHead(){
+  const h = G(), W = .08, R = .018;
+  add(h, loft(roundBack(-.004, .062, W, W, W-.006, W-.008, 5.2, 4.2, .032, .35), PM.whiteM));
+  add(h, rslab(W, W, .007, R, .0025, PM.gloss), 0, 0, -.0035);                 // black glass face, edges eased
+  add(h, rring(W-.008, W-.008, R-.004, .0028, .0006, PM.ring), 0, 0, -.0001);   // red light ring just under the glass edge
+  add(h, rslab(W-.014, W-.014, .0008, R-.007, .0003, PM.gloss), 0, 0, -.0003); // inner glass panel (keeps the ring a thin line)
+  add(h, lens(.0085), 0, -.013, 0);
+  add(h, decal(DEC.logo, .02, .005), 0, .004, .0006);
+  add(h, faceZ(cyl(.0012,.0006,PM.dot,16)), 0, -.026, .0004);                 // light sensor under the lens
+  for(const x of [-.027,.027]) add(h, faceZ(cyl(.0007,.0004,PM.dot,12)), x, -.027, .0004);  // mic holes
+  return h;
+}
 const MODELS = {
   dbcp(){ const g=G();                                 // Doorbell Camera Pro: white shell, black glass face, glowing ring button
     add(g, rslab(.058,.172,.03,.026,.008,PM.white),0,0,.015);
@@ -849,6 +884,14 @@ const MODELS = {
       if(p.g===1){ const uv = new Float32Array(p.nv*2); for(let i=0;i<p.nv;i++){ uv[2*i]=(pos[3*i]+.0354)/.0708; uv[2*i+1]=(pos[3*i+1]+.0493)/.0475; } geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, M[p.g]); m.castShadow = true; g.add(m);
     }
+    // head (no CAD yet): white stem out of the mount's knurled collar, rising into the underside of a rounded-square head
+    // with a black glass face, a red light ring around its edge, the lens low on the centre line (Gen 3 official renders)
+    const SO = V(0,.0193,.046), head = ocpHead(), HP = V(0,.066,.092);
+    const stemEnd = V(0,.04,.07), dir = stemEnd.clone().sub(SO), len = dir.length();
+    const stem = add(g, cyl(.0095,len,PM.white,40), ...SO.clone().addScaledVector(dir,.5).toArray());
+    stem.quaternion.setFromUnitVectors(V(0,1,0), dir.normalize());
+    add(g, new THREE.Mesh(new THREE.SphereGeometry(.0105,32,20),PM.white), ...SO.toArray());
+    add(g, head, ...HP.toArray()); head.rotation.x = .1;
     return g; },
   ocspot(){ const g=G();                                // Spotlight Pro: light bar with six LEDs, speaker neck, camera head
     add(g, rslab(.1,.09,.016,.01,.005,PM.white),0,.0,.008);
@@ -1338,7 +1381,7 @@ if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).th
     e => { window.__export = {error:String(e)}; }, {binary:true, onlyVisible:true, maxTextureSize:1024});
 });
 // test hooks for review
-window.__tour = { focus:k=>focus(byKey[k]), overview, state, camera, controls, scene, THREE };
+window.__tour = { focus:k=>focus(byKey[k]), overview, state, camera, controls, scene, THREE, MODELS, renderer };
 </script>
 <p id="credits" style="position:fixed;left:12px;bottom:4px;margin:0;font-size:9px;color:rgba(255,255,255,.28);z-index:1;pointer-events:none">Sofa: Wayfair (CC BY 4.0) · Car: “Tesla 2018 Model 3” by Ameer Studio (CC BY 4.0, modified) · Furniture &amp; textures: Poly Haven (CC0)</p>
 </body></html>
