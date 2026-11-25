@@ -862,6 +862,24 @@ function thermDisplay(){
   x.shadowBlur = 0; x.fillStyle = 'rgba(255,255,255,.35)'; x.font = '500 34px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('vivint', 512, 842);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
 }
+/* printed key labels for the keypad, laid out on the same grid as its keys (10 px per mm) */
+function keypadLabels(){
+  const W = 772, H = 1472, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const P = (mx, my) => [W/2 + mx*10000, H/2 - my*10000];
+  x.fillStyle = x.strokeStyle = '#4a4d50'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineCap = x.lineJoin = 'round';
+  const F = (px, w=400) => x.font = w + ' ' + px + 'px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
+  F(46); x.fillText('Stay', ...P(-.0155, .056)); x.fillText('Away', ...P(.0155, .056));
+  F(60, 300); for(let r=0;r<3;r++) for(let c2=0;c2<3;c2++) x.fillText(String(r*3+c2+1), ...P((c2-1)*.0225, .032-r*.022));
+  x.fillText('0', ...P(0, -.034)); F(36); x.fillText('Clear', ...P(-.0225, -.034));
+  x.lineWidth = 5; let [cx, cy] = P(-.0225, -.058);                                       // police shield
+  x.beginPath(); x.moveTo(cx, cy-26); x.lineTo(cx+20, cy-18); x.quadraticCurveTo(cx+20, cy+12, cx, cy+26); x.quadraticCurveTo(cx-20, cy+12, cx-20, cy-18); x.closePath(); x.stroke();
+  [cx, cy] = P(0, -.058); x.beginPath();                                                   // medical cross
+  for(const [a,b] of [[-8,-24],[8,-24],[8,-8],[24,-8],[24,8],[8,8],[8,24],[-8,24],[-8,8],[-24,8],[-24,-8],[-8,-8]]) x.lineTo(cx+a, cy+b); x.closePath(); x.stroke();
+  [cx, cy] = P(.0225, -.058); x.beginPath(); x.moveTo(cx, cy+24);                         // flame
+  x.bezierCurveTo(cx-24, cy+22, cx-22, cy-4, cx-6, cy-26); x.bezierCurveTo(cx-4, cy-12, cx+6, cy-10, cx+8, cy-18); x.bezierCurveTo(cx+24, cy-2, cx+22, cy+22, cx, cy+24); x.stroke();
+  x.fillStyle = '#9da1a4'; F(34, 500); x.fillText('vivint', ...P(0, -.0715));
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
+}
 const MODELS = {
   dbcp(){ const g=G(), W = .043, H = .132;              // Doorbell Camera Pro (Gen 2): 43 x 132 x 35 mm. White body on a recessed back plate,
                                     // a full-face black glass front with eased edges, lens up top, red-ring button below
@@ -1002,7 +1020,14 @@ const MODELS = {
     add(g, rslab(.01,.003,.0008,.0012,.0003,mat(0xb9bdbf,{r:.5})),.03,.008,.0162);
     add(g, rslab(.05,.012,.014,.004,.003,PM.whiteM),.004,-.0215,.007);
     return g; },
-  motion(){ return photoSolid('motion',.072,.042); },
+  motion(){ const g=G();                                // Motion Sensor: 71 x 81 x 51 mm. Grey back body, a pillowy white front cover with deeply rounded
+    add(g, rslab(.066, .076, .026, .013, .004, mat(0xdcdddd,{r:.5})), 0, -.001, .013);   // edges, a large frosted lens window, TEST button on the side
+    add(g, rslab(.071, .081, .027, .017, .0095, PM.whiteM), 0, 0, .0375);
+    const fr = PM.frost.clone(); fr.color.set(0xc9cccd); fr.roughness = .38;
+    add(g, rslab(.054, .046, .0022, .009, .0009, fr), 0, .0135, .0505);
+    add(g, decal(DEC.logo, .017, .0043, {color:0xc4c6c7}), 0, -.027, .0512);
+    const t = add(g, rslab(.0085, .019, .0016, .0042, .0006, mat(0xd2d4d5,{r:.4})), .0331, .004, .013); t.rotation.y = Math.PI/2;
+    return g; },
   smokeco(){ const g=G();                               // Smoke & CO Detector: turned white housing with a rounded front edge, a raised sensing chamber
     const prof = [[0,0],[.065,0],[.0668,.003],[.067,.03],[.0662,.035],[.0625,.0388],[.055,.0412],[.045,.0421],[.0418,.0414],[.0405,.041],[.0405,.0425],[.036,.043],[0,.043]]
       .map(([r,z])=>new THREE.Vector2(r,z));                                          // behind six louvre fins, domed cap, dark speaker / LED windows
@@ -1029,8 +1054,25 @@ const MODELS = {
     add(g, faceZ(cyl(.0012, .0008, mat(0x3a2e26,{r:.5}), 20)), 0, .009, .0222);
     return g; },
   garage(){ return photoSolid('garage',.12,.034); },
-  glass(){ return photoSolid('glass',.055,.02); },
-  keypad(){ return photoSolid('keypad',.075,.02); },
+  glass(){ const g=G();                                 // Glass Break Detector: 66 x 99 x 23 mm. Soft white slab on a grey back seam, recessed mic disc
+    add(g, rslab(.0655, .0985, .008, .0135, .0025, mat(0xcfd1d2,{r:.45})), 0, 0, .004); // with the microphone hole, TEST button on the side
+    add(g, rslab(.066, .099, .017, .0145, .0065, PM.whiteM), 0, 0, .0145);
+    add(g, faceZ(cyl(.0115, .0006, mat(0xe2e3e1,{r:.6}), 64)), -.011, -.006, .0229);
+    add(g, faceZ(cyl(.0016, .0008, PM.dot, 20)), -.011, -.006, .0233);
+    const t = add(g, rslab(.0075, .019, .0014, .0037, .0005, mat(0xd2d4d5,{r:.4})), .0331, -.005, .012); t.rotation.y = Math.PI/2;
+    return g; },
+  keypad(){ const g=G();                                // Keypad: 80 x 150 x 27 mm. Grey rim, flat white face, raised keys with printed labels,
+    add(g, rslab(.08, .15, .024, .0145, .004, mat(0xd3d5d6,{r:.45})), 0, 0, .012);      // the three emergency keys ringed in dark grey, grey status window
+    add(g, rslab(.0772, .1472, .0045, .013, .0016, PM.whiteM), 0, 0, .0245);
+    const fz = .0268, cap = PM.keyCap, K = (x, y, w=.017, h=.017) => { add(g, rslab(w, h, .0026, Math.min(w,h)/2, .0011, cap), x, y, fz+.0013); };
+    K(-.0155, .056, .029, .0145); K(.0155, .056, .029, .0145);
+    for(let r=0;r<3;r++) for(let c=0;c<3;c++) K((c-1)*.0225, .032-r*.022);
+    K(-.0225, -.034); K(0, -.034);
+    add(g, faceZ(cyl(.0085, .0008, mat(0xbfc2c4,{r:.5}), 48)), .0225, -.034, fz+.0004);
+    for(const x of [-.0225, 0, .0225]){ K(x, -.058); add(g, torus(.0083, .0007, mat(0x3c3f42,{r:.4})), x, -.058, fz+.0018); }
+    add(g, new THREE.Mesh(new THREE.PlaneGeometry(.0772, .1472), new THREE.MeshStandardMaterial({map:keypadLabels(), transparent:true, roughness:.5, depthWrite:false,
+      polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3})), 0, 0, fz+.00265);
+    return g; },
   plug(){ return photoSolid('plug',.045,.03); },
   fob(){ const g=G();                                   // Key Fob on a split ring with the house keys, lying on the counter
     const w=.035, d=.012; add(g, photoSolid('fob',w,d,true));
