@@ -3279,7 +3279,7 @@ $('#allTiles').innerHTML=Object.entries(ALLPOS).map(([k,[x,y,w,h]])=>k==='shortc
   $('#homeAll').insertAdjacentHTML('afterbegin','<div class="hall-h"><div><div class="eb">Full Vivint Product Suite</div><h1>One system. Every corner of your home.</h1></div></div>'); }
 $('#p-home').insertAdjacentHTML('beforeend','<div id="flipLayer"></div>');
 /* All grid: built from one spec so every gap is exactly G on every iPad width */
-function allGrid(Wt){ const G=14, X0=20.6, Y0=74, Y1=981,   /* (Connect: one 14px rhythm: edge, header pills, tiles, eyebrow line, edge) */ top=Math.round((Y1-Y0)*0.40), cw=(Wt-2*G)/3, cx=[X0,X0+cw+G,X0+2*(cw+G)], half=(cw-G)/2, y2=Y0+top+G, rest=Y1-y2, P={};
+function allGrid(Wt){ const G=14, X0=20.6, Y0=51, Y1=950, top=Math.round((Y1-Y0)*0.40), cw=(Wt-2*G)/3, cx=[X0,X0+cw+G,X0+2*(cw+G)], half=(cw-G)/2, y2=Y0+top+G, rest=Y1-y2, P={};
   P.ocp=[cx[0],Y0,cw,top]; P.dbcp=[cx[1],Y0,half,top]; P.icp=[cx[1]+half+G,Y0,half,top]; P.ocspot=[cx[2],Y0,cw,top];
   const sh=(rest-2*G)/3, sw=(cw-2*G)/3; [['motion','glass','window'],['water','smokeco','fire'],['pendant','fob','chime']].forEach((r,ri)=>r.forEach((k,ci)=>P[k]=[cx[0]+ci*(sw+G),y2+ri*(sh+G),sw,sh]));
   const kh=Math.round(rest*0.43), hh=rest-G-kh; P.shp2=[cx[1],y2,cw,hh]; P.keypad=[cx[1],y2+hh+G,half,kh]; P.app=[cx[1]+half+G,y2+hh+G,half,kh];
@@ -3714,12 +3714,6 @@ const _barFor=barFor; barFor=function(p){ _barFor(p); navify(); };
 $$('#mitems .mi img').forEach(im=>{ const m=im.getAttribute('src').match(/m_([a-z]+)\.png/); if(m){ im.insertAdjacentHTML('beforebegin',SVGI(m[1],26)); im.remove(); } });
 /* burger + back */
 $('#burger').innerHTML=SVGI('menu',24);
-/* header (as in Fast Recruit): menu and logo top left */
-{ const h=document.createElement('div'); h.id='hdr'; $('#stage').appendChild(h); h.append($('#burger'),$('#barlogo')); const f=document.createElement('div'); f.id='hdrFade'; $('#stage').insertBefore(f,h);
-  /* when the window is a different shape from the app, the band above it carries on the fade (no gap at the top edge) */
-  const o=document.createElement('div'); o.id='hdrFadeOut'; document.body.appendChild(o);
-  const fit=()=>{ const r=$('#stage').getBoundingClientRect(); o.style.height=Math.max(0,r.top)+'px'; o.classList.toggle('home',$('#stage').querySelector('#p-home.on')!=null); };
-  addEventListener('resize',fit); setInterval(fit,700); fit(); }
 navify();
 
 /* scroll-scrubbed reverse animation under the Outdoor Camera hero */
@@ -4738,7 +4732,7 @@ IP.gal='<rect x="6.5" y="3.5" width="14" height="11" rx="2"/><path d="M3.5 7.5v1
   Object.values(PG).forEach(q=>{ const b=$(q); if(b) b.addEventListener('scroll',()=>requestAnimationFrame(galSpy),{passive:true}); }); }
 
 /* footer controls: fire on finger-up so swipe/zoom/tip guards never swallow a tap */
-{ const SEL='#bar button,#bar [role=button],#hdr button,#hdr [role=button]'; let d=null, fired=0;
+{ const SEL='#bar button,#bar [role=button]'; let d=null, fired=0;
   document.addEventListener('pointerdown',e=>{ const t=e.target.closest&&e.target.closest(SEL); d=t?{t,x:e.clientX,y:e.clientY,id:e.pointerId}:null; },true);
   document.addEventListener('pointercancel',e=>{ if(d&&e.pointerId===d.id) d=null; },true);
   document.addEventListener('pointerup',e=>{ if(!d||e.pointerId!==d.id) return; const s=d; d=null;
@@ -5180,7 +5174,7 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-
     requestAnimationFrame(()=>{ if(hitsUnder(a)){ a.classList.add('sm'); center(a.parentElement.parentElement); if(hitsUnder(a)) a.classList.add('ov'); } }); }),{threshold:[.99]});
   /* center each arrow on the visible page (some sections are laid out on the fixed-width stage, which isn't centered on wider/narrower screens) */
   const center=box=>{ if(!box||!box.offsetWidth) return; const br=box.getBoundingClientRect(), cx=br.left+br.width/2, kb=br.height/(box.offsetHeight||1)||1;
-    const bb=$('#bar'), lr=bb&&bb.getBoundingClientRect(); let ly=lr&&lr.height?lr.top+lr.height/2:null; /* vertical: level with the footer (where the Vivint logo was before it moved up to the header) */
+    const lg=$('#barlogo'), lr=lg&&lg.getBoundingClientRect(); let ly=lr&&lr.height?lr.top+lr.height/2:null; /* vertical: level with the Vivint logo in the footer */
     box.querySelectorAll(':scope>*>.nxa').forEach(a=>{ const s=a.parentElement, r=s.getBoundingClientRect(); if(!r.width) return; const k=r.width/(s.offsetWidth||1)||1;
       a.style.left=((cx-r.left)/k)+'px';
       if(ly!=null){ const it=a.classList.contains('sm')?24:38, mt=parseFloat(getComputedStyle(s).scrollMarginTop)||0;
@@ -6093,87 +6087,7 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
     try{ const u=await claude.use('user'); if(u&&await u.canEdit()){ btn.classList.add('show'); navResume(); try{ mcp=await claude.use('mcp'); }catch(e){ mcp=null; } pubState(); } }catch(e){} })();
 })();
 </script>
-
-<style id="shpcHdr">
-/* SmartHomePros Connect header: menu + logo top left (as in Fast Recruit), over Fast Recruit's black fade.
-   Photo pages stay full screen behind it; plain black pages start below it (nothing to see up there but black) */
-#hdr{position:absolute;left:12px;top:15px;height:52px;display:flex;align-items:center;gap:6px;z-index:30;pointer-events:none}
-#hdr>*{pointer-events:auto}
-body.pkon #hdr{z-index:61}
-#hdr #burger{width:52px!important;height:52px!important;margin:0!important;flex:none}
-#hdr #barlogo{height:28px!important;margin:0 0 0 4px!important;flex:none;-webkit-user-drag:none}
-#hdr,#hdr *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-#hdrFade{position:absolute;left:0;top:0;width:100%;height:120px;z-index:29;pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 72%,rgba(0,0,0,0) 100%)}
-body.pkon #hdrFade{z-index:60}
-#stage:has(#p-home.on) #hdrFade{opacity:0}   /* landing pages are black with their tiles below the header: no fade needed, and it would dim the toggle and eyebrow */
-#hdrFade{transition:opacity .3s}
-#hdrFadeOut{position:fixed;left:0;right:0;top:0;height:0;background:rgba(0,0,0,.94);z-index:25;pointer-events:none;transition:opacity .3s}
-#hdrFadeOut.home{opacity:0}
-#stage:has(#p-monitoring.on) #gTitle{opacity:0!important}   /* its photo already carries the title */
-/* landing pages: eyebrow top right, in the header row */
-/* everything else: eyebrow (and the Back pill) top left, below the header and indented */
-#gTitle,#bkPill{top:74px!important;left:62px!important}
-#screen>#p-about,#screen>#p-ai,#screen>#p-awards,#screen>#p-birdseye,#screen>#p-buyouts,#screen>#p-comparisons,#screen>#p-compat,#screen>#p-map,#screen>#p-moves,#screen>#p-packages,#screen>#p-patents,#screen>#p-playback,#screen>#p-preview,#screen>#p-protection,#screen>#p-psa,#screen>#p-reviews,#screen>#p-social,#screen>#p-videos,#screen>#p-whatsnew{top:56px!important;bottom:-56px!important}
-#stage:has(#p-about.on) #gTitle,#stage:has(#p-about.on) #bkPill,#stage:has(#p-ai.on) #gTitle,#stage:has(#p-ai.on) #bkPill,#stage:has(#p-awards.on) #gTitle,#stage:has(#p-awards.on) #bkPill,#stage:has(#p-birdseye.on) #gTitle,#stage:has(#p-birdseye.on) #bkPill,#stage:has(#p-buyouts.on) #gTitle,#stage:has(#p-buyouts.on) #bkPill,#stage:has(#p-comparisons.on) #gTitle,#stage:has(#p-comparisons.on) #bkPill,#stage:has(#p-compat.on) #gTitle,#stage:has(#p-compat.on) #bkPill,#stage:has(#p-map.on) #gTitle,#stage:has(#p-map.on) #bkPill,#stage:has(#p-moves.on) #gTitle,#stage:has(#p-moves.on) #bkPill,#stage:has(#p-packages.on) #gTitle,#stage:has(#p-packages.on) #bkPill,#stage:has(#p-patents.on) #gTitle,#stage:has(#p-patents.on) #bkPill,#stage:has(#p-playback.on) #gTitle,#stage:has(#p-playback.on) #bkPill,#stage:has(#p-preview.on) #gTitle,#stage:has(#p-preview.on) #bkPill,#stage:has(#p-protection.on) #gTitle,#stage:has(#p-protection.on) #bkPill,#stage:has(#p-psa.on) #gTitle,#stage:has(#p-psa.on) #bkPill,#stage:has(#p-reviews.on) #gTitle,#stage:has(#p-reviews.on) #bkPill,#stage:has(#p-social.on) #gTitle,#stage:has(#p-social.on) #bkPill,#stage:has(#p-videos.on) #gTitle,#stage:has(#p-videos.on) #bkPill,#stage:has(#p-whatsnew.on) #gTitle,#stage:has(#p-whatsnew.on) #bkPill{top:90px!important}
-#screen>#p-compat{transform:scale(.945);transform-origin:50% 0}   /* its tile grid runs to the bottom edge: a touch smaller so it still clears it */
-#stage.lnav #gTitle{opacity:0!important}   /* product pages: the eyebrow sits on each section instead */
-.shpc-eb{font-size:14px!important;font-weight:600!important;letter-spacing:2.6px!important;text-transform:uppercase!important;color:var(--vg,#05E5AF)!important;line-height:1.2!important;white-space:nowrap;opacity:1!important}
-.shpc-new{display:block;pointer-events:none}
-/* landing + category pages: the footer pills move up into the header row (category toggle centred, About/Videos/Yard Sign right) */
-#bar.home #barRight.pnav{bottom:964px!important}
-#bar.home #homeX{bottom:964px!important}
-/* 3D Home: full screen (edge to edge, behind the header and its fade); the tiles and their category morph stay hidden behind it */
-#p-home #tour3d{left:0!important;right:0!important;top:0!important;bottom:0!important;border-radius:0!important}
-#p-home.d3 #flipLayer,#p-home.d3 #homeTrack,#p-home.d3 #lpT{opacity:0!important;pointer-events:none!important}
-/* every other page: All Products in the header's top-right corner (its product card opens down from it);
-   About / Videos / Yard Sign keep their pill beside it */
-#prodBtn{bottom:964px!important;right:18px!important}
-#bar.hx-ctr #homeX{left:calc(100% - 18px - var(--pbw,166px) - 12px)!important;transform:translateX(-100%)!important;bottom:964px!important}
-#psheet .pan{top:12px!important;bottom:auto!important}
-.ocb[data-go="ai"].aiorb,.dbai.aiorb{top:82px!important}   /* the AI orb sits just below the All Products pill */
-/* Tiles / 3D Home: icons only, as tall as the bottom pills */
-#hmode{top:14px!important;height:54px;padding:5px!important;box-sizing:border-box;background:rgba(28,28,28,.92)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
-#hmode button{height:44px!important;min-width:0!important;width:58px;padding:0!important;gap:0!important;font-size:0!important;border-radius:22px!important}
-#hmode button svg{width:22px!important;height:22px!important}
-#hmode i{top:5px!important;bottom:5px!important;left:5px!important;width:calc(50% - 5px)!important;border-radius:22px!important}
-/* category pages: tiles start where the All Products tiles do */
-/* landing + category pages: one 14px rhythm top to bottom: edge, header pills (54), tiles, eyebrow line (15), edge */
-#homeTrack,#p-home .hpane{height:1032px!important}
-#homeTrack .hcat{padding-top:82px!important;padding-bottom:43px!important}
-#lpT{top:auto!important;bottom:14px!important;left:21px!important;height:15px!important}
-#lpT .lpl{top:0!important;bottom:auto!important;left:0!important;right:auto!important;text-align:left!important}
+<style id="shpcFix">
+/* 3D Home: the tiles and their category morph stay hidden behind it */
+#p-home.d3 #flipLayer,#p-home.d3 #homeTrack{opacity:0!important;pointer-events:none!important}
 </style>
-
-<script id="shpcEb">
-/* SmartHomePros Connect: on product pages the product's name is the eyebrow of every section, directly above that
-   section's title and lined up with it. A section without a title gets none; a title that already had an eyebrow
-   (Smart Actions, FAQs, Meet the…) gets the product name in its place. */
-(()=>{ const PRODP=['prod','ocp','dbcp','hub','therm'];
-  const nameOf=p=>{ const pt=document.querySelector('#p-'+p+' .ptitle'); return pt?pt.textContent.trim():''; };
-  const isEb=e=>{ if(!e||e.matches('h1,h2,h3,p,ul,img,video,button')) return false; if(e.matches('.eb,.xeb,.dbeb,.vivint-eb,.shpc-eb')) return true;
-    const c=getComputedStyle(e); return c.textTransform==='uppercase'&&parseFloat(c.fontSize)<=16&&e.textContent.trim().length<60&&!e.querySelector('h1,h2,h3'); };
-  const titleOf=sec=>[...sec.querySelectorAll('h1,h2')].find(h=>!h.closest('table,th,td,.shpc-skip')&&h.offsetWidth>0&&parseFloat(getComputedStyle(h).fontSize)>=26);
-  function run(){ const p=(typeof cur!=='undefined'?cur:''); if(!PRODP.includes(p)) return; const pg=document.getElementById('p-'+p); if(!pg) return; const name=nameOf(p); if(!name) return;
-    pg.querySelectorAll('.otab,.psec').forEach(sec=>{ if(sec.parentElement.closest('.otab,.psec')) return; const t=titleOf(sec); if(!t) return;
-      let e=t.previousElementSibling; while(e&&!e.textContent.trim()&&!e.matches('img,video,svg')) e=e.previousElementSibling;
-      if(e&&isEb(e)&&!e.classList.contains('shpc-new')){ if(!e.dataset.shpcO) e.dataset.shpcO=e.textContent; if(e.textContent!==name) e.textContent=name; e.classList.add('shpc-eb'); return; }
-      let n=t.previousElementSibling; if(!(n&&n.classList.contains('shpc-new'))){ n=document.createElement('div'); n.className='shpc-eb shpc-new'; t.parentNode.insertBefore(n,t); }
-      if(n.textContent!==name) n.textContent=name;
-      const cs=getComputedStyle(t); n.style.textAlign=cs.textAlign==='center'?'center':cs.textAlign==='right'||cs.textAlign==='end'?'right':'left';
-      const pc=getComputedStyle(t.parentNode), row=/flex|grid/.test(pc.display)&&!/column/.test(pc.flexDirection);
-      if(cs.position==='absolute'||cs.position==='fixed'||row){ n.style.position='absolute'; n.style.left=t.offsetLeft+'px'; n.style.width=t.offsetWidth+'px'; n.style.top=(t.offsetTop-n.offsetHeight-12)+'px'; n.style.margin='0'; }
-      else { n.style.position='static'; n.style.width=''; n.style.marginBottom='12px'; } }); }
-  let tm=0; const later=()=>{ clearTimeout(tm); tm=setTimeout(run,120); };
-  new MutationObserver(later).observe(document.getElementById('screen'),{subtree:true,childList:true,characterData:true});
-  addEventListener('resize',later); const _s=show; show=function(){ const r=_s.apply(this,arguments); later(); setTimeout(run,600); return r; }; later(); })();
-</script>
-
-<script id="shpcHmode">
-/* Tiles / 3D Home toggle: halfway between the Vivint logo and the category toggle */
-(()=>{ const place=()=>{ const hm=document.getElementById('hmode'), lg=document.getElementById('barlogo'), cat=document.querySelector('#bar.home #barRight'), home=document.getElementById('p-home');
-    if(!hm||!lg||!cat||!home||!home.classList.contains('on')) return; const st=document.getElementById('stage'), z=st.getBoundingClientRect().width/st.offsetWidth; if(!z) return;
-    const a=lg.getBoundingClientRect().right, b=cat.getBoundingClientRect().left; if(!(b>a)) return;
-    const x=((a+b)/2-home.getBoundingClientRect().left)/z; hm.style.setProperty('left',x.toFixed(1)+'px','important'); };
-  addEventListener('resize',place); setInterval(place,500); setTimeout(place,300); })();
-</script>
