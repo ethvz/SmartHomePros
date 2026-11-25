@@ -5180,7 +5180,7 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-
     requestAnimationFrame(()=>{ if(hitsUnder(a)){ a.classList.add('sm'); center(a.parentElement.parentElement); if(hitsUnder(a)) a.classList.add('ov'); } }); }),{threshold:[.99]});
   /* center each arrow on the visible page (some sections are laid out on the fixed-width stage, which isn't centered on wider/narrower screens) */
   const center=box=>{ if(!box||!box.offsetWidth) return; const br=box.getBoundingClientRect(), cx=br.left+br.width/2, kb=br.height/(box.offsetHeight||1)||1;
-    const lg=$('#barlogo'), lr=lg&&lg.getBoundingClientRect(); let ly=lr&&lr.height?lr.top+lr.height/2:null; /* vertical: level with the Vivint logo in the footer */
+    const bb=$('#bar'), lr=bb&&bb.getBoundingClientRect(); let ly=lr&&lr.height?lr.top+lr.height/2:null; /* vertical: level with the footer (where the Vivint logo was before it moved up to the header) */
     box.querySelectorAll(':scope>*>.nxa').forEach(a=>{ const s=a.parentElement, r=s.getBoundingClientRect(); if(!r.width) return; const k=r.width/(s.offsetWidth||1)||1;
       a.style.left=((cx-r.left)/k)+'px';
       if(ly!=null){ const it=a.classList.contains('sm')?24:38, mt=parseFloat(getComputedStyle(s).scrollMarginTop)||0;
@@ -6126,6 +6126,12 @@ body.pkon #hdrFade{z-index:60}
 /* 3D Home: full screen (edge to edge, behind the header and its fade); the tiles and their category morph stay hidden behind it */
 #p-home #tour3d{left:0!important;right:0!important;top:0!important;bottom:0!important;border-radius:0!important}
 #p-home.d3 #flipLayer,#p-home.d3 #homeTrack,#p-home.d3 #lpT{opacity:0!important;pointer-events:none!important}
+/* every other page: All Products in the header's top-right corner (its product card opens down from it);
+   About / Videos / Yard Sign keep their pill beside it */
+#prodBtn{bottom:964px!important;right:18px!important}
+#bar.hx-ctr #homeX{left:calc(100% - 18px - var(--pbw,166px) - 12px)!important;transform:translateX(-100%)!important;bottom:964px!important}
+#psheet .pan{top:12px!important;bottom:auto!important}
+.ocb[data-go="ai"].aiorb,.dbai.aiorb{top:82px!important}   /* the AI orb sits just below the All Products pill */
 /* Tiles / 3D Home: icons only, as tall as the bottom pills */
 #hmode{top:14px!important;height:54px;padding:5px!important;box-sizing:border-box;background:rgba(28,28,28,.92)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 #hmode button{height:44px!important;min-width:0!important;width:58px;padding:0!important;gap:0!important;font-size:0!important;border-radius:22px!important}
