@@ -10,7 +10,7 @@ from pack import transform, write_packs, IMG
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = '/home/claude/shpc-art'
 SERVED = set('htm html css cjs js jsx mjs wasm csv cts geojson json map md mts ts tsx txt webmanifest xml avif gif ico jpeg jpg png svg webp otf ttf woff woff2 mp3 mp4 ogg wav webm pdf'.split())
-LANDING_KEEP = {'pitch/assets/home2.webp', 'pitch/assets/icon-192.png', 'recruit/a_470ace19f4f41e262a08af30291d0034.webp', 'recruit/icon.png'}
+LANDING_KEEP = {'pitch/assets/home2.webp', 'pitch/assets/vl/imagine.webp', 'pitch/assets/icon-192.png', 'recruit/a_470ace19f4f41e262a08af30291d0034.webp', 'recruit/icon.png'}
 PACK_MAX = 7_000_000
 
 
