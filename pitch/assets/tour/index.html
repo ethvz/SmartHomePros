@@ -849,6 +849,10 @@ const MODELS = {
       if(p.g===1){ const uv = new Float32Array(p.nv*2); for(let i=0;i<p.nv;i++){ uv[2*i]=(pos[3*i]+.0354)/.0708; uv[2*i+1]=(pos[3*i+1]+.0493)/.0475; } geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, M[p.g]); m.castShadow = true; g.add(m);
     }
+    /* the STEP had no camera head: ball in the mount's socket (centre y≈.019), short neck, black head with the red ring */
+    add(g, new THREE.Mesh(new THREE.SphereGeometry(.0165,40,28),PM.mount),0,.019,.05);
+    add(g, faceZ(cyl(.0105,.034,PM.mount,40)),0,.021,.078);
+    const h = camHead(.74); add(g, h,0,.03,.118); h.rotation.set(.2,-.12,0);
     return g; },
   ocspot(){ const g=G();                                // Spotlight Pro: light bar with six LEDs, speaker neck, camera head
     add(g, rslab(.1,.09,.016,.01,.005,PM.white),0,.0,.008);
