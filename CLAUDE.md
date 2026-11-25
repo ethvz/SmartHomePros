@@ -36,13 +36,16 @@ The old standalone sites (ethvz/Fast-Pitch, ethvz/Fast-Recruit Pages) now redire
 
 `python3 -m http.server 8766` in the repo root, open http://localhost:8766/index.html?pick (`?pick` skips the
 launch redirect). Check iPad landscape 1180x820, portrait 820x1180 and iPhone 390x844. The 3D Home exposes
-`window.__tour` (camera, controls, scene, focus(k), overview()) for scripted checks.
+`window.__tour` (camera, controls, scene, focus(k), overview(), MODELS) for scripted checks: `__tour.MODELS.k()` builds
+one product on its own for close inspection.
 
 ## Open items (waiting on Ethan)
 
 - Connect home: real links for the quick links (most show "link coming soon"), confirmed story copy (promo amounts,
   Fast Start tiers, drug-screen steps, Constructors Race), the 2027 season calendar, and a sharp photo of a rep
   actually knocking on a door for the background.
-- 3D Home: outside walls are still plain white (the reference house mixes in dark cladding and more trim); the
-  Outdoor Camera Pro model is only the mount (the STEP had no camera head - ask for the head CAD).
+- 3D Home: outside walls are still plain white (the reference house mixes in dark cladding and more trim). Only the
+  Smart Hub and the Outdoor Camera Pro mount come from CAD; the camera heads and the other products are modelled in
+  `pitch/assets/tour/index.html` (MODELS) from the official renders and spec sheet in iCloud
+  `Vivint/Vivint Products/` (Product Renders, Full Product Spec Sheets.pdf). Head CAD would still beat the model.
 - Awards gator board PDF (24x36) was made from the Fast Pitch awards page; may need 0.125" bleed for the printer.

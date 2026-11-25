@@ -880,6 +880,25 @@ function keypadLabels(){
   x.fillStyle = '#9da1a4'; F(34, 500); x.fillText('vivint', ...P(0, -.0715));
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
 }
+/* printed marks on the myQ hub face: brand line, vent slots, myQ connected, button icons (10 px per mm, 100 mm square) */
+function garageMarks(){
+  const N = 1000, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
+  const P = (mx, my) => [N/2 + mx*10000, N/2 - my*10000];
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = '#8e9396'; x.font = '600 44px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '6px'; x.fillText('CHAMBERLAIN', ...P(0, .036));
+  x.fillStyle = '#3b3e41'; for(let i=0;i<9;i++){ const [vx, vy] = P(-.0256+i*.0064, .022 + (i%2 ? .0016 : -.0016)); x.beginPath(); x.roundRect(vx-4, vy-16, 8, 32, 4); x.fill(); }
+  x.fillStyle = '#6d7276'; x.letterSpacing = '0px'; x.font = '400 50px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('my', ...P(.027, .0005)); x.font = '700 56px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('Q', ...P(.0352, .0005));
+  x.font = '400 22px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('connected', ...P(.031, -.0072));
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
+}
+/* a fine grey speaker-fabric weave (tiles; one tile ~2 mm) */
+function weaveTex(){
+  const N = 32, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
+  x.fillStyle = '#5f6366'; x.fillRect(0,0,N,N);
+  for(let i=0;i<4;i++) for(let j=0;j<4;j++){ const o = (i+j)%2; x.fillStyle = o ? '#8d9194' : '#7c8083';
+    x.beginPath(); x.ellipse(j*8+4, i*8+4, o?3.6:2.4, o?2.4:3.6, 0, 0, Math.PI*2); x.fill(); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
+}
 const MODELS = {
   dbcp(){ const g=G(), W = .043, H = .132;              // Doorbell Camera Pro (Gen 2): 43 x 132 x 35 mm. White body on a recessed back plate,
                                     // a full-face black glass front with eased edges, lens up top, red-ring button below
@@ -1045,15 +1064,36 @@ const MODELS = {
     for(const sx of [-1,1]) add(g, rslab(.008, .026, .002, .004, .0008, dark), sx*.05, 0, .0405);
     for(const [x,y,w] of [[-.031,.039,.011],[-.024,.044,.005],[-.016,.046,.011]]){ const p = add(g, rslab(w, .008, .0015, .0025, .0006, w>.006?led:mat(0x6c7073,{r:.35})), x, y, .0418); p.rotation.z = Math.atan2(-x, y); }
     return g; },
-  water(){ return photoSolid('water',.072,.022,true); },
+  water(){ const g=G(), W=.064;                         // Water Sensor: 64 mm square puck lying on the floor (origin at the base, top toward +y):
+    const base = add(g, rslab(W-.004, W-.004, .014, .017, .005, PM.whiteM), 0, .007, 0); base.rotation.x = -Math.PI/2;   // rounded base,
+    const seam = add(g, rslab(W-.003, W-.003, .0016, .0165, .0005, mat(0xc5c7c8,{r:.5})), 0, .0145, 0); seam.rotation.x = -Math.PI/2;  // grey seam,
+    const lid = add(g, rslab(W, W, .009, .018, .0032, PM.whiteM), 0, .0195, 0); lid.rotation.x = -Math.PI/2;                   // soft-edged lid
+    add(g, cyl(.0007, .0004, PM.dot, 12), .0, .0242, .006);
+    return g; },
   /* products photographed from the front: a rounded body with the real product photo as its face */
-  chime(){ return photoSolid('chime',.06,.035); },
+  chime(){ const g=G();                                 // Chime Extender: 58 x 98 x 36 mm plug-in speaker. White body, grey woven fabric front
+    add(g, rslab(.058, .098, .03, .014, .006, PM.whiteM), 0, 0, .015);                    // in a thin grey rim, a side button
+    add(g, rslab(.0565, .0965, .006, .0135, .0022, mat(0xb9bcbe,{r:.4})), 0, 0, .033);
+    const ft = weaveTex(); ft.repeat.set(480, 480);   // slab UVs are in metres
+    add(g, rslab(.0525, .0925, .0012, .0118, .0005, new THREE.MeshStandardMaterial({map:ft, bumpMap:ft, bumpScale:.6, roughness:.95, envMapIntensity:.1})), 0, 0, .0356);
+    const b = add(g, rslab(.0055, .016, .0014, .0027, .0005, mat(0xe4e5e4,{r:.4})), -.0291, .004, .016); b.rotation.y = -Math.PI/2;
+    return g; },
   fire(){ const g=G();                                  // Smoke & CO Monitor (listens for the existing alarms): 38 x 76 x 25 mm white block,
     add(g, rslab(.038, .076, .022, .006, .003, PM.whiteM), 0, 0, .011);                   // a raised band across the top, a single mic hole
     add(g, rslab(.0384, .0085, .0245, .004, .0015, PM.whiteM), 0, .0275, .01225);
     add(g, faceZ(cyl(.0012, .0008, mat(0x3a2e26,{r:.5}), 20)), 0, .009, .0222);
     return g; },
-  garage(){ return photoSolid('garage',.12,.034); },
+  garage(){ const g=G(), W=.114;                        // Garage Door Controller (myQ hub): 114 mm squircle, 38 mm deep. Soft white body on a grey rim,
+    add(g, loft([[0,W-.004,W-.004,4.6],[.003,W,W,4.6],[.027,W,W,4.6],[.032,W-.003,W-.003,4.5],[.0355,W-.008,W-.008,4.4],[.0372,W-.014,W-.014,4.3],[.038,W-.024,W-.024,4.2]], PM.whiteM, 96));   // clear light window over the LED grid,
+    add(g, loft([[0,W+.0006,W+.0006,4.6],[.0035,W+.0006,W+.0006,4.6]], mat(0xb9bdc0,{r:.4}), 96));                                  // vents, three buttons, printed marks
+    const win = mat(0xd9dcdd,{r:.2}); add(g, rslab(.034, .034, .004, .008, .0015, win), 0, -.003, .0375);
+    const clr = new THREE.MeshPhysicalMaterial({color:0xf4f6f7, roughness:.05, transmission:.6, thickness:.004, transparent:true, opacity:.55, clearcoat:1});
+    for(let r=0;r<3;r++) for(let c=0;c<4;c++) add(g, rslab(.0052, .0052, .0008, .0006, .0002, mat(0xd8c88a,{r:.35,x:{emissive:0x8a7a3a,emissiveIntensity:.35}})), (c-1.5)*.0062, -.003+(1-r)*.0062, .0397);
+    add(g, rslab(.03, .03, .0016, .006, .0006, clr), 0, -.003, .0404);
+    for(const x of [-.03, 0, .03]) add(g, rslab(.008, .011, .0014, .0035, .0005, mat(0xeeeeec,{r:.45})), x, -.038, .0372);
+    add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), new THREE.MeshStandardMaterial({map:garageMarks(), transparent:true, roughness:.5, depthWrite:false,
+      polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})), 0, 0, .0381);
+    return g; },
   glass(){ const g=G();                                 // Glass Break Detector: 66 x 99 x 23 mm. Soft white slab on a grey back seam, recessed mic disc
     add(g, rslab(.0655, .0985, .008, .0135, .0025, mat(0xcfd1d2,{r:.45})), 0, 0, .004); // with the microphone hole, TEST button on the side
     add(g, rslab(.066, .099, .017, .0145, .0065, PM.whiteM), 0, 0, .0145);
@@ -1073,7 +1113,16 @@ const MODELS = {
     add(g, new THREE.Mesh(new THREE.PlaneGeometry(.0772, .1472), new THREE.MeshStandardMaterial({map:keypadLabels(), transparent:true, roughness:.5, depthWrite:false,
       polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3})), 0, 0, fz+.00265);
     return g; },
-  plug(){ return photoSolid('plug',.045,.03); },
+  plug(){ const g=G();                                  // Smart Plug: 53 x 99 x 38 mm, plugged into the wall outlet. Rounded white body with grip ribs
+    add(g, rslab(.053, .093, .034, .009, .007, PM.whiteM), 0, -.003, .017);              // down one side, a ringed button, its own outlet on the top end
+    const ob = add(g, rslab(.038, .012, .03, .004, .002, PM.whiteM), 0, .045, .015);
+    const slot = mat(0x2a2b2d,{r:.7});
+    for(const x of [-.0065,.0065]) add(g, new THREE.Mesh(new THREE.BoxGeometry(.0022, .002, .009), slot), x, .051, .015);
+    add(g, cyl(.0019, .002, slot, 16), 0, .051, .0055);
+    for(let i=0;i<9;i++) add(g, new THREE.Mesh(new THREE.BoxGeometry(.0012, .0035, .022), mat(0xe2e3e2,{r:.5})), -.0262, -.03+i*.0075, .017);
+    add(g, torus(.0056, .00035, mat(0xa7abae,{r:.4})), 0, -.012, .0342);
+    add(g, faceZ(cyl(.0054, .0005, mat(0xf1f1ef,{r:.45}), 40)), 0, -.012, .0341);
+    return g; },
   fob(){ const g=G();                                   // Key Fob on a split ring with the house keys, lying on the counter
     const w=.035, d=.012; add(g, photoSolid('fob',w,d,true));
     const [hx,hy] = holeCenter('fob',w), ring = mat(0xb8bcc0,{r:.25,m:1});
