@@ -64,6 +64,8 @@ def patch_recruit():
         s = s.replace(TITLE, TITLE + '\n' + head_hook('recruit'), 1)
     if 'dock.js' not in s:
         s = s.replace(TITLE, TITLE + '\n' + DOCK, 1)
+    if 'id="appLock"' not in s:   # app, not a website (shared with the other apps)
+        s = s.replace(TITLE, TITLE + '\n' + open(os.path.join(ROOT, 'tools/applock.html')).read(), 1)
     # menu: a full-width "Switch app" row above the menu's bottom buttons
     btn = ("'<div class=\"dw-foot\">' + (window.SHPC ? '<button type=\"button\" class=\"dw-u dw-app\" data-shpc-switch title=\"Switch app\" aria-label=\"Switch app\">"
            + GRID.replace('class="ic" width="20" height="20" ', '') + "<span>Switch app</span></button>' : '') + '<button type=\"button\" class=\"dw-u dw-social\"")

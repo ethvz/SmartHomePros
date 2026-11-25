@@ -3,6 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<style id="appLock">/* app, not a website: no text selection, callouts, image dragging or browser zoom */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y}
+*,*::before,*::after{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+input,textarea,select,[contenteditable]:not([contenteditable="false"]),[contenteditable]:not([contenteditable="false"]) *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,svg,video,canvas,a{-webkit-user-drag:none;user-drag:none}</style>
+<script id="appLockJs">(function(){var no=function(e){e.preventDefault()},ed=function(t){return t&&t.closest&&t.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])')};
+['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,no,{passive:false})});
+document.addEventListener('dragstart',function(e){if(!(e.target.closest&&e.target.closest('[draggable="true"]')))e.preventDefault()},true);
+document.addEventListener('selectstart',function(e){if(!ed(e.target))e.preventDefault()},true);
+document.addEventListener('contextmenu',function(e){if(!ed(e.target))e.preventDefault()},true);
+addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault()},{passive:false});
+addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&/^(\+|=|-|_|0)$/.test(e.key))e.preventDefault()});})();</script>
+
 <meta charset="utf-8">
 <title>Fast Pitch 2027</title>
 <meta name="description" content="Vivint Smart Home: one system, every corner of your home.">
@@ -5462,7 +5475,7 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
 { const pg=$('#p-home'), pill=$('#hmode'), box=$('#tour3d');
   const set=m=>{ const d3=m==='3d'; pg.classList.toggle('d3',d3); pill.classList.toggle('d3',d3); document.body.classList.toggle('hd3',d3);
     pill.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.hm===m));
-    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=14&fb=76';   /* (Connect: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
+    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=15&fb=76';   /* (Connect: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
   /* run the 3D scene only while it is on screen (3D view picked and the home page showing) */

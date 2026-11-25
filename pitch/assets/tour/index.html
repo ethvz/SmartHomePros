@@ -1,5 +1,18 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Fast Pitch Home Tour</title>
+<style id="appLock">/* app, not a website: no text selection, callouts, image dragging or browser zoom */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y}
+*,*::before,*::after{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+input,textarea,select,[contenteditable]:not([contenteditable="false"]),[contenteditable]:not([contenteditable="false"]) *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,svg,video,canvas,a{-webkit-user-drag:none;user-drag:none}</style>
+<script id="appLockJs">(function(){var no=function(e){e.preventDefault()},ed=function(t){return t&&t.closest&&t.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])')};
+['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,no,{passive:false})});
+document.addEventListener('dragstart',function(e){if(!(e.target.closest&&e.target.closest('[draggable="true"]')))e.preventDefault()},true);
+document.addEventListener('selectstart',function(e){if(!ed(e.target))e.preventDefault()},true);
+document.addEventListener('contextmenu',function(e){if(!ed(e.target))e.preventDefault()},true);
+addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault()},{passive:false});
+addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&/^(\+|=|-|_|0)$/.test(e.key))e.preventDefault()});})();</script>
+
 <style id="fbInset">/* ?fb=N: Fast Pitch's footer floats over the bottom N px; the rail, hint, card and credits sit above it */
 :root{--fb:0px}#rail,#hint,#credits{translate:0 calc(-1 * var(--fb))}#card{margin-bottom:var(--fb)}</style>
 <script>{ const fb = +new URLSearchParams(location.search).get('fb'); if (fb > 0) document.documentElement.style.setProperty('--fb', fb + 'px'); }</script>
@@ -57,7 +70,7 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 
 /* bottom rail */
 /* product carousel: identical to Fast Pitch's All Products sheet */
-#rail{position:fixed;left:0;right:0;bottom:10px;z-index:6;height:196px;pointer-events:none}
+#rail{position:fixed;left:0;right:0;bottom:10px;z-index:6;height:212px;pointer-events:none}
 #railIn{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;gap:22px;overflow-x:auto;overflow-y:hidden;padding:0 28px 12px;scroll-padding:0 40px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;pointer-events:auto;
   -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 5%,#000 95%,transparent 100%)}
 #railIn::-webkit-scrollbar{display:none}
@@ -169,6 +182,14 @@ body.focus #back{display:none}
   .c-media{min-height:120px;padding-top:46px}
   .c-media img{max-height:100%}
 }
+
+/* rail: a group is as wide as its tiles (a long title wraps instead of pushing the next group away) */
+#railIn .grp>span{white-space:normal;width:0;min-width:100%;line-height:1.35}
+#railIn.drag{cursor:grabbing;scroll-snap-type:none}
+#railIn{cursor:grab}
+/* rounder product card */
+#card{border-radius:28px}
+@media (max-width:760px), (max-aspect-ratio:1/1){ #card{border-radius:24px} }
 </style>
 <script>
 (()=>{ if(window.parent===window) return; document.documentElement.classList.add('emb');
@@ -225,7 +246,7 @@ import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
-const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=10'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
+const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=14'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
   for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const b=document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.min(92,Math.round(92*got/tot))+'%'); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
@@ -371,13 +392,16 @@ const V = (x,y,z) => new THREE.Vector3(x,y,z);
 
 /* ------------------------------------------------------------------ materials */
 const M = {
-  siding: phys(0xffffff, {r:.78, x:{map:TXC.lap, bumpMap:TXC.lapB, bumpScale:2.2}}),
+  siding: mat(0xdfe2e6, {r:.92, x:{bumpMap:TX.plaster, bumpScale:.35}}),   // smooth light stucco (reference house)
   batten: phys(0xffffff, {r:.62, x:{map:TXC.batten}}),
   paint:  mat(0xe6dfd4, {r:.93, x:{bumpMap:TX.plaster, bumpScale:.5}}),
   ceil:   mat(0xf4f2ee, {r:.95}),
   cut:    mat(0xf6f4f0, {r:.9}),          // section faces where the house is cut open
   trim:   phys(0x1c1e20, {r:.42, m:.35}),
-  roof:   phys(0xffffff, {r:.85, x:{map:TX.roof, normalMap:TX.roofN, roughnessMap:TX.roofR, color:0x4b4f55}}),
+  roof:   phys(0xffffff, {r:.85, x:{map:TX.roof, normalMap:TX.roofN, roughnessMap:TX.roofR, color:0x62666c}}),
+  soffit: mat(0xe9e7e2, {r:.9}),
+  ground: mat(0x060707, {r:1}),
+  fence:  phys(0x2a2c2e, {r:.7}),
   fascia: phys(0x1d1f21, {r:.5, m:.2}),
   floor:  phys(0xffffff, {r:1, x:{map:TX.floor, normalMap:TX.floorN, roughnessMap:TX.floorR, clearcoat:.25, clearcoatRoughness:.35}}),
   conc:   mat(0xffffff, {r:1, x:{map:TX.conc, normalMap:TX.concN, roughnessMap:TX.concR, color:0xd2d0cb}}),
@@ -400,51 +424,27 @@ const M = {
 /* ------------------------------------------------------------------ site */
 const FL = 0.15;           // finished floor
 const EH = 6.3;            // eave / ceiling height of the two-storey volume
-// lawn, then a soft black vignette so the diorama melts into the night
-{ const g = new THREE.PlaneGeometry(46, 46); g.rotateX(-Math.PI/2); worldUV(g);
-  const ground = new THREE.Mesh(g, M.grass); ground.userData.plane = true; ground.position.set(0,-.005,2); ground.receiveShadow = true; scene.add(ground);
-  const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d');
-  const gr = x.createRadialGradient(256,256,70,256,256,256); gr.addColorStop(0,'rgba(3,4,4,0)'); gr.addColorStop(.3,'rgba(3,4,4,.2)'); gr.addColorStop(.5,'rgba(3,4,4,.78)'); gr.addColorStop(.64,'rgba(3,4,4,1)'); gr.addColorStop(1,'rgba(3,4,4,1)');
-  x.fillStyle = gr; x.fillRect(0,0,512,512);
-  const vg = new THREE.Mesh(new THREE.PlaneGeometry(47,47), new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c), transparent:true, depthWrite:false}));
-  vg.rotation.x = -Math.PI/2; vg.position.set(0,.06,2); vg.scale.set(1,1,1); vg.renderOrder = 2; scene.add(vg); }
-/* hardscape: driveway with saw-cut joints, a stepping-paver walk, a stoop, steel-edged beds and a gravel strip
-   along the foundation. Soft "grass-shadow" strips sit along every edge so lawn never meets concrete with a hard line. */
-const edgeTex = (() => { const c = document.createElement('canvas'); c.width = 64; c.height = 64; const x = c.getContext('2d');
-  const g = x.createLinearGradient(0,0,0,64); g.addColorStop(0,'rgba(22,26,14,.78)'); g.addColorStop(.45,'rgba(26,30,16,.35)'); g.addColorStop(1,'rgba(30,34,18,0)');
-  x.fillStyle = g; x.fillRect(0,0,64,64); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
-const edgeM = new THREE.MeshBasicMaterial({map:edgeTex, transparent:true, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-4});
-/* a soft strip on the lawn: from (x1,z1) to (x2,z2), fading away from the hard edge toward `side` (+1 / -1 across the line) */
-function edge(x1,z1,x2,z2,w=.32,side=1){
-  const len = Math.hypot(x2-x1,z2-z1), m = new THREE.Mesh(new THREE.PlaneGeometry(len,w), edgeM);
-  m.rotation.x = -Math.PI/2; m.rotation.z = Math.atan2(-(z2-z1), x2-x1) + (side<0 ? Math.PI : 0);
-  const nx = -(z2-z1)/len, nz = (x2-x1)/len; m.position.set((x1+x2)/2 + nx*side*w/2, .012, (z1+z2)/2 + nz*side*w/2);
-  m.renderOrder = 1; scene.add(m); return m; }
+// black void with the house on a concrete pad, like a model on a table (reference look)
+{ const g = new THREE.PlaneGeometry(60, 60); g.rotateX(-Math.PI/2); worldUV(g);
+  const ground = new THREE.Mesh(g, M.ground); ground.userData.plane = true; ground.position.set(0,-.36,2); ground.receiveShadow = true; scene.add(ground); }
 const concDark = mat(0x3f4140, {r:.95});
-slab(-10.2,-5.2,0,.045,4.2,13.5,M.conc);                                   // driveway
-for(const z of [6.7,9.2,11.7]) slab(-10.2,-5.2,.045,.047,z-.008,z+.008,concDark,null,false);
-slab(-7.71,-7.69,.045,.047,4.2,13.5,concDark,null,false);
-edge(-10.2,4.2,-10.2,13.5,.36,-1); edge(-5.2,4.2,-5.2,13.5,.36,1); edge(-10.2,13.5,-5.2,13.5,.3,-1);
+slab(-11.2,12.9,-.35,.03,-7.2,6.6,M.conc);                                  // the pad (its front edge shows)
+slab(-10.6,-4.9,-.35,.045,6.6,11.2,M.conc);                                 // driveway runs on past the pad
+slab(-10.6,-4.9,.03,.045,3.9,6.6,M.conc);
+for(const z of [7.6,9.4]) slab(-10.6,-4.9,.045,.047,z-.008,z+.008,concDark,null,false);
 slab(-2.35,-0.45,0,.13,4.0,5.25,M.conc); slab(-2.35,-0.45,0,.075,5.25,5.65,M.conc);   // stoop + step
-for(let i=0, z=6.05; z<13.2; i++, z+=.95){ const x0 = -1.95 + (i%2 ? .06 : -.06);                      // stepping pavers
-  slab(x0,x0+1.1,0,.05,z,z+.62,M.conc); edge(x0,z,x0+1.1,z,.22,-1); edge(x0,z+.62,x0+1.1,z+.62,.22,1); edge(x0,z,x0,z+.62,.2,-1); edge(x0+1.1,z,x0+1.1,z+.62,.2,1); }
+slab(-2.25,-0.55,.03,.05,5.65,6.6,M.conc);                                  // walk to the street
 slab(-10.4,10.2,0,FL-.02,-6.2,4.2,M.plinth);                               // foundation
 const steel = phys(0x23201d, {r:.6, m:.6});
 const bed = (x1,x2,z1,z2) => { slab(x1,x2,0,.055,z1,z2,M.mulch,null,false);
-  slab(x1,x2,0,.07,z2-.012,z2,steel,null,false); slab(x1-.012,x1,0,.07,z1,z2,steel,null,false); slab(x2,x2+.012,0,.07,z1,z2,steel,null,false);
-  edge(x1,z2,x2,z2,.3,1); edge(x1,z1,x1,z2,.25,-1); edge(x2,z1,x2,z2,.25,1); };
-bed(-5,-2.4,4.2,5.7); bed(-.4,1.4,4.2,5.4);
+  slab(x1,x2,0,.07,z2-.012,z2,steel,null,false); slab(x1-.012,x1,0,.07,z1,z2,steel,null,false); slab(x2,x2+.012,0,.07,z1,z2,steel,null,false); };
+bed(-4.9,-2.4,4.2,5.4); bed(-.4,1.4,4.2,5.4);
+slab(-4.9,-2.35,.03,.06,5.4,6.6,M.grass); slab(-.45,1.4,.03,.06,5.4,6.6,M.grass);   // lawn strips out front
 // pea-gravel strip along the great room and tower
 { const gravel = mat(0x8b8780, {r:1, x:{normalMap:TX.concN, normalScale:new THREE.Vector2(3,3), map:TX.conc}});
-  slab(1.4,11.7,0,.04,4.2,4.75,gravel,null,false); edge(1.4,4.75,11.7,4.75,.3,1);
-  slab(11.5,12.05,0,.04,-6.2,4.75,gravel,null,false); edge(12.05,-6.2,12.05,4.75,.3,1); }
-// subtle variation in the lawn (worn and lush patches) so it doesn't read as one flat colour
-{ const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d');
-  for(let i=0;i<90;i++){ const r = 8+rnd()*34, px = rnd()*256, py = rnd()*256, g = x.createRadialGradient(px,py,0,px,py,r), lush = rnd()<.5;
-    g.addColorStop(0, lush ? 'rgba(8,22,6,.32)' : 'rgba(70,62,30,.22)'); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(px-r,py-r,2*r,2*r); }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-  const v = new THREE.Mesh(new THREE.PlaneGeometry(36,30), new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false}));
-  v.rotation.x = -Math.PI/2; v.position.set(0,.004,4); v.renderOrder = 1; scene.add(v); }
+  slab(1.4,11.7,0,.04,4.2,4.75,gravel,null,false);
+  slab(11.5,12.05,0,.04,-6.2,4.75,gravel,null,false); }
+slab(12.1,12.9,.03,.06,-7.2,6.6,M.grass);                                   // side yard behind the fence
 
 /* ------------------------------------------------------------------ walls with openings */
 /* A wall along X (fixed z=at) or along Z (fixed x=at). Openings {a,b,lo,hi,kind:'window'|'door'|'none', lit} */
@@ -514,15 +514,17 @@ slab(-5,1.4,EH+FL-.02,EH+FL+.2,-5.8,3.8,M.ceil);   // lid
   slab(-1.72,-1.62,FL+.35,FL+2.05,3.9,3.905,M.glassLit,d);
   slab(-1.98,-1.9,FL,FL+2.43,3.78,4.04,M.trim,d); slab(-0.9,-0.82,FL,FL+2.43,3.78,4.04,M.trim,d); slab(-1.98,-0.82,FL+2.35,FL+2.43,3.78,4.04,M.trim,d);
 }
-/* entry canopy with downlights */
-slab(-4.9,1.6,3.08,3.24,4.0,5.45,M.fascia);
-slab(-4.9,1.6,3.0,3.08,4.0,5.42,mat(0x6b4a33,{r:.6,x:{map:TX.floor,color:0x9a7656}}));   // wood soffit
+/* porch roof across the front: dark shingles sloping out over the entry (reference house) */
+{ const len = 1.75, a = .24, g = new THREE.BoxGeometry(7.5,.16,len); worldUV(g);
+  const r = new THREE.Mesh(g, [M.roof,M.roof,M.roof,M.soffit,M.roof,M.roof]); r.userData.box = true;
+  r.position.set(-1.85, 3.42, 3.9+len/2*Math.cos(a)); r.rotation.x = a; r.castShadow = r.receiveShadow = true; scene.add(r);
+  slab(-5.6,1.9,3.0,3.24,5.6,5.72,M.fascia); }
 
 /* Great room: x 1.6..10, z -6..4, double height, cut open at the front (z = 4) */
-const shared = wall({axis:'z', at:1.5, from:-6, to:4, h:EH, m:M.paint});   // shared with the main volume; painted room side
+const shared = wall({axis:'z', at:1.5, from:-6, to:4, h:EH+.6, m:M.paint});   // shared with the main volume; painted room side
 wall({axis:'x', at:-5.9, from:1.4, to:10.1, h:EH, faces:{pos:M.paint, neg:M.siding, side:M.paint}, open:[
   {a:2.5,b:3.2,lo:4.9,hi:5.6,kind:'window'},{a:3.8,b:4.5,lo:4.9,hi:5.6,kind:'window'},{a:5.1,b:5.8,lo:4.9,hi:5.6,kind:'window'},{a:6.4,b:7.1,lo:4.9,hi:5.6,kind:'window'}]});
-const rightW = wall({axis:'z', at:9.9, from:-6, to:4, h:EH, faces:{pos:M.siding, neg:M.paint, side:M.paint}, open:[
+const rightW = wall({axis:'z', at:9.9, from:-6, to:4, h:EH+.6, faces:{pos:M.siding, neg:M.paint, side:M.paint}, open:[
   {a:-1.15,b:-0.2,lo:0,hi:2.3,kind:'none'},          // side entry to the mudroom
   {a:1.45,b:3.35,lo:.85,hi:2.45,kind:'sash'}]});
 /* side entry door (half-glass) and the single-hung window the Door & Window Sensor is on */
@@ -541,7 +543,6 @@ const rightW = wall({axis:'z', at:9.9, from:-6, to:4, h:EH, faces:{pos:M.siding,
   slab(9.6,9.835,lo+.035,lo+.055,a-.08,b+.08,M.cab);             // interior stool the magnet sits on
   slab(9.66,9.8,lo-.12,lo+.035,a-.04,b+.04,M.paint); }
 slab(1.6,9.8,FL-.02,FL,-5.8,4,M.floor);                    // floor
-slab(1.4,10,EH+FL,EH+FL+.22,-6,4,M.ceil);                  // ceiling slab (its cut edge shows at the front)
 slab(1.4,10,FL-.12,FL-.02,3.9,4,M.cut);                   // floor section edge
 // exterior faces of the great room (seen from the side / back)
 
@@ -549,20 +550,42 @@ slab(1.4,10,FL-.12,FL-.02,3.9,4,M.cut);                   // floor section edge
 slab(10.0,11.5,0,7.2,-6.2,1.0,M.batten);
 slab(9.95,11.6,7.2,7.35,-6.3,1.1,M.fascia);
 
-/* Gable roof over both volumes: ridge along x */
-{ const ridgeY = EH+FL+2.0, z0 = -6.6, z1 = 4.6, zr = -1, eY = EH+FL+.22;
+/* a gable wall built from thin horizontal boxes (so it bakes like the other walls); profile(y) gives [a,b] at height y */
+function gable(axis, at, y0, y1, prof, m, t=.2, step=.14){
+  for(let y=y0; y<y1-1e-3; y+=step){ const yt = Math.min(y+step, y1), [a,b] = prof(yt); if(b-a < .02) break;
+    if(axis==='x') slab(a,b,y,yt,at-t/2,at+t/2,m); else slab(at-t/2,at+t/2,y,yt,a,b,m); } }
+/* Roofs, like the reference: a side gable over the two-storey volume and a tall front-facing gable over the great room.
+   The great room is vaulted to the ridge, so the cut front shows the "A". */
+const RIDGE_L = 1.35, RIDGE_G = 3.1;
+{ const eY = EH+FL+.22, z0 = -6.6, z1 = 4.6, zr = -1, ridgeY = eY+RIDGE_L;
   const pitch = Math.atan2(ridgeY-eY, zr-z0);
   const mk = (zA, zB, sgn) => { const len = Math.hypot(zB-zA, ridgeY-eY)+.1;
-    const r = new THREE.Mesh(new THREE.BoxGeometry(16.2,.18,len), M.roof); worldUV(r.geometry); r.userData.box = true;
-    r.position.set(2.4, (eY+ridgeY)/2+.06, (zA+zB)/2); r.rotation.x = sgn*pitch; r.castShadow = r.receiveShadow = true; scene.add(r); return r; };
+    const r = new THREE.Mesh(new THREE.BoxGeometry(7.4,.18,len), M.roof); worldUV(r.geometry); r.userData.box = true;
+    r.position.set(-2.05, (eY+ridgeY)/2+.06, (zA+zB)/2); r.rotation.x = sgn*pitch; r.castShadow = r.receiveShadow = true; scene.add(r); return r; };
   mk(z0, zr, -1); mk(zr, z1, 1);
-  // gable ends (siding triangles) and fascia
-  const tri = (x, flip) => { const s = new THREE.Shape(); s.moveTo(z0+.4,0); s.lineTo(z1-.4,0); s.lineTo(zr,ridgeY-eY-.05); s.closePath();
-    const g = new THREE.ExtrudeGeometry(s,{depth:.2,bevelEnabled:false}); g.rotateY(-Math.PI/2); g.computeVertexNormals(); worldUV(g, x, eY, 0);
-    const m = new THREE.Mesh(g, M.siding); m.position.set(x+(flip?.2:0), eY, 0); m.castShadow = m.receiveShadow = true; scene.add(m); };
-  tri(-5.0, false); tri(10.2, false);
-  slab(-5.7,10.5,eY-.18,eY+.02,z1-.22,z1,M.fascia);
-  slab(-5.7,10.5,eY-.18,eY+.02,z0,z0+.22,M.fascia); }
+  const tri = x => gable('z', x, eY-.02, ridgeY, y => { const f = (y-eY)/(ridgeY-eY); return [z0+.4+(zr-z0-.4)*f, z1-.4-(z1-.4-zr)*f]; }, M.siding);
+  tri(-5.0); tri(1.6);
+  slab(-5.75,1.6,eY-.18,eY+.02,z1-.22,z1,M.fascia); slab(-5.75,1.6,eY-.18,eY+.02,z0,z0+.22,M.fascia); }
+{ const eY = EH+FL+.22, x0 = 1.15, x1 = 10.45, xr = 5.8, z0 = -6.6, z1 = 4.75, ridgeY = eY+RIDGE_G;
+  const mk = (xA, xB, sgn) => { const w = Math.hypot(xB-xA, ridgeY-eY)+.12, a = Math.atan2(ridgeY-eY, Math.abs(xB-xA));
+    const r = new THREE.Mesh(new THREE.BoxGeometry(w,.2,z1-z0), [M.roof,M.roof,M.roof,M.ceil,M.roof,M.roof]); worldUV(r.geometry); r.userData.box = true;
+    r.position.set((xA+xB)/2, (eY+ridgeY)/2+.08, (z0+z1)/2); r.rotation.z = sgn*a; r.castShadow = r.receiveShadow = true; scene.add(r); return r; };
+  mk(x0, xr, 1); mk(xr, x1, -1);
+  // back gable wall: painted inside, stucco outside
+  const uy = x => (eY - (EH+FL)) + (ridgeY-eY)*(1 - Math.abs(x-xr)/(xr-x0)) + .02;   // underside of the roof above x, from the wall top
+  const top = EH+FL, kx = (ridgeY-eY)/(xr-x0);
+  gable('x', -5.9, top, top+uy(xr), y => { const h = y-top - (eY-top) - .02 - .04; const d = Math.max(0, h)/kx; return [Math.max(1.5, x0+d), Math.min(9.95, x1-d)]; }, M.paint);
+  // the cut edge of the roof at the front reads as a crisp white line (section), like the reference
+  for(const [xA,xB,sgn] of [[x0,xr,1],[xr,x1,-1]]){ const w = Math.hypot(xB-xA, ridgeY-eY)+.12, a = Math.atan2(ridgeY-eY, Math.abs(xB-xA));
+    const e = new THREE.Mesh(new THREE.BoxGeometry(w,.22,.03), M.cut); e.position.set((xA+xB)/2, (eY+ridgeY)/2+.08, z1+.016); e.rotation.z = sgn*a; scene.add(e); } }
+/* dark fence and a tree off the right side */
+{ for(let z=-6.9; z<3.2; z+=.16) slab(12.25,12.31,.03,1.85,z,z+.13,M.fence,null,false);
+  slab(12.2,12.36,1.85,1.9,-6.95,3.3,M.fence,null,false);
+  const leaf = new THREE.MeshStandardMaterial({color:0x2e4a2c, roughness:.9, flatShading:true}), bark = mat(0x3b2f27,{r:1});
+  const tree = new THREE.Group(); tree.position.set(13.1,0,-2.4); scene.add(tree);
+  const tr = cyl(.14,3.2,bark,10); tr.position.y = 1.6; tree.add(tr);
+  for(const [x,y,z,r] of [[0,3.6,0,1.5],[.7,4.4,.3,1.1],[-.6,4.6,-.2,1.15],[.1,5.4,.1,1.0],[.4,3.2,-.7,1.0],[-.5,3.4,.6,1.0]]){
+    const b = new THREE.Mesh(new THREE.IcosahedronGeometry(r,1), leaf); b.position.set(x,y,z); b.castShadow = true; tree.add(b); } }
 
 /* ------------------------------------------------------------------ interior build-outs (procedural) */
 // kitchen run on the back wall
@@ -630,14 +653,14 @@ plate(1.604,FL+.32,-2.6,Math.PI/2); plate(9.796,FL+.32,3.62,-Math.PI/2);
 slab(2.6,6.5,FL,FL+.012,.05,3.1,M.rug,null,false);
 
 /* ------------------------------------------------------------------ lights */
-scene.add(new THREE.HemisphereLight(0x6f86b0, 0x050606, 0.1));
-const moon = new THREE.DirectionalLight(0x9fb3dc, .32);
+scene.add(new THREE.HemisphereLight(0xb4c1d4, 0x101111, 2.4));
+const moon = new THREE.DirectionalLight(0xcdd6e6, 5.5);
 moon.position.set(-9, 20, 16); moon.target.position.set(1, 0, -1);
 moon.castShadow = true; moon.shadow.mapSize.set(2048, 2048);
 Object.assign(moon.shadow.camera, {left:-17, right:17, top:14, bottom:-12, near:4, far:60});
 moon.shadow.bias = -0.0004; moon.shadow.normalBias = 0.03; moon.shadow.radius = 4;
 scene.add(moon, moon.target);
-const warm = 0xffc994;
+const warm = 0xffd7b0;
 const pl = (x,y,z,i,d=9) => { const l = new THREE.PointLight(warm, i, d, 2); l.position.set(x,y,z); scene.add(l); return l; };
 pl(5.35,2.3,-3.0,22,10);                        // island pendants
 pl(4.2,3.4,1.6,17,12);                          // living
@@ -650,8 +673,8 @@ pl(5.6,5.6,-2.0,18,13);                         // upper volume fill
 // under-cabinet LED strip
 slab(2.45,8.15,FL+1.535,FL+1.545,-5.47,-5.44,M.bulb,null,false);
 // exterior: canopy downlights wash the facade, sconces by the garage
-for(const x of [-3.6,0.2]){ const s = new THREE.SpotLight(warm, 30, 7, .75, .9, 2); s.position.set(x,2.98,4.3); s.target.position.set(x,0,4.05); scene.add(s, s.target);
-  const d = cyl(.045,.01,M.bulb,16); d.position.set(x,2.995,4.4); scene.add(d); }
+for(const x of [-3.6,0.2]){ const s = new THREE.SpotLight(warm, 30, 7, .75, .9, 2); s.position.set(x,3.28,4.3); s.target.position.set(x,0,4.05); scene.add(s, s.target);
+  const d = cyl(.045,.01,M.bulb,16); d.position.set(x,3.32,4.4); scene.add(d); }
 { const s = new THREE.SpotLight(warm, 26, 8, 1.0, .95, 2); s.position.set(-7.7,2.9,4.4); s.target.position.set(-7.7,0,5.6); scene.add(s, s.target); }
 for(const x of [-9.85,-5.55]){
   slab(x-.06,x+.06,2.6,2.85,3.9,4.02,M.blackM); slab(x-.04,x+.04,2.58,2.6,3.92,4.0,M.bulb,null,false); }
@@ -695,8 +718,7 @@ for(const [x,z] of [[4.6,-3.0],[6.1,-3.0],[8.1,1.85]]){
   const cord = cyl(.006, EH+FL-2.45, M.blackM, 6); cord.position.set(x, (EH+FL+2.45)/2, z); cord.castShadow = false; scene.add(cord); }
 // landscaping: ferns and ornamental grass in the beds, tufts softening the lawn edges
 for(const [x,z,r] of [[-4.2,4.95,.3],[-3.0,5.05,2.1],[.5,4.85,1.2]]) model('fern_02', {pos:V(x,.055,z), rotY:r, fit:{w:1.3}, shadow:false});
-for(const [x,z,r,w] of [[-4.75,5.35,0,.9],[-2.65,4.55,1.4,.8],[1.05,5.05,2.2,.8],[-.15,4.55,.6,.7],[11.75,3.9,1,.8],[11.75,1.8,2.5,.9],[11.75,-.6,4,.8],
-                        [-10.45,6,0,.8],[-10.45,9.5,2,.7],[-4.95,8.2,1,.6],[-4.95,11.6,3,.7],[-1.2,12.6,2,.5],[2.8,4.95,1.2,.8],[5.6,4.95,3.3,.8],[8.4,4.95,.4,.8]])
+for(const [x,z,r,w] of [[-4.75,5.0,0,.9],[-2.65,4.55,1.4,.8],[1.05,5.0,2.2,.8],[-.15,4.55,.6,.7],[11.75,3.9,1,.8],[11.75,1.8,2.5,.9],[11.75,-.6,4,.8],[2.8,4.5,1.2,.8],[5.6,4.5,3.3,.8],[8.4,4.5,.4,.8]])
   model('grass_tuft', {pos:V(x,.02,z), rotY:r, fit:{w:w}, shadow:false});
 // an economy car parked straight on the drive, nose to the garage
 model('car2', {pos:V(-7.7,.045,6.4), rotY:-Math.PI/2, fit:{w:2.69}});
@@ -1116,7 +1138,7 @@ controls.enablePan = false; controls.rotateSpeed = .7; controls.zoomSpeed = .9;
 controls.touches = {ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN};
 
 /* one diorama view: front-right three-quarter, like an architectural cutaway */
-const HOME = {target:V(0.0,2.3,1.2), r:27.5, phi:1.36, theta:.17, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-.95, maxA:1.05}};
+const HOME = {target:V(-.2,2.2,1.4), r:32, phi:1.3, theta:-.1, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-.95, maxA:1.05}};
 const state = { focus:null, fly:null, idleAt:performance.now(), cat:'all' };
 const shown = p => state.cat==='all' || CATS[state.cat].includes(p.k);
 
@@ -1180,6 +1202,18 @@ for(const [n,ks] of RAILG){ const g = document.createElement('div'); g.className
   const row = g.querySelector('.row'); ks.forEach(k => { const p = PRODUCTS.find(q=>q.k===k); if(p) row.appendChild(p.chip); });
   if(row.children.length) railIn.appendChild(g); }
 /* centre a chip inside the carousel only — scrollIntoView would also scroll Fast Pitch's page around this frame */
+/* drag the rail with a mouse (touch already swipes it); a drag never counts as a tap */
+{ let x0=0, s0=0, moved=false, id=null, v=0, lt=0, lx=0, dragEnd=0;
+  railIn.addEventListener('pointerdown', e => { if(e.pointerType!=='mouse' || e.button!==0) return; id=e.pointerId; x0=lx=e.clientX; s0=railIn.scrollLeft; moved=false; v=0; lt=performance.now(); });
+  addEventListener('pointermove', e => { if(e.pointerId!==id) return; const dx=e.clientX-x0;
+    if(!moved && Math.abs(dx)>5){ moved=true; railIn.classList.add('drag'); try{ railIn.setPointerCapture(id); }catch(_){} }
+    if(moved){ railIn.scrollLeft = s0-dx; const t=performance.now(); v = (lx-e.clientX)/Math.max(1,t-lt); lx=e.clientX; lt=t; } });
+  const up = e => { if(e.pointerId!==id) return; id=null; railIn.classList.remove('drag');
+    if(moved){ let sp=v*16; const glide=()=>{ if(Math.abs(sp)<.4) return; railIn.scrollLeft+=sp; sp*=.92; requestAnimationFrame(glide); }; requestAnimationFrame(glide);
+      dragEnd=performance.now(); } };
+  railIn.addEventListener('click', ev=>{ if(performance.now()-dragEnd<350){ ev.stopPropagation(); ev.preventDefault(); } }, true);
+  addEventListener('pointerup', up); addEventListener('pointercancel', up);
+}
 function railTo(el){ const r = railIn.getBoundingClientRect(), e = el.getBoundingClientRect();
   railIn.scrollTo({left: railIn.scrollLeft + (e.left + e.width/2) - (r.left + r.width/2), behavior: reduceMotion?'auto':'smooth'}); }
 function setHint(t){ hint.textContent = t; hint.classList.remove('gone'); clearTimeout(setHint.t); setHint.t = setTimeout(()=>hint.classList.add('gone'), 4200); }
@@ -1212,7 +1246,7 @@ function ficon(t){ t=t.toLowerCase();
     : /button|press|tap|touch|display/.test(t) ? 'tap' : 'home';
   return '<svg viewBox="0 0 24 24">'+FI[k]+'</svg>'; }
 function fillCard(p){ document.body.dataset.fk=p.k;
-  const im = $('#cImg'); im.onerror = () => { im.onerror = null; im.src = PK('chip/'+p.img+'.webp'); }; im.src = '../cat/'+p.img+'.webp?v=176'; im.alt = p.name;
+  const im = $('#cImg'); im.onerror = () => { im.onerror = null; im.src = PK('chip/'+p.img+'.webp'); }; im.src = __PK['cat/'+p.img+'.webp'] || PK('chip/'+p.img+'.webp'); im.alt = p.name;
   $('#cWhere').textContent = p.where; $('#cName').textContent = p.name; $('#cHead').textContent = p.name;
   $('#cFeats').innerHTML = p.feats.slice(0,3).map(([t,b])=>`<div class="feat"><i>${ficon(t+' '+b)}</i><b>${t}</b><p>${b}</p></div>`).join('');
   const L = vis(), i = L.indexOf(p); $('#cCount').textContent = `${i+1} of ${L.length}`;
@@ -1311,8 +1345,8 @@ const vo = {x:0, y:0};
 function updateViewOffset(dt){
   const W = innerWidth, Hh = innerHeight; let tx = 0, ty = 0;
   if(state.focus){
-    if(sheetMQ.matches){ const sh = Math.min(.44*Hh, 400); ty = (112 + sh)/2 - 30; }
-    else { tx = (Math.min(360, .38*W) + 18)/2; }
+    if(sheetMQ.matches){ const sh = Math.min(.58*Hh, 520); ty = (112 + sh)/2 - 30; }
+    else { tx = -(Math.min(372, .34*W) + 18)/2; }   // the card sits on the left now: push the product to the right of it
   }
   const k = 1 - Math.exp(-dt*5);
   vo.x += (tx-vo.x)*k; vo.y += (ty-vo.y)*k;
