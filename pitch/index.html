@@ -3715,7 +3715,7 @@ $$('#mitems .mi img').forEach(im=>{ const m=im.getAttribute('src').match(/m_([a-
 /* burger + back */
 $('#burger').innerHTML=SVGI('menu',24);
 /* header (as in Fast Recruit): menu and logo top left */
-{ const h=document.createElement('div'); h.id='hdr'; $('#stage').appendChild(h); h.append($('#burger'),$('#barlogo')); }
+{ const h=document.createElement('div'); h.id='hdr'; $('#stage').appendChild(h); h.append($('#burger'),$('#barlogo')); const f=document.createElement('div'); f.id='hdrFade'; $('#stage').insertBefore(f,h); }
 navify();
 
 /* scroll-scrubbed reverse animation under the Outdoor Camera hero */
@@ -6091,16 +6091,32 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 </script>
 
 <style id="shpcHdr">
-/* header: menu + logo top left, like Fast Recruit; landing-page eyebrows top right; product eyebrows top left, below the header */
+/* SmartHomePros Connect header: menu + logo top left (as in Fast Recruit), over Fast Recruit's black fade.
+   Photo pages stay full screen behind it; plain black pages start below it (nothing to see up there but black) */
 #hdr{position:absolute;left:12px;top:6px;height:52px;display:flex;align-items:center;gap:6px;z-index:30;pointer-events:none}
 #hdr>*{pointer-events:auto}
 body.pkon #hdr{z-index:61}
 #hdr #burger{width:52px!important;height:52px!important;margin:0!important;flex:none}
 #hdr #barlogo{height:28px!important;margin:0 0 0 4px!important;flex:none;-webkit-user-drag:none}
 #hdr,#hdr *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#hdrFade{position:absolute;left:0;top:0;width:100%;height:120px;z-index:29;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.78) 38%,rgba(0,0,0,.38) 72%,rgba(0,0,0,0) 100%)}
+body.pkon #hdrFade{z-index:60}
+#stage:has(#p-home.on) #hdrFade{opacity:0}   /* landing pages are black with their tiles below the header: no fade needed, and it would dim the toggle and eyebrow */
+#hdrFade{transition:opacity .3s}
+#stage:has(#p-monitoring.on) #gTitle{opacity:0!important}   /* its photo already carries the title */
+/* landing pages: eyebrow top right, in the header row */
 #lpT .lpl{left:auto!important;right:0!important;top:17px!important;text-align:right}
-/* every page but the landing pages sits below the header, its eyebrow with it (lower, and indented) */
-#screen>.page:not(#p-home){top:56px!important;bottom:-56px!important}
-#gTitle{top:90px!important;left:62px!important}
+/* everything else: eyebrow (and the Back pill) top left, below the header and indented */
+#gTitle,#bkPill{top:66px!important;left:62px!important}
+#screen>#p-about,#screen>#p-ai,#screen>#p-awards,#screen>#p-birdseye,#screen>#p-buyouts,#screen>#p-comparisons,#screen>#p-compat,#screen>#p-map,#screen>#p-moves,#screen>#p-packages,#screen>#p-patents,#screen>#p-playback,#screen>#p-preview,#screen>#p-protection,#screen>#p-psa,#screen>#p-reviews,#screen>#p-social,#screen>#p-videos,#screen>#p-whatsnew{top:56px!important;bottom:-56px!important}
+#stage:has(#p-about.on) #gTitle,#stage:has(#p-about.on) #bkPill,#stage:has(#p-ai.on) #gTitle,#stage:has(#p-ai.on) #bkPill,#stage:has(#p-awards.on) #gTitle,#stage:has(#p-awards.on) #bkPill,#stage:has(#p-birdseye.on) #gTitle,#stage:has(#p-birdseye.on) #bkPill,#stage:has(#p-buyouts.on) #gTitle,#stage:has(#p-buyouts.on) #bkPill,#stage:has(#p-comparisons.on) #gTitle,#stage:has(#p-comparisons.on) #bkPill,#stage:has(#p-compat.on) #gTitle,#stage:has(#p-compat.on) #bkPill,#stage:has(#p-map.on) #gTitle,#stage:has(#p-map.on) #bkPill,#stage:has(#p-moves.on) #gTitle,#stage:has(#p-moves.on) #bkPill,#stage:has(#p-packages.on) #gTitle,#stage:has(#p-packages.on) #bkPill,#stage:has(#p-patents.on) #gTitle,#stage:has(#p-patents.on) #bkPill,#stage:has(#p-playback.on) #gTitle,#stage:has(#p-playback.on) #bkPill,#stage:has(#p-preview.on) #gTitle,#stage:has(#p-preview.on) #bkPill,#stage:has(#p-protection.on) #gTitle,#stage:has(#p-protection.on) #bkPill,#stage:has(#p-psa.on) #gTitle,#stage:has(#p-psa.on) #bkPill,#stage:has(#p-reviews.on) #gTitle,#stage:has(#p-reviews.on) #bkPill,#stage:has(#p-social.on) #gTitle,#stage:has(#p-social.on) #bkPill,#stage:has(#p-videos.on) #gTitle,#stage:has(#p-videos.on) #bkPill,#stage:has(#p-whatsnew.on) #gTitle,#stage:has(#p-whatsnew.on) #bkPill{top:90px!important}
 #screen>#p-compat{transform:scale(.945);transform-origin:50% 0}   /* its tile grid runs to the bottom edge: a touch smaller so it still clears it */
+/* Tiles / 3D Home: icons only, as tall as the bottom pills */
+#hmode{top:4px!important;height:54px;padding:5px!important;box-sizing:border-box;background:rgba(28,28,28,.92)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+#hmode button{height:44px!important;min-width:0!important;width:58px;padding:0!important;gap:0!important;font-size:0!important;border-radius:22px!important}
+#hmode button svg{width:22px!important;height:22px!important}
+#hmode i{top:5px!important;bottom:5px!important;left:5px!important;width:calc(50% - 5px)!important;border-radius:22px!important}
+/* category pages: tiles start where the All Products tiles do */
+#homeTrack .hcat{padding-top:59px!important}
 </style>
