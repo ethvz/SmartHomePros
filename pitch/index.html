@@ -3279,7 +3279,7 @@ $('#allTiles').innerHTML=Object.entries(ALLPOS).map(([k,[x,y,w,h]])=>k==='shortc
   $('#homeAll').insertAdjacentHTML('afterbegin','<div class="hall-h"><div><div class="eb">Full Vivint Product Suite</div><h1>One system. Every corner of your home.</h1></div></div>'); }
 $('#p-home').insertAdjacentHTML('beforeend','<div id="flipLayer"></div>');
 /* All grid: built from one spec so every gap is exactly G on every iPad width */
-function allGrid(Wt){ const G=14, X0=20.6, Y0=51, Y1=950, top=Math.round((Y1-Y0)*0.40), cw=(Wt-2*G)/3, cx=[X0,X0+cw+G,X0+2*(cw+G)], half=(cw-G)/2, y2=Y0+top+G, rest=Y1-y2, P={};
+function allGrid(Wt){ const G=14, X0=20.6, Y0=74, Y1=981,   /* (Connect: one 14px rhythm: edge, header pills, tiles, eyebrow line, edge) */ top=Math.round((Y1-Y0)*0.40), cw=(Wt-2*G)/3, cx=[X0,X0+cw+G,X0+2*(cw+G)], half=(cw-G)/2, y2=Y0+top+G, rest=Y1-y2, P={};
   P.ocp=[cx[0],Y0,cw,top]; P.dbcp=[cx[1],Y0,half,top]; P.icp=[cx[1]+half+G,Y0,half,top]; P.ocspot=[cx[2],Y0,cw,top];
   const sh=(rest-2*G)/3, sw=(cw-2*G)/3; [['motion','glass','window'],['water','smokeco','fire'],['pendant','fob','chime']].forEach((r,ri)=>r.forEach((k,ci)=>P[k]=[cx[0]+ci*(sw+G),y2+ri*(sh+G),sw,sh]));
   const kh=Math.round(rest*0.43), hh=rest-G-kh; P.shp2=[cx[1],y2,cw,hh]; P.keypad=[cx[1],y2+hh+G,half,kh]; P.app=[cx[1]+half+G,y2+hh+G,half,kh];
@@ -6097,7 +6097,7 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 <style id="shpcHdr">
 /* SmartHomePros Connect header: menu + logo top left (as in Fast Recruit), over Fast Recruit's black fade.
    Photo pages stay full screen behind it; plain black pages start below it (nothing to see up there but black) */
-#hdr{position:absolute;left:12px;top:6px;height:52px;display:flex;align-items:center;gap:6px;z-index:30;pointer-events:none}
+#hdr{position:absolute;left:12px;top:15px;height:52px;display:flex;align-items:center;gap:6px;z-index:30;pointer-events:none}
 #hdr>*{pointer-events:auto}
 body.pkon #hdr{z-index:61}
 #hdr #burger{width:52px!important;height:52px!important;margin:0!important;flex:none}
@@ -6112,9 +6112,8 @@ body.pkon #hdrFade{z-index:60}
 #hdrFadeOut.home{opacity:0}
 #stage:has(#p-monitoring.on) #gTitle{opacity:0!important}   /* its photo already carries the title */
 /* landing pages: eyebrow top right, in the header row */
-#lpT .lpl{left:auto!important;right:0!important;top:17px!important;text-align:right}
 /* everything else: eyebrow (and the Back pill) top left, below the header and indented */
-#gTitle,#bkPill{top:66px!important;left:62px!important}
+#gTitle,#bkPill{top:74px!important;left:62px!important}
 #screen>#p-about,#screen>#p-ai,#screen>#p-awards,#screen>#p-birdseye,#screen>#p-buyouts,#screen>#p-comparisons,#screen>#p-compat,#screen>#p-map,#screen>#p-moves,#screen>#p-packages,#screen>#p-patents,#screen>#p-playback,#screen>#p-preview,#screen>#p-protection,#screen>#p-psa,#screen>#p-reviews,#screen>#p-social,#screen>#p-videos,#screen>#p-whatsnew{top:56px!important;bottom:-56px!important}
 #stage:has(#p-about.on) #gTitle,#stage:has(#p-about.on) #bkPill,#stage:has(#p-ai.on) #gTitle,#stage:has(#p-ai.on) #bkPill,#stage:has(#p-awards.on) #gTitle,#stage:has(#p-awards.on) #bkPill,#stage:has(#p-birdseye.on) #gTitle,#stage:has(#p-birdseye.on) #bkPill,#stage:has(#p-buyouts.on) #gTitle,#stage:has(#p-buyouts.on) #bkPill,#stage:has(#p-comparisons.on) #gTitle,#stage:has(#p-comparisons.on) #bkPill,#stage:has(#p-compat.on) #gTitle,#stage:has(#p-compat.on) #bkPill,#stage:has(#p-map.on) #gTitle,#stage:has(#p-map.on) #bkPill,#stage:has(#p-moves.on) #gTitle,#stage:has(#p-moves.on) #bkPill,#stage:has(#p-packages.on) #gTitle,#stage:has(#p-packages.on) #bkPill,#stage:has(#p-patents.on) #gTitle,#stage:has(#p-patents.on) #bkPill,#stage:has(#p-playback.on) #gTitle,#stage:has(#p-playback.on) #bkPill,#stage:has(#p-preview.on) #gTitle,#stage:has(#p-preview.on) #bkPill,#stage:has(#p-protection.on) #gTitle,#stage:has(#p-protection.on) #bkPill,#stage:has(#p-psa.on) #gTitle,#stage:has(#p-psa.on) #bkPill,#stage:has(#p-reviews.on) #gTitle,#stage:has(#p-reviews.on) #bkPill,#stage:has(#p-social.on) #gTitle,#stage:has(#p-social.on) #bkPill,#stage:has(#p-videos.on) #gTitle,#stage:has(#p-videos.on) #bkPill,#stage:has(#p-whatsnew.on) #gTitle,#stage:has(#p-whatsnew.on) #bkPill{top:90px!important}
 #screen>#p-compat{transform:scale(.945);transform-origin:50% 0}   /* its tile grid runs to the bottom edge: a touch smaller so it still clears it */
@@ -6122,16 +6121,19 @@ body.pkon #hdrFade{z-index:60}
 .shpc-eb{font-size:14px!important;font-weight:600!important;letter-spacing:2.6px!important;text-transform:uppercase!important;color:var(--vg,#05E5AF)!important;line-height:1.2!important;white-space:nowrap;opacity:1!important}
 .shpc-new{display:block;pointer-events:none}
 /* landing + category pages: the footer pills move up into the header row (category toggle centred, About/Videos/Yard Sign right) */
-#bar.home #barRight.pnav{bottom:973px!important}
-#bar.home #homeX{bottom:973px!important}
-#lpT .lpl{right:240px!important}
+#bar.home #barRight.pnav{bottom:964px!important}
+#bar.home #homeX{bottom:964px!important}
 /* Tiles / 3D Home: icons only, as tall as the bottom pills */
-#hmode{top:4px!important;height:54px;padding:5px!important;box-sizing:border-box;background:rgba(28,28,28,.92)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+#hmode{top:14px!important;height:54px;padding:5px!important;box-sizing:border-box;background:rgba(28,28,28,.92)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 #hmode button{height:44px!important;min-width:0!important;width:58px;padding:0!important;gap:0!important;font-size:0!important;border-radius:22px!important}
 #hmode button svg{width:22px!important;height:22px!important}
 #hmode i{top:5px!important;bottom:5px!important;left:5px!important;width:calc(50% - 5px)!important;border-radius:22px!important}
 /* category pages: tiles start where the All Products tiles do */
-#homeTrack .hcat{padding-top:59px!important}
+/* landing + category pages: one 14px rhythm top to bottom: edge, header pills (54), tiles, eyebrow line (15), edge */
+#homeTrack,#p-home .hpane{height:1032px!important}
+#homeTrack .hcat{padding-top:82px!important;padding-bottom:43px!important}
+#lpT{top:auto!important;bottom:14px!important;left:21px!important;height:15px!important}
+#lpT .lpl{top:0!important;bottom:auto!important;left:0!important;right:auto!important;text-align:left!important}
 </style>
 
 <script id="shpcEb">
