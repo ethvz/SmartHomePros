@@ -848,6 +848,20 @@ function ocpHead(){
   for(const x of [-.027,.027]) add(h, faceZ(cyl(.0007,.0004,PM.dot,12)), x, -.027, .0004);  // mic holes
   return h;
 }
+/* the thermostat's lit display, drawn to match the product render: chevrons, mode icon, current and set temperature */
+function thermDisplay(){
+  const c = document.createElement('canvas'); c.width = c.height = 1024; const x = c.getContext('2d');
+  x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = 'round'; x.lineJoin = 'round'; x.shadowColor = 'rgba(70,74,78,.55)'; x.shadowBlur = 16;   // lit glyphs with the soft grey halo they show through the frosted face
+  const chev = (y, up) => { x.lineWidth = 9; x.beginPath(); x.moveTo(484, y + (up?14:-14)); x.lineTo(512, y + (up?-14:14)); x.lineTo(540, y + (up?14:-14)); x.stroke(); };
+  chev(100, true); chev(915, false);
+  x.lineWidth = 5; for(let i=0;i<6;i++){ const a = i*Math.PI/3; x.beginPath(); x.moveTo(512, 345); x.lineTo(512+Math.cos(a)*36, 345+Math.sin(a)*36); x.stroke();
+    for(const sgn of [-1,1]){ const bx = 512+Math.cos(a)*22, by = 345+Math.sin(a)*22, b = a + sgn*.9; x.beginPath(); x.moveTo(bx,by); x.lineTo(bx+Math.cos(b)*12, by+Math.sin(b)*12); x.stroke(); } }
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = '200 230px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('73', 512, 480);
+  x.font = '300 74px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('75', 512, 632);
+  x.shadowBlur = 0; x.fillStyle = 'rgba(255,255,255,.35)'; x.font = '500 34px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.fillText('vivint', 512, 842);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return t;
+}
 const MODELS = {
   dbcp(){ const g=G(), W = .043, H = .132;              // Doorbell Camera Pro (Gen 2): 43 x 132 x 35 mm. White body on a recessed back plate,
                                     // a full-face black glass front with eased edges, lens up top, red-ring button below
@@ -954,7 +968,14 @@ const MODELS = {
     add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1513,.0915), (()=>{ const t = HUB ? hubTex('hubscr') : DEC.hub; return new THREE.MeshStandardMaterial({map:t, emissiveMap:t, emissive:0xffffff, emissiveIntensity:.75, color:0x222222, roughness:.15, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}); })()),-.0032,.01555,.02262);
     add(g, faceZ(cyl(.0013,.0004,PM.lens,24)),0,.0705,.0228);   // camera pinhole above the screen
     return g; },
-  therm(){ return photoSolid('therm',.085,.024); },
+  therm(){ const g=G(), W=.114;                         // Smart Thermostat: 114 x 114 x 23 mm. White back body, thin grey seam, soft-edged white face,
+    add(g, rslab(W-.002, W-.002, .015, .025, .004, PM.whiteM), 0, 0, .0075);        // side button; the display glows through the face (cooling 73 / set 75)
+    add(g, rslab(W-.0025, W-.0025, .0014, .0245, .0005, mat(0xb4b8bb,{r:.4,m:.2})), 0, 0, .0157);
+    add(g, rslab(W, W, .0072, .026, .003, PM.whiteM), 0, 0, .0196);
+    const b = add(g, cyl(.0034, .003, PM.whiteM, 32), W/2-.0004, .006, .009); b.rotation.z = Math.PI/2;
+    add(g, new THREE.Mesh(new THREE.PlaneGeometry(W*.98, W*.98), new THREE.MeshBasicMaterial({map:thermDisplay(), transparent:true, depthWrite:false, toneMapped:false,
+      polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})), 0, 0, .0233);
+    return g; },
   icp(){ const g=G();                                   // Indoor Camera Pro: 66 x 107 x 66 mm. Rounded-square base, S-bent strap loop from a hinge
     const shell = mat(0x27282a,{r:.62,m:.05,x:{envMapIntensity:.6}});  // on the base up to a pivot disc on the back of a soft-backed head (origin at the base)
     add(g, rslab(.062, .062, .009, .013, .0035, shell), 0, .0045, 0).rotation.x = -Math.PI/2;
@@ -982,11 +1003,31 @@ const MODELS = {
     add(g, rslab(.05,.012,.014,.004,.003,PM.whiteM),.004,-.0215,.007);
     return g; },
   motion(){ return photoSolid('motion',.072,.042); },
-  smokeco(){ return photoSolid('smokeco',.134,.045); },
+  smokeco(){ const g=G();                               // Smoke & CO Detector: turned white housing with a rounded front edge, a raised sensing chamber
+    const prof = [[0,0],[.065,0],[.0668,.003],[.067,.03],[.0662,.035],[.0625,.0388],[.055,.0412],[.045,.0421],[.0418,.0414],[.0405,.041],[.0405,.0425],[.036,.043],[0,.043]]
+      .map(([r,z])=>new THREE.Vector2(r,z));                                          // behind six louvre fins, domed cap, dark speaker / LED windows
+    const body = add(g, new THREE.Mesh(new THREE.LatheGeometry(prof, 96), PM.whiteM)); body.rotation.x = Math.PI/2;
+    const mesh = add(g, new THREE.Mesh(new THREE.CylinderGeometry(.034,.034,.011,64,1,true), mat(0x5b5f63,{r:.7})), 0, 0, .0485); mesh.rotation.x = Math.PI/2;
+    const inner = add(g, faceZ(cyl(.0335, .012, PM.whiteM, 64)), 0, 0, .048); inner.scale.set(.96,1,.96);
+    for(let i=0;i<6;i++){ const a = i/6*Math.PI*2 + Math.PI/2, f = G(); f.rotation.z = a; g.add(f);
+      const fin = new THREE.Shape([[.021,0],[.0415,0],[.0415,.004],[.036,.0145],[.021,.0145]].map(([x,y])=>new THREE.Vector2(x,y)));
+      const fg = new THREE.ExtrudeGeometry(fin, {depth:.0056, bevelEnabled:true, bevelThickness:.0008, bevelSize:.0008, bevelSegments:3});
+      fg.rotateX(Math.PI/2); fg.translate(0, .0028, .042); f.add(new THREE.Mesh(fg, PM.whiteM)); }   // profile (r, height) stood up radially
+    add(g, faceZ(cyl(.0255, .006, PM.whiteM, 64)), 0, 0, .054);
+    add(g, dome(.0255, .0035, PM.whiteM), 0, 0, .057);
+    add(g, faceZ(cyl(.0018, .001, mat(0xd9dad9,{r:.5}), 20)), 0, 0, .0603);
+    const dark = mat(0x1c1d1f,{r:.4}), led = mat(0x8a8e91,{r:.35});
+    for(const sx of [-1,1]) add(g, rslab(.008, .026, .002, .004, .0008, dark), sx*.05, 0, .0405);
+    for(const [x,y,w] of [[-.031,.039,.011],[-.024,.044,.005],[-.016,.046,.011]]){ const p = add(g, rslab(w, .008, .0015, .0025, .0006, w>.006?led:mat(0x6c7073,{r:.35})), x, y, .0418); p.rotation.z = Math.atan2(-x, y); }
+    return g; },
   water(){ return photoSolid('water',.072,.022,true); },
   /* products photographed from the front: a rounded body with the real product photo as its face */
   chime(){ return photoSolid('chime',.06,.035); },
-  fire(){ return photoSolid('fire',.055,.028); },
+  fire(){ const g=G();                                  // Smoke & CO Monitor (listens for the existing alarms): 38 x 76 x 25 mm white block,
+    add(g, rslab(.038, .076, .022, .006, .003, PM.whiteM), 0, 0, .011);                   // a raised band across the top, a single mic hole
+    add(g, rslab(.0384, .0085, .0245, .004, .0015, PM.whiteM), 0, .0275, .01225);
+    add(g, faceZ(cyl(.0012, .0008, mat(0x3a2e26,{r:.5}), 20)), 0, .009, .0222);
+    return g; },
   garage(){ return photoSolid('garage',.12,.034); },
   glass(){ return photoSolid('glass',.055,.02); },
   keypad(){ return photoSolid('keypad',.075,.02); },
