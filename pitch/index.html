@@ -6118,6 +6118,13 @@ body.pkon #hdrFade{z-index:60}
 #screen>#p-about,#screen>#p-ai,#screen>#p-awards,#screen>#p-birdseye,#screen>#p-buyouts,#screen>#p-comparisons,#screen>#p-compat,#screen>#p-map,#screen>#p-moves,#screen>#p-packages,#screen>#p-patents,#screen>#p-playback,#screen>#p-preview,#screen>#p-protection,#screen>#p-psa,#screen>#p-reviews,#screen>#p-social,#screen>#p-videos,#screen>#p-whatsnew{top:56px!important;bottom:-56px!important}
 #stage:has(#p-about.on) #gTitle,#stage:has(#p-about.on) #bkPill,#stage:has(#p-ai.on) #gTitle,#stage:has(#p-ai.on) #bkPill,#stage:has(#p-awards.on) #gTitle,#stage:has(#p-awards.on) #bkPill,#stage:has(#p-birdseye.on) #gTitle,#stage:has(#p-birdseye.on) #bkPill,#stage:has(#p-buyouts.on) #gTitle,#stage:has(#p-buyouts.on) #bkPill,#stage:has(#p-comparisons.on) #gTitle,#stage:has(#p-comparisons.on) #bkPill,#stage:has(#p-compat.on) #gTitle,#stage:has(#p-compat.on) #bkPill,#stage:has(#p-map.on) #gTitle,#stage:has(#p-map.on) #bkPill,#stage:has(#p-moves.on) #gTitle,#stage:has(#p-moves.on) #bkPill,#stage:has(#p-packages.on) #gTitle,#stage:has(#p-packages.on) #bkPill,#stage:has(#p-patents.on) #gTitle,#stage:has(#p-patents.on) #bkPill,#stage:has(#p-playback.on) #gTitle,#stage:has(#p-playback.on) #bkPill,#stage:has(#p-preview.on) #gTitle,#stage:has(#p-preview.on) #bkPill,#stage:has(#p-protection.on) #gTitle,#stage:has(#p-protection.on) #bkPill,#stage:has(#p-psa.on) #gTitle,#stage:has(#p-psa.on) #bkPill,#stage:has(#p-reviews.on) #gTitle,#stage:has(#p-reviews.on) #bkPill,#stage:has(#p-social.on) #gTitle,#stage:has(#p-social.on) #bkPill,#stage:has(#p-videos.on) #gTitle,#stage:has(#p-videos.on) #bkPill,#stage:has(#p-whatsnew.on) #gTitle,#stage:has(#p-whatsnew.on) #bkPill{top:90px!important}
 #screen>#p-compat{transform:scale(.945);transform-origin:50% 0}   /* its tile grid runs to the bottom edge: a touch smaller so it still clears it */
+#stage.lnav #gTitle{opacity:0!important}   /* product pages: the eyebrow sits on each section instead */
+.shpc-eb{font-size:14px!important;font-weight:600!important;letter-spacing:2.6px!important;text-transform:uppercase!important;color:var(--vg,#05E5AF)!important;line-height:1.2!important;white-space:nowrap;opacity:1!important}
+.shpc-new{display:block;pointer-events:none}
+/* landing + category pages: the footer pills move up into the header row (category toggle centred, About/Videos/Yard Sign right) */
+#bar.home #barRight.pnav{bottom:973px!important}
+#bar.home #homeX{bottom:973px!important}
+#lpT .lpl{right:240px!important}
 /* Tiles / 3D Home: icons only, as tall as the bottom pills */
 #hmode{top:4px!important;height:54px;padding:5px!important;box-sizing:border-box;background:rgba(28,28,28,.92)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 #hmode button{height:44px!important;min-width:0!important;width:58px;padding:0!important;gap:0!important;font-size:0!important;border-radius:22px!important}
@@ -6126,3 +6133,36 @@ body.pkon #hdrFade{z-index:60}
 /* category pages: tiles start where the All Products tiles do */
 #homeTrack .hcat{padding-top:59px!important}
 </style>
+
+<script id="shpcEb">
+/* SmartHomePros Connect: on product pages the product's name is the eyebrow of every section, directly above that
+   section's title and lined up with it. A section without a title gets none; a title that already had an eyebrow
+   (Smart Actions, FAQs, Meet the…) gets the product name in its place. */
+(()=>{ const PRODP=['prod','ocp','dbcp','hub','therm'];
+  const nameOf=p=>{ const pt=document.querySelector('#p-'+p+' .ptitle'); return pt?pt.textContent.trim():''; };
+  const isEb=e=>{ if(!e||e.matches('h1,h2,h3,p,ul,img,video,button')) return false; if(e.matches('.eb,.xeb,.dbeb,.vivint-eb,.shpc-eb')) return true;
+    const c=getComputedStyle(e); return c.textTransform==='uppercase'&&parseFloat(c.fontSize)<=16&&e.textContent.trim().length<60&&!e.querySelector('h1,h2,h3'); };
+  const titleOf=sec=>[...sec.querySelectorAll('h1,h2')].find(h=>!h.closest('table,th,td,.shpc-skip')&&h.offsetWidth>0&&parseFloat(getComputedStyle(h).fontSize)>=26);
+  function run(){ const p=(typeof cur!=='undefined'?cur:''); if(!PRODP.includes(p)) return; const pg=document.getElementById('p-'+p); if(!pg) return; const name=nameOf(p); if(!name) return;
+    pg.querySelectorAll('.otab,.psec').forEach(sec=>{ if(sec.parentElement.closest('.otab,.psec')) return; const t=titleOf(sec); if(!t) return;
+      let e=t.previousElementSibling; while(e&&!e.textContent.trim()&&!e.matches('img,video,svg')) e=e.previousElementSibling;
+      if(e&&isEb(e)&&!e.classList.contains('shpc-new')){ if(!e.dataset.shpcO) e.dataset.shpcO=e.textContent; if(e.textContent!==name) e.textContent=name; e.classList.add('shpc-eb'); return; }
+      let n=t.previousElementSibling; if(!(n&&n.classList.contains('shpc-new'))){ n=document.createElement('div'); n.className='shpc-eb shpc-new'; t.parentNode.insertBefore(n,t); }
+      if(n.textContent!==name) n.textContent=name;
+      const cs=getComputedStyle(t); n.style.textAlign=cs.textAlign==='center'?'center':cs.textAlign==='right'||cs.textAlign==='end'?'right':'left';
+      const pc=getComputedStyle(t.parentNode), row=/flex|grid/.test(pc.display)&&!/column/.test(pc.flexDirection);
+      if(cs.position==='absolute'||cs.position==='fixed'||row){ n.style.position='absolute'; n.style.left=t.offsetLeft+'px'; n.style.width=t.offsetWidth+'px'; n.style.top=(t.offsetTop-n.offsetHeight-12)+'px'; n.style.margin='0'; }
+      else { n.style.position='static'; n.style.width=''; n.style.marginBottom='12px'; } }); }
+  let tm=0; const later=()=>{ clearTimeout(tm); tm=setTimeout(run,120); };
+  new MutationObserver(later).observe(document.getElementById('screen'),{subtree:true,childList:true,characterData:true});
+  addEventListener('resize',later); const _s=show; show=function(){ const r=_s.apply(this,arguments); later(); setTimeout(run,600); return r; }; later(); })();
+</script>
+
+<script id="shpcHmode">
+/* Tiles / 3D Home toggle: halfway between the Vivint logo and the category toggle */
+(()=>{ const place=()=>{ const hm=document.getElementById('hmode'), lg=document.getElementById('barlogo'), cat=document.querySelector('#bar.home #barRight'), home=document.getElementById('p-home');
+    if(!hm||!lg||!cat||!home||!home.classList.contains('on')) return; const st=document.getElementById('stage'), z=st.getBoundingClientRect().width/st.offsetWidth; if(!z) return;
+    const a=lg.getBoundingClientRect().right, b=cat.getBoundingClientRect().left; if(!(b>a)) return;
+    const x=((a+b)/2-home.getBoundingClientRect().left)/z; hm.style.setProperty('left',x.toFixed(1)+'px','important'); };
+  addEventListener('resize',place); setInterval(place,500); setTimeout(place,300); })();
+</script>
