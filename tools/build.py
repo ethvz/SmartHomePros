@@ -14,7 +14,7 @@ Patches (all idempotent, applied on every run):
 import os, re, shutil, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FR = '/home/claude/fast-recruit'
+FR = os.environ.get('FR_REPO', os.path.join(os.path.dirname(ROOT), 'Fast-Recruit'))   # local checkout of ethvz/Fast-Recruit, branch connect-source
 FP = sys.argv[sys.argv.index('--pitch') + 1] if '--pitch' in sys.argv and len(sys.argv) > sys.argv.index('--pitch') + 1 else '/tmp/fpchk'
 
 
