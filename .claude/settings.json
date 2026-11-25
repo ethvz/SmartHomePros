@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/git-sync.sh\" pull", "timeout": 60, "statusMessage": "Pulling latest from GitHub..." }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/git-sync.sh\" pull", "timeout": 60, "statusMessage": "Pulling latest from GitHub..." }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/git-sync.sh\" push", "timeout": 120, "statusMessage": "Pushing to GitHub..." }
+        ]
+      }
+    ]
+  }
+}

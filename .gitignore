@@ -1,3 +1,5 @@
 recruit/devices.html
 screens.html
 tools/__pycache__/
+.DS_Store
+.claude/settings.local.json
