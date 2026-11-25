@@ -3355,7 +3355,7 @@ document.addEventListener('click',e=>{ if(Date.now()-swiped<350){e.stopPropagati
   if(d.hcmp){OC.hcmp=OC.hcmp===+d.hcmp?0:+d.hcmp;return ocRender();}
   if(d.ocmode){OC.mode=d.ocmode;OC.tip=false;ocRender();jump($('#ocScroll'),'feat');setTimeout(ocSpy,400);return;}
   if(d.whistle){whistle.currentTime=0;whistle.play().catch(()=>{});return;}
-  if(d.home){closeMenu();closeModals(); if(cur==='home') return flipTo('all'); stack=['home']; show('home'); return; } /* back to the category page the product was opened from (hcat is kept while away) */
+  if(d.home){closeMenu();closeModals(); if(cur==='home'){ if(window.SHPC){ location.href=window.SHPC.picker; return; } return flipTo('all'); } stack=['home']; show('home'); return; } /* back to the category page the product was opened from (hcat is kept while away) */
   if(d.go) return go(d.go);
   if(d.toast) return toast(d.toast);
   if(d.pb!==undefined) return pb(d.pb);
@@ -3714,6 +3714,8 @@ const _barFor=barFor; barFor=function(p){ _barFor(p); navify(); };
 $$('#mitems .mi img').forEach(im=>{ const m=im.getAttribute('src').match(/m_([a-z]+)\.png/); if(m){ im.insertAdjacentHTML('beforebegin',SVGI(m[1],26)); im.remove(); } });
 /* burger + back */
 $('#burger').innerHTML=SVGI('menu',24);
+/* header (as in Fast Recruit): menu and logo top left */
+{ const h=document.createElement('div'); h.id='hdr'; $('#stage').appendChild(h); h.append($('#burger'),$('#barlogo')); }
 navify();
 
 /* scroll-scrubbed reverse animation under the Outdoor Camera hero */
@@ -4732,7 +4734,7 @@ IP.gal='<rect x="6.5" y="3.5" width="14" height="11" rx="2"/><path d="M3.5 7.5v1
   Object.values(PG).forEach(q=>{ const b=$(q); if(b) b.addEventListener('scroll',()=>requestAnimationFrame(galSpy),{passive:true}); }); }
 
 /* footer controls: fire on finger-up so swipe/zoom/tip guards never swallow a tap */
-{ const SEL='#bar button,#bar [role=button]'; let d=null, fired=0;
+{ const SEL='#bar button,#bar [role=button],#hdr button,#hdr [role=button]'; let d=null, fired=0;
   document.addEventListener('pointerdown',e=>{ const t=e.target.closest&&e.target.closest(SEL); d=t?{t,x:e.clientX,y:e.clientY,id:e.pointerId}:null; },true);
   document.addEventListener('pointercancel',e=>{ if(d&&e.pointerId===d.id) d=null; },true);
   document.addEventListener('pointerup',e=>{ if(!d||e.pointerId!==d.id) return; const s=d; d=null;
@@ -6088,3 +6090,17 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 })();
 </script>
 
+<style id="shpcHdr">
+/* header: menu + logo top left, like Fast Recruit; landing-page eyebrows top right; product eyebrows top left, below the header */
+#hdr{position:absolute;left:12px;top:6px;height:52px;display:flex;align-items:center;gap:6px;z-index:30;pointer-events:none}
+#hdr>*{pointer-events:auto}
+body.pkon #hdr{z-index:61}
+#hdr #burger{width:52px!important;height:52px!important;margin:0!important;flex:none}
+#hdr #barlogo{height:28px!important;margin:0 0 0 4px!important;flex:none;-webkit-user-drag:none}
+#hdr,#hdr *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#lpT .lpl{left:auto!important;right:0!important;top:17px!important;text-align:right}
+/* every page but the landing pages sits below the header, its eyebrow with it (lower, and indented) */
+#screen>.page:not(#p-home){top:56px!important;bottom:-56px!important}
+#gTitle{top:90px!important;left:62px!important}
+#screen>#p-compat{transform:scale(.945);transform-origin:50% 0}   /* its tile grid runs to the bottom edge: a touch smaller so it still clears it */
+</style>

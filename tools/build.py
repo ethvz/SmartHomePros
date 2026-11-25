@@ -60,7 +60,7 @@ def patch_recruit():
     s = sub(s, '<link rel="manifest" href="manifest.webmanifest">', '<link rel="manifest" href="../manifest.webmanifest">', 'fr manifest')
     s = sub(s, '<link rel="apple-touch-icon" href="apple-touch-icon.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">', 'fr touch icon')
     s = sub(s, '<meta name="apple-mobile-web-app-title" content="Vivint Recruiting">', '<meta name="apple-mobile-web-app-title" content="SHP Connect">', 'fr title')
-    if 'window.SHPC' not in s:
+    if 'window.SHPC = {' not in s:
         s = s.replace(TITLE, TITLE + '\n' + head_hook('recruit'), 1)
     if 'dock.js' not in s:
         s = s.replace(TITLE, TITLE + '\n' + DOCK, 1)
@@ -81,7 +81,7 @@ def patch_pitch():
     s = sub(s, '<link rel="manifest" href="manifest.webmanifest">', '<link rel="manifest" href="../manifest.webmanifest">', 'fp manifest')
     s = sub(s, '<link rel="apple-touch-icon" href="assets/icon-180.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">', 'fp touch icon')
     s = sub(s, '<meta name="apple-mobile-web-app-title" content="Fast Pitch 2027">', '<meta name="apple-mobile-web-app-title" content="SHP Connect">', 'fp title')
-    if 'window.SHPC' not in s:
+    if 'window.SHPC = {' not in s:
         s = s.replace(TITLE, TITLE + '\n' + head_hook('pitch'), 1)
     if 'dock.js' not in s:
         s = s.replace(TITLE, TITLE + '\n' + DOCK, 1)
