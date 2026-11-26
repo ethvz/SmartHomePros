@@ -6,7 +6,7 @@
 // Scene: group origin sits 15 mm (world) in front of the door; the model is scaled x1.45, so in these local units the exterior
 // door face is z = -0.01034 and the interior door face z = -0.05172.
 export default H => {
-  const { THREE, G, add, rslab, rbox, printPlane } = H;
+  const { THREE, G, add, rslab, rbox, printPlane, splitMat } = H;
   const g = G(), mm = v => v / 1000;
   const ZO = -0.01034, ZI = -0.05172, ROSE_Y = mm(-24.1);
 
@@ -20,8 +20,10 @@ export default H => {
   const gapM = new THREE.MeshStandardMaterial({ color: 0x070707, roughness: .9 });
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xeeeeec, roughness: .5, sheen: .6, sheenRoughness: .5, sheenColor: 0xffffff, clearcoat: .15, clearcoatRoughness: .5,
     emissive: 0xf4f8f2, emissiveIntensity: .05 });
+  const rimM = new THREE.MeshPhysicalMaterial({ color: 0xc4c6c6, roughness: .5, sheen: .4, sheenColor: 0xffffff });
+  const keyS = splitMat(rimM, keyM, 'z', mm(1.08), 1e-6, 0xc4c6c6), btnS = splitMat(rimM, keyM, 'z', mm(.78), 1e-6, 0xc4c6c6);
   const plugM = new THREE.MeshPhysicalMaterial({ color: 0x2a2a2b, roughness: .5, metalness: .3 });
-  const ledOff = new THREE.MeshStandardMaterial({ color: 0x272828, roughness: .85, metalness: .1 });
+  const ledOff = new THREE.MeshStandardMaterial({ color: 0x242424, roughness: .9, metalness: .1 });
   const glossM = new THREE.MeshPhysicalMaterial({ color: 0x050506, roughness: .06, metalness: .1, clearcoat: 1, clearcoatRoughness: .03, specularIntensity: 1 });
   const ledOn = new THREE.MeshStandardMaterial({ color: 0x9cf5a2, emissive: 0x6dff8a, emissiveIntensity: 1.1, roughness: .3 });
 
@@ -66,9 +68,9 @@ export default H => {
 
   // Kwikset logo button (raised 1.0 mm, frosted white, in a 0.4 mm dark gap)
   add(ex, rslab(mm(19.1), mm(10.3), mm(.2), mm(2.6), mm(.05), gapM), 0, mm(41.8), PF + mm(.02));
-  const kb = add(ex, pillow(mm(18.3), mm(9.5), mm(2.2), mm(.92), mm(.8), mm(.08), keyM), 0, mm(41.8), PF);
+  const kb = add(ex, pillow(mm(18.3), mm(9.5), mm(2.2), mm(.92), mm(.8), mm(.08), btnS), 0, mm(41.8), PF);
   add(ex, conform(printPlane(mm(16), mm(7), (x, P) => { x.fillStyle = '#121212'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = 'italic 800 37px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, mm(.1))); x.scale(1.06, 1); x.fillText('Kwikset', 0, 0); x.restore(); }),
+    x.font = 'italic 800 37px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, mm(.1))); x.scale(.98, 1); x.fillText('Kwikset', 0, 0); x.restore(); }),
     (px, py) => kb.userData.zf(inset(px, py, mm(18.3), mm(9.5), mm(2.2)))), 0, mm(41.8), PF);
 
   // ten keys, 2 rows x 5, raised 1.5 mm with a 0.3 mm crown
@@ -76,22 +78,25 @@ export default H => {
   for (let r = 0; r < 2; r++) for (let c = 0; c < 5; c++) {
     const x = mm((c - 2) * 10.45), y = mm(r ? 11.9 : 27.2), digit = String((r * 5 + c + 1) % 10);
     add(ex, rslab(KW + mm(.8), KH + mm(.8), mm(.2), KR + mm(.4), mm(.05), gapM), x, y, PF + mm(.02));
-    const k = add(ex, pillow(KW, KH, KR, mm(1.2), mm(.8), mm(.3), keyM), x, y, PF);
+    const k = add(ex, pillow(KW, KH, KR, mm(1.2), mm(.8), mm(.3), keyS), x, y, PF);
     add(ex, conform(printPlane(mm(6), mm(7), (cx, P) => { cx.fillStyle = '#141414'; cx.textAlign = 'center'; cx.textBaseline = 'alphabetic';
-      cx.font = '500 58px ' + FONT; cx.fillText(digit, ...P(0, mm(-2.1))); }), (px, py) => k.userData.zf(inset(px, py, KW, KH, KR))), x, y, PF);
+      cx.font = '600 64px ' + FONT; cx.fillText(digit, ...P(0, mm(-2.3))); }), (px, py) => k.userData.zf(inset(px, py, KW, KH, KR))), x, y, PF);
   }
 
   // deadbolt rose: concave foot fillet, bell shoulder, flat front disc, groove, SmartKey plug
   const rose = [[26.8, 12.3], [26.5, 12.5]];
   for (let i = 1; i <= 6; i++) { const a = i / 6 * Math.PI / 2; rose.push([26.5 - Math.sin(a), 13.5 - Math.cos(a)]); }
-  for (let i = 1; i <= 22; i++) { const a = i / 22 * Math.PI / 2; rose.push([17.5 + 8 * Math.cos(a), 13.5 + 18.25 * Math.sin(a) ** .92]); }
-  rose.push([12, 31.75], [9.7, 31.75], [9.62, 31.55], [9.55, 30.9], [9.0, 30.6], [0, 30.6]);
+  // bell: steep sloped shoulder (reads as a dark annulus face-on), soft round at the foot, 1.5 mm round into the flat front disc
+  rose.push([25.48, 14.1], [25.38, 14.8], [25.2, 15.6]);
+  for (let i = 1; i <= 14; i++) { const t = i / 14, r = 25.2 + (17.9 - 25.2) * t, z = 15.6 + (30.2 - 15.6) * t; rose.push([r, z]); }
+  for (let i = 1; i <= 6; i++) { const q = i / 6 * Math.PI / 2; rose.push([16.4 + 1.5 * Math.cos(q), 30.25 + 1.5 * Math.sin(q)]); }
+  rose.push([14, 31.75], [9.7, 31.75], [9.62, 31.55], [9.55, 30.9], [9.0, 30.6], [0, 30.6]);
   add(ex, lathe(rose, powderL), 0, ROSE_Y, 0);
   add(ex, lathe([[9.25, 30.4], [9.25, 31.5], [9.05, 31.72], [8.7, 31.75], [0, 31.75]], plugM, 96), 0, ROSE_Y, 0);
   { const ring = new THREE.Mesh(new THREE.RingGeometry(mm(9.2), mm(9.62), 96), gapM); add(ex, ring, 0, ROSE_Y, mm(30.95)); }
   // three hidden status LEDs on the top of the shoulder (11, 12, 1 o'clock)
   for (const deg of [-20, 0, 20]) {
-    const pts = []; for (let i = 0; i <= 6; i++) { const a = (38 + i / 6 * 16) * Math.PI / 180; pts.push([17.5 + 8 * Math.cos(a) + .03, 13.5 + 18.25 * Math.sin(a) ** .92 + .02]); }
+    const pts = []; for (let i = 0; i <= 6; i++) { const t = .55 + i / 6 * .25; pts.push([25.2 + (17.9 - 25.2) * t + .04, 15.6 + (30.2 - 15.6) * t + .02]); }
     const w = 2 / 23.5;
     add(ex, lathe(pts, ledOff, 6, Math.PI + deg * Math.PI / 180 - w / 2, w), 0, ROSE_Y, 0);
   }

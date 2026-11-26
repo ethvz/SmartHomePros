@@ -57,7 +57,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
         if (l.B != null) sh.uniforms['uB' + i] = { value: new THREE.Color(l.B) };
         c += `{ float sd = vOP.${l.ax} - ${f(l.at)}; float fw = max(fwidth(sd), 1e-7);`;
         if (l.B != null) c += ` diffuseColor.rgb = mix(diffuseColor.rgb, uB${i}, smoothstep(-fw, fw, sd));`;
-        if (l.w) c += ` diffuseColor.rgb = mix(diffuseColor.rgb, uL${i}, (1.0 - smoothstep(${f(l.w / 2)} - fw, ${f(l.w / 2)} + fw, abs(sd))) * ${f(l.k ?? .85)});`;
+        if (l.w) c += ` diffuseColor.rgb = mix(diffuseColor.rgb, uL${i}, (1.0 - smoothstep(${f(l.w / 2)} - fw, ${f(l.w / 2)} + fw, abs(sd))) * ${f(l.k ?? .85)}${l.mask ? ' * float(' + l.mask + ')' : ''});`;
         c += ' }\n';
         if (l.rB != null) r += `{ float sd = vOP.${l.ax} - ${f(l.at)}; float fw = max(fwidth(sd), 1e-7); roughnessFactor = mix(roughnessFactor, ${f(l.rB)}, smoothstep(-fw, fw, sd)); }\n`;
       });
@@ -112,7 +112,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 12; j++) { const f = 1 - .94 * j / 12; out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
-  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .3, col: 0x9c9c9a, k: .9 }]);
+  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .3, col: 0x9c9c9a, k: .9, mask: 'vOP.z < 27.5' }]);
   add(P, solid([{ type: 'outer', pts: pts(rrShape(W, HH, R), 320), prof: shellProf }], shellMat));
   const zTop = D + crown;
 

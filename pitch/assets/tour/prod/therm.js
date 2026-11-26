@@ -95,16 +95,16 @@ export default H => {
     const num = (s, cx, cy, capH, wT, wt) => {            // digits sized by cap height and total ink width, tight tracking
       x.font = `${wt} 100px ${F}`; const asc = x.measureText('7').actualBoundingBoxAscent || 70, fs = 100*capH*10/asc; x.font = `${wt} ${fs}px ${F}`;
       x.textAlign = 'left'; x.textBaseline = 'alphabetic'; const ms = [...s].map(c => x.measureText(c)), iw = ms.map(m => m.actualBoundingBoxLeft + m.actualBoundingBoxRight);
-      const gap = s.length > 1 ? Math.max(capH*.9, (wT*10 - iw.reduce((a, b) => a+b, 0))/(s.length-1)) : 0, wI = iw.reduce((a, b) => a+b, 0) + gap*(s.length-1); let px = X(cx) - wI/2;
+      const gap = s.length > 1 ? Math.max(capH*1.6, (wT*10 - iw.reduce((a, b) => a+b, 0))/(s.length-1)) : 0, wI = iw.reduce((a, b) => a+b, 0) + gap*(s.length-1); let px = X(cx) - wI/2;
       [...s].forEach((c, i) => { x.fillText(c, px + ms[i].actualBoundingBoxLeft, Y(cy) + capH*5); px += iw[i] + gap; }); };
     const glyphs = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
       x.lineWidth = 10; chev(46.5, true); chev(-46.5, false);
-      x.lineWidth = 4.2; flake(0, 18.3, 3.65);
-      num('73', 0, 2.4, 15.6, 23.7, 300); num('75', 0, -13.2, 6.0, 8.7, 400); };
+      x.lineWidth = 3; flake(0, 18.3, 3.75);
+      num('73', 0, 2.4, 15.6, 23.7, 300); num('75', 0, -13.2, 6.0, 9.4, 300); };
     const draw = () => { x.clearRect(0, 0, N, N);
       x.save(); x.shadowColor = 'rgba(255,255,255,.95)'; x.shadowBlur = 22; x.globalAlpha = .55; glyphs(); x.restore();   // soft halo
       x.save(); x.shadowColor = 'rgba(255,255,255,.8)'; x.shadowBlur = 7; glyphs(); x.restore();                          // glyphs + tight bloom
-      x.save(); x.fillStyle = 'rgba(255,255,255,.3)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
+      x.save(); x.fillStyle = 'rgba(255,255,255,.16)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
       x.font = `500 ${100*120/w0}px ${F}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('vivint', X(0), Y(-36.6)); x.restore(); };
     draw();
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.premultiplyAlpha = true;
@@ -125,6 +125,8 @@ export default H => {
     x.fillStyle = gr; x.fillRect(-256, 0, 512, 460); x.restore();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
     const wash = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false})), 0, (-W/2 + 3 - 20.6)*k, .4*k);
-    wash.renderOrder = 2; }
+    wash.renderOrder = 2;
+    wash.geometry.boundingBox = new THREE.Box3(new THREE.Vector3(-.05, -.001, 0), new THREE.Vector3(.05, .001, .0001));   // a wall effect: keep it out of the product's framing box
+  }
   return g;
 };

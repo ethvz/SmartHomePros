@@ -38,9 +38,9 @@ html.pp #p-about .nrgt .nl{left:22px;top:22px;width:96px}
 html.pp #p-about .ab:nth-child(8)>img:not(.bg){width:auto!important;height:calc(100% - 20px)!important;top:10px!important}
 
 /* ================= GIVES BACK: photo + live stats instead of the landscape art ================= */
-html.pp #p-gives{background:linear-gradient(180deg,#edeae4 0,#edeae4 calc(100% - var(--ppFoot,68px)),#000 calc(100% - var(--ppFoot,68px)))}
+html.pp #p-gives{background:#000}
 html.pp #p-gives>img.full{display:none!important}
-html.pp #p-gives .gvp{display:flex;flex-direction:column;position:absolute;left:0;top:0;width:100%;height:var(--U);color:#111}
+html.pp #p-gives .gvp{display:flex;flex-direction:column;position:absolute;left:0;top:0;width:100%;height:var(--U);color:#111;background:#edeae4}
 html.pp .gvp-ph{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;background:#3a4a55}
 html.pp .gvp-img{position:absolute;left:0;top:0;background:url(../assets/gives.webp?v=176) 0 0/100% 100% no-repeat;transform-origin:0 0}
 html.pp #p-gives.on .gvp-img{animation:gvpZ 9s cubic-bezier(.2,.6,.2,1) both}

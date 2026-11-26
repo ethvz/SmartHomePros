@@ -16,12 +16,12 @@ export default H => {
   const dimK = mat(0x1e1e1f, {r:.35});
 
   // ---------------------------------------------------------------- mount (engineering CAD), decoded exactly like the inline model
-  const C = { x:0, y:19.3, zf:46, r:16.4 };                 // collar axis + front face (CAD)
+  const C = { x:0, y:21, zf:46, r:18.6 };                   // collar: CAD front face z = 46; radius/axis matched to the side photo (CAD nut r16.4 reads small)
   if(OCPM){
     const mountMat = mountW.clone(); mountMat.side = THREE.DoubleSide;
     // hairline parting groove at z = 7 mm (wall-plate layer / front shell): same white both sides, fine dark line
     const mountSplit = H.splitMat(mountMat, mountMat, 'z', .007, .0003, 0x8a8c8f); mountSplit.side = THREE.DoubleSide;
-    const grl = grilleMat(0xc4c6c8, [84,56]); grl.side = THREE.DoubleSide;
+    const grl = grilleMat(0xc4c6c8, [5.2,3.6]); grl.side = THREE.DoubleSide;
     const Mt = [mountSplit, grl, mountMat];
     const cad = add(g, G());
     for(const p of OCPM.parts){
@@ -42,6 +42,8 @@ export default H => {
     add(M, H.rslab(77, 99, 29, 10, 4, mountW), 0, 0, 14.5);
     add(M, H.rslab(71, 42, 1, 7, .4, grilleMat(0xc4c6c8,[60,36])), 0, -28, 29.1);
   }
+  // inner wall behind the speaker grille (the CAD's hidden chassis used to fill it): white, so the side opening is not see-through
+  add(M, H.rslab(70.6, 46, 12.5, 4, 1, mountW), 0, -26, 7.5);
   // microphone pinhole on the +x side, just above the grille, near the 7 mm seam
   { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.45, -3, 15); ph.rotation.z = Math.PI/2; }
 
@@ -79,7 +81,7 @@ export default H => {
   }
 
   // ---------------------------------------------------------------- head shell (head-local mm: face at z = 0, +z out of the glass)
-  const Zb = -42, Rt = 16, Rs = 17, Rbt = 22, Rc = 13.5;
+  const Zb = -43.5, Rt = 16, Rs = 17, Rbt = 22, Rc = 13.5;
   const hwS = z => 42 - .16*Math.max(0, -z-2);
   const yTs = z => 42 - .16*Math.max(0, -z-2);
   const yBs = z => -(42 - .12*Math.max(0, -z-2));
@@ -151,7 +153,7 @@ export default H => {
   const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = 30*Math.PI/180;
   const aT = .62, Th = V3(0, cyB - Rbt*Math.sin(aT), czB - Rbt*Math.cos(aT));              // neck target on the slot floor (head-local)
   const nT = V3(0, -Math.sin(aT), -Math.cos(aT)); Th.addScaledVector(nT, -2);
-  const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 4 + 2, Tm = B.clone().addScaledVector(u, Dn);
+  const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 6 + 2, Tm = B.clone().addScaledVector(u, Dn);
   head.rotation.x = tilt; head.updateMatrix();
   const Gp = Tm.clone().sub(Th.clone().applyEuler(head.rotation));
   add(M, head, Gp.x, Gp.y, Gp.z);

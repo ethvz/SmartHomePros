@@ -44,7 +44,7 @@
 
   function run(){ strips(); art(); therm(); }
   window.__ppA=run;
-  let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); } finally{ setTimeout(()=>busy=false,0); } }); };
+  let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); }catch(e){ window.__ppAerr=String(e&&e.stack||e); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
   new MutationObserver(later).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   addEventListener('resize',later); addEventListener('orientationchange',()=>setTimeout(later,300)); later();

@@ -25,13 +25,15 @@ export default H => {
   const outer = rings[rings.length - 1];
   const LX = 55, LY0 = -10.5, LY1 = 27.7, LCY = (LY0 + LY1) / 2;
   const lensO = K.rr(LX, LY1 - LY0, [4, 4, 6, 6], { cy: LCY });
+  const LR = 1.4, lensG = K.rr(LX + 2 * LR, LY1 - LY0 + 2 * LR, [4 + LR, 4 + LR, 6 + LR, 6 + LR], { cy: LCY });   // opening lip rolls R1.4 into the recess
   for (let k = 1; k <= 8; k++){ const t = k / 8;
-    rings.push(outer.map(([x, y], i) => { const X = x + (lensO[i][0] - x) * t, Y = y + (lensO[i][1] - y) * t; return [X, Y, FZ + crown(X, Y)]; })); }
+    rings.push(outer.map(([x, y], i) => { const X = x + (lensG[i][0] - x) * t, Y = y + (lensG[i][1] - y) * t; return [X, Y, FZ + crown(X, Y)]; })); }
+  for (let i = 1; i <= 6; i++){ const a = i / 6 * Math.PI / 2, f = Math.sin(a);
+    rings.push(lensG.map(([x, y], j) => { const X = x + (lensO[j][0] - x) * f, Y = y + (lensO[j][1] - y) * f, gx = lensG[j][0], gy = lensG[j][1]; return [X, Y, FZ + crown(gx, gy) - LR * (1 - Math.cos(a))]; })); }
   const lip = rings[rings.length - 1];
-  rings.push(lip.map(([x, y, z]) => [x, y, z - .3]));
-  rings.push(lip.map(([x, y, z]) => [x, y, z - 1.9]));
+  rings.push(lip.map(([x, y, z]) => [x, y, z - .6]));
 
-  const grey = 0xb0b1b4, white = 0xf2f2f0;
+  const grey = 0x9fa0a4, white = 0xf2f2f0;
   const PILL = { y: 8, z: 13, len: 21, wid: 7, gap: .4 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
@@ -43,7 +45,7 @@ export default H => {
   /* Fresnel lens: frosted lavender-grey, faint vertical facet bands, shade under the top lip; follows the crown 1.5 mm down */
   const lensRings = [];
   for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27.5) ** 2)]; }));
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9593a0, roughness: .66, map: K.bandsTex(true), specularIntensity: .15 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa2a2a7, roughness: .62, map: K.bandsTex(true), specularIntensity: .15 });
   add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
 
   /* wordmark, tone-on-tone, flush on the crowned face */

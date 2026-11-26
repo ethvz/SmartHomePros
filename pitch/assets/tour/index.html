@@ -1260,7 +1260,10 @@ const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, do
 H.models = MODELS;                                     // so a product can build on another (the Spotlight Pro is the Outdoor Camera Pro plus its light bar)
 { const keys = ['ocp','ocspot','dbcp','icp','lock','garage','therm','plug','keypad','motion','glass','window','water','smokeco','fire','pendant','fob','chime','ysign'];
   const bust = /[?&]studio=/.test(location.search) ? Date.now() : TOURV;
-  await Promise.all(keys.map(k => import('./prod/' + k + '.js?v=' + bust).then(m => { const old = MODELS[k]; MODELS[k] = () => { try { return m.default(H); } catch(e){ console.warn('prod/'+k, e); if(/[?&]studio=/.test(location.search)) throw e; return old(); } }; }).catch(e => console.warn('prod/'+k, e)))); }
+  const studioK = new URLSearchParams(location.search).get('studio');
+  /* a dropped connection would leave a product on its old model: retry a failed file (a new URL each time, since a failed import is cached) */
+  const load = (k, n = 0) => import('./prod/' + k + '.js?v=' + bust + (n ? '&r=' + n : '')).catch(e => n < 4 ? new Promise(r => setTimeout(r, 300 * (n + 1))).then(() => load(k, n + 1)) : Promise.reject(e));
+  await Promise.all(keys.map(k => load(k).then(m => { const old = MODELS[k]; MODELS[k] = () => { try { return m.default(H); } catch(e){ console.warn('prod/'+k, e); if(/[?&]studio=/.test(location.search)) throw e; return old(); } }; }).catch(e => { console.warn('prod/'+k, e); if(k === studioK) throw e; }))); }   // studio never shows a stale model
 /* soft fill light that follows the camera to the focused product, like a photographer's key light */
 const prodLight = new THREE.SpotLight(0xffffff, 0, 3.2, .42, .85, 1.2);
 scene.add(prodLight, prodLight.target);

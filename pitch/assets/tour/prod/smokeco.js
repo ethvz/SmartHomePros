@@ -10,12 +10,12 @@ export default H => {
   /* ---------- materials */
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .26, clearcoat: .55, clearcoatRoughness: .18 });
   const capM = new THREE.MeshPhysicalMaterial({ color: 0xf6f6f6, roughness: .4, clearcoat: .25, clearcoatRoughness: .35 });
-  const dark = mat(0x2b2b2b, { r: .7 }), fin = mat(0x4a4a4a, { r: .55 }), inner = mat(0x343536, { r: .8 });
+  const dark = mat(0x2b2b2b, { r: .7 }), fin = mat(0x333435, { r: .6 }), inner = mat(0x343536, { r: .8 });
 
   /* ---------- face surface: dome + scoop (mm) */
   const RL = 40, RF = 63;                                  // face annulus: lip ... fillet start
   const faceZ = r => 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - RL) / (RF - RL))) ** 2);
-  const SC = { x: -51.5, y: 0, R: 10.5, d: 2.5 };          // half-moon scoop at 9 o'clock
+  const SC = { x: -52, y: 0, R: 11, d: 3.4 };          // half-moon scoop at 9 o'clock
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(r);
     const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** 1.15; return z; };
 
@@ -39,7 +39,7 @@ export default H => {
     return out; };
   const holes = [
     { pts: rrPts(42, 46.6, -10.5, 10.5, [2.2, 2.2, 2.2, 2.2], 0), phi: 0, u: [42, 46.6], v: 10.5 },
-    { pts: rrPts(49.2, 54.4, -9, 9, [1.6, 5.2, 5.2, 1.6], 0), phi: 0, u: [49.2, 54.4], v: 9 },
+    { pts: rrPts(49.2, 56, -9.5, 9.5, [1.6, 6, 6, 1.6], 0), phi: 0, u: [49.2, 56], v: 9.5 },
     { pts: rrPts(43.6, 48.2, -6.8, 6.8, [2.2, 2.2, 2.2, 2.2], 180), phi: 180, u: [43.6, 48.2], v: 6.8 },
   ];
 
@@ -89,27 +89,27 @@ export default H => {
     const [gx0, gy0] = P(0, 0); const gr = x.createRadialGradient(gx0, gy0, 44 * k, gx0, gy0, 56 * k);
     gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,.10)'); x.fillStyle = gr; x.fillRect(0, 0, N, N); x.restore(); }
   // printed text: straight lines tangent to the circle, letters' tops toward the centre, condensed caps
-  const txt = (s, r, phi, cap, w = 400, col = '#8f8f8f', cond = .8) => { const [px, py] = P(r * Math.cos(phi * D2R), r * Math.sin(phi * D2R));
+  const txt = (s, r, phi, cap, w = 500, col = '#6f6f6f', cond = .86) => { const [px, py] = P(r * Math.cos(phi * D2R), r * Math.sin(phi * D2R));
     x.save(); x.translate(px, py); x.rotate(Math.atan2(-Math.cos(phi * D2R), -Math.sin(phi * D2R))); x.scale(cond, 1);
     x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = `${w} ${Math.round(cap * k / .72)}px "Helvetica Neue", Helvetica, Arial, sans-serif`; x.fillText(s, 0, 0); x.restore(); };
   txt('CO', 57.6, 141, 2.4); txt('FIRE/FEU', 58, 108, 2.2);
   txt('TEST/ HUSH', 52.6, 95.5, 1.9); txt('TEST/SILENCIEUX', 55.3, 95.5, 1.9);
-  txt('GREEN/VERT - OK', 51.2, 154, 1.55); txt('YLW - FAULT JUANE - PANNE', 53.8, 154.5, 1.55); txt('RED - ALARM ROUGE - ALARME', 56.4, 155, 1.55);
-  txt('ENTRETIEN - 1 BIP', 52, 22, 1.55); txt('FEU ALARME - 3 BIPS', 54.7, 22.5, 1.55); txt('MONOXYDE DE CARBONE - 4 BIPS', 57.4, 23, 1.55);
-  txt('SERVICE - 1 BEEP', 52, -22, 1.55); txt('FIRE ALARM - 3 BEEPS', 54.7, -22.5, 1.55); txt('CARBON MONOXIDE ALARM - 4 BEEPS', 57.4, -23, 1.55);
-  txt('ATTENTION', 44.6, 239, 4.3, 400, '#8a8a8a', .9); txt('NOTICE', 50.3, 239.5, 3, 400, '#8f8f8f', .85); txt('SUPPLÉMENTAIRE AU DOS', 55, 240, 2.9, 400, '#8f8f8f', .85);
-  txt('CAUTION', 44.6, 299.5, 4.3, 400, '#8a8a8a', .9); txt('ADDITIONAL', 50.3, 299.5, 3, 400, '#8f8f8f', .85); txt('MARKINGS ON BACK', 55, 299, 2.9, 400, '#8f8f8f', .85);
+  txt('GREEN/VERT - OK', 51.2, 154, 1.75); txt('YLW - FAULT JUANE - PANNE', 53.8, 154.5, 1.75); txt('RED - ALARM ROUGE - ALARME', 56.4, 155, 1.75);
+  txt('ENTRETIEN - 1 BIP', 52, 22, 1.75); txt('FEU ALARME - 3 BIPS', 54.7, 22.5, 1.75); txt('MONOXYDE DE CARBONE - 4 BIPS', 57.4, 23, 1.75);
+  txt('SERVICE - 1 BEEP', 52, -22, 1.75); txt('FIRE ALARM - 3 BEEPS', 54.7, -22.5, 1.75); txt('CARBON MONOXIDE ALARM - 4 BEEPS', 57.4, -23, 1.75);
+  txt('ATTENTION', 44.6, 239, 4.3, 500, '#666', 1); txt('NOTICE', 50, 239.5, 3.2, 500, '#6c6c6c', 1); txt('SUPPLÉMENTAIRE AU DOS', 55, 240, 3.1, 500, '#6c6c6c', 1);
+  txt('CAUTION', 44.6, 299.5, 4.3, 500, '#666', 1); txt('ADDITIONAL', 50, 299.5, 3.2, 500, '#6c6c6c', 1); txt('MARKINGS ON BACK', 55, 299, 3.1, 500, '#6c6c6c', 1);
   // no-paint icon: ring, brush + roller, slash
   { const [cx, cy] = P(50.5 * Math.cos(57 * D2R), 50.5 * Math.sin(57 * D2R)), R = 6.5 * k; x.save(); x.translate(cx, cy);
-    x.strokeStyle = x.fillStyle = '#4a4a4a'; x.lineWidth = 1 * k; x.beginPath(); x.arc(0, 0, R - .5 * k, 0, Math.PI * 2); x.stroke();
+    x.strokeStyle = x.fillStyle = '#4a4a4a'; x.lineWidth = 1.3 * k; x.beginPath(); x.arc(0, 0, R - .65 * k, 0, Math.PI * 2); x.stroke();
     x.save(); x.beginPath(); x.arc(0, 0, R - 1 * k, 0, Math.PI * 2); x.clip(); const u = k;
     x.fillRect(-3.2 * u, -3.6 * u, 6.4 * u, 2.2 * u);                       // roller
     x.fillRect(2.6 * u, -2.8 * u, .8 * u, 2.4 * u); x.fillRect(-.4 * u, -.8 * u, 3.8 * u, .7 * u); x.fillRect(-.4 * u, -.8 * u, .8 * u, 3 * u);
     x.beginPath(); x.moveTo(-1.2 * u, 2.2 * u); x.lineTo(.8 * u, 2.2 * u); x.lineTo(.5 * u, 4.6 * u); x.lineTo(-.9 * u, 4.6 * u); x.closePath(); x.fill();   // brush
-    x.restore(); x.lineWidth = 1 * k; x.beginPath(); x.moveTo(-R * .68, -R * .68); x.lineTo(R * .68, R * .68); x.stroke(); x.restore(); }
+    x.restore(); x.lineWidth = 1.3 * k; x.beginPath(); x.moveTo(-R * .68, -R * .68); x.lineTo(R * .68, R * .68); x.stroke(); x.restore(); }
   // pinhole at 6 o'clock
-  { x.fillStyle = '#1e1e1e'; x.beginPath(); x.arc(...P(0, -64.5), .75 * k, 0, Math.PI * 2); x.fill();
+  { x.fillStyle = '#1e1e1e'; x.beginPath(); x.arc(...P(0, -64.5), .95 * k, 0, Math.PI * 2); x.fill();
     x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = .25 * k; x.beginPath(); x.arc(...P(0, -64.5), 1.05 * k, 0, Math.PI * 2); x.stroke(); }
   const tex = c => { const t = new THREE.CanvasTexture(c); t.anisotropy = Math.min(8, maxAniso); return t; };
   const mapT = tex(cv); mapT.colorSpace = THREE.SRGBColorSpace; const maskT = tex(mk);
@@ -152,10 +152,10 @@ export default H => {
     const mg = new THREE.CylinderGeometry(38, 38, 12.4, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, 33.6 + 6.2);
     // cylinder UV u starts at +z (pre-rotation) i.e. -y here; rotate so the tabs sit at 0, 60, 120 ... degrees
     const mesh = add(g, new THREE.Mesh(mg, new THREE.MeshStandardMaterial({ map: t, roughness: .75, metalness: .1 }))); mesh.rotation.z = -Math.PI / 2; }
-  { const cp = [V2(38.2, 45.8), V2(37.6, 46.3), V2(35.4, 46.3), V2(34.9, 46.5), V2(34.7, 47), V2(34.7, 49.2), V2(34.4, 49.6), V2(32.2, 49.6), V2(31.7, 49.9),
-      V2(31.5, 50.5), V2(31.5, 52.1), V2(31.3, 52.7), V2(30.8, 53), V2(30.3, 52.8), V2(30.1, 52.2), V2(30.05, 51.4)];
+  { const cp = [V2(38.2, 45.8), V2(37.6, 46.3), V2(37, 46.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
+      V2(35.1, 50.6), V2(35.1, 52.1), V2(34.9, 52.7), V2(34.5, 53), V2(34.1, 52.8), V2(33.9, 52.2), V2(33.85, 51.4)];
     const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp, 180), white)); ch.rotation.x = Math.PI / 2;
-    const dk = [V2(30.05, 51.4), V2(29.6, 50.6), V2(0, 50.6)];
+    const dk = [V2(33.85, 51.4), V2(33.4, 50.6), V2(0, 50.6)];
     const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk, 120), mat(0x3a3b3c, { r: .85 }))); di.rotation.x = Math.PI / 2; }
 
   /* ---------- floating cap (TEST/HUSH button) with a shallow centre dimple */

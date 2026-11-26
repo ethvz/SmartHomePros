@@ -130,7 +130,7 @@ export default H => {
   for (const x of [-6.2, 6.2]) { add(g, tube(.8, ZF - 1, ZF, voidM), x, 20.6, 0); add(g, disc(0, .8, voidM), x, 20.6, ZF - 1); }
 
   /* ---------- wordmark (flush print) ---------- */
-  add(g, H.decal(H.DEC.logo, 25.5, 6.4, { color: 0xd6d6d6, r: .4 }), 0, -19.5, ZF + .01);
+  add(g, H.decal(H.DEC.logo, 34, 8.5, { color: 0xd6d6d6, r: .4 }), 0, -19.5, ZF + .01);
 
   /* ---------- light ring (flush) + recessed doorbell button ---------- */
   const B = add(g, G(), 0, BY, ZF);
