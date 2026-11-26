@@ -19,7 +19,7 @@ export default H => {
   // y = -152, faces leaning back 13 mm toward the bottom, near-semicircular back (rearmost z = 8), big round wing/back corners
   const zF = 91, yT = -85, yB = -152, lean = 13, S = .12, wing = V2(66, 47).normalize(), cW = wing.x*50 + wing.y*zF;
   const yc = (yT + yB)/2, ry = (yT - yB)/2;
-  const zBack = y => 8 + 26*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));
+  const zBack = y => 8 + 18*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));
   const Wb = 76.2, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -40;
 
   // sheared group for everything that sits on / is the bar: y' = y - S*(z - 20)
@@ -117,13 +117,13 @@ export default H => {
     const sample = (C, u) => { const L = [0]; for(let i=1;i<C.length;i++) L.push(L[i-1] + Math.hypot(C[i][0]-C[i-1][0], C[i][1]-C[i-1][1]));
       const s = u*L[L.length-1]; let k = 1; while(k < L.length-1 && L[k] < s) k++; const fr = (s - L[k-1])/(L[k]-L[k-1] || 1);
       return [C[k-1][0] + (C[k][0]-C[k-1][0])*fr, C[k-1][1] + (C[k][1]-C[k-1][1])*fr, L[L.length-1]]; };
-    const Lall = sample(chainAt(leanAt(yc), yc), 1)[2], u0 = 7/Lall, Ltot = Lall*(1 - 2*u0), Rw = 10, K = 220;
+    const Lall = sample(chainAt(leanAt(yc), yc), 1)[2], Ltot = Lall - 14, Rw = 10, K = 220;   // window length fixed: its ends are vertical lines 7 mm before the wing ends at mid height
     const yTopAt = s => wY0 + .2 - (s < Rw ? Rw - Math.sqrt(Rw*Rw - (Rw - s)**2) : 0), yMid = (wY0 + wY1)/2;
     const glass = new THREE.MeshPhysicalMaterial({color:0xeef2f5, roughness:.03, metalness:0, transparent:true, opacity:.3, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:2.5, side:THREE.DoubleSide, depthWrite:false});
     const smoke = new THREE.MeshPhysicalMaterial({color:0x6e7174, roughness:.15, transparent:true, opacity:.9, clearcoat:.8, side:THREE.DoubleSide, depthWrite:false});
     const sheet = (rows, d, m, cols) => { const pos = [], idx = []; let R = 0;
-      for(const v of cols){ const u = u0 + v*(1 - 2*u0), s = Math.min(v, 1 - v)*Ltot, ys = rows(s); R = ys.length;
-        for(const y of ys){ const [x, z] = sample(chainAt(leanAt(y) + d, y), u); pos.push(x, y, z); } }
+      for(const v of cols){ const s = Math.min(v, 1 - v)*Ltot, ys = rows(s); R = ys.length;
+        for(const y of ys){ const C = chainAt(leanAt(y) + d, y), Ly = sample(C, 1)[2], u = .5 + (v - .5)*Ltot/Ly; const [x, z] = sample(C, u); pos.push(x, y, z); } }
       for(let c=0;c<cols.length-1;c++) for(let r=0;r<R-1;r++){ const a = c*R+r, b = a+1, cc = a+R, dd = cc+1; idx.push(a,cc,b, b,cc,dd); }
       const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
       const m2 = new THREE.Mesh(ge, m); SG.add(m2); return m2; };
@@ -146,7 +146,7 @@ export default H => {
     add(pnl, H.rslab(61.4, 15.4, .8, 3.6, .2, mat(0x6f7275, {r:.7})), 0, 0, .25);            // shadow groove round the panel
     add(pnl, H.rslab(60, 14, .8, 3, .2, mat(0xaeb1b4, {r:.55})), 0, 0, .33);                  // the grey panel, ~1 mm below the saddle skin
     for(const sx of [-24, 24]) add(pnl, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, .2, 32), mat(0xc3c6c8, {r:.45}))), sx, 0, .74);
-    add(pnl, H.rslab(10, 1.5, .4, .7, .1, mat(0x2c2e30, {r:.8})), 0, -11, .2);                 // small slot below the panel
+    add(pnl, H.rslab(10, 1.5, .4, .7, .1, mat(0x2c2e30, {r:.8})), 0, 11, .2);   // (+y of pnl points down the bar)                 // small slot below the panel
     // two Phillips wall screws on the band's back
     const scr = mat(0xb9bbbd, {r:.35, m:.6});
     for(const sx of [-27, 27]){ add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, .6, 24), scr)), sx, -56, -.2);

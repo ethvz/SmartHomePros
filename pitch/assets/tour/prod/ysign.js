@@ -129,7 +129,8 @@ export default H => { const { THREE, G, add, rbox } = H;
   const font = (w, px) => `${w} ${px * k}px "Vivint Sans", "Avenir Next", "Montserrat", "Helvetica Neue", Arial, sans-serif`;
   const fitText = (t, x0, x1, yc, capH, w) => { cx.font = font(w, capH / .7); const m = cx.measureText(t).width, [a, b] = P(x0, yc), [c] = P(x1, yc);
     cx.save(); cx.translate(a, b); cx.scale((c - a) / m, 1); cx.textBaseline = 'middle'; cx.fillText(t, 0, 0); cx.restore(); };
-  const draw = () => { cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, N, N); cx.fillStyle = '#ff8200'; cx.beginPath(); cx.arc(N / 2, N / 2, 145 * k, 0, Math.PI * 2); cx.fill();
+  const draw = () => { cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, N, N); cx.fillStyle = '#ff8200'; cx.beginPath();   // #FF8200 artwork, pre-compensated for the renderer's tone mapping
+    cx.arc(N / 2, N / 2, 145 * k, 0, Math.PI * 2); cx.fill();
     cx.fillStyle = '#ffffff'; fitText('Protected by', -33, 33, 71, 8, 500);
     fitText('855.484.8468', -94.2, -12.5, -73.5, 10, 400); fitText('vivint.com', 11.9, 90.5, -73.5, 10, 400);
     { const [a, b] = P(-.5, -64.4), [c, d] = P(.5, -82); cx.fillRect(a, b, c - a, d - b); }
@@ -149,7 +150,7 @@ export default H => { const { THREE, G, add, rbox } = H;
     art.needsUpdate = true; };
   draw();
   if (document.fonts) document.fonts.load(font(500, 8)).then(draw, () => {});
-  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0x9a9a9a, roughness: .4, envMapIntensity: .6, clearcoat: .15, clearcoatRoughness: .35, bumpMap: peel, bumpScale: .25 });
+  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0xb0b0b0, roughness: .42, envMapIntensity: .3, specularIntensity: .45, clearcoat: .1, clearcoatRoughness: .4, toneMapped: false, bumpMap: peel, bumpScale: .25 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
   for (const y of [131, -133]) add(S, new THREE.Mesh(new THREE.CircleGeometry(2.3, 24), new THREE.MeshStandardMaterial({ color: 0x2f3a33, roughness: .9 })), 0, yC + y, 9.52);   // shadowed post behind the holes
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
