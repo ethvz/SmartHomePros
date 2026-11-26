@@ -2420,7 +2420,7 @@ body.hd3 #gTitle{opacity:0!important}
 
     <!-- HOME -->
     <section class="page" id="p-home">
-      <div id="hmode" role="group" aria-label="Home view"><i></i><button data-hm="grid" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg>Tiles</button><button data-hm="3d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z"/><path d="M3.8 7.6 12 12.2l8.2-4.6M12 12.2v8.8"/></svg>3D Home</button></div><div id="tour3d"></div>
+      <div id="tour3d"></div>
       <div id="homeTrack"><div id="homeAll" class="hpane"><div id="allTiles"></div>
       <div class="amb"></div>
       </div>
@@ -2798,6 +2798,7 @@ body.hd3 #gTitle{opacity:0!important}
     <button id="burger" aria-label="Menu"><svg width="30" height="24" viewBox="0 0 30 24" fill="none" stroke="#141a1a" stroke-width="2.4" stroke-linecap="round"><path d="M2 3h26M2 12h18M2 21h26"/></svg></button>
     <button id="back" aria-label="Back"><svg width="14" height="22" viewBox="0 0 14 22" fill="none" stroke="var(--mint)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3l-8 8 8 8"/></svg></button>
     <img id="barlogo" src="assets/logo.svg?v=95" alt="vivint — home" role="button" data-home="1" style="cursor:pointer">
+    <div id="hmode" role="group" aria-label="Home view"><i></i><button data-hm="grid" class="on" aria-label="Tiles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg><span>Tiles</span></button><button data-hm="3d" aria-label="3D Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z"/><path d="M3.8 7.6 12 12.2l8.2-4.6M12 12.2v8.8"/></svg><span>3D Home</span></button></div>
     <div id="homeSeg"><i class="sind"></i><button class="on" data-hcat="all">All Products</button><button data-hcat="sensors">Sensors</button><button data-hcat="smart">Smart Home</button><button data-hcat="cams">Cameras</button></div>
     <div id="barRight"></div>
   </div>
@@ -5478,6 +5479,11 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
     if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=20&fb=76';   /* (Connect: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
+  /* keep the pill halfway between the logo and the category pill (both move with the layout) */
+  const place=()=>{ const bar=$('#bar'), lg=$('#barlogo'), cat=$('#barRight'); if(!bar||!lg||!cat) return; const b=bar.getBoundingClientRect(), l=lg.getBoundingClientRect(), c=cat.getBoundingClientRect();
+    if(!l.width||!c.width) return; pill.style.setProperty('--hmx', ((l.right+c.left)/2 - b.left)*(bar.offsetWidth/b.width)+'px'); };   /* the stage is scaled to fit: back to bar px */
+  addEventListener('resize',place); new ResizeObserver(place).observe($('#bar')); [0,120,400,700,1200].forEach(t=>setTimeout(place,t));
+  $('#barRight').addEventListener('transitionend',place);
   /* run the 3D scene only while it is on screen (3D view picked and the home page showing) */
   const ctl=()=>{ const f=box.firstChild; if(!f||!f.contentWindow) return; const on=pg.classList.contains('d3')&&pg.classList.contains('on')&&!document.hidden; f.contentWindow.postMessage({fpTourCtl:on?'resume':'pause'},'*'); };
   new MutationObserver(ctl).observe(pg,{attributes:true,attributeFilter:['class']}); document.addEventListener('visibilitychange',ctl);
@@ -6107,6 +6113,18 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 #p-home.d3 #flipLayer,#p-home.d3 #homeTrack{opacity:0!important;pointer-events:none!important}
 /* 3D Home fills the screen, edge to edge (the footer floats over it) */
 #p-home #tour3d{left:0!important;right:0!important;top:0!important;bottom:0!important;border-radius:0!important}
+/* Tiles | 3D Home: a footer pill like About / Videos / Yard Sign (icon over small label), on the home page only, centred
+   halfway between the vivint logo and the category pill (left set by the script below) */
+#bar #hmode{position:absolute;top:auto;bottom:7px;left:var(--hmx,26%);transform:translateX(-50%);display:flex;gap:2px;padding:5px;border-radius:999px;background:#1c1c1c;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.45);z-index:31;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+#bar.home #hmode{opacity:1;visibility:visible;transition:opacity .3s}
+#bar #hmode button{width:72px;height:44px;min-width:0;padding:0;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(255,255,255,.62);font:inherit;letter-spacing:0}
+#bar #hmode button:active{transform:scale(.95)}
+#bar #hmode button svg{width:19px;height:19px}
+#bar #hmode button span{font-size:9px;line-height:1;font-weight:500;letter-spacing:.15px;white-space:nowrap}
+#bar #hmode button.on{color:#05E5AF}
+#bar #hmode i{top:5px;left:5px;bottom:auto;width:72px;height:44px;border-radius:22px;background:rgba(5,229,175,.16);transform:none;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+#bar #hmode.d3 i{transform:translateX(74px)}
+#allTiles{transform:none}
 </style>
 <style>
 /* video library: playable tiles + full-screen player (SmartHomePros Connect) */
