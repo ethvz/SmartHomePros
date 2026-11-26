@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Citizens One;;;;
+FN:Vivint – Citizens One
+ORG:Vivint
+item1.TEL;type=VOICE:+18447376900
+item1.X-ABLabel:Call
+END:VCARD

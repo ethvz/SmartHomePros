@@ -27,15 +27,44 @@
       box.querySelectorAll('.hgl figure img').forEach((im, i) => {
         if (!im.__ippL) { im.__ippL = 1; im.addEventListener('load', () => focusOne(im, FOC[k][i], im.naturalWidth, im.naturalHeight, cx, window.SH || 1485)); }
         focusOne(im, FOC[k][i], im.naturalWidth, im.naturalHeight, cx, H); }); });
-    const v = Q('#dbHv'); if (v) { if (!v.__ippL) { v.__ippL = 1; v.addEventListener('loadedmetadata', galFocus); } focusOne(v, .6, v.videoWidth || 1376, v.videoHeight || 1032, cx, H); }
+    const v = Q('#dbHv'); if (v) { if (!v.__ippL) { v.__ippL = 1; v.addEventListener('loadedmetadata', galFocus); } focusOne(v, .6, v.videoWidth || 1376, v.videoHeight || 1032, cx, H - foot() - 330); }
   }
 
-  function layout() { galFocus(); if (!isIPP()) return; spinFit(); }
+
+  /* ---------- OCP / DBCP Highlights: media band between the heading and the 3-column list ---------- */
+  function featLayout() {
+    if (!isIPP()) return;
+    [['#ocScroll', '#ocmPhone', '#ocmList', 920], ['#dbScroll', '#dbmPhone', '#dbmList', 372]].forEach(([bq, pq, lq, pw]) => {
+      const box = Q(bq), ph = Q(pq), L = Q(lq); if (!box || !ph || !L) return;
+      const sec = L.closest('.otab'), H = window.SH || 1485, pf = foot(), T = top0();
+      const rows = Math.ceil(L.children.length / 3), bh = 58, listH = rows * bh + (rows - 1) * 6;
+      const head = T + 214;
+      /* 24/7 tab: the storage caption gets its own strip under the heading, and the band starts below it */
+      const cap = sec.querySelector('.dbm-cap'), hd = sec.querySelector('.dbm-h'); let mt = head, capT = 0;
+      if (cap && hd && cap.classList.contains('on')) { capT = hd.offsetTop + hd.offsetHeight + 18; mt = Math.max(head, capT + cap.offsetHeight + 22); }
+      const mh = Math.max(320, H - pf - 18 - listH - 26 - mt), bw = 1032 - 96 - 30;
+      let phs, phh;
+      if (pw === 920) { const port = ph.classList.contains('port'); phs = port ? Math.min(mh / 732, 1.1) : Math.min(.86, bw / 920); phh = port ? 732 * phs : 454 * phs; }
+      else { phs = Math.min(mh / 748, 1.12); phh = 748 * phs; }
+      const v = { '--capT': capT + 'px', '--lbh': bh + 'px', '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
+      if (pw === 372) v['--cl'] = (96 + 30 + 372 * phs + 10).toFixed(1) + 'px';
+      Object.entries(v).forEach(([k, x]) => setP(sec, k, x));
+    });
+  }
+  /* the page's own balance() re-places these with inline styles: lay ours out again whenever it does (writes go to the tab, not the watched nodes) */
+  function featWatch() {
+    ['#dbmPhone', '#dbmCap', '#ocmPhone', '#ocmCap'].forEach(q => { const el = Q(q); if (!el || el.__ippw) return; el.__ippw = 1;
+      new MutationObserver(() => { if (isIPP()) featLayout(); }).observe(el, { attributes: true, attributeFilter: ['class'] }); });
+    ['#ocmH', '#dbmH'].forEach(q => { const el = Q(q); if (!el || el.__ippw) return; el.__ippw = 1;
+      new MutationObserver(() => { if (isIPP()) requestAnimationFrame(featLayout); }).observe(el, { childList: true }); });
+  }
+
+  function layout() { galFocus(); if (!isIPP()) return; spinFit(); featLayout(); }
   function galEager(sec) { sec.querySelectorAll('.hgl img[loading=lazy]').forEach(im => { im.loading = 'eager'; }); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ippo) return; el.__ippo = 1;
     /* writes only to children / other elements, never to the observed page's class */
     new MutationObserver(() => { if (isIPP() && el.classList.contains('on')) { requestAnimationFrame(layout); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
-  function boot() { secWatch(); layout(); }
+  function boot() { secWatch(); featWatch(); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);

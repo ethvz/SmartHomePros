@@ -6,7 +6,7 @@ html.ipp #stage{--bT:var(--ippT,96px);--bF:var(--ippFoot,84px)}
 html.ipp :is(#p-ocp,#p-dbcp,#p-ai,#p-compat,#p-whatsnew,#p-preview,#p-birdseye){left:calc(-1*var(--gx,0px))!important;right:auto!important;width:1032px!important}
 
 /* ===================== product pages: one upright screen per tab ===================== */
-html.ipp :is(#ocScroll,#dbScroll){width:1032px!important}
+html.ipp :is(#ocScroll,#dbScroll){left:0!important;width:1032px!important}
 html.ipp :is(#ocScroll,#dbScroll)>*{width:1032px!important;height:var(--H)!important;margin:0!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;left:0!important}
 html.ipp :is(#ocScroll,#dbScroll)>[hidden]{display:none!important}
 html.ipp :is(#ocScroll,#dbScroll)>[data-t=hero]::after{display:none}
@@ -30,9 +30,9 @@ html.ipp #ocHeroHot .ocb[data-go=ai]{left:auto!important;right:40px;top:calc(var
 html.ipp #ocHeroHot .ocb[data-whistle]{left:auto!important;right:124px;top:calc(var(--bT) - 24px)!important}
 
 /* ---------- DBCP hero: the season video fills the screen (cropped round the doorbell), words low on the left ---------- */
-html.ipp #dbScroll .dbh-vid{left:0!important;width:1032px!important;height:var(--H)!important}
-html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:var(--H);background:linear-gradient(180deg,rgba(0,0,0,.4) 0,transparent 16%,transparent 48%,rgba(0,0,0,.78) 76%,rgba(0,0,0,.88) 100%)!important}
-html.ipp #dbScroll .dbh-txt{left:calc(var(--gx) + 48px)!important;width:720px!important;top:auto!important;bottom:calc(var(--bF) + 150px);margin:0!important}
+html.ipp #dbScroll .dbh-vid{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px)!important}
+html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px);background:linear-gradient(180deg,rgba(0,0,0,.4) 0,transparent 14%,transparent 70%,#000 100%)!important}
+html.ipp #dbScroll .dbh-txt{left:calc(var(--gx) + 48px)!important;width:720px!important;top:auto!important;bottom:calc(var(--bF) + 120px);margin:0!important}
 html.ipp #dbScroll .dbh-txt p{max-width:560px}
 html.ipp #dbScroll .dbai{top:calc(var(--bT) - 24px)!important;right:40px!important}
 
@@ -40,3 +40,39 @@ html.ipp #dbScroll .dbai{top:calc(var(--bT) - 24px)!important;right:40px!importa
 html.ipp :is(#ocScroll,#dbScroll)>.hum{height:calc(var(--H) + 774px)!important;overflow:clip!important}
 html.ipp :is(#ocScroll,#dbScroll)>.hum .hum-st{width:1032px!important;height:var(--H)!important}
 html.ipp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{width:1376px!important;height:1032px!important;margin:0!important;left:0!important;transform-origin:0 0;transform:translate(calc(516px - 688px * var(--spk,1.2)),calc(var(--H) / 2 - 516px * var(--spk,1.2))) scale(var(--spk,1.2))}
+
+/* ---------- Highlights (feat): heading up top, the visual in a wide band across the middle, the feature list as a 3-column grid below.
+   prodB.js sets --mt / --mh (band top / height), --phs (phone scale), --phh (scaled phone height), --cl (DBCP card left) on the tab ---------- */
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-col{left:calc(var(--gx) + 24px)!important;right:36px;width:auto!important;top:0!important;bottom:calc(var(--bF) + 18px)!important;margin:0!important;justify-content:space-between!important;gap:0!important;transform:none!important;z-index:6}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-h{left:0!important;width:auto!important;max-width:760px;min-height:0!important;padding:calc(var(--bT) + 22px) 18px 0;display:block!important}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list{display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px 8px;width:auto!important;left:0!important}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button{height:var(--lbh,58px)!important;font-size:18.5px!important;line-height:1.15;padding:0 16px!important;gap:12px;border-radius:16px;background:rgba(255,255,255,.04);transition:background .2s,color .2s,transform .12s cubic-bezier(.2,.8,.2,1)}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button.on{background:#1f2a27}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button:active{transform:scale(.96)}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button svg{flex:none}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap{left:calc(var(--gx) + 42px)!important;top:var(--capT)!important;width:auto!important;max-width:820px;margin:0!important;transform:none!important;z-index:7;flex-direction:row!important;flex-wrap:nowrap!important;gap:28px!important;align-items:flex-start}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap>div{flex:none;max-width:280px}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap i{width:1px!important;height:auto!important;align-self:stretch}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap em{flex:1 1 200px!important;margin:6px 0 0!important;align-self:flex-end}
+html.ipp #ocScroll .ocm-fade{display:none}
+
+/* OCP: the photo / render fills the band above the landscape phone, which sits at the bottom of the band */
+html.ipp #ocScroll .ocm-card{left:calc(var(--gx) + 10px)!important;width:calc(1032px - var(--gx) - 30px)!important;top:var(--mt)!important;height:calc(var(--mh) - var(--phh) + 70px)!important;-webkit-mask-image:linear-gradient(180deg,#000 80%,transparent)!important;mask-image:linear-gradient(180deg,#000 80%,transparent)!important;transition:height .5s cubic-bezier(.22,1,.36,1)}
+html.ipp #ocScroll .ocm.solo .ocm-card,html.ipp #ocScroll .ocm.bleed .ocm-card{height:var(--mh)!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.ipp #ocScroll .ocm-card img{left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important;padding:0!important;translate:none!important;scale:none!important;transform-origin:50% 50%!important}
+html.ipp #ocScroll .ocm.bleed .ocm-card img.bleedim{object-fit:cover!important;border-radius:28px}
+html.ipp #ocScroll .ocm-phone{left:calc(var(--gx) / 2 + 516px - 460px * var(--phs))!important;top:calc(var(--mt) + var(--mh) - var(--phh))!important;transform-origin:0 0;scale:var(--phs)}
+html.ipp #ocScroll .ocm-phone.port{left:calc(var(--gx) / 2 + 516px - 278px * var(--phs))!important;top:var(--mt)!important}
+html.ipp #ocScroll .ocm:has(.ocm-phone.port) .ocm-card{opacity:0}
+html.ipp #ocScroll .ocm-svw{left:calc(var(--gx) + 10px)!important;right:auto!important;width:calc(1032px - var(--gx) - 30px);top:var(--mt)!important;bottom:auto!important;height:calc(var(--mh) - var(--phh) + 40px);-webkit-mask-image:none!important;mask-image:none!important}
+html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important}
+html.ipp #ocScroll .ocm-bv{left:calc(var(--gx) + 10px)!important;width:calc(1032px - var(--gx) - 30px)!important;top:var(--mt)!important;height:var(--mh)!important;-webkit-mask-image:none!important;mask-image:none!important;border-radius:28px;overflow:hidden}
+
+/* DBCP: the upright phone on the left of the band, the product close-up beside it */
+html.ipp #dbScroll .dbm-phone{left:calc(var(--gx) + 30px)!important;top:var(--mt)!important;transform:none!important;transform-origin:0 0;scale:var(--phs);margin:0!important}
+html.ipp #dbScroll .dbm-phone.off{opacity:0}
+html.ipp #dbScroll .dbm-card{left:var(--cl)!important;width:calc(1012px - var(--cl))!important;top:var(--mt)!important;height:var(--mh)!important;margin:0!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.ipp #dbScroll .dbm-card img,html.ipp #dbScroll .dbm-card img.rr,html.ipp #dbScroll .dbm-card img.dflt{padding:10px 20px!important;translate:none!important;scale:none!important;object-fit:contain!important}
+html.ipp #dbScroll .dbm-hub{left:calc(var(--gx) + 10px)!important;width:calc(1032px - var(--gx) - 30px)!important;top:var(--mt)!important;height:var(--mh)!important;margin:0!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.ipp #dbScroll .dbm-hubdb{display:none}

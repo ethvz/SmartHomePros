@@ -11,7 +11,7 @@ Patches (all idempotent, applied on every run):
   * the offline helpers only clear their own caches (they used to clear everything that wasn't theirs)
   * Fast Pitch's art-board edits live in fp_layout / fp_nav (Fast Recruit already uses layout / nav)
 """
-import os, re, shutil, subprocess, sys
+import hashlib, os, re, shutil, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FR = os.environ.get('FR_REPO', os.path.join(os.path.dirname(ROOT), 'Fast-Recruit'))   # local checkout of ethvz/Fast-Recruit, branch connect-source
@@ -44,6 +44,17 @@ TITLE = '<meta name="apple-mobile-web-app-title" content="Smart Home Pros">'
 
 
 DOCK = '<script src="../dock.js" defer></script>\n'   # the shared editor dock (Edit layout + Screens)
+# the shared navigation (nav/: corner logo + hamburger, menu with the app selector), versioned by content so the
+# Fast Recruit offline helper (cache-first for scripts) picks up every change
+NAV_FILES = ('nav/shpnav.css', 'nav/shpnav.js')
+NAV_RE = r'<link rel="stylesheet" href="\.\./nav/shpnav\.css[^"]*">\n<script src="\.\./nav/shpnav\.js[^"]*" defer></script>\n'
+
+
+def nav_ver():
+    h = hashlib.sha1()
+    for f in NAV_FILES:
+        h.update(open(os.path.join(ROOT, f), 'rb').read())
+    return h.hexdigest()[:8]
 
 
 def head_hook(app):
@@ -75,9 +86,20 @@ def patch_recruit():
     if '.dw-foot .dw-app' not in s:
         s = s.replace('</style>', '  .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* Smart Home Pros */\n'
                    '  .dw:not(.short) .dw-foot .dw-vid, .dw:not(.short) .dw-foot:has(.dw-vid) .dw-app { grid-column: auto; } .dw.short .dw-foot { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* Video Library beside Switch app */\n</style>', 1)
+    # shared navigation (nav/shpnav.*): the corner logo + hamburger and the app selector in the menu
+    nv = nav_ver()
+    s = re.sub(NAV_RE, '', s)
+    assert '</head>' in s, 'patch target missing: fr nav include'
+    s = s.replace('</head>', '<link rel="stylesheet" href="../nav/shpnav.css?v=%s">\n<script src="../nav/shpnav.js?v=%s" defer></script>\n</head>' % (nv, nv), 1)
+    # no black bar at the bottom: the page runs under the home indicator (the controls are kept clear of it in nav/shpnav.css)
+    s = sub(s, '- safeTop - safeBot;', '- safeTop;   /* Smart Home Pros: under the home indicator too (no black bar); safeBot still read for the controls */', 'fr stage height')
     open(p, 'w', encoding='utf-8').write(s)
     p = os.path.join(ROOT, 'recruit/sw.js'); s = open(p).read()
     s = sub(s, 'ks.filter(k => k !== V && k !== MC && k !== META)', "ks.filter(k => k.startsWith('fast-recruit-') && k !== V)", 'fr sw caches')
+    # the offline helper also keeps the shared navigation; its cache name follows the nav version so a nav change refreshes it
+    m = re.search(r"const V = '(fast-recruit-[0-9a-f]+)(?:-n[0-9a-f]+)?', PRE = \[(?:\"\.\./nav/shpnav\.css\", \"\.\./nav/shpnav\.js\", )?", s)
+    assert m, 'patch target missing: fr sw nav'
+    s = s[:m.start()] + "const V = '%s-n%s', PRE = [\"../nav/shpnav.css\", \"../nav/shpnav.js\", " % (m.group(1), nv) + s[m.end():]
     open(p, 'w').write(s)
 
 

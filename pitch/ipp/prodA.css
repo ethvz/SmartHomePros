@@ -1,1 +1,29 @@
-/* iPad portrait (html.ipp) layout: prodA group. Every rule is scoped to html.ipp. */
+/* iPad portrait (html.ipp) layout: prodA group. Every rule is scoped to html.ipp.
+   Sections: #p-prod (generic product pages), #p-hub (Smart Hub), #p-therm (Smart Thermostat).
+   The stage is 1032 wide x --H tall. Each sub-section is one full upright screen (1032 x --H) laid out like the landscape
+   version: same type sizes, same cards and controls, re-flowed into the taller frame. Content keeps clear of the rail on the
+   left (--ipL), the status bar (--ippT) and the footer (--ippFoot). Positions that depend on the product art come from ipp/prodA.js. */
+
+html.ipp :is(#prScroll,#hbScroll,#thScroll){--ipL:128px;--ipR:56px;--ipTop:var(--ippT,96px);--ipBot:var(--ippFoot,84px)}
+/* inside the sections the landscape "centred 1376 canvas" maths collapses to the 1032 stage: no gutter, full width */
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>*{--gx:0px;--W:1032px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>:not(#emuLayer){width:1032px!important;height:var(--H)!important;margin:0!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important;overflow:hidden!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>[hidden]{display:none!important}
+
+/* ---------- heroes: the photo / video fills the upright screen; copy bottom-left at landscape size ---------- */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.lh-media,.lh-scrim,.ich-vid,.hbh-vid,.ich-scrim,.ich-sc,.hbh-scrim,.hbh-sc){left:0!important;right:auto!important;width:1032px!important;height:var(--H)!important}
+html.ipp :is(#prScroll,#thScroll) .lh-ph{width:100%!important;height:100%!important;object-fit:cover}
+html.ipp :is(#prScroll,#thScroll) .lh-media .smk-ghost{object-fit:cover}
+html.ipp :is(#prScroll,#thScroll) .lh-media{background:#000}
+html.ipp :is(#prScroll,#thScroll) .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.5) 0,rgba(0,0,0,.12) 9%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 48%,rgba(0,0,0,.84) 100%)!important}
+html.ipp :is(#prScroll,#thScroll) .lhero .lh-txt{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:auto!important;bottom:calc(var(--ipBot) + 150px)!important}
+html.ipp :is(#prScroll,#thScroll) .lhero .lh-txt p{max-width:700px}
+/* light lock / chime photos: the copy sits on the dark fade, so it is white like every other hero */
+html.ipp #prScroll .lhero .lh-txt :is(h1,p){color:#fff!important;text-shadow:0 2px 24px rgba(0,0,0,.45)!important}
+html.ipp #prScroll .lhero .lh-txt p{color:rgba(255,255,255,.86)!important}
+html.ipp #prScroll .lhero .nxa{filter:none!important}
+/* overview photo carousel: each slide is one upright screen */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .hgl{left:0!important;width:1032px!important;height:100%!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .hgl figure{width:1032px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .hg-dots{bottom:calc(var(--ipBot) + 70px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .lhero.hgw .lh-txt{bottom:calc(var(--ipBot) + 150px)!important}

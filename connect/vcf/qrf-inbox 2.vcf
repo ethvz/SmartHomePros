@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – QRF Inbox;;;;
+FN:Vivint – QRF Inbox
+ORG:Vivint
+item1.EMAIL;type=INTERNET;type=WORK:qrfinbox@vivint.com
+item1.X-ABLabel:Email
+END:VCARD

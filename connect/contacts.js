@@ -16,13 +16,15 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
     book: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/>',
     srch: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
     x: '<path d="M6 6l12 12M18 6L6 18"/>', ok: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
     star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'
   };
   var svg = function (k) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[k] + '</svg>'; };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var fmt = function (d) { return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6); };
   var standalone = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
-  var framed = (function () { try { return window.top !== window; } catch (e) { return true; } })();
+  /* real vCards only where the files are served as text/vcard: GitHub Pages (Safari + Home Screen app) and local testing */
+  var realHost = /(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$|^\[::1\]$|\.localhost$|\.test$/.test(location.hostname);
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)');
   var total = DEPTS.reduce(function (n, d) { return n + d.c.length + d.t.length + d.e.length; }, 0);
 
@@ -117,9 +119,10 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
   pn.addEventListener('touchend', end); pn.addEventListener('touchcancel', end);
 
   /* ---- Save / Save all: hand iOS the .vcf (it shows Create New Contact / Add to Existing) ----
-     Online (or cached by the app): the static file connect/vcf/<f>.vcf, opened in place in Safari and in the in-app
-     browser from the Home Screen app (target=_blank keeps the app from getting stuck on the card with no back button).
-     Inside the claude.ai copy (an iframe) or offline with no cached copy: share or download the same card as a Blob. */
+     GitHub Pages / Home Screen app / localhost: the static file connect/vcf/<f>.vcf (served as text/vcard), opened in
+     place in Safari and in the in-app browser from the Home Screen app (target=_blank there, so the app never gets stuck
+     on the card with no back button). Offline with no cached copy: share or download the same card as a Blob.
+     The claude.ai artifact copy can't hand over a vCard (no text/vcard, no downloads), so there Save becomes Copy. */
   function blob(f, name) {
     var txt = VCF[f]; if (!txt) return false;
     var fn = (f === ALL ? 'Vivint Sales Contacts' : 'Vivint - ' + name) + '.vcf';
@@ -133,17 +136,47 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
       setTimeout(function () { URL.revokeObjectURL(u); }, 60000); return true;
     } catch (e) { return false; }
   }
-  function flash(b) {
+  function plain(d) {
+    return ['Vivint – ' + d.n].concat(d.c.map(function (p) { return 'Call: ' + fmt(p); }), d.t.map(function (p) { return 'Text only: ' + fmt(p); }), d.e.map(function (m) { return 'Email: ' + m; })).join('\n');
+  }
+  function copy(txt) {
+    var ok = false, ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, txt.length);
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove();
+    if (!ok && navigator.clipboard) { navigator.clipboard.writeText(txt).catch(function () {}); ok = true; }
+    return ok;
+  }
+  function toast(msg) { var t = document.querySelector('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, 2600); }
+  function flash(b, label) {
     var s = b.querySelector('span'); if (!b._l) b._l = s.textContent;
-    b.classList.add('go'); s.textContent = 'Opening…'; clearTimeout(b._t);
+    b.classList.add('go'); s.textContent = label; clearTimeout(b._t);
     b._t = setTimeout(function () { b.classList.remove('go'); s.textContent = b._l; }, 1400);
+  }
+  if (!realHost) {
+    el.classList.add('cp');
+    el.querySelectorAll('.mc-sv, .mc-all').forEach(function (b) {
+      b.removeAttribute('href'); b.removeAttribute('target'); b.setAttribute('role', 'button'); b.tabIndex = 0;
+      b.querySelector('svg').outerHTML = svg('copy');
+      b.querySelector('span').textContent = b.classList.contains('mc-all') ? 'Copy all' : 'Copy';
+      b.setAttribute('aria-label', 'Copy ' + b.dataset.n + ' details');
+    });
+    $('.mc-ft').textContent = 'Save to Contacts works in the installed app. Here, Copy puts the numbers and emails on your clipboard.';
   }
   el.addEventListener('click', function (e) {
     var b = e.target.closest('.mc-sv, .mc-all'); if (!b) return;
-    flash(b);
+    if (!realHost) {
+      e.preventDefault();
+      var txt = b.dataset.f === ALL ? DEPTS.map(plain).join('\n\n') : plain(DEPTS.filter(function (d) { return d.f === b.dataset.f; })[0]);
+      if (copy(txt)) { flash(b, 'Copied'); toast('Copied. Save to Contacts works in the installed app'); } else toast('Save to Contacts works in the installed app');
+      return;
+    }
+    flash(b, 'Opening…');
     var cached = navigator.serviceWorker && navigator.serviceWorker.controller;
-    if (framed || (navigator.onLine === false && !cached)) { if (blob(b.dataset.f, b.dataset.n)) e.preventDefault(); }
+    if (navigator.onLine === false && !cached) { if (blob(b.dataset.f, b.dataset.n)) e.preventDefault(); }
   });
+  el.addEventListener('keydown', function (e) { var b = e.target.closest && e.target.closest('.cp .mc-sv, .cp .mc-all'); if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); b.click(); } });
   addEventListener('pageshow', function (e) { if (e.persisted) el.querySelectorAll('.go').forEach(function (b) { clearTimeout(b._t); b.classList.remove('go'); b.querySelector('span').textContent = b._l; }); });
   if (reduce && reduce.matches) el.classList.add('rm');
 })();
