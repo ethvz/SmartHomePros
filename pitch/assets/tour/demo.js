@@ -137,8 +137,9 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
   #card #dmAct .t{display:none}
   #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
   #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock]{width:40px;padding:0;justify-content:center}
-  #card #dmAct button.rnd{width:40px}
-  #card #dmAct .tv{min-width:46px;font-size:17px}
+  #card #dmAct button.rnd{width:36px;height:36px}
+  #card #dmAct .tv{min-width:42px;font-size:16px}
+  #card.dmHas[data-dm=therm] .c-name{max-width:17vw!important}
   #card #dmAct .tv small{font-size:8.5px;letter-spacing:.1em}
 }
 /* live caption while an automation plays */
@@ -512,7 +513,7 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
   else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
   actEl.dataset.k = want;
   const nx = tour.card.querySelector('#next'); if(actEl.parentNode !== tour.card || actEl.nextSibling !== nx) tour.card.insertBefore(actEl, nx);
-  actK = want; actEl.classList.remove('off'); tour.card.classList.add('dmHas');
+  actK = want; actEl.classList.remove('off'); tour.card.classList.add('dmHas'); tour.card.dataset.dm = want;
   showTry(want === 'hub'); }
 { const p = parts('therm'); if(p.setState){ const set0 = p.setState; p.setState = o => { const r = set0(o); if(actK === 'therm') queueMicrotask(syncAct); return r; }; } }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }

@@ -18,7 +18,7 @@ export default H => {
   const RL = 44.5, LR = 4, DL = 43.5, RF = 67, LIFT = 7, ZB = 3;
   const lipD = r => r >= RL + LR ? 0 : LR - Math.sqrt(Math.max(0, LR * LR - (RL + LR - r) ** 2));
   const faceZ = r => ZB + 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - DL) / (RF - DL))) ** 2) - lipD(r);
-  const SC = { x: -50, y: 0, R: 13.5, d: 2.5 };       // half-moon scoop at 9 o'clock (crisp outer arc)
+  const SC = { x: -50, y: 0, R: 13.5, d: 3.5 };       // half-moon scoop at 9 o'clock (crisp outer arc)
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(Math.max(r, RL));
     const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** .25; return z; };
 
@@ -87,11 +87,11 @@ export default H => {
   const drawPts = (pts) => { x.beginPath(); pts.forEach(([px, py], i) => i ? x.lineTo(...P(px, py)) : x.moveTo(...P(px, py))); x.closePath(); };
   const pad = (pts, fill) => { drawPts(pts); x.fillStyle = fill; x.fill(); x.lineWidth = .32 * k; x.strokeStyle = '#2a2a2a'; x.stroke(); };
   // CO pad (big round corner outer / away from the LED), LED window, FIRE pad (mirror); they start right where the lip rolls over (photo)
-  const coPts = polarPad(48.6, 58.6, 124.6, 141, [1.2, 1.4, 7, 1.2]);
-  const fiPts = polarPad(48.6, 58.6, 99, 115.4, [1.2, 7, 1.4, 1.2]);
+  const coPts = polarPad(48.6, 58.6, 124.6, 138.6, [1.2, 1.4, 7, 1.2]);
+  const fiPts = polarPad(48.6, 58.6, 100.8, 115.2, [1.2, 7, 1.4, 1.2]);
   pad(coPts, '#45474a'); pad(fiPts, '#45474a');
-  const ledPts = polarPad(49.6, 57.6, 116.7, 123.3, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
-  x.fillStyle = '#626567'; drawPts(polarPad(51.4, 55.8, 118.2, 121.8, [.8, .8, .8, .8])); x.fill();
+  const ledPts = polarPad(49.6, 57.6, 116.8, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
+  x.fillStyle = '#626567'; drawPts(polarPad(51.4, 55.8, 118.1, 121.5, [.8, .8, .8, .8])); x.fill();
   // soft sheen on the smoked pads (lighter toward their outer edge) and a thin darker lip on the side away from the light (glossy insert edge)
   for (const pts of [coPts, fiPts, ledPts]) { x.save(); drawPts(pts); x.clip();
     const [gx0, gy0] = P(0, 0); const gr = x.createRadialGradient(gx0, gy0, 48 * k, gx0, gy0, 59 * k);
@@ -102,7 +102,7 @@ export default H => {
     x.save(); x.translate(px, py); x.rotate(Math.atan2(-Math.cos(phi * D2R), -Math.sin(phi * D2R))); x.scale(cond, 1);
     x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = `${w} ${Math.round(cap * k / .72)}px "Helvetica Neue", Helvetica, Arial, sans-serif`; x.fillText(s, 0, 0); x.restore(); };
-  txt('CO', 61.2, 133, 2.4); txt('FIRE/FEU', 60.8, 111.5, 2.2);
+  txt('CO', 61.2, 131.5, 2.4); txt('FIRE/FEU', 60.8, 111.5, 2.2);
   txt('TEST/ HUSH', 54.6, 93, 1.9); txt('TEST/SILENCIEUX', 57.6, 93.5, 1.9);
   txt('GREEN/VERT - OK', 51.6, 160, 1.6); txt('YLW - FAULT JUANE - PANNE', 54.1, 160, 1.6); txt('RED - ALARM ROUGE - ALARME', 56.6, 160, 1.6);
   txt('ENTRETIEN - 1 BIP', 52, 22, 1.75); txt('FEU ALARME - 3 BIPS', 54.7, 22.5, 1.75); txt('MONOXYDE DE CARBONE - 4 BIPS', 57.4, 23, 1.75);
@@ -122,9 +122,11 @@ export default H => {
     x.beginPath(); x.moveTo(-1.1 * u, 2.0 * u); x.lineTo(1.5 * u, 2.0 * u); x.lineTo(1.0 * u, 5.0 * u); x.quadraticCurveTo(.2 * u, 5.8 * u, -.6 * u, 5.0 * u); x.closePath(); x.fill();   // tapered head
     x.restore(); x.lineWidth = 1.3 * k; x.beginPath(); x.moveTo(-R * .7, -R * .7); x.lineTo(R * .7, R * .7); x.stroke(); x.restore(); }
   // pinhole at 6 o'clock
-  { const [hx, hy] = P(0, -66.2); x.fillStyle = '#1a1a1a'; x.beginPath(); x.arc(hx, hy, .8 * k, 0, Math.PI * 2); x.fill();
-    x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = .3 * k; x.beginPath(); x.arc(hx, hy, .95 * k, .15 * Math.PI, .85 * Math.PI); x.stroke();   // bright lower lip
-    x.strokeStyle = 'rgba(0,0,0,.25)'; x.lineWidth = .2 * k; x.beginPath(); x.arc(hx, hy, .95 * k, 1.1 * Math.PI, 1.9 * Math.PI); x.stroke(); }
+  { const [hx, hy] = P(0, -66.2); const pg = x.createRadialGradient(hx, hy, .9 * k, hx, hy, 1.5 * k); pg.addColorStop(0, 'rgba(90,90,90,.55)'); pg.addColorStop(1, 'rgba(90,90,90,0)');
+    x.fillStyle = pg; x.beginPath(); x.arc(hx, hy, 1.5 * k, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#1a1a1a'; x.beginPath(); x.arc(hx, hy, 1.0 * k, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = .3 * k; x.beginPath(); x.arc(hx, hy, 1.15 * k, .15 * Math.PI, .85 * Math.PI); x.stroke();   // bright lower lip
+    x.strokeStyle = 'rgba(0,0,0,.25)'; x.lineWidth = .2 * k; x.beginPath(); x.arc(hx, hy, 1.15 * k, 1.1 * Math.PI, 1.9 * Math.PI); x.stroke(); }
   const tex = c => { const t = new THREE.CanvasTexture(c); t.anisotropy = Math.min(8, maxAniso); return t; };
   const mapT = tex(cv); mapT.colorSpace = THREE.SRGBColorSpace; const maskT = tex(mk);
 
@@ -154,7 +156,7 @@ export default H => {
 
   /* ---------- well lip, well wall + floor (dark below), insect mesh band, chamber rings, dark interior */
   { const f = faceZ(RL), lp = [V2(30, 33.6 + ZB), V2(43.6, 33.6 + ZB), V2(44.3, 33.9 + ZB), V2(RL, Math.min(f, 34.6 + ZB)), V2(RL, f + .02)].reverse();   // well wall under the lip
-    const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), inner)); lip.rotation.x = Math.PI / 2; }
+    const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), white)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 4096, Hh = 208, c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
     const circ = 2 * Math.PI * 40.5, pxmm = W / circ; y.fillStyle = '#101010'; y.fillRect(0, 0, W, Hh);

@@ -146,8 +146,8 @@ export default H => {
     // soft fan on the wall below
     const c = document.createElement('canvas'), CW = 512, CH = 336; c.width = CW; c.height = CH; const x = c.getContext('2d'), id = x.createImageData(CW, CH);
     const stops = [[0, 1], [.28, .7], [.62, .3], [1, 0]], I = yn => { for(let i=1;i<stops.length;i++) if(yn <= stops[i][0]){ const [a0, v0] = stops[i-1], [a1, v1] = stops[i], t = (yn - a0)/(a1 - a0); return v0 + (v1 - v0)*t*t*(3 - 2*t); } return 0; };
-    for(let py=0;py<CH;py++){ const yn = py/(CH-1), w = .42 + .58*yn, iv = I(yn);                 // soft downcast cone: widens as it falls, fades with distance
-      for(let px=0;px<CW;px++){ const xn = (px/(CW-1))*2 - 1, h = Math.exp(-2.6*(xn/w)**2), o = (py*CW + px)*4;
+    for(let py=0;py<CH;py++){ const yn = py/(CH-1), w = .55 + .7*yn, iv = .88*I(yn);                 // soft downcast cone: widens as it falls, fades with distance
+      for(let px=0;px<CW;px++){ const xn = (px/(CW-1))*2 - 1, h = Math.exp(-2.1*(xn/w)**2)*(1 - xn**8), o = (py*CW + px)*4;
         id.data[o] = id.data[o+1] = id.data[o+2] = 255; id.data[o+3] = Math.round(255*iv*h*(xn*xn < 1 ? 1 : 0)); } }
     x.putImageData(id, 0, 0);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
