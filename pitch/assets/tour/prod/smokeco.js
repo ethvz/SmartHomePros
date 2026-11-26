@@ -46,9 +46,9 @@ export default H => {
     const end = out[out.length - 1]; out.push([u0 + e * .4, c - e]); out.push([u0, c - e * 1.6]); out.push([u0, -c + e * 1.6]); out.push([u0 + e * .4, -c + e]);
     return out; })();
   const holes = [
-    { pts: rrPts(44.6, 49.3, -11.7, 11.7, [2.2, 2.2, 2.2, 2.2], 0), phi: 0, u: [44.6, 49.3], v: 11.7 },
+    { pts: rrPts(44.6, 49.3, -11.7, 11.7, [1.2, 1.2, 1.2, 1.2], 0), phi: 0, u: [44.6, 49.3], v: 11.7 },
     { pts: dPts, phi: 0, u: [51.2, 56.4], v: 12, d: 1 },
-    { pts: rrPts(46.6, 51.2, -12, 12, [2.2, 2.2, 2.2, 2.2], 180), phi: 180, u: [46.6, 51.2], v: 12 },
+    { pts: rrPts(46.6, 51.2, -12, 12, [1.2, 1.2, 1.2, 1.2], 180), phi: 180, u: [46.6, 51.2], v: 12 },
   ];
 
   /* ---------- canvases: printed map + hole mask, planar over the 142 mm disc */
@@ -87,8 +87,8 @@ export default H => {
   const drawPts = (pts) => { x.beginPath(); pts.forEach(([px, py], i) => i ? x.lineTo(...P(px, py)) : x.moveTo(...P(px, py))); x.closePath(); };
   const pad = (pts, fill) => { drawPts(pts); x.fillStyle = fill; x.fill(); x.lineWidth = .32 * k; x.strokeStyle = '#2a2a2a'; x.stroke(); };
   // CO pad (big round corner outer / away from the LED), LED window, FIRE pad (mirror); they start right where the lip rolls over (photo)
-  const coPts = polarPad(48.6, 58.6, 124.6, 138.6, [1.2, 1.4, 7, 1.2]);
-  const fiPts = polarPad(48.6, 58.6, 100.8, 115.2, [1.2, 7, 1.4, 1.2]);
+  const coPts = polarPad(48.2, 58.6, 124.6, 138.6, [1.2, 1.4, 7, 1.2]);
+  const fiPts = polarPad(48.2, 58.6, 100.8, 115.2, [1.2, 7, 1.4, 1.2]);
   pad(coPts, '#45474a'); pad(fiPts, '#45474a');
   const ledPts = polarPad(49.6, 57.6, 116.8, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
   x.fillStyle = '#626567'; drawPts(polarPad(51.4, 55.8, 118.1, 121.5, [.8, .8, .8, .8])); x.fill();
@@ -109,24 +109,26 @@ export default H => {
   txt('SERVICE - 1 BEEP', 52, -22, 1.75); txt('FIRE ALARM - 3 BEEPS', 54.7, -22.5, 1.75); txt('CARBON MONOXIDE ALARM - 4 BEEPS', 57.4, -23, 1.75);
   txt('ATTENTION', 46.4, 239, 4.3, 500, '#555', 1); txt('NOTICE', 51.3, 239.5, 3.2, 500, '#5a5a5a', 1); txt('SUPPLÉMENTAIRE AU DOS', 55.8, 240, 3.1, 500, '#5a5a5a', 1);
   txt('CAUTION', 46.4, 299.5, 4.3, 500, '#555', 1); txt('ADDITIONAL', 51.3, 299.5, 3.2, 500, '#5a5a5a', 1); txt('MARKINGS ON BACK', 55.8, 299, 3.1, 500, '#5a5a5a', 1);
-  // no-paint icon: ring, brush + roller, slash
-  // no-paint icon (photo: centre r 52, 60 deg from the top spoke's side; ring 8.3 mm radius, 1.3 mm line): paint roller across the top with
-  // its handle bent down to the right, a brush (ferrule + tapered head) lower left, and the slash
-  { const [cx, cy] = P(52.2 * Math.cos(60 * D2R), 52.2 * Math.sin(60 * D2R)), R = 8.3 * k, u = k; x.save(); x.translate(cx, cy);
+  // no-paint icon (photo: centre r 52, 60 deg from the top spoke; ring 8.6 mm radius, 1.3 mm line): a paintbrush tilted ~27 deg -
+  // roller-like bar with a knob on top, a dark head with a white paint "crown" in it, a short neck and a tear-drop handle with a hole -
+  // crossed by the slash from 10 to 4 o'clock
+  { const [cx, cy] = P(52 * Math.cos(60 * D2R), 52 * Math.sin(60 * D2R)), R = 8.6 * k, u = k; x.save(); x.translate(cx, cy);
     x.strokeStyle = x.fillStyle = '#3e3e3e'; x.lineWidth = 1.3 * k; x.beginPath(); x.arc(0, 0, R - .65 * k, 0, Math.PI * 2); x.stroke();
-    x.save(); x.beginPath(); x.arc(0, 0, R - 1.2 * k, 0, Math.PI * 2); x.clip(); x.lineCap = 'round'; x.lineJoin = 'round';
-    x.beginPath(); x.roundRect(-3.8 * u, -4.4 * u, 7 * u, 2.4 * u, .5 * u); x.fill();                      // roller
-    x.lineWidth = .8 * u; x.beginPath(); x.moveTo(3.2 * u, -3.2 * u); x.lineTo(4.4 * u, -3.2 * u); x.lineTo(4.4 * u, -.9 * u);  // handle: out, down,
-    x.lineTo(.2 * u, -.9 * u); x.lineTo(.2 * u, .6 * u); x.stroke();                                                         // back across, down
-    x.fillRect(-.9 * u, .6 * u, 2.2 * u, 1.4 * u);                                                                          // brush ferrule
-    x.beginPath(); x.moveTo(-1.1 * u, 2.0 * u); x.lineTo(1.5 * u, 2.0 * u); x.lineTo(1.0 * u, 5.0 * u); x.quadraticCurveTo(.2 * u, 5.8 * u, -.6 * u, 5.0 * u); x.closePath(); x.fill();   // tapered head
-    x.restore(); x.lineWidth = 1.3 * k; x.beginPath(); x.moveTo(-R * .7, -R * .7); x.lineTo(R * .7, R * .7); x.stroke(); x.restore(); }
+    x.save(); x.beginPath(); x.arc(0, 0, R - 1.2 * k, 0, Math.PI * 2); x.clip(); x.rotate(27 * D2R);
+    x.beginPath(); x.roundRect(-3.4 * u, -5.9 * u, 7.2 * u, 1.5 * u, .7 * u); x.fill(); x.beginPath(); x.arc(-3.5 * u, -5.15 * u, 1.05 * u, 0, Math.PI * 2); x.fill();   // top bar + knob
+    x.fillRect(-2.9 * u, -4.0 * u, 6 * u, 3.0 * u);                                                                                             // head
+    x.fillStyle = '#f4f4f2'; x.beginPath(); x.moveTo(-2.2 * u, -1.6 * u); x.lineTo(-2.2 * u, -3.0 * u); x.lineTo(-1.3 * u, -2.2 * u); x.lineTo(-.3 * u, -3.4 * u);
+    x.lineTo(.7 * u, -2.3 * u); x.lineTo(1.6 * u, -3.2 * u); x.lineTo(2.4 * u, -2.1 * u); x.lineTo(2.4 * u, -1.6 * u); x.closePath(); x.fill();   // paint crown
+    x.fillStyle = '#3e3e3e'; x.fillRect(-.55 * u, -1.1 * u, 1.3 * u, 2.2 * u);                                                                   // neck
+    x.beginPath(); x.moveTo(-.55 * u, .9 * u); x.lineTo(.75 * u, .9 * u); x.bezierCurveTo(2.3 * u, 2.4 * u, 2 * u, 5.4 * u, .1 * u, 5.4 * u);
+    x.bezierCurveTo(-1.8 * u, 5.4 * u, -2.1 * u, 2.4 * u, -.55 * u, .9 * u); x.fill();                                                          // tear-drop handle
+    x.fillStyle = '#f4f4f2'; x.beginPath(); x.arc(.1 * u, 4.2 * u, .38 * u, 0, Math.PI * 2); x.fill();
+    x.restore(); const sa = 22 * D2R; x.lineWidth = 1.3 * k; x.beginPath(); x.moveTo(-R * Math.cos(sa), -R * Math.sin(sa)); x.lineTo(R * Math.cos(sa), R * Math.sin(sa)); x.stroke(); x.restore(); }
   // pinhole at 6 o'clock
-  { const [hx, hy] = P(0, -66.2); const pg = x.createRadialGradient(hx, hy, .9 * k, hx, hy, 1.5 * k); pg.addColorStop(0, 'rgba(90,90,90,.55)'); pg.addColorStop(1, 'rgba(90,90,90,0)');
-    x.fillStyle = pg; x.beginPath(); x.arc(hx, hy, 1.5 * k, 0, Math.PI * 2); x.fill();
-    x.fillStyle = '#1a1a1a'; x.beginPath(); x.arc(hx, hy, 1.0 * k, 0, Math.PI * 2); x.fill();
-    x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = .3 * k; x.beginPath(); x.arc(hx, hy, 1.15 * k, .15 * Math.PI, .85 * Math.PI); x.stroke();   // bright lower lip
-    x.strokeStyle = 'rgba(0,0,0,.25)'; x.lineWidth = .2 * k; x.beginPath(); x.arc(hx, hy, 1.15 * k, 1.1 * Math.PI, 1.9 * Math.PI); x.stroke(); }
+  { const [hx, hy] = P(0, -66.2), pg = x.createRadialGradient(hx + .3 * k, hy + .5 * k, .2 * k, hx, hy, 2.1 * k);
+    pg.addColorStop(0, '#5e5f61'); pg.addColorStop(.55, '#3c3d3f'); pg.addColorStop(1, '#222324');
+    x.fillStyle = pg; x.beginPath(); x.arc(hx, hy, 2.1 * k, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = 'rgba(0,0,0,.45)'; x.lineWidth = .25 * k; x.beginPath(); x.arc(hx, hy, 2.05 * k, 0, Math.PI * 2); x.stroke(); }
   const tex = c => { const t = new THREE.CanvasTexture(c); t.anisotropy = Math.min(8, maxAniso); return t; };
   const mapT = tex(cv); mapT.colorSpace = THREE.SRGBColorSpace; const maskT = tex(mk);
 
@@ -159,9 +161,9 @@ export default H => {
     const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), white)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 4096, Hh = 208, c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
-    const circ = 2 * Math.PI * 40.5, pxmm = W / circ; y.fillStyle = '#101010'; y.fillRect(0, 0, W, Hh);
+    const circ = 2 * Math.PI * 40.5, pxmm = W / circ; y.fillStyle = '#2c2d2e'; y.fillRect(0, 0, W, Hh);
     for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 9 * pxmm); }
-    y.strokeStyle = 'rgba(70,70,70,.9)'; y.lineWidth = .14 * pxmm; const pitch = .4 * pxmm;
+    y.strokeStyle = 'rgba(125,126,128,.9)'; y.lineWidth = .14 * pxmm; const pitch = .4 * pxmm;
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
