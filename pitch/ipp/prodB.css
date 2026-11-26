@@ -12,6 +12,8 @@ html.ipp :is(#ocScroll,#dbScroll)>[hidden]{display:none!important}
 html.ipp :is(#ocScroll,#dbScroll)>[data-t=hero]::after{display:none}
 /* next-section chevron, clear of the footer */
 html.ipp :is(#ocScroll,#dbScroll) .nxa{left:calc(50% + var(--gx,0px) / 2)!important;top:auto!important;bottom:calc(var(--bF) + 4px)!important}
+/* Compare fills down to the footer: no chevron over the rival cards */
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=cmp] .nxa{display:none!important}
 /* hero photo gallery (swipe left on the hero): one upright screen per photo; prodB.js crops each photo round its product */
 html.ipp :is(#ocScroll,#dbScroll) .hgl{left:0!important;width:1032px!important;height:var(--H)!important}
 html.ipp :is(#ocScroll,#dbScroll) .hgl figure{width:1032px!important}
@@ -31,7 +33,7 @@ html.ipp #ocHeroHot .ocb[data-whistle]{left:auto!important;right:124px;top:calc(
 
 /* ---------- DBCP hero: the season video fills the screen (cropped round the doorbell), words low on the left ---------- */
 html.ipp #dbScroll .dbh-vid{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px)!important}
-html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px);background:linear-gradient(180deg,rgba(0,0,0,.4) 0,transparent 14%,transparent 70%,#000 100%)!important}
+html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px);background:linear-gradient(180deg,rgba(0,0,0,.62) 0,rgba(0,0,0,.35) 8%,transparent 16%,transparent 70%,#000 100%)!important}
 html.ipp #dbScroll .dbh-txt{left:calc(var(--gx) + 48px)!important;width:720px!important;top:auto!important;bottom:calc(var(--bF) + 120px);margin:0!important}
 html.ipp #dbScroll .dbh-txt p{max-width:560px}
 html.ipp #dbScroll .dbai{top:calc(var(--bT) - 24px)!important;right:40px!important}
@@ -66,7 +68,10 @@ html.ipp #ocScroll .ocm-phone{left:calc(var(--gx) / 2 + 516px - 460px * var(--ph
 html.ipp #ocScroll .ocm-phone.port{left:calc(var(--gx) / 2 + 516px - 278px * var(--phs))!important;top:var(--mt)!important}
 html.ipp #ocScroll .ocm:has(.ocm-phone.port) .ocm-card{opacity:0}
 html.ipp #ocScroll .ocm-svw{left:calc(var(--gx) + 10px)!important;right:auto!important;width:calc(1032px - var(--gx) - 30px);top:var(--mt)!important;bottom:auto!important;height:calc(var(--mh) - var(--phh) + 40px);-webkit-mask-image:none!important;mask-image:none!important}
-html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important}
+html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important;transform-origin:50% 100%;scale:2.1}
+/* per-state product scale: exploded 4K view stays clear of the phone; radar clip shown whole */
+html.ipp #ocScroll .ocm-card img[data-im="ocm/sensor"]{height:calc(100% - 80px)!important}
+html.ipp #ocScroll .ocm-bv video{object-fit:contain!important}
 html.ipp #ocScroll .ocm-bv{left:calc(var(--gx) + 10px)!important;width:calc(1032px - var(--gx) - 30px)!important;top:var(--mt)!important;height:var(--mh)!important;-webkit-mask-image:none!important;mask-image:none!important;border-radius:28px;overflow:hidden}
 
 /* DBCP: the upright phone on the left of the band, the product close-up beside it */
@@ -100,9 +105,13 @@ html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vf:calc(var(--vw) * .561
 html.ipp #ocArlo h2{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important;font-size:58px!important;gap:22px!important}
 html.ipp #ocArlo h2 i{width:90px!important}
 html.ipp #ocArlo .ocar-back{left:calc(var(--gx) + 44px)!important;right:auto!important;top:calc(var(--bT) + 116px)!important}
-html.ipp #ocArloVid,html.ipp #ocArloVid3{position:absolute;display:block;left:calc(var(--gx) + 30px)!important;width:var(--vw)!important;height:var(--vf)!important;border-radius:0!important;object-fit:cover!important;top:calc(var(--vt) - (var(--vf) - var(--vh)) / 2)!important;clip-path:inset(calc((var(--vf) - var(--vh)) / 2) 0 round 24px);-webkit-clip-path:inset(calc((var(--vf) - var(--vh)) / 2) 0 round 24px)}
+/* each copy sits in its own rounded wrapper (overflow clip, no clip-path on the video: that cost half the frame rate) */
+.ippArW{display:contents}
+html.ipp #ocArlo .ippArW{display:block;position:absolute;left:calc(var(--gx) + 30px);width:var(--vw);height:var(--vh);top:var(--vt);border-radius:24px;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
+html.ipp #ocArlo .ippArW+.ippArW{top:calc(var(--vt) + var(--vh) + 16px)}
+html.ipp #ocArloVid,html.ipp #ocArloVid3{position:absolute;display:block;left:0!important;top:calc((var(--vh) - var(--vf)) / 2)!important;width:var(--vw)!important;height:var(--vf)!important;border-radius:0!important;object-fit:cover!important}
 html.ipp #ocArloVid{object-position:0 50%!important}
-html.ipp #ocArloVid3{object-position:100% 50%;top:calc(var(--vt) + var(--vh) + 16px - (var(--vf) - var(--vh)) / 2)!important}
+html.ipp #ocArloVid3{object-position:100% 50%}
 html.ipp #ocArlo .ocar-l{left:calc(var(--gx) + 50px)!important;top:calc(var(--vt) + 20px)!important}
 html.ipp #ocArlo .ocar-l+.ocar-l{top:calc(var(--vt) + var(--vh) + 36px)!important}
 html.ipp #ocArlo .ocar-w{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--vt) + 2 * var(--vh) + 56px)!important}
@@ -164,10 +173,10 @@ html.ipp :is(#ocScroll,#dbScroll) .xa-col.t{width:auto}
 html.ipp :is(#ocScroll,#dbScroll) .xa-foot{left:calc(var(--gx) + 48px)!important;right:36px!important;top:calc(var(--bT) + 790px)!important;z-index:1}
 /* Smart Actions: the product, oversized, rising from the bottom-right edge into the free space under the list */
 .ippBleed{display:none}
-html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{display:block;position:absolute;z-index:0;pointer-events:none;opacity:0;translate:0 80px;transition:opacity .7s ease .15s,translate .9s cubic-bezier(.22,1,.36,1) .15s;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{display:block;position:absolute;z-index:0;pointer-events:none;opacity:0;translate:0 60px;transition:opacity .7s ease .15s,translate .9s cubic-bezier(.22,1,.36,1) .15s;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
 html.ipp :is(#ocScroll,#dbScroll)>[data-t=act][data-vis="1"] .ippBleed{opacity:1;translate:none}
-html.ipp #ocScroll>[data-t=act] .ippBleed{height:min(500px,calc(var(--H) - var(--bF) - var(--bT) - 830px));width:auto;right:-170px;bottom:calc(var(--bF) + 6px)}
-html.ipp #dbScroll>[data-t=act] .ippBleed{height:min(520px,calc(var(--H) - var(--bF) - var(--bT) - 810px));width:auto;right:-30px;bottom:calc(var(--bF) + 6px);rotate:-10deg}
+html.ipp #ocScroll>[data-t=act] .ippBleed{height:min(440px,calc(var(--H) - var(--bF) - var(--bT) - 850px));width:auto;right:48px;bottom:calc(var(--bF) + 14px)}
+html.ipp #dbScroll>[data-t=act] .ippBleed{height:min(460px,calc(var(--H) - var(--bF) - var(--bT) - 840px));width:auto;right:80px;bottom:calc(var(--bF) + 14px)}
 @media (prefers-reduced-motion:reduce){html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{translate:none;transition:opacity .4s ease}}
 /* Works With */
 html.ipp :is(#ocScroll,#dbScroll) .xw-go{right:40px!important;top:calc(var(--bT) + 80px)!important}
@@ -187,6 +196,8 @@ html.ipp :is(#ocScroll,#dbScroll) .xf-list{left:calc(var(--gx) + 30px)!important
 html.ipp #p-ai{background:#000}
 html.ipp #p-ai>img.full,html.ipp #p-ai>#aiHot{left:0!important;top:0!important;width:1376px!important;height:964px!important;right:auto;bottom:auto;transform-origin:0 0;transform:translate(var(--aix,-171px),var(--aiy,260px)) scale(var(--aik,1))}
 html.ipp #p-ai>#aiHot{position:absolute}
+/* the artwork's bottom edge drew a faint line: fade it out */
+html.ipp #p-ai>img.full{-webkit-mask-image:linear-gradient(180deg,#000 88%,transparent 98.5%);mask-image:linear-gradient(180deg,#000 88%,transparent 98.5%)}
 html.ipp #p-ai #aiHot .hot{transition:transform .15s cubic-bezier(.2,.8,.2,1)}
 html.ipp #p-ai.on>img.full{animation:ippAiIn .8s cubic-bezier(.22,1,.36,1) backwards}
 @keyframes ippAiIn{from{opacity:0;scale:.94}to{opacity:1;scale:1}}
