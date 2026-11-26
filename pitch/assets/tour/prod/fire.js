@@ -2,8 +2,8 @@
 // Built in millimetres inside a 0.001-scaled group. Outline = rectangle with crisp 45 deg corner chamfers (3 mm legs) through the full
 // depth and a shallow 9 x 0.5 mm notch centred in the top edge (photo). Rear solid + plate body share the outline; the front is ONE
 // height-field surface over that outline (so every change is flush): 2 mm side/edge roll-offs running unbroken round the chamfers, the
-// face at z 24.6, a top strip (top 7.4 mm) set back 0.8 mm with a soft crease 3.6 mm below the top (the photo's highlight line), and an
-// inset half-round rib 7.4-10.1 mm below the top, ending 4.4 mm in from each side (the photo's bright band). One countersunk pinhole.
+// face at z 24.6; inside the side bands (4.4 mm in) a top strip set back 0.8 mm through a soft step 3.1 mm below the top (the photo's
+// highlight line), and a rounded rib 7.4-10.1 mm below the top, 0.35 proud with R0.6 corners (the photo's bright band). One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
@@ -24,25 +24,26 @@ export default H => {
   const PH = Y - 27.8, ZF = 24.6;                         // pinhole 27.8 mm below the top; face plane
   const BS = 2, BT = .9;                                  // edge roll-off: 2 mm wide, 0.9 mm deep (elliptical)
   const ss = (a, b, t) => { t = Math.max(0, Math.min(1, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
-  const RY = Y - 8.75, RH = 1.35, RL = X - 4.4 - RH;     // rib: capsule centre line y, half height, half length
+  const RY = Y - 8.75, RH = 1.35, RW = X - 4.4, RR = .6;  // rib: centre y, half height, half length (ends 4.4 mm in), corner radius
   const hf = (x, y) => {                                  // height of the front surface (inside the outline)
-    let z = ZF;
-    // above the rib the face curves gently back (catching more light toward the top), then a soft R0.4 step 3.1 mm below the top (photo; review said 3.6) sets
-    // the top strip back 0.8 mm: the step faces up and is the photo's highlight line; the strip itself keeps tipping back to the top edge
-    const t = y - (Y - 7.4);
-    if (t > 0) z -= t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3);
-    z -= .8 * ss(Y - 3.1 - .28, Y - 3.1 + .28, y);
-    // rib: round-topped, 0.6 proud; its upper side is a half-round, its lower side stays full then drops steeply (only a hairline shade under it, photo)
-    const dx = Math.max(0, Math.abs(x) - RL), dr = Math.hypot(dx, y - RY);
-    if (dr < RH) z = Math.max(z, ZF + .6 * Math.sqrt(1 - (dr / RH) ** (y > RY ? 2 : 6)));
-    // edge roll-off
-    // a ~24 deg flat (faces the light like the photo's bright side strips), soft inner crease
-    // per edge: 2 mm on the sides, bottom and chamfers; a tight 0.8 mm round on the top edge and notch (photo); the deepest drop wins, so it stays continuous
-    let drop = 0;
+    let z = ZF, drop = 0, dside = 1e9;
+    // per edge roll-off: a ~24 deg flat with a soft inner crease, 2 mm on the sides, bottom and chamfers; a tight 0.8 mm round on the top
+    // edge and notch (photo); the deepest drop wins, so it stays continuous. dside = distance to the sides/chamfers (not the top).
     for (let i = 0; i < OP.length; i++) { const [x1, y1] = OP[i], [x2, y2] = OP[(i + 1) % OP.length], dx2 = x2 - x1, dy2 = y2 - y1;
       const tt = Math.max(0, Math.min(1, ((x - x1) * dx2 + (y - y1) * dy2) / (dx2 * dx2 + dy2 * dy2))), dd = Math.hypot(x - x1 - tt * dx2, y - y1 - tt * dy2);
       const top = y1 > Y - 1 && y2 > Y - 1, bs = top ? .8 : BS, bt = top ? .6 : BT;
+      if (!top) dside = Math.min(dside, dd);
       if (dd < bs) { const q = (bs - dd) / bs; drop = Math.max(drop, bt * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1)); } }
+    // the top detail sits INSIDE the side bands (4.4 mm in, following the chamfers), so the bands and chamfers run unbroken to the top:
+    // above the rib the face curves gently back, then a soft step 3.1 mm below the top sets the strip back 0.8 mm (the step faces up: the
+    // photo's highlight line) and the strip keeps tipping back to the top edge
+    const w = ss(4.4 - .35, 4.4 + .35, dside), t = y - (Y - 7.4);
+    if (t > 0) z -= w * (t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3));
+    z -= w * .8 * ss(Y - 3.1 - .28, Y - 3.1 + .28, y);
+    // rib: rounded rectangle (R0.6 corners), 0.35 proud, smoothstep profile = R~0.5 base fillet and round top, so no dark line under it
+    { const qx = Math.abs(x) - (RW - RR), qy = Math.abs(y - RY) - (RH - RR), sd = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - RR;
+      const fw = .9 + 1.3 * ss(RY + .2, RY - .6, y);         // lower side: a longer, gentler fillet (photo: no shade line under the band)
+      if (sd < 0) z = Math.max(z, ZF + .35 * ss(0, fw, -sd)); }
     z -= drop;
     return z; };
 

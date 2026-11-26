@@ -19,9 +19,9 @@ export default H => {
   const RL = 43, LR = 2.5, DL = 43, RF = 67, LIFT = 7, ZB = 3;
   const lipD = r => r >= RL + LR ? 0 : LR - Math.sqrt(Math.max(0, LR * LR - (RL + LR - r) ** 2));
   const faceZ = r => ZB + 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - DL) / (RF - DL))) ** 2) - lipD(r);
-  const SC = { x: -48.5, y: 0, R: 13.5, d: 3.5 };       // half-moon scoop at 9 o'clock (crisp outer arc)
+  const SC = { x: -48.5, y: 0, R: 13.5, d: 4.5 };       // half-moon scoop at 9 o'clock (crisp outer arc)
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(Math.max(r, RL));
-    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) { const ed = SC.R * (1 - Math.sqrt(q)), w = Math.min(1, ed / .8); z -= SC.d * (1 - q) ** .35 * w * w * (3 - 2 * w); } return z; };   // 0.8 mm rounded rim
+    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) { const ed = SC.R * (1 - Math.sqrt(q)), w = Math.min(1, ed / .8); z -= SC.d * (1 - q) ** .5 * w * w * (3 - 2 * w); } return z; };   // 0.8 mm rounded rim
 
   /* ---------- body lathe: back, base seam, straight side, fillet into the face */
   const prof = [V2(0, 0), V2(69.6, 0), V2(70.7, .25), V2(71, 1), V2(71, 2.85), V2(70.7, 2.9), V2(70.7, 3.1), V2(71, 3.15)];
@@ -95,7 +95,7 @@ export default H => {
   const fiPts = polarPad(45.5, 59.3, 100.8, 115.2, [1.2, 7, 1.4, 1.2]);
   pad(coPts, '#45474a'); pad(fiPts, '#45474a');
   const ledPts = polarPad(47.8, 55.9, 116.8, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
-  x.fillStyle = '#626567'; drawPts(polarPad(49.5, 54, 118.1, 121.5, [.8, .8, .8, .8])); x.fill();
+  x.fillStyle = '#505355'; drawPts(polarPad(49.5, 54, 118.1, 121.5, [.8, .8, .8, .8])); x.fill();
   // soft sheen on the smoked pads (lighter toward their outer edge) and a thin darker lip on the side away from the light (glossy insert edge)
   for (const pts of [coPts, fiPts, ledPts]) { x.save(); drawPts(pts); x.clip();
     const [gx0, gy0] = P(0, 0); const gr = x.createRadialGradient(gx0, gy0, 45.5 * k, gx0, gy0, 59.3 * k);
@@ -174,15 +174,15 @@ export default H => {
       const b = add(g, new THREE.Mesh(new THREE.BoxGeometry(ul, 1.6, 2.2), fin), X, Y, top - 1.1); b.rotation.z = h.phi * D2R; } }
 
   // the cup inside the lip is shaded grey in the photos (no AO in the renderer, so it is baked into the colour)
-  const cupM = new THREE.MeshPhysicalMaterial({ color: 0xd6d6d6, roughness: .32, clearcoat: .4, clearcoatRoughness: .25 });
+  const cupM = new THREE.MeshPhysicalMaterial({ color: 0x787878, roughness: .32, clearcoat: .4, clearcoatRoughness: .25 });
   /* ---------- well lip, well wall + floor (dark below), insect mesh band, chamber rings, dark interior */
   { const f = faceZ(RL), lp = [V2(30, 33.6 + ZB), V2(43.6, 33.6 + ZB), V2(44.3, 33.9 + ZB), V2(RL, Math.min(f, 34.6 + ZB)), V2(RL, f + .02)].reverse();   // well wall under the lip
     const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), cupM)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 8192, circ = 2 * Math.PI * 40.5, pxmm = W / circ, Hh = Math.round(9 * pxmm), c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
-    y.fillStyle = '#4a4b4c'; y.fillRect(0, 0, W, Hh);
+    y.fillStyle = '#2a2b2c'; y.fillRect(0, 0, W, Hh);
     for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 6 * pxmm); }
-    y.strokeStyle = 'rgba(110,111,112,.6)'; y.lineWidth = .14 * pxmm; const pitch = .5 * pxmm;   // >= 8 px pitch: no moire with mipmaps
+    y.strokeStyle = 'rgba(95,96,97,.6)'; y.lineWidth = .14 * pxmm; const pitch = .5 * pxmm;   // >= 8 px pitch: no moire with mipmaps
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
@@ -221,7 +221,7 @@ export default H => {
     for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 27) / (49.6 - 27))); p.setZ(i, p.getZ(i) * (.72 + .28 * t)); }
     sg.computeVertexNormals();
     { const nn = sg.attributes.normal, col = [];             // side walls (normal across the strap) 0.85: the straps read as solid
-      for (let i = 0; i < nn.count; i++) { const v = Math.abs(nn.getZ(i)) > .7 ? .85 : 1; col.push(v, v, v); }
+      for (let i = 0; i < nn.count; i++) { const v = Math.abs(nn.getZ(i)) > .7 ? .7 : 1; col.push(v, v, v); }
       sg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); }
     const spM = white.clone(); spM.vertexColors = true;
     for (const a of [90, 30, -30, -90, 150, 210]) { const c = Math.cos(a * D2R), sn = Math.sin(a * D2R);
