@@ -1311,7 +1311,7 @@ const RAILG = [['Smart Hub & Mobile App',['hub']],['Cameras',['ocp','ocspot','db
 const RLAB = {hub:'Smart Hub Pro 2',ocp:'Outdoor Camera Pro',ocspot:'Outdoor Camera + Spotlight',dbcp:'Doorbell Camera Pro',icp:'Indoor Camera Pro',lock:'Smart Lock',garage:'Garage Control',therm:'Smart Thermostat',plug:'Smart Plug',keypad:'Keypad',motion:'Motion Sensor',glass:'Glass Break',window:'Door & Window',water:'Water Sensor',smokeco:'Smoke & CO Detector',fire:'Smoke/CO Monitor',pendant:'Panic Pendant',fob:'Key Fob',chime:'Chime Extender',ysign:'Yard Sign'};
 { const ORD = RAILG.flatMap(g=>g[1]); PRODUCTS.sort((a,b)=>(ORD.indexOf(a.k)+99*(ORD.indexOf(a.k)<0))-(ORD.indexOf(b.k)+99*(ORD.indexOf(b.k)<0))); }
 const PLACE = {
-  ysign: {pos:V(-5.6,.06,6.15),        view:V(.25,0,1),  stand:true, s:1, d:1.5},
+  ysign: {pos:V(-5.6,.06,6.15),        view:V(.25,0,1),  stand:true, s:1, d:1.5, ay:1.0},
   ocspot:{pos:V(-9.0,3.4,4.02),      view:V(0,0,1),            d:1.1},
   garage:{pos:V(-9.69,1.75,1.0),     view:V(1,0,0),  xray:true, d:.85},
   lock:  {pos:V(DOOR[1]-.22,FL+1.18,3.915), view:V(0,0,1),     d:.72},
@@ -1355,7 +1355,7 @@ for(const p of PRODUCTS){
   scene.add(g); g.updateMatrixWorld(true);
   p.model = g;
   p.center = new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3());
-  p.anchor = p.center.clone().addScaledVector(p.view, .12);
+  p.anchor = p.center.clone().addScaledVector(p.view, .12); if(p.ay) p.anchor.y += p.ay;   // ay: lift the ring off a small product so it doesn't cover it
   const hit = new THREE.Mesh(new THREE.SphereGeometry(.22,12,8), new THREE.MeshBasicMaterial({visible:false}));
   hit.position.copy(p.center); hit.userData.p = p; scene.add(hit); hitMeshes.push(hit);
   p.feats = FEATS[p.k] || [];
