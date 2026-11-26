@@ -20,7 +20,7 @@ export default H => {
   const zF = 93, yT = -85, yB = -152, lean = 13, leanW = 6, S = .12, wing = V2(.93, .37).normalize(), cW = wing.x*61 + wing.y*zF;   // centre face 122 at the top, wings ~68 deg to the wall
   const yc = (yT + yB)/2, ry = (yT - yB)/2;
   const zBack = y => 8 + 14*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));   // near-semicircular back
-  const Wb = 77, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -46.2;   // band starts just inside the mount's rim (no notch)
+  const Wb = 77, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -49.4;   // band starts just inside the mount's rim (no notch)
 
   // sheared group for everything that sits on / is the bar: y' = y - S*(z - 20)
   const SG = new THREE.Group(); M.add(SG); SG.matrixAutoUpdate = false;
@@ -36,7 +36,7 @@ export default H => {
     s.lineTo(Tb, yTop); s.lineTo(0, yTop);
     const j = ext(s, Wb, 3, white);
     j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
-    add(M, H.rslab(Wb, 14, 7, 3, 1, white), 0, -49.5 - 4, 3.5);   // transition block under the mount: R1 wall-side edges like the plate, so no notch where band and mount meet
+    add(M, H.rslab(77, 7, 7, 3, 1, white), 0, -53, 3.5);   // transition block under the mount: R1 wall-side edges like the plate, so no notch where band and mount meet
     { const f7 = new THREE.Shape(), r7 = 7; f7.moveTo(Tb - .5, -49.4); f7.lineTo(Tb + r7, -49.4);   // R7 concave fillet: band front meets the mount's bottom end
       for(let k=1;k<=10;k++){ const a = Math.PI/2*k/10; f7.lineTo(Tb + r7 - r7*Math.sin(a), -49.4 - r7 + r7*Math.cos(a)); }
       f7.lineTo(Tb - .5, -49.4 - r7); f7.lineTo(Tb - .5, -49.4);
@@ -103,16 +103,16 @@ export default H => {
 
   // ---------------------------------------------------------------- LED faces: white reflector plate 1 mm behind the window with 3 real
   // capsule recesses (2.5 deep, darker walls, grey floor) x 2 clear TIR domes with a faceted core
-  const lensM = new THREE.MeshPhysicalMaterial({color:0x3c4044, roughness:.03, metalness:.05, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.3, specularIntensity:1, envMapIntensity:1.5, depthWrite:false});   // clear grey glass
-  const coreM = new THREE.MeshPhysicalMaterial({color:0x24272a, roughness:.08, metalness:.3, flatShading:true, clearcoat:1});
+  const lensM = new THREE.MeshPhysicalMaterial({color:0xc3c8cc, roughness:.03, metalness:.05, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.4, specularIntensity:1, envMapIntensity:2, depthWrite:false});   // clear grey glass
+  const coreM = new THREE.MeshPhysicalMaterial({color:0x6b7075, roughness:.2, metalness:.3, clearcoat:1});
   const die = mat(0xefe9da, {r:.4, x:{emissive:0x2a2822}});
   const domeGeo = new THREE.SphereGeometry(5.1, 40, 16, 0, Math.PI*2, 0, Math.PI/2); domeGeo.scale(1, .56, 1);
-  const coneGeo = new THREE.ConeGeometry(4.2, 3.2, 8, 1, true);
+  const coneGeo = new THREE.ConeGeometry(2.6, 1.8, 24, 1, true);
   const wallM = new THREE.MeshPhysicalMaterial({vertexColors:true, roughness:.7});          // capsule walls shaded floor -> lip
-  const sW = 40, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
+  const sW = 48, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
     { n: V2(0, 1), p: V2(0, zF), w: 100, cols: [-28, 0, 28], ln: lean },
-    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 56, cols: [-20, 0, 20], ln: leanW },
-    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 56, cols: [-20, 0, 20], ln: leanW } ];
+    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 50, cols: [-17, 0, 17], ln: leanW },
+    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 50, cols: [-17, 0, 17], ln: leanW } ];
   for(const F of faces){
     const slant = Math.hypot(yT - yB, F.ln), dv = V2(F.ln, yT - yB).normalize();
     const hW = (wY0 - wY1)*slant/(yT - yB) + 2, vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;
@@ -131,7 +131,7 @@ export default H => {
     const pm = add(f, new THREE.Mesh(pg, [refl, wallM]), 0, 0, zfl - .2); pm.receiveShadow = true;
     for(const cx of F.cols) for(const cy of [-12, 12]){
       const dmesh = add(f, new THREE.Mesh(domeGeo, lensM), cx, cy, zfl + .05); dmesh.rotation.x = Math.PI/2; dmesh.renderOrder = 1;
-      add(f, new THREE.Mesh(coneGeo, coreM), cx, cy, zfl + 1.3).rotation.x = Math.PI/2;   // faceted core, apex up inside the dome
+      add(f, new THREE.Mesh(coneGeo, coreM), cx, cy, zfl + 1.0).rotation.x = Math.PI/2;   // faceted core, apex up inside the dome
       add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .2, 16), die)), cx, cy, zfl + .1); }
   }
 
