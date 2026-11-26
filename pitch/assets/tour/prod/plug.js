@@ -114,7 +114,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [], g0 = 2.2 * groove(x, y);
     for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)) + g0; out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
     const gv = 2.2 * groove(x, y), zs = D - h, dr = z => 1.6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
-    for (const [z, d] of [[1.8, gv], [2.3, gv], [zs - 1.8, gv], [zs - 1.1, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
+    for (const [z, d] of [[1.8, gv], [2.3, gv], [16.4, gv], [17, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
     for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = 1.6 + (w - 1.6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
@@ -133,6 +133,10 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     { x: { toneMapped: false } });
   add(P, led, 0, 9, zTop - .02);
 
+  /* printed warning on the top wall, in front of the vents (reads from behind) */
+  { const wt = plane(80, 4, 40, (x, Pp) => { x.save(); x.translate(...Pp(0, 0)); x.rotate(Math.PI); x.fillStyle = 'rgba(70,70,70,.6)'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.font = '500 80px "Helvetica Neue", Helvetica, Arial, sans-serif'; const t = 'WARNING: DO NOT EXCEED ELECTRICAL RATINGS'; x.scale(72 * 40 / x.measureText(t).width, 1); x.fillText(t, 0, 0); x.restore(); }, { r: .5 });
+    wt.rotation.x = -Math.PI / 2 - Math.atan(1.6 / 24); add(P, wt, -1, HH / 2 - 1.28, 22); }
   /* 6. vent grooves on the top wall (back half) */
   const vent = plane(72, 17, 20, (x, Pp) => { for (let i = 0; i < 15; i++) { const vx = -36 + i * 66 / 14 + 3;
       const [ax, ay] = Pp(vx - .75, 7), [bx, by] = Pp(vx + .75, -7), gr = x.createLinearGradient(ax, 0, bx, 0);
@@ -149,8 +153,8 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     const dense = a => { const s = new THREE.Shape(a); return pts(s, 90); };
     const deep = (k, K, v) => .16 + .84 * sm(5.2, 10.7, v[2]);
     const loops = [{ type: 'outer', pts: pts(rrShape(30, 27, 1), 160), prof: uni(pp) },
-      { type: 'pocket', pts: offs(pts(rrShape(8, 2.2, .35), 80), -4, 6.35), prof: uni(slotProf), col: deep },
-      { type: 'pocket', pts: offs(pts(rrShape(8, 2.2, .35), 80), -4, -6.35), prof: uni(slotProf), col: deep },
+      { type: 'pocket', pts: offs(pts(rrShape(9, 2.2, .35), 80), -3.5, 6.35), prof: uni(slotProf), col: deep },
+      { type: 'pocket', pts: offs(pts(rrShape(9.5, 2.2, .35), 80), -3.5, -6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: dense(U), prof: uni(slotProf), col: deep }];
     const boss = solid(loops, white.clone(), true); boss.material.vertexColors = true;
     boss.rotation.y = Math.PI / 2; add(P, boss, 40, .5, 19); }

@@ -104,10 +104,10 @@ export default H => {
     gS.push([3 - 17.2 * Math.sin(a), 60 - 2 * iS, 60 - iT - iB, 12 - 4 * k, (iB - iT) / 2]); }
   add(hd, shell(gS, grey, { skip: (k, i) => k === 14 && i === 32 }));     // flat bottom strip z 3..20.7 rebuilt below with real holes
   { const S = new THREE.Shape([[-18, 3], [18, 3], [18, 20.7], [-18, 20.7]].map(([x, z]) => new THREE.Vector2(x, z)));
-    [8, 9, 10, 11, 10, 9, 8].forEach((n, r) => { for (let i = 0; i < n; i++) S.holes.push(circ((i - (n - 1) / 2) * 2.75, 11.6 + (r - 3) * 2.38, .7)); });
+    [8, 9, 10, 11, 10, 9, 8].forEach((n, r) => { for (let i = 0; i < n; i++) S.holes.push(circ((i - (n - 1) / 2) * 2.75, 12.4 + (r - 3) * 2.38, .7)); });
     const toB = (geo, y) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i), y, p.getY(i)); geo.computeVertexNormals(); return geo; };
     add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(S, 12), -30), grey));
-    const fl = rrS(34, 16.4, 4, 0, 11.6);
+    const fl = rrS(34, 16.2, 4, 0, 12.4);
     add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(fl, 32), -29.1), voidM)); }
   const cS = [[20.9, 60, 60, 12], [22.6, 60, 60, 12]];
   for (let i = 1; i <= 8; i++) { const a = i / 8 * PI / 2, s = 1.2 * (1 - Math.cos(a)); cS.push([22.6 + 1.2 * Math.sin(a), 60 - 2 * s, 60 - 2 * s, 12 - s]); }
@@ -134,7 +134,7 @@ export default H => {
   // speaker grille (hex holes) and microSD flap on the bottom
   const sd = add(hd, pp(22, 9, (x, P) => { const [a, b] = P(-10, 3.25), [c, d] = P(10, -3.25);
     x.fillStyle = '#55565a'; x.strokeStyle = '#2a2b2d'; x.lineWidth = 2.5; x.beginPath(); x.roundRect(a, b, c - a, d - b, 30); x.fill(); x.stroke();
-    const [e, f] = P(-3, 3.25), [h, k] = P(3, 1.75); x.fillStyle = '#2f3032'; x.beginPath(); x.roundRect(e, f, h - e, k - f, 6); x.fill(); }), 0, -30.0, 1.6);
+    const [e, f] = P(-3, 3.25), [h, k] = P(3, 1.75); x.fillStyle = '#2f3032'; x.beginPath(); x.roundRect(e, f, h - e, k - f, 6); x.fill(); }), 0, -30.0, 0.8);
   sd.rotation.x = PI / 2;
 
   /* ---------- back hub: mushroom pivot holding the loop arch ---------- */

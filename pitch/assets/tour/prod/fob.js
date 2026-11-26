@@ -118,10 +118,10 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0x2f3032, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
   const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#9c9d9e';
-    x.font = '300 146px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    x.font = '300 194px "Helvetica Neue", Helvetica, Arial, sans-serif';
     const fit = (s, x0, x1, y) => { const m = x.measureText(s).width, [a, b] = Pp(x0, y), [c] = Pp(x1, y); x.save(); x.translate(a, b); x.scale((c - a) / m, 1); x.fillText(s, 0, 4); x.restore(); };
-    fit('DISARM', -5.6, 6.0, 20.1 - 10.2); fit('STAY', -3.6, 3.6, 0); fit('AWAY', -4.1, 4.3, .2 - 10.2);
-    x.fillStyle = '#b0282a'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.1, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
+    fit('DISARM', -5.6, 5.5, 20.1 - 10.2); fit('STAY', -3.9, 3.0, 0); fit('AWAY', -4.6, 3.6, .2 - 10.2);
+    x.fillStyle = '#b0282a'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
   add(F, leg, 0, 10.2, D - .3 + .02);
 
   /* 7. debossed logo on the grey end */

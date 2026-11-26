@@ -9,12 +9,14 @@ export default H => {
 
   /* ---------- helpers (mm) ---------- */
   // rounded-rect ring of points, CCW seen from +z, same count for every size so sections can be lofted
+  // r may be [top, bottom] corner radii
   const rrPts = (w, h, r, cy = 0, n = 10) => {
-    r = Math.max(1e-4, Math.min(r, w / 2 - 1e-4, h / 2 - 1e-4)); const x = w / 2 - r, y = h / 2 - r, P = [];
-    for (const [cx, cc, a0] of [[x, y, 0], [-x, y, PI / 2], [-x, -y, PI], [x, -y, 1.5 * PI]])
-      for (let i = 0; i <= n; i++) { const a = a0 + i / n * PI / 2; P.push([cx + r * Math.cos(a), cy + cc + r * Math.sin(a)]); }
+    const cl = v => Math.max(1e-4, Math.min(v, w / 2 - 1e-4, h / 2 - 1e-4)), [rt, rb] = Array.isArray(r) ? r.map(cl) : [cl(r), cl(r)], P = [];
+    for (const [sx, sy, a0, rr] of [[1, 1, 0, rt], [-1, 1, PI / 2, rt], [-1, -1, PI, rb], [1, -1, 1.5 * PI, rb]])
+      for (let i = 0; i <= n; i++) { const a = a0 + i / n * PI / 2; P.push([sx * (w / 2 - rr) + rr * Math.cos(a), cy + sy * (h / 2 - rr) + rr * Math.sin(a)]); }
     return P;
   };
+  const sub = (r, s) => Array.isArray(r) ? r.map(v => v - s) : r - s;
   const rrS = (w, h, r, cx = 0, cy = 0) => new THREE.Shape(rrPts(w, h, r, cy, 14).map(([x, y]) => new THREE.Vector2(x + cx, y)));
   const circ = (x, y, r) => { const p = new THREE.Path(); p.absarc(x, y, r, 0, 2 * PI, true); return p; };
   // loft through rounded-rect sections [z, w, h, r, cy]; flat caps on the ends asked for. groups: 0 = sides, 1 = caps
@@ -55,13 +57,13 @@ export default H => {
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
 
   /* ---------- black front cap: z 28.0 -> 35.0, R2.5 rolled front edge ---------- */
-  const ZF = 35, W = 43, HH = 132, R = 11.5;
+  const ZF = 35, W = 43, HH = 132, R = [11.5, 10];                      // rounder top corners than bottom (top close-up vs bottom view)
   const capS = [[28.0, W, HH, R], [32.5, W, HH, R]];
-  for (let i = 1; i <= 9; i++) { const a = i / 9 * PI / 2, s = 2.5 * (1 - Math.cos(a)); capS.push([32.5 + 2.5 * Math.sin(a), W - 2 * s, HH - 2 * s, R - s]); }
+  for (let i = 1; i <= 9; i++) { const a = i / 9 * PI / 2, s = 2.5 * (1 - Math.cos(a)); capS.push([32.5 + 2.5 * Math.sin(a), W - 2 * s, HH - 2 * s, sub(R, s)]); }
   add(g, shell(capS, [glassL, glass], { front: false }));
   // flat glass face with real openings: lens, two mic holes, light ring
   const LY = 45.1, BY = -45;
-  const face = rrS(W - 5, HH - 5, R - 2.5);
+  const face = rrS(W - 5, HH - 5, sub(R, 2.5));
   face.holes.push(circ(0, LY, 9.0), circ(-6.2, 20.6, .8), circ(6.2, 20.6, .8), circ(0, BY, 15.45));
   add(g, new THREE.Mesh(new THREE.ShapeGeometry(face, 48), glass), 0, 0, ZF);
 
@@ -102,12 +104,12 @@ export default H => {
   const upPad = rrS(22, 14, 5, 0, 37); const wire = rrS(7, 4, 2, 0, 38); upPad.holes.push(new THREE.Path(wire.getPoints().reverse()));
   add(g, H.ext(upPad, 2.25, .5, plate));
   add(g, H.rslab(7, 4, .3, 1.9, .05, voidM), 0, 38, 1.2);
-  const loPad = rrS(11, 21, 5.5, 0, -43.5); loPad.holes.push(new THREE.Path(rrS(4, 13, 2, 0, -43.5).getPoints().reverse()));
+  const loPad = rrS(13, 23, 6.5, 0, -38); loPad.holes.push(new THREE.Path(rrS(4, 13, 2, 0, -38).getPoints().reverse()));
   add(g, H.ext(loPad, 2.25, .5, plate));
-  add(g, H.rslab(4.2, 13.2, .3, 2, .05, phys(0xcfd0d0, { roughness: .7 })), 0, -43.5, 1.5);
-  const boss = rrS(14.5, 14.5, 3, 0, -7); boss.holes.push(circ(-1.75, -7, .75), circ(1.75, -7, .75));
+  add(g, H.rslab(4.2, 13.2, .3, 2, .05, phys(0xcfd0d0, { roughness: .7 })), 0, -38, 1.5);
+  const boss = rrS(17, 17, 4.5, 0, 1); boss.holes.push(circ(-3.2, 1, .8), circ(3.2, 1, .8));
   const bm = add(g, H.ext(boss, .6, .2, plate), 0, 0, 1.65);
-  for (const x of [-1.75, 1.75]) add(g, disc(0, .8, voidM), x, -7, 1.6).rotation.y = PI;
+  for (const x of [-3.2, 3.2]) add(g, disc(0, .85, voidM), x, 1, 1.75).rotation.y = PI;
 
   /* ---------- bottom face: notch, speaker slots, security-screw tab ---------- */
   const slope = 1.3 / (zb1 - zb0), ybAt = z => bodyAt(z).bot;

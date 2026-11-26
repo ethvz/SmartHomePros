@@ -560,7 +560,7 @@ slab(TVX+.03,TVX+.08,FL+1.18,FL+2.0,0.62,2.08,phys(0x070809,{r:.12,x:{clearcoat:
     let x = 3.62; let i = Math.round(y*7);
     while(x < 5.0){ const w = .03+.025*((i*37)%5)/4, h = .22+.12*((i*53)%7)/6, gap = (i%6===0) ? .22 : .004;
       if(x+w > 5.0) break; slab(x,x+w,y+.03,y+.03+h,GR.cz-.27,GR.cz-.06,mat(bookC[i%bookC.length],{r:.75}),null,false); x += w+gap; i++; } }
-  for(const [x,y] of [[5.12,FL+2.2],[5.12,FL+1.72]]) slab(x-.11,x+.11,y-.14,y+.14,GR.cz,GR.cz+.02,mat(0x1d1e20,{r:.5}),null,false); }
+  for(const [x,y] of [[3.25,FL+2.65],[3.25,FL+2.2]]) slab(x-.11,x+.11,y-.14,y+.14,GR.cz,GR.cz+.02,mat(0x1d1e20,{r:.5}),null,false); }
 // big canvas art above the kitchen, and a floor lamp beside the sofa
 { const c=document.createElement('canvas'); c.width=512; c.height=256; const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,512,256); g.addColorStop(0,'#c9b8a0'); g.addColorStop(.5,'#8a7560'); g.addColorStop(1,'#d8cdbd'); x.fillStyle=g; x.fillRect(0,0,512,256);
@@ -655,7 +655,7 @@ for(const [x,z,r] of [[-6.05,4.6,.3],[-5.15,4.75,2.1],[-2.75,4.45,1.2]]) model('
 for(const [x,z,r,w] of [[-4.9,4.5,0,.8],[-6.4,5.0,1.4,.7],[-1.6,4.45,2.2,.7],[.2,4.45,.6,.7],[6.75,3.9,1,.8],[6.8,1.8,2.5,.9],[6.75,-.6,4,.8],[1.9,4.45,1.2,.8],[3.7,4.45,3.3,.8],[5.4,4.45,.4,.8]])
   model('grass_tuft', {pos:V(x,.02,z), rotY:r, fit:{w:w}, shadow:false});
 // the grey sedan on the drive apron beside the garage, side-on to the street (as in the reference)
-model('car4', {pos:V(-11.6,.045,6.25), rotY:Math.PI/2, tweak:o=>o.traverse(m=>{ const a = m.material; if(!m.isMesh || !a) return;
+model('car4', {pos:V(-10.5,.045,6.3), rotY:Math.PI/2, tweak:o=>o.traverse(m=>{ const a = m.material; if(!m.isMesh || !a) return;
   if(/glass/i.test(a.name||'')){ a.transparent = true; a.opacity = .82; }
   if(/tail|brake|rear.?light/i.test(a.name||'')){ a.emissive && a.emissive.set(0x8a0c0c); a.emissiveIntensity = 1.2; } })});   // grey sedan: "Tesla 2018 Model 3" by Ameer Studio (CC BY 4.0), modified   // sleek grey sedan ("Car Concept", CC BY 4.0); glass made cheap for iPads
 /* the house: one solid model (Blender) with its own baked lightmap */
@@ -1313,10 +1313,10 @@ const PLACE = {
   water: {pos:V(-.3,FL+.012,GR.z0+.62), view:V(.05,.78,.62), flat:true, d:.62},
   fob:   {pos:V(-.9,FL+.945,-4.05),  view:V(.15,.8,.6),  flat:true, s:1.2, d:.5},
   pendant:{pos:V(GR.x0+.035,FL+1.62,3.72), view:V(1,0,0), s:1.25, d:.82},
-  icp:   {pos:V(3.5,FL+2.58,GR.cz-.15), view:V(.25,0,1), stand:true, s:1.1, d:.6},
+  icp:   {pos:V(3.9,FL+2.58,GR.cz-.15), view:V(.25,0,1), stand:true, s:1.1, d:.6},
   fire:  {pos:V(1.52,5.55,GR.z0+.01), view:V(0,0,1),           d:.75},
   keypad:{pos:V(GR.x0+.02,FL+1.35,3.22), view:V(1,0,0),        d:.7},
-  therm: {pos:V(2.8,FL+1.5,GR.cz+.01), view:V(0,0,1),          d:.66},
+  therm: {pos:V(3.25,FL+1.5,GR.cz+.01), view:V(0,0,1),          d:.66},
   window:{pos:V(-5.35,FL+1.2,4.035), view:V(0,0,1), s:1.15,     d:.5},
   glass: {pos:V(GR.x1-.01,FL+2.75,1.8), view:V(-1,0,0),        d:.7},
   plug:  {pos:V(5.15,FL+.32,GR.cz+.01), view:V(0,0,1),         d:.65},

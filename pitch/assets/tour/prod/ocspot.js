@@ -33,8 +33,8 @@ export default H => {
   // ---------------------------------------------------------------- light bar housing
   // plan (x, z): centre face z = 88 (~80 wide), wings back to (+-88, 20), rounded back; section: top y = -84, bottom y = -150,
   // the back a half-ellipse (rearmost z = 8 at mid height), all three LED faces leaning back 12 mm toward the bottom.
-  const zF = 90, yT = -85, yB = -149, lean = 10, wing = V2(66, 47).normalize(), cW = wing.x*50 + wing.y*zF;   // centre face ~100 wide, wings ~54 deg to the wall (front photo)
-  const zBack = y => 20 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/33)**2));   // half-ellipse back, rearmost z = 6
+  const zF = 92, yT = -85, yB = -152, lean = 24, wing = V2(66, 47).normalize(), cW = wing.x*50 + wing.y*zF;   // centre face ~100 wide, wings ~54 deg to the wall (front photo)
+  const zBack = y => 20 - 14*Math.sqrt(Math.max(0, 1 - ((y+118.5)/33.5)**2));   // half-ellipse back, rearmost z = 6
   const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, zF - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
   const RC = [4, 4, 4, 4];                                    // corner radii: front corners R4; the wings run right back to the rounded (half-ellipse) back
   const nC = 10, nE = 14;
@@ -49,13 +49,13 @@ export default H => {
     return P; };
   const NP = 4*(nC+1+nE-1);
   const leanAt = y => lean*(yT - y)/(yT - yB);
-  const wY0 = yT - 4, wY1 = yB + 4, band = 7;                      // window band: housing sits 7 mm back, behind the reflector plates
+  const wY0 = yT - 2.6, wY1 = yB + 2.6, band = 7;                      // window band: housing sits 7 mm back, behind the reflector plates
   const levels = [];
-  for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yT - 3 + 3*Math.cos(a), 3 - 3*Math.sin(a), 0]); }    // top edge R3
-  levels.push([wY0+.6, 0, 0], [wY0+.3, .3, 0], [wY0, band, 1]);
+  for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yT - 1.5 + 1.5*Math.cos(a), 1.5 - 1.5*Math.sin(a), 0]); }    // top edge R1.5 (no lip)
+  levels.push([wY0+.3, 0, 0], [wY0+.15, .3, 0], [wY0, band, 1]);
   for(let y = wY0 - 4; y > wY1 + 1; y -= 4) levels.push([y, band, 1]);
-  levels.push([wY1, band, 1], [wY1-.3, .3, 0], [wY1-.6, 0, 0]);
-  for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yB + 3 - 3*Math.sin(a), 3 - 3*Math.cos(a), 0]); }   // bottom edge R3
+  levels.push([wY1, band, 1], [wY1-.15, .3, 0], [wY1-.3, 0, 0]);
+  for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yB + 1.5 - 1.5*Math.sin(a), 1.5 - 1.5*Math.cos(a), 0]); }   // bottom edge R1.5
   const pos = [], idxA = [], idxB = [];
   for(const [y, d] of levels) for(const [x, z] of outline(leanAt(y) + d, y)) pos.push(x, y, z);
   for(let r=0;r<levels.length-1;r++){ const into = (levels[r][2] && levels[r+1][2]) ? idxB : idxA;
@@ -107,7 +107,7 @@ export default H => {
       const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
       return add(M, new THREE.Mesh(ge, m)); };
     strip(wY0 + .2, wY1 - .2, glass).renderOrder = 2;                 // flush outer window over the whole band
-    strip(wY0 + .2, wY0 - 2.4, smoke, .06); strip(wY1 + 2.4, wY1 - .2, smoke, .06);
+    strip(wY0 + .2, wY0 - 2, smoke, .06); strip(wY1 + 2, wY1 - .2, smoke, .06);
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below)

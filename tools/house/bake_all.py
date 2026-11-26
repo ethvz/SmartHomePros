@@ -1,10 +1,11 @@
-import bpy, json, math, sys, time
+import bpy, json, math, sys, time, os
 from mathutils import Vector
 SAMPLES = int(sys.argv[sys.argv.index('--samples')+1]) if '--samples' in sys.argv else 16
-E = json.load(open('lights.json')); SIZE = E['size']
-bpy.ops.wm.open_mainfile(filepath='/home/claude/work/shell/shell_lm.blend')
+W = os.environ.get('HOUSE_WORK', os.path.join(os.getcwd(), 'work'))
+E = json.load(open(os.path.join(W, 'bake/lights.json'))); SIZE = E['size']
+bpy.ops.wm.open_mainfile(filepath=os.path.join(W, 'shell_lm.blend'))
 shell = [o for o in bpy.context.scene.objects if o.type=='MESH']
-bpy.ops.import_scene.gltf(filepath='scene.glb')
+bpy.ops.import_scene.gltf(filepath=os.path.join(W, 'bake/scene.glb'))
 sc = bpy.context.scene
 for o in list(sc.objects):
     if o.type in ('LIGHT','CAMERA'): bpy.data.objects.remove(o)
@@ -24,7 +25,13 @@ for L in E['lights']:
     d.color = c; o = bpy.data.objects.new(d.name, d); sc.collection.objects.link(o); o.location = t2b(L['pos'])
     if 'target' in L:
         dirv = t2b(L['target']) - t2b(L['pos']); o.rotation_euler = dirv.to_track_quat('-Z','Y').to_euler()
-sc.render.engine = 'CYCLES'; cy = sc.cycles; cy.device = 'CPU'; cy.samples = SAMPLES; cy.use_denoising = False
+sc.render.engine = 'CYCLES'; cy = sc.cycles; cy.device = 'CPU'
+try:   # Metal GPU when available (minutes instead of tens of minutes)
+    pr = bpy.context.preferences.addons['cycles'].preferences; pr.compute_device_type = 'METAL'; pr.get_devices()
+    for d in pr.devices: d.use = True
+    if any(d.type == 'METAL' for d in pr.devices): cy.device = 'GPU'
+except Exception as e: print('gpu', e)
+print('device', cy.device); cy.samples = SAMPLES; cy.use_denoising = False
 cy.max_bounces = 4; cy.diffuse_bounces = 3; cy.glossy_bounces = 1; cy.transmission_bounces = 2
 sc.render.bake.margin = 3; sc.render.bake.use_clear = True
 lm = bpy.data.images.new('lm', SIZE, SIZE, float_buffer=True, alpha=False)
@@ -51,5 +58,5 @@ bpy.context.view_layer.objects.active = targets[0]
 t0 = time.time()
 bpy.ops.object.bake(type='DIFFUSE', pass_filter={'DIRECT','INDIRECT'}, use_clear=True, margin=3)
 print('bake s', round(time.time()-t0))
-lm.filepath_raw = '/home/claude/work/bake/lm_all.exr'; lm.file_format = 'OPEN_EXR'; lm.save()
-ls.filepath_raw = '/home/claude/work/bake/shell_all.exr'; ls.file_format = 'OPEN_EXR'; ls.save()
+lm.filepath_raw = os.path.join(W, 'bake/lm_all.exr'); lm.file_format = 'OPEN_EXR'; lm.save()
+ls.filepath_raw = os.path.join(W, 'bake/shell_all.exr'); ls.file_format = 'OPEN_EXR'; ls.save()

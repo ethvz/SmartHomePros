@@ -37,10 +37,10 @@ export default H => {
   body.castShadow = body.receiveShadow = true;
 
   /* concave spherical dish (sag 2.0 at the centre), following the dome, crisp rim; 5 mm bore, felt 1.5 mm below */
-  const DD = 2.6, SR = (RD * RD + DD * DD) / (2 * DD), sag = r => SR - Math.sqrt(SR * SR - r * r), D0 = sag(RD);
+  const DD = 3.4, SR = (RD * RD + DD * DD) / (2 * DD), sag = r => SR - Math.sqrt(SR * SR - r * r), D0 = sag(RD);
   const dz = (x, y) => { const r = Math.hypot(x, y); return FZ + dome(x, y) - (D0 - sag(r)); };
   const dish = [];
-  for (const s of [1, .985, .94, .85, .74, .62, .5, .4, .3, 2.5 / RD]) dish.push(rim.map(([x, y]) => [x * s, y * s, dz(x * s, y * s)]));
+  for (const s of [1, .985, .94, .85, .74, .62, .5, .4, .3, 2.8 / RD]) dish.push(rim.map(([x, y]) => [x * s, y * s, dz(x * s, y * s)]));
   const hb = dish[dish.length - 1].map(([x, y, z]) => [x, y, z]);
   const zf = dz(0, 0);
   dish.push(hb.map(([x, y]) => [x, y, zf - .15]), hb.map(([x, y]) => [x, y, zf - .8]));
@@ -48,7 +48,7 @@ export default H => {
   add(u, new THREE.Mesh(K.skin(dish), wm));
   const bore = [hb.map(([x, y]) => [x, y, zf - .8]), hb.map(([x, y]) => [x, y, zf - 1.6])];
   add(u, new THREE.Mesh(K.skin(bore), new THREE.MeshStandardMaterial({ color: 0x2a2b2c, roughness: .8 })));
-  const felt = add(u, new THREE.Mesh(new THREE.CircleGeometry(2.6, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,
+  const felt = add(u, new THREE.Mesh(new THREE.CircleGeometry(2.9, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,
     bumpMap: K.noiseTex(), bumpScale: .6 })), 0, 0, zf - 1.5);
 
   /* TEST pill */
