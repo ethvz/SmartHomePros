@@ -45,7 +45,8 @@ export default H => {
       const Nr0 = new Int8Array(OCPM.buf, p.n, p.nv*3);
       if(p.g !== 1) I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
       geo.setIndex(new THREE.BufferAttribute(I,1));
-      if(p.g === 0) geo.computeVertexNormals();                // fresh normals after the clamps (no groove shading left over)
+      if(p.g === 0){ const N0 = new Int8Array(OCPM.buf, p.n, p.nv*3); geo.deleteAttribute('normal'); geo.computeVertexNormals();   // fresh normals after the clamps
+        const Nn = geo.attributes.normal; for(let i=0;i<p.nv;i++) if(Nn.getX(i)*N0[3*i] + Nn.getY(i)*N0[3*i+1] + Nn.getZ(i)*N0[3*i+2] < 0) Nn.setXYZ(i, -Nn.getX(i), -Nn.getY(i), -Nn.getZ(i)); }   // keep the CAD's facing (its winding is mixed)
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
         for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
           uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0385)/.0770; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
