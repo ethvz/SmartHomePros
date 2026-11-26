@@ -4,3 +4,6 @@ tools/__pycache__/
 .DS_Store
 .claude/settings.local.json
 _bisect/
+_artifact/
+_artifact.manifest
+.claude/artifact-stamp

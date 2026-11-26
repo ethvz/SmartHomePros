@@ -17,7 +17,8 @@
     "Stop": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/git-sync.sh\" push", "timeout": 120, "statusMessage": "Pushing to GitHub..." }
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/git-sync.sh\" push", "timeout": 120, "statusMessage": "Pushing to GitHub..." },
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/artifact-sync.sh\" check", "timeout": 30, "statusMessage": "Checking the Connect artifact..." }
         ]
       }
     ]

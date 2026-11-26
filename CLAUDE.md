@@ -25,9 +25,12 @@ Vivint no longer sells solar: never show solar panels or solar products.
   404s on GitHub Pages - un-ignore it if wanted there).
 - `sw.js` - offline cache for the Connect home only (bump `CACHE` when its FILES change). Each app has its own worker.
 - `connect/` - Connect home assets.
-- `tools/art.py` - builds `../shpc-art`, the packed copy published as the private claude.ai artifact
-  "SmartHomePros Connect" (artifact limit is 512 files, so images are bundled into packs/*.json). Optional now that
-  GitHub Pages is the real home.
+- `tools/art.py` - builds the packed copy published as the private claude.ai artifact "SmartHomePros Connect"
+  (https://claude.ai/artifact/Te4syByxZ1wBLsGHmGYf63; images are bundled into packs/*.json). The owner wants every change
+  mirrored there: `tools/artifact-sync.sh` (a Stop hook in `.claude/settings.json`) blocks the end of a turn while the
+  artifact is out of date. Then: `bash tools/artifact-sync.sh build` (builds `_artifact/`, lists changed files), publish
+  those files with the Artifact tool (page `_artifact/index.html`, root `_artifact`), `bash tools/artifact-sync.sh mark`.
+  Publish only changed files (the artifact keeps the rest and its stored layouts) and never pass `capabilities`.
 - `tools/house/` - Blender + bake pipeline for the 3D Home house.
 
 The old standalone sites (ethvz/Fast-Pitch, ethvz/Fast-Recruit Pages) now redirect here and retire their offline copies.

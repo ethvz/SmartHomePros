@@ -1,4 +1,4 @@
-"""Build the claude.ai artifact copy of Connect in /home/claude/shpc-art (GitHub Pages uses the repo as is).
+"""Build the claude.ai artifact copy of Connect in ../shpc-art next to the repo, or $SHPC_ART (GitHub Pages uses the repo as is).
 
 An artifact version holds at most 512 files, so both apps' images ship as bundles (tools/pack.py).
   python3 tools/art.py
@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from pack import transform, write_packs, IMG
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = '/home/claude/shpc-art'
+OUT = os.environ.get('SHPC_ART') or os.path.join(os.path.dirname(ROOT), 'shpc-art')
 SERVED = set('htm html css cjs js jsx mjs wasm csv cts geojson json map md mts ts tsx txt webmanifest xml avif gif ico jpeg jpg png svg webp otf ttf woff woff2 mp3 mp4 ogg wav webm pdf'.split())
 LANDING_KEEP = {'pitch/assets/home2.webp', 'pitch/assets/vl/imagine.webp', 'pitch/assets/icon-192.png', 'recruit/a_470ace19f4f41e262a08af30291d0034.webp', 'recruit/icon.png', 'connect/bg.webp'}
 PACK_MAX = 7_000_000
