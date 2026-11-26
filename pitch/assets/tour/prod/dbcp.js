@@ -162,7 +162,7 @@ export default H => {
     add(B, lathe(rp, ringM)); }                                                          // one band: bright inner edge grading to deep red-orange
   add(B, tube(13.3, -1.15, -.12, ringWall));                                             // diffuser inner wall, lit
   add(B, lathe([[0, -2.1], [1.5, -2.08], [4, -1.97], [8, -1.65], [11, -1.3], [12.6, -1.13]], btn));   // dished button, flat at the pole
-  add(B, lathe([[12.6, -1.13], [13.05, -1.12], [13.25, -1.2], [13.3, -1.4], [13.3, -2.8]], btnRim));      // closes up to the lit ring wall
+  add(B, lathe([[12.6, -1.13], [13.05, -1.12], [13.25, -1.2], [13.3, -1.4], [13.3, -2.8]], ringWall));   // lit lip, runs straight into the ring wall (review r4)
   add(B, disc(13.25, 15.5, voidM), 0, 0, -1.6);
   g.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = false; } });
   return out;

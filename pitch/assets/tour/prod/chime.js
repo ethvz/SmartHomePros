@@ -58,7 +58,7 @@ export default H => {
   const win = (mx, my, mz) => mx < -W/2 + .01 && Math.abs(my) < 12.5 && mz > 11.4 && mz < 18.4;
   add(g, cap(P, 10.5, 0, shell, false));
   add(g, sweep(P, prof, shell, win));
-  const innerWall = new THREE.MeshPhysicalMaterial({color:0xa9a9a7, roughness:.55, clearcoat:.1});
+  const innerWall = new THREE.MeshPhysicalMaterial({color:0x9a9a98, roughness:.55, clearcoat:.1});
   add(g, sweep(P, [[1.5, 31.28], [1.62, 31.12], [1.85, 30.75], [2.1, 30.3], [2.1, 30.1]], innerWall));        // grey inward-sloping wall from the crest down to the fabric
   add(g, sweep(P, [[2.1, 30.1], [2.7, 30.1]], dark));                                                          // dark gap floor at the foot of the wall
 
@@ -67,17 +67,17 @@ export default H => {
     const T = 40.8, cols = 48, rows = 68, cw = N/cols, rh = N/rows;                          // 40.8 mm tile: rib columns 0.85 mm, rows 0.6 mm
     let seed = 11; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
     const TAU = Math.PI*2, heather = (px, py) => { const u = px/N*TAU, v = py/N*TAU;               // low-frequency mottling that still tiles
-      return .925 + .035*Math.sin(3*u + 1.3) * Math.cos(2*v + .4) + .025*Math.sin(5*u + 2*v + 2.1) + .02*Math.cos(4*v - 3*u + .7) + .015*Math.sin(7*v + 1.1); };
-    x.fillStyle = '#5e5e5e'; x.fillRect(0, 0, N, N);
+      return .95 + .018*Math.sin(3*u + 1.3) * Math.cos(2*v + .4) + .013*Math.sin(5*u + 2*v + 2.1) + .01*Math.cos(4*v - 3*u + .7) + .008*Math.sin(7*v + 1.1); };
+    x.fillStyle = '#3c3c3c'; x.fillRect(0, 0, N, N);
     for(let r=-1;r<=rows;r++) for(let q=0;q<cols;q++){
       const cx = q*cw + cw/2, cy = r*rh + rh/2, h = heather(cx, cy);
       for(const side of [-1, 1]){                                                                  // two interlocking loops per stitch, nearly vertical
-        const roll = rnd(); let v = 190 + rnd()*16; if(roll < .1) v = 145 + rnd()*15; else if(roll > .93) v = 232 + rnd()*16; v *= h;
+        const roll = rnd(); let v = 200 + rnd()*14; if(roll < .04) v = 172 + rnd()*12; else if(roll > .94) v = 236 + rnd()*14; v *= h;
         x.save(); x.translate(cx + side*cw*.2, cy); x.rotate(side*.25);
         const gr = x.createLinearGradient(-cw*.22, 0, cw*.22, 0), e = `rgb(${v*.55|0},${v*.55|0},${v*.55|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
         gr.addColorStop(0, e); gr.addColorStop(.5, m); gr.addColorStop(1, e);
-        x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.22, rh*.68, 0, 0, TAU); x.fill(); x.restore(); }
-      x.fillStyle = '#262626'; x.beginPath(); x.ellipse(q*cw, cy + rh/2, cw*.147, rh*.375, 0, 0, TAU); x.fill();   // see-through slit pore between columns (0.25 x 0.45 mm)
+        x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.19, rh*.66, 0, 0, TAU); x.fill(); x.restore(); }
+      x.fillStyle = '#1e1e1e'; x.beginPath(); x.ellipse(q*cw, cy + rh/2, cw*.17, rh*.42, 0, 0, TAU); x.fill();   // see-through slit pore between columns (0.25 x 0.45 mm)
     }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/T, 1/T); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;

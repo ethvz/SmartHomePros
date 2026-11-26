@@ -1,6 +1,6 @@
 {
-  "name": "SmartHomePros Connect",
-  "short_name": "SHP Connect",
+  "name": "Smart Home Pros App",
+  "short_name": "Smart Home Pros",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",

@@ -24,7 +24,7 @@ addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&/^(\+|=|-|_|0)
 <link rel="manifest" href="../manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SHP Connect">
+<meta name="apple-mobile-web-app-title" content="Smart Home Pros">
 <script src="../dock.js" defer></script>
 
 <script>window.SHPC = { app: 'pitch', picker: '../index.html?pick' }; try { localStorage.setItem('shpc_last', 'pitch'); } catch (e) {}
@@ -2084,7 +2084,7 @@ html.booted #stage{animation:bootIn .35s ease both}
 #drawer .m2-dl>span{position:relative;z-index:1}
 #drawer .m2-dl>svg{position:relative;z-index:1}
 #drawer .m2-dl i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(5,229,175,.22);transition:width .3s ease}
-#drawer .m2-f .m2-dl{margin-right:0}#drawer .m2-f .m2-app{margin-right:auto}#drawer .m2-app .ic{color:#fff}/* SmartHomePros Connect */
+#drawer .m2-f .m2-dl{margin-right:0}#drawer .m2-f .m2-app{margin-right:auto}#drawer .m2-app .ic{color:#fff}/* Smart Home Pros */
 #drawer .m2-dl.done{background:rgba(5,229,175,.12);box-shadow:inset 0 0 0 1px rgba(5,229,175,.4)}
 #drawer .m2-dl.busy{pointer-events:none}
 #p-verify{background:transparent!important;left:calc(-1*var(--gx,0px))!important;right:auto!important;width:var(--W,1376px)!important}
@@ -5480,7 +5480,7 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
 { const pg=$('#p-home'), pill=$('#hmode'), box=$('#tour3d');
   const set=m=>{ const d3=m==='3d'; pg.classList.toggle('d3',d3); pill.classList.toggle('d3',d3); document.body.classList.toggle('hd3',d3);
     pill.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.hm===m));
-    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=23&fb=76';   /* (Connect: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
+    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=23&fb=76';   /* (SHP app: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
   /* keep the pill halfway between the logo and the category pill (both move with the layout) */
@@ -6111,7 +6111,7 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 })();
 </script>
 <style id="shpcFix">
-/* offline download lives in Connect → Settings now */
+/* offline download lives in SHP page → Settings now */
 #drawer #dlBtn{display:none!important}
 /* 3D Home: the tiles and their category morph stay hidden behind it */
 #p-home.d3 #flipLayer,#p-home.d3 #homeTrack{opacity:0!important;pointer-events:none!important}
@@ -6131,7 +6131,7 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 #allTiles{transform:none}
 </style>
 <style>
-/* video library: playable tiles + full-screen player (SmartHomePros Connect) */
+/* video library: playable tiles + full-screen player (Smart Home Pros) */
 .vl2-c .vl2-pv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #vlp{position:fixed;inset:0;z-index:9000;background:#000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
 #vlp.on{opacity:1;visibility:visible;transition:opacity .35s}

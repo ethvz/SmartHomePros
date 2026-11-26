@@ -1,11 +1,11 @@
-"""SmartHomePros Connect build.
+"""Smart Home Pros build.
 
   python3 tools/build.py            refresh recruit/ from the Fast Recruit working copy, then patch both apps
   python3 tools/build.py --pitch    also re-copy pitch/ from a Fast Pitch checkout (only for the first import:
                                     pitch/ is Fast Pitch's home now, edit it in place)
 
 Patches (all idempotent, applied on every run):
-  * both apps use the Connect manifest and icon, so "Add to Home Screen" from anywhere installs Connect
+  * both apps use the Smart Home Pros manifest and icon, so "Add to Home Screen" from anywhere installs the app
   * each app records itself as the last app used (the picker reopens it on launch)
   * a "Switch app" button in each app's menu goes back to the picker
   * the offline helpers only clear their own caches (they used to clear everything that wasn't theirs)
@@ -40,7 +40,7 @@ def sub(s, old, new, label, count=1):
     return s.replace(old, new, count)
 
 
-TITLE = '<meta name="apple-mobile-web-app-title" content="SHP Connect">'
+TITLE = '<meta name="apple-mobile-web-app-title" content="Smart Home Pros">'
 
 
 DOCK = '<script src="../dock.js" defer></script>\n'   # the shared editor dock (Edit layout + Screens)
@@ -59,7 +59,7 @@ def patch_recruit():
     p = os.path.join(ROOT, 'recruit/index.html'); s = open(p, encoding='utf-8').read()
     s = sub(s, '<link rel="manifest" href="manifest.webmanifest">', '<link rel="manifest" href="../manifest.webmanifest">', 'fr manifest')
     s = sub(s, '<link rel="apple-touch-icon" href="apple-touch-icon.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">', 'fr touch icon')
-    s = sub(s, '<meta name="apple-mobile-web-app-title" content="Vivint Recruiting">', '<meta name="apple-mobile-web-app-title" content="SHP Connect">', 'fr title')
+    s = sub(s, '<meta name="apple-mobile-web-app-title" content="Vivint Recruiting">', '<meta name="apple-mobile-web-app-title" content="Smart Home Pros">', 'fr title')
     if 'window.SHPC = {' not in s:
         s = s.replace(TITLE, TITLE + '\n' + head_hook('recruit'), 1)
     if 'dock.js' not in s:
@@ -70,10 +70,10 @@ def patch_recruit():
     btn = ("'<div class=\"dw-foot\">' + (window.SHPC ? '<button type=\"button\" class=\"dw-u dw-app\" data-shpc-switch title=\"Switch app\" aria-label=\"Switch app\">"
            + GRID.replace('class="ic" width="20" height="20" ', '') + "<span>Switch app</span></button>' : '') + '<button type=\"button\" class=\"dw-u dw-social\"")
     s = sub(s, "'<div class=\"dw-foot\"><button type=\"button\" class=\"dw-u dw-social\"", btn, 'fr menu foot')
-    if '.dw-foot .dw-dl {' not in s:   # offline download lives in Connect → Settings now
-        s = s.replace('</style>', '  .dw-foot .dw-dl { display: none !important; } .dw-foot { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* SmartHomePros Connect: download is in Connect Settings */\n</style>', 1)
+    if '.dw-foot .dw-dl {' not in s:   # offline download lives in SHP page → Settings now
+        s = s.replace('</style>', '  .dw-foot .dw-dl { display: none !important; } .dw-foot { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* Smart Home Pros: download is in Connect Settings */\n</style>', 1)
     if '.dw-foot .dw-app' not in s:
-        s = s.replace('</style>', '  .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* SmartHomePros Connect */\n'
+        s = s.replace('</style>', '  .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* Smart Home Pros */\n'
                    '  .dw:not(.short) .dw-foot .dw-vid, .dw:not(.short) .dw-foot:has(.dw-vid) .dw-app { grid-column: auto; } .dw.short .dw-foot { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* Video Library beside Switch app */\n</style>', 1)
     open(p, 'w', encoding='utf-8').write(s)
     p = os.path.join(ROOT, 'recruit/sw.js'); s = open(p).read()
@@ -85,7 +85,7 @@ def patch_pitch():
     p = os.path.join(ROOT, 'pitch/index.html'); s = open(p, encoding='utf-8').read()
     s = sub(s, '<link rel="manifest" href="manifest.webmanifest">', '<link rel="manifest" href="../manifest.webmanifest">', 'fp manifest')
     s = sub(s, '<link rel="apple-touch-icon" href="assets/icon-180.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">', 'fp touch icon')
-    s = sub(s, '<meta name="apple-mobile-web-app-title" content="Fast Pitch 2027">', '<meta name="apple-mobile-web-app-title" content="SHP Connect">', 'fp title')
+    s = sub(s, '<meta name="apple-mobile-web-app-title" content="Fast Pitch 2027">', '<meta name="apple-mobile-web-app-title" content="Smart Home Pros">', 'fp title')
     if 'window.SHPC = {' not in s:
         s = s.replace(TITLE, TITLE + '\n' + head_hook('pitch'), 1)
     if 'dock.js' not in s:
@@ -93,7 +93,7 @@ def patch_pitch():
     s = sub(s, "col=db.collection('layout');", "col=db.collection('fp_layout');", 'fp layout db')
     s = s.replace("db.collection('nav')", "db.collection('fp_nav')")
     s = sub(s, '<i id="dlBar"></i></button>', '<i id="dlBar"></i></button><button class="m2-dl m2-app" data-shpc-switch>' + GRID + '<span>Switch app</span></button>', 'fp menu foot')
-    s = sub(s, '#drawer .m2-dl.done{', '#drawer .m2-f .m2-dl{margin-right:0}#drawer .m2-f .m2-app{margin-right:auto}#drawer .m2-app .ic{color:#fff}/* SmartHomePros Connect */\n#drawer .m2-dl.done{', 'fp menu css')
+    s = sub(s, '#drawer .m2-dl.done{', '#drawer .m2-f .m2-dl{margin-right:0}#drawer .m2-f .m2-app{margin-right:auto}#drawer .m2-app .ic{color:#fff}/* Smart Home Pros */\n#drawer .m2-dl.done{', 'fp menu css')
     open(p, 'w', encoding='utf-8').write(s)
     p = os.path.join(ROOT, 'pitch/sw.js'); s = open(p).read()
     s = sub(s, 'if (k !== CACHE) await caches.delete(k);', "if (k !== CACHE && k.startsWith('fp-')) await caches.delete(k);", 'fp sw caches')
@@ -105,4 +105,4 @@ if __name__ == '__main__':
     if '--pitch' in sys.argv:
         copy_tree(FP, os.path.join(ROOT, 'pitch'), ['README.md', 'tools/', '.gitignore'])
     patch_recruit(); patch_pitch()
-    print('Connect built')
+    print("Smart Home Pros built")

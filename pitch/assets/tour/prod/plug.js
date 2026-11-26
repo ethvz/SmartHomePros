@@ -66,8 +66,8 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
         c += ' }\n';
         if (l.rB != null) r += `{ float sd = vOP.${l.ax} - ${f(l.at)}; float fw = max(fwidth(sd), 1e-7); roughnessFactor = mix(roughnessFactor, ${f(l.rB)}, smoothstep(-fw, fw, sd)); }\n`;
       });
-      sh.vertexShader = 'varying vec3 vOP;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vOP = position;');
-      sh.fragmentShader = 'varying vec3 vOP;\n' + L.map((l, i) => `uniform vec3 uL${i};` + (l.B != null ? ` uniform vec3 uB${i};` : '')).join('\n') + '\n' + sh.fragmentShader
+      sh.vertexShader = 'varying vec3 vOP; varying vec3 vON;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vOP = position;').replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n vON = objectNormal;');
+      sh.fragmentShader = 'varying vec3 vOP; varying vec3 vON;\n' + L.map((l, i) => `uniform vec3 uL${i};` + (l.B != null ? ` uniform vec3 uB${i};` : '')).join('\n') + '\n' + sh.fragmentShader
         .replace('#include <color_fragment>', '#include <color_fragment>\n' + c)
         .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n' + r);
     };
@@ -102,7 +102,7 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   /* ---- end helpers ---- */
   const g = G(), Q = new URLSearchParams(location.search), bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search)), nocord = bare || Q.has('nocord');
   const P = G(); P.scale.setScalar(.001); P.position.y = .006; g.add(P);                  // body sits a little above the plate centre (upper receptacle)
-  const W = 96, HH = 53, D = 38, R = 6, crown = .6;
+  const W = 96, HH = 53, D = 38, R = 6, crown = 0;   // flat plateau (a ring-indexed crown made an X crease along the diagonals)
   const white = new THREE.MeshPhysicalMaterial({ color: 0xb6b4b2, roughness: .55, clearcoat: .04, clearcoatRoughness: .5, envMapIntensity: .6 });
 
   /* 1-2. housing + collar: one shell, hairline at x = +36 */
@@ -121,7 +121,7 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
-  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .45, col: 0x7d7d7b, k: 1, mask: 'vOP.z < 37.2' }, { ax: 'x', at: 36.4, w: .4, col: 0xffffff, k: .5, mask: 'vOP.z < 37.2' }]);
+  const shellMat = lineMat(white, [{ ax: 'x', at: 39.5, w: .45, col: 0x7d7d7b, k: 1, mask: 'abs(normalize(vON).z) < .985' }, { ax: 'x', at: 39.9, w: .4, col: 0xffffff, k: .5, mask: 'abs(normalize(vON).z) < .985' }]);   // collar joint, drawn on the walls and the front-to-end round, not on the flat face
   { const sh = solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat);
     add(P, sh); }
   const zTop = D + crown;
@@ -160,7 +160,7 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
       { type: 'pocket', pts: offs(pts(rrShape(8.7, 2.7, .4), 80), -2.85, -6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: dense(U), prof: uni(slotProf), col: deep }];
     const bm = white.clone(); bm.vertexColors = true; bm.envMapIntensity = .5; const boss = solid(loops, bm, true);
-    boss.rotation.y = Math.PI / 2; add(P, boss, 39.5, .5, 14.7); }
+    boss.rotation.y = Math.PI / 2; add(P, boss, 39.5, .5, 17.5); }   // plate spans z 3.5-31.5
 
   /* 7. printed text: "Max. 330W / Incandescent" upside down under the faceplate; FCC block on the far end */
   const txt = plane(20, 7, 40, (x, Pp) => { x.save(); x.translate(...Pp(0, 0)); x.rotate(Math.PI); x.fillStyle = '#3a3a3a'; x.textAlign = 'center'; x.textBaseline = 'middle';
@@ -181,11 +181,11 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
 
   /* lamp cord plugged into the pass-through receptacle (dark brown/black, ribbed strain relief), running down to the floor */
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0x2b2826, roughness: .5, clearcoat: .25, clearcoatRoughness: .4 });
-  { const head = rslab(16, 21, 15, 3.5, 2.2, cordM); add(P, head, 51 + 8.4, .5, 23);
-    for (const y of [-6.35, 6.35]) add(P, new THREE.Mesh(new THREE.BoxGeometry(2, 1.6, 6.5), steel), 50.5, y + .5, 23).rotation.y = Math.PI / 2;
-    const grip = new THREE.Mesh(new THREE.CylinderGeometry(6.2, 4, 14, 28), cordM); grip.rotation.z = -Math.PI / 2; add(P, grip, 67.4 + 7, .5, 23);
-    for (let i = 0; i < 5; i++) { const r = 6.0 - i * .45, t = new THREE.Mesh(new THREE.TorusGeometry(r, .75, 10, 32), cordM); t.rotation.y = Math.PI / 2; add(P, t, 69.4 + i * 2.6, .5, 23); }
-    const C = [[81, .5, 23], [88, .4, 22.6], [95, -3, 21.5], [100, -14, 19.5]];
+  { const head = rslab(16, 21, 15, 3.5, 2.2, cordM); add(P, head, 51 + 8.4, .5, 25.8);
+    for (const y of [-6.35, 6.35]) add(P, new THREE.Mesh(new THREE.BoxGeometry(2, 1.6, 6.5), steel), 50.5, y + .5, 25.8).rotation.y = Math.PI / 2;
+    const grip = new THREE.Mesh(new THREE.CylinderGeometry(6.2, 4, 14, 28), cordM); grip.rotation.z = -Math.PI / 2; add(P, grip, 67.4 + 7, .5, 25.8);
+    for (let i = 0; i < 5; i++) { const r = 6.0 - i * .45, t = new THREE.Mesh(new THREE.TorusGeometry(r, .75, 10, 32), cordM); t.rotation.y = Math.PI / 2; add(P, t, 69.4 + i * 2.6, .5, 25.8); }
+    const C = [[81, .5, 25.8], [88, .4, 25.2], [95, -3, 23.5], [100, -14, 20.5]];
     if (!nocord) C.push([103, -45, 16], [105, -120, 13], [106, -200, 12], [109, -219, 13], [118, -224.4, 20], [150, -224.4, 44]);
     const curve = new THREE.CatmullRomCurve3(C.map(a => new THREE.Vector3(...a)), false, 'centripetal');
     add(P, new THREE.Mesh(new THREE.TubeGeometry(curve, nocord ? 30 : 160, 2.3, 12, false), cordM)); }

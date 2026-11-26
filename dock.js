@@ -1,4 +1,4 @@
-/* SmartHomePros Connect: the editor dock, shared by Fast Pitch and Fast Recruit.
+/* Smart Home Pros: the editor dock, shared by Fast Pitch and Fast Recruit.
    One frosted-glass pill with Edit layout and Screens. Drag it by the six dots to anywhere on the screen; it stays
    there (in both apps) until it's moved again. It only shows for editors (when the app's own Edit layout button would),
    and hides while editing or while the screen preview is open. */

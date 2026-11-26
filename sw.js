@@ -1,4 +1,4 @@
-/* SmartHomePros Connect: offline copy of the app picker only. Fast Pitch (pitch/) and Fast Recruit (recruit/) run their own offline helpers. */
+/* Smart Home Pros: offline copy of the app picker only. Fast Pitch (pitch/) and Fast Recruit (recruit/) run their own offline helpers. */
 const CACHE = 'shpc-10';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-32.png',
   'pitch/assets/home2.webp', 'pitch/assets/vl/imagine.webp', 'pitch/assets/icon-192.png', 'recruit/a_470ace19f4f41e262a08af30291d0034.webp', 'recruit/icon.png', 'connect/bg.webp', 'connect/conveyour.jpg', 'connect/recruit_ho.jpg',

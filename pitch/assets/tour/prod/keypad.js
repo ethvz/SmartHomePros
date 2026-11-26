@@ -66,7 +66,8 @@ export default H => {
   const keyAt = (x, y, w, h, r, label, font, dy = 0) => {
     const ol = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(rrPts(mm(w + .7), mm(h + .7), mm(r + .35)).map(([a, b]) => new THREE.Vector2(a, b)))), hair);
     add(g, ol, mm(x), mm(y), FZ + mm(.03));
-    const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.5), mm(.5), mm(w === h ? 1.4 : 1.2), keyMV), mm(x), mm(y), FZ);
+    const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.5), mm(.5), mm(w === h ? 1.4 : 1.2), keyMV.clone()), mm(x), mm(y), FZ);   // own material per key so each can light up
+    k.name = 'key' + (label || 'lens');
     { // baked shade: ~8% darker over the lower-left 30% of the key top (the dome turns away from the light there)
       const pa = k.geometry.attributes.position, col = [], half = mm(Math.min(w, h) / 2);
       for (let i = 0; i < pa.count; i++) { const p = (-pa.getX(i) / mm(w / 2) - pa.getY(i) / mm(h / 2)) / Math.SQRT2, s = Math.min(1, Math.max(0, (p - .3) / .5)); const f = 1 - .08 * s * s * (3 - 2 * s); col.push(f, f, f); }
@@ -74,12 +75,13 @@ export default H => {
     if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#262626'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
       c.font = font; c.fillText(label, ...P(0, mm(dy))); }), (px, py) => k.userData.zf(inset(px + 0, py, mm(w), mm(h), mm(r)))), mm(x), mm(y), FZ);
     return k; };
-  keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '400 44px ' + FONT, -1.65);
-  keyAt(16.7, 56.6, 23.4, 14.3, 7.15, 'Away', '400 44px ' + FONT, -1.65);
+  const parts = { keys: [], statusIcons: [] };                           // interactive hooks for the 3D Home demo (group.userData.parts)
+  parts.stay = keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '400 44px ' + FONT, -1.65);
+  parts.away = keyAt(16.7, 56.6, 23.4, 14.3, 7.15, 'Away', '400 44px ' + FONT, -1.65);
   const CX = [-21.1, 0, 21.1], RY = [35.4, 14.3, -6.8, -27.9], D = 14.35;
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) keyAt(CX[c], RY[r], D, D, D / 2, String(r * 3 + c + 1), '400 64px ' + FONT, -2.25);
-  keyAt(CX[0], RY[3], D, D, D / 2, 'Clear', '400 44px ' + FONT, -1.5);
-  keyAt(CX[1], RY[3], D, D, D / 2, '0', '400 64px ' + FONT, -2.25);
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) parts.keys.push(keyAt(CX[c], RY[r], D, D, D / 2, String(r * 3 + c + 1), '400 64px ' + FONT, -2.25));
+  parts.clear = keyAt(CX[0], RY[3], D, D, D / 2, 'Clear', '400 44px ' + FONT, -1.5);
+  parts.keys.push(keyAt(CX[1], RY[3], D, D, D / 2, '0', '400 64px ' + FONT, -2.25));   // keys = 1..9, 0
   { // tactile dot above the 5
     const zf = (D / 2 - 3.0); const kz = (mm(.5) + mm(1.4) * (1 - (1 - Math.min(1, (mm(zf) - mm(.5)) / (mm(D / 2) - mm(.5)))) ** 2));
     const dot = new THREE.Mesh(new THREE.SphereGeometry(mm(.4), 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), keyM); dot.rotation.x = Math.PI / 2; dot.scale.set(1, .75, 1);
@@ -100,7 +102,7 @@ export default H => {
       c.beginPath(); c.moveTo(x, y + 21); c.bezierCurveTo(x - 9, y + 20, x - 8, y + 8, x - 1, y + 1); c.bezierCurveTo(x + 1, y + 7, x + 6, y + 8, x + 6, y + 12); c.bezierCurveTo(x + 8, y + 17, x + 5, y + 21, x, y + 21); c.stroke(); }];
   const dish = r => -.6 - .6 * (1 - Math.min(1, (r / 5.7)) ** 2);
   EX.forEach((x, i) => {
-    add(g, lathe([[ER, .02], [ER - .15, -.04], [6.05, -.6], [6.0, -.72]], ringM), mm(x), mm(EY), FZ);              // matte grey conical bezel, meets the button
+    const ring = add(g, lathe([[ER, .02], [ER - .15, -.04], [6.05, -.6], [6.0, -.72]], ringM.clone()), mm(x), mm(EY), FZ); ring.name = ['police', 'medical', 'fire'][i] + 'Ring'; parts.statusIcons.push(ring);   // glows red when active              // matte grey conical bezel, meets the button
     const prof = [[6.0, -.72], [5.92, -.63], [5.75, -.6]]; for (let k = 1; k <= 10; k++) { const r = 5.7 * (1 - k / 10); prof.push([r, dish(r)]); }
     { const btn = add(g, lathe(prof, keyMV), mm(x), mm(EY), FZ);   // half-strength lower-left shade (about 4%), baked
       const pa = btn.geometry.attributes.position, col = [];
@@ -118,8 +120,9 @@ export default H => {
   /* ---------- downcast light (bottom face) and buzzer holes (right side) ---------- */
   { const sh = new THREE.Shape(rrPts(mm(40), mm(2), mm(1)).map(([a, b]) => new THREE.Vector2(a, b)));
     const geo = new THREE.ExtrudeGeometry(sh, { depth: mm(.2), bevelEnabled: false });
-    const m = new THREE.Mesh(geo, lightM); m.rotation.x = Math.PI / 2 - .046; add(g, m, 0, mm(-74.89 - .02 + .2), mm(5)); }   // on the underside surface (inset 0.16 mm at z 5), 0.02 mm proud
+    const m = new THREE.Mesh(geo, lightM); parts.slot = m; m.rotation.x = Math.PI / 2 - .046; add(g, m, 0, mm(-74.89 - .02 + .2), mm(5)); }   // on the underside surface (inset 0.16 mm at z 5), 0.02 mm proud
   for (let k = -1; k <= 1; k++) { const h = new THREE.Mesh(new THREE.CylinderGeometry(mm(.5), mm(.5), mm(.6), 20), holeM); h.scale.set(1.6, 1, 1); h.rotation.z = Math.PI / 2; h.rotation.y = -.046;
     add(g, h, mm(39.84 - .25), mm(-3 + k * 2.8), mm(5)); }
+  g.userData.parts = parts;
   return g;
 };

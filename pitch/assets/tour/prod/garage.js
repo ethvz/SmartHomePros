@@ -74,7 +74,7 @@ export default H => {
   for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
   add(g, ringMesh(rings.slice(0, nBody), bodyM, false, true));
   { // hole walls and floor: same white plastic, darkened toward the floor (baked ambient occlusion) like the shadowed well in the photos
-    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0x8f8c72, roughness: .6, envMapIntensity: .5, vertexColors: true }), true, false);
+    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0x938d82, roughness: .6, envMapIntensity: .5, vertexColors: true }), true, false);
     const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
     const n = hole.length;
     for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), top = Math.max(0, (pa.getY(i) - mm(PC[1])) / mm(HW / 2));
@@ -85,16 +85,17 @@ export default H => {
     wm.geometry.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); add(g, wm); }
 
   /* ---------- LED board, 12 separate SMD packages, clear lens ---------- */
+  const parts = { leds: [], buttons: [] };                              // interactive hooks for the 3D Home demo (group.userData.parts)
   const lc = [0, mm(PC[1])], faceC = dome(0, PC[1]);
   add(g, H.rslab(mm(15.4), mm(13.6), mm(.6), mm(.8), mm(.15), boardM), lc[0], lc[1], mm(ZF + .3));
   for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = mm((c - 1.5) * 3.9), y = lc[1] + mm((1 - r) * 4.6);
     add(g, H.rslab(mm(3.0), mm(3.4), mm(.5), mm(.25), mm(.1), ledFrameM), x, y, mm(ZF + .85));
-    add(g, H.rslab(mm(2.4), mm(2.8), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
+    parts.leds.push(add(g, H.rslab(mm(2.4), mm(2.8), mm(.2), mm(.2), mm(.05), ledM.clone()), x, y, mm(ZF + 1.06))); }   // own material per LED (light on = emissive up)
   { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.4), lensM); lens.castShadow = false; lens.renderOrder = 2; lens.material = [lensM, new THREE.MeshPhysicalMaterial({ color: 0x8c9090, roughness: .2, clearcoat: .5 })];   // caps clear, sides show the block's thickness
     add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25));
-    const bev = new THREE.Mesh(new THREE.ShapeGeometry((() => { const o = new THREE.Shape(rrPts(mm(24), mm(24), mm(5.5)).map(([a, b]) => new THREE.Vector2(a, b))); o.holes.push(new THREE.Path(rrPts(mm(23.2), mm(23.2), mm(5.1)).map(([a, b]) => new THREE.Vector2(a, b)))); return o; })()),
-      new THREE.MeshStandardMaterial({ color: 0xf4f4f4, roughness: .2, transparent: true, opacity: .75 }));
-    add(g, bev, lc[0], lc[1], mm(faceC - 4 + .01)); }   // the lens's bright 0.4 mm bevel edge
+    const bev = new THREE.Mesh(new THREE.ShapeGeometry((() => { const o = new THREE.Shape(rrPts(mm(24), mm(24), mm(5.5)).map(([a, b]) => new THREE.Vector2(a, b))); o.holes.push(new THREE.Path(rrPts(mm(23.7), mm(23.7), mm(5.35)).map(([a, b]) => new THREE.Vector2(a, b)))); return o; })()),
+      new THREE.MeshStandardMaterial({ color: 0xcfcbc2, roughness: .3, transparent: true, opacity: .6 }));
+    add(g, bev, lc[0], lc[1], mm(faceC - 4 + .01)); }   // the lens's 0.15 mm bevel edge
 
   /* ---------- printing (conformed to the dome) ---------- */
   const printAt = (cx, cy, w, h, draw) => add(g, conform(printPlane(mm(w), mm(h), draw), (px, py) => mm(dome(cx + px * 1000, cy + py * 1000))), mm(cx), mm(cy), 0);
@@ -132,7 +133,7 @@ export default H => {
     bg.rotation.x = Math.atan((dome(bx, by + .5) - dome(bx, by - .5)) / 1); bg.rotation.y = -Math.atan((dome(bx + .5, by) - dome(bx - .5, by)) / 1);
     { const sh = new THREE.Shape(rrPts(mm(6.6), mm(10.6), mm(3.3)).map(([a, b]) => new THREE.Vector2(a, b))), hp = new THREE.Path(rrPts(mm(6.0), mm(10.0), mm(3.0)).map(([a, b]) => new THREE.Vector2(a, b)));
       sh.holes.push(hp); add(bg, new THREE.Mesh(new THREE.ShapeGeometry(sh), outlineM), 0, 0, mm(.03)); }   // single crisp groove line
-    add(bg, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM), 0, 0, mm(-.02));
+    const bm = add(bg, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM.clone()), 0, 0, mm(-.02)); bm.name = ['btnClose', 'btnLight', 'btnOpen'][i]; parts.buttons.push(bm);
     add(bg, conform(printPlane(mm(5), mm(8), (c, P) => { c.strokeStyle = '#777'; c.lineWidth = 2.4; const [x, y] = P(0, mm(-1.2)); icon[i](c, x, y); }), () => mm(.32)), 0, 0, mm(-.02)); });
 
   /* ---------- power cord: ribbed boot out of the right side, white cord down the wall ---------- */
@@ -145,5 +146,6 @@ export default H => {
     const curve = new THREE.CatmullRomCurve3([[63.6, -1.5, 6.5], [67, -3.5, 6.0], [69.5, -11, 5.2], [70.5, -25, 3.2], [70.6, -50, 2.0], [70.4, -80, 1.9]].map(([x, y, z]) => new THREE.Vector3(mm(x), mm(y), mm(z))));
     const cord = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, mm(1.5), 16, false), cordM); cord.castShadow = true; cord.scale.z = .55; add(g, cord);   // flat twin-lead
     if (new URLSearchParams(location.search).get('part') === 'nocord') { g.remove(cord); g.remove(boot); g.remove(sock); } }   // DEBUG
+  g.userData.parts = parts;
   return g;
 };

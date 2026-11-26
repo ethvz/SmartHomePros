@@ -52,7 +52,7 @@ export default H => {
     s.absarc(cx, cy+e, r, 0, Math.PI, false); s.absarc(cx, cy-e, r, Math.PI, 2*Math.PI, false); return s; };
 
   /* ---- materials */
-  const cover = new THREE.MeshPhysicalMaterial({color:0xd6d6d4, roughness:.7, sheen:.15, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.08, clearcoatRoughness:.35});
+  const cover = new THREE.MeshPhysicalMaterial({color:0xbababa, roughness:.7, sheen:.15, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.08, clearcoatRoughness:.35});
   const coverSide = cover.clone(); coverSide.color.set(0xffffff); coverSide.vertexColors = true;          // side band greyer than the face, blending over the roll
   const housing = new THREE.MeshPhysicalMaterial({color:0xdddddb, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
   const groove = new THREE.MeshStandardMaterial({color:0x666666, roughness:.8});
@@ -72,7 +72,7 @@ export default H => {
   add(g, sweep(P, [[1, 14.2], [1, 15.9]], groove));
   add(g, sweep(P, [[1, 15.9], [.22, 15.9]], groove));
   /* ---- front cover z 15.9 -> 22.9, flush side wall, 3.5 mm soft front roll, flat face */
-  { const cS = new THREE.Color(0xcacac8), cF = new THREE.Color(0xd6d6d4), tmp = new THREE.Color();
+  { const cS = new THREE.Color(0xaeaeac), cF = new THREE.Color(0xbababa), tmp = new THREE.Color();
     add(g, sweep(P, [[.22, 15.9], [.07, 15.97], [0, 16.15], ...arc(0, 19.4, 3.5, D, 12)], coverSide, null, (xx, yy, z) => { const f = Math.min(1, Math.max(0, (z - 19.4)/3.5)); tmp.copy(cS).lerp(cF, f*f); return [tmp.r, tmp.g, tmp.b]; })); }
   add(g, cap(P, 3.5, D, cover, true));
 
@@ -98,7 +98,7 @@ export default H => {
     const chev = (cy, up) => { const s = up ? 1 : -1; x.beginPath(); x.moveTo(X(-2.85), Y(cy - 1.4*s)); x.lineTo(X(0), Y(cy + 1.4*s)); x.lineTo(X(2.85), Y(cy - 1.4*s)); x.stroke(); };
     const flake = (cx, cy, r) => { for(let i=0;i<6;i++){ const a = Math.PI/2 + i*Math.PI/3, ca = Math.cos(a), sa = Math.sin(a);
         x.beginPath(); x.moveTo(X(cx), Y(cy)); x.lineTo(X(cx + ca*r), Y(cy + sa*r)); x.stroke();
-        for(const f of [.55, .8]) for(const sg of [-1, 1]){ const bx = cx + ca*r*f, by = cy + sa*r*f, b = a + sg*.8, L = r*(f < .7 ? .27 : .18);
+        for(const f of [.66]) for(const sg of [-1, 1]){ const bx = cx + ca*r*f, by = cy + sa*r*f, b = a + sg*.75, L = r*.3;
           x.beginPath(); x.moveTo(X(bx), Y(by)); x.lineTo(X(bx + Math.cos(b)*L), Y(by + Math.sin(b)*L)); x.stroke(); } } };
     const num = (s, cx, cy, capH, wT, wt) => {            // digits sized by cap height and total ink width, tight tracking
       x.font = `${wt} 100px ${F}`; const asc = x.measureText('7').actualBoundingBoxAscent || 70, fs = 100*capH*10/asc; x.font = `${wt} ${fs}px ${F}`;
@@ -115,15 +115,16 @@ export default H => {
     const small = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
       x.lineWidth = 3; if(ST.mode === 'cool') flake(0, 18.3, 3.85); else if(ST.mode === 'heat') flame(0, 18.3, 7.7);
       if(ST.mode !== 'off') num(String(Math.round(ST.setpoint)), 0, -13.2, 6.0, 9.4, 400); };
-    const draw = () => { x.clearRect(0, 0, N, N); if(!ST.display){ t && (t.needsUpdate = true); return; }
+    const draw = () => { x.clearRect(0, 0, N, N); x.fillStyle = 'rgba(255,255,255,0.004)'; x.fillRect(0, 0, N, N);   // white (near-zero alpha) under everything so edge texels filter to white, not grey
+      if(!ST.display){ t && (t.needsUpdate = true); return; }
       const halo = (fn, blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4096; x.shadowColor = col; x.shadowBlur = blur; fn(); x.restore(); };   // shadow only, glyphs stay thin
       halo(big, 34, 'rgba(255,255,255,.75)'); halo(big, 12, 'rgba(255,255,255,.6)');
-      x.save(); x.filter = 'blur(2px)'; x.globalAlpha = .6; big(); small(); x.restore();            // light diffused through the dead-front
+      x.save(); x.filter = 'blur(2px)'; x.globalAlpha = .6; big(); x.restore();            // light diffused through the dead-front
       big(); small(); };
     let t = null; draw();
-    t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16; t.premultiplyAlpha = true; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter;
+    t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter;
     if(document.fonts) Promise.all(['300', '400', '500'].map(w => document.fonts.load(`${w} 60px "Vivint Sans"`))).then(() => { draw(); t.needsUpdate = true; }).catch(() => {});
-    const m = new THREE.MeshBasicMaterial({map:t, transparent:true, blending:THREE.CustomBlending, blendSrc:THREE.OneFactor, blendDst:THREE.OneMinusSrcAlphaFactor, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
+    const m = new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
     const dispMesh = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), m), 0, 0, (D + .03)*k);
     var display = { mesh:dispMesh, texture:t, canvas:cv, state:ST, redraw:() => { draw(); t.needsUpdate = true; } }; }
 
