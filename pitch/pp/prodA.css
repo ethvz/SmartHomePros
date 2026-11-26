@@ -332,3 +332,8 @@ html.pp #prScroll .strip.wide>.dws::before{content:"";position:absolute;left:0;r
 html.pp #prScroll .dws-t{z-index:2}
 html.pp #prScroll .dws-t h1{color:#fff!important;text-shadow:0 2px 24px rgba(0,0,0,.4)}
 html.pp #prScroll .strip.wide>.dws{background:#000}
+/* Smart Hub Hardware | Specs pill: centred like every other product page; long spec names wrap instead of running into the value */
+html.pp #p-hub #hbScroll .otab.fb>.fsp{left:50%!important;margin-left:-140px!important;bottom:96px!important}
+html.pp #p-hub #hbSpec .hbspec div b{width:200px!important;padding-right:14px;box-sizing:border-box}
+/* Door & Window Specs: the Surface / Recessed toggle sits above the pill, so the copy starts above the toggle */
+html.pp #prScroll .psec[data-t=specs]:has(.hl .dwseg) .fsp-pane{padding-bottom:276px!important}
