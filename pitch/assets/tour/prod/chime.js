@@ -52,15 +52,15 @@ export default H => {
   const prof = [];
   for(let i=0;i<=16;i++){ const t = i/16*Math.PI/2, c = 10.5, p = 1.8;                     // inset vs z round the back edge
     const u = Math.cos(t)**(2/p), v = Math.sin(t)**(2/p); prof.push([c*(1-v), c*(1-u)]); }
-  prof.push([0, 11.4], [0, 18.4], [0, 29.3]);
-  for(let i=1;i<=10;i++){ const t = i/10*Math.PI/2; prof.push([1.2*(1-Math.cos(t)), 29.3 + 2.0*Math.sin(t)]); }  // ~R2 front roll up to the rim crest
-  prof.push([1.38, 31.32], [1.5, 31.28]);                                                                         // soft crest
+  prof.push([0, 11.4], [0, 18.4], [0, 30.8]);
+  for(let i=1;i<=8;i++){ const t = i/8*Math.PI/2; prof.push([.5*(1-Math.cos(t)), 30.8 + .5*Math.sin(t)]); }       // R0.5 front roll to the crest near the outer edge
   const win = (mx, my, mz) => mx < -W/2 + .01 && Math.abs(my) < 12.5 && mz > 11.4 && mz < 18.4;
   add(g, cap(P, 10.5, 0, shell, false));
   add(g, sweep(P, prof, shell, win));
-  const innerWall = new THREE.MeshPhysicalMaterial({color:0x9a9a98, roughness:.55, clearcoat:.1});
-  add(g, sweep(P, [[1.5, 31.28], [1.62, 31.12], [1.85, 30.75], [2.1, 30.3], [2.1, 30.1]], innerWall));        // grey inward-sloping wall from the crest down to the fabric
-  add(g, sweep(P, [[2.1, 30.1], [2.7, 30.1]], dark));                                                          // dark gap floor at the foot of the wall
+  const bezel = new THREE.MeshPhysicalMaterial({color:0xc2c2c0, roughness:.6, clearcoat:.08});
+  add(g, sweep(P, [[.5, 31.3], [1.85, 30.2]], bezel));                                                         // straight bezel sloping down and in from the crest to the fabric
+  add(g, sweep(P, [[1.85, 30.2], [1.85, 30.0]], dark));
+  add(g, sweep(P, [[1.85, 30.0], [2.6, 30.0]], dark));                                                         // dark floor (the hairline gap) at the bezel foot
 
   /* ---- fabric grille: inset 2.0, face 0.5 mm below the rim crest, edge wrapped soft */
   { const N = 2048, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
@@ -73,28 +73,28 @@ export default H => {
       const cx = q*cw + cw/2, cy = r*rh + rh/2, h = heather(cx, cy);
       for(const side of [-1, 1]){                                                                  // two interlocking loops per stitch, nearly vertical
         const roll = rnd(); let v = 200 + rnd()*14; if(roll < .04) v = 172 + rnd()*12; else if(roll > .94) v = 236 + rnd()*14; v *= h;
-        x.save(); x.translate(cx + side*cw*.2, cy); x.rotate(side*.25);
-        const gr = x.createLinearGradient(-cw*.22, 0, cw*.22, 0), e = `rgb(${v*.55|0},${v*.55|0},${v*.55|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
+        x.save(); x.translate(cx + side*cw*.2 + (rnd() - .5)*2*.08*N/T, cy); x.rotate(side*.25);
+        const gr = x.createLinearGradient(-cw*.23, 0, cw*.23, 0), e = `rgb(${v*.8|0},${v*.8|0},${v*.8|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
         gr.addColorStop(0, e); gr.addColorStop(.5, m); gr.addColorStop(1, e);
-        x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.19, rh*.66, 0, 0, TAU); x.fill(); x.restore(); }
-      x.fillStyle = '#1e1e1e'; x.beginPath(); x.ellipse(q*cw, cy + rh/2, cw*.17, rh*.42, 0, 0, TAU); x.fill();   // see-through slit pore between columns (0.25 x 0.45 mm)
+        x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.23, rh*.75, 0, 0, TAU); x.fill(); x.restore(); }
+      if(rnd() < .7){ x.fillStyle = '#262626'; x.beginPath(); x.ellipse(q*cw, cy + rh/2 + (q%2)*rh/2, cw*.12, rh*.55, 0, 0, TAU); x.fill(); }   // staggered, irregular slit pores   // see-through slit pore between columns (0.25 x 0.45 mm)
     }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/T, 1/T); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
     const fab = new THREE.MeshPhysicalMaterial({color:0xc2c2c2, map:t, bumpMap:bt, bumpScale:1.5, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
     const b = .3, fg = new THREE.ExtrudeGeometry(offsetShape(P, 2.1), {depth:.9-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:4, curveSegments:24});
-    fg.translate(0, 0, 29.4 + b); fg.scale(k, k, k); const fm = add(g, new THREE.Mesh(fg, fab)); fm.receiveShadow = true; }
+    fg.translate(0, 0, 29.2 + b); fg.scale(k, k, k); const fm = add(g, new THREE.Mesh(fg, fab)); fm.receiveShadow = true; }
 
   /* ---- status LED behind the fabric, top centre (lit: soft white dot diffused through the weave; nothing protrudes) */
   { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), mm = 128/4;     // 4 mm plane, 32 px/mm
-    const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(.35, 'rgba(255,255,255,.25)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,.22)'); gr.addColorStop(.35, 'rgba(255,255,255,.1)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
     x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
     x.globalCompositeOperation = 'lighter';                                                          // light escaping through the slit pores, strongest in the ~2 mm core
     for(let cy=-.3; cy<4.3; cy+=.6) for(let cx=0; cx<4.3; cx+=.85){ const d = Math.hypot(cx-2, cy-2), a = Math.max(0, 1 - d/1.6);
       if(a <= 0) continue; x.fillStyle = `rgba(255,255,255,${a})`; x.beginPath(); x.ellipse(cx*mm, cy*mm, .14*mm, .24*mm, 0, 0, Math.PI*2); x.fill(); }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
     const led = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.004, .004), new THREE.MeshBasicMaterial({map:t, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, opacity:.3*2,
-      polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3})), 0, (Ht/2 - 10)*k, (30.3 + .02)*k); led.renderOrder = 3;
+      polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3})), 0, (Ht/2 - 10)*k, (30.1 + .02)*k); led.renderOrder = 3;
     g.userData.parts = { led: { mesh:led, material:led.material, setColor(hex){ led.material.color.set(hex); }, setIntensity(v){ led.material.opacity = .6*v; led.visible = v > 0; } } }; }
 
   /* ---- left-side button: pill 21 x 5, 0.4 mm groove, cap 0.15 mm below the wall */
@@ -121,8 +121,8 @@ export default H => {
   { const bc = document.createElement('canvas'); bc.width = 16; bc.height = 256; const bx = bc.getContext('2d');      // brushed grain along the blade length
     let sd = 5; const rr = () => (sd = (sd*16807) % 2147483647) / 2147483647;
     for(let y=0;y<256;y++){ const v = 150 + rr()*90 | 0; bx.fillStyle = `rgb(${v},${v},${v})`; bx.fillRect(0, y, 16, 1); }
-    const brush = new THREE.CanvasTexture(bc); brush.wrapS = brush.wrapT = THREE.RepeatWrapping; brush.repeat.set(1/20, 1/2.5);
-    const nickel = new THREE.MeshPhysicalMaterial({color:0xc8c8c8, metalness:.75, roughness:.38, roughnessMap:brush, bumpMap:brush, bumpScale:.4, clearcoat:.15});
+    const brush = new THREE.CanvasTexture(bc); brush.wrapS = brush.wrapT = THREE.RepeatWrapping; brush.repeat.set(1/20, 1/40);
+    const nickel = new THREE.MeshPhysicalMaterial({color:0xe0e0de, metalness:.55, roughness:.3, roughnessMap:brush, bumpMap:brush, bumpScale:.15, clearcoat:.15});
     for(const sx of [-1, 1]){ const s = new THREE.Shape(), L = 16.5, h = 3.2, r = 1.2;              // (u = distance from the back face, v = y)
       s.moveTo(-.5, -h); s.lineTo(L-r, -h); s.absarc(L-r, -h+r, r, -Math.PI/2, 0, false); s.lineTo(L, h-r); s.absarc(L-r, h-r, r, 0, Math.PI/2, false); s.lineTo(-.5, h); s.closePath();
       const hole = new THREE.Path(); hole.absarc(L-4, 0, 1.5, 0, Math.PI*2, true); s.holes.push(hole);

@@ -137,7 +137,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmCap button{height:40px;padding:0 16px;border-radius:20px;background:rgba(255,255,255,.1);font-weight:600;font-size:14px;flex:none}
 #dmCap.alarm .st i.cur{box-shadow:inset 0 0 0 2px #ff3b30}
 #dmShieldRun{position:fixed;inset:0;z-index:9}
-#dmRed{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .6s;box-shadow:inset 0 0 160px 30px rgba(255,36,24,.75)}
+#dmRed{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .6s;box-shadow:inset 0 0 min(160px,18vmin) min(30px,3vmin) rgba(255,36,24,.75)}
 #dmRed.on{opacity:1;animation:dmRedP 1.1s ease-in-out infinite}
 @keyframes dmRedP{50%{opacity:.35}}
 #dmShieldRun[hidden]{display:none}
@@ -392,6 +392,8 @@ function showDock(on){ if(on){ emu(); EMU.docked = true; hubEl.classList.remove(
 async function toPip(){ if(!hubEl.classList.contains('vis')) { hubEl.style.transition = 'none'; hubEl.style.transform = pipMatrix(); hubEl.classList.add('pip'); void hubEl.offsetWidth; hubEl.style.transition = ''; hubEl.classList.add('vis'); EMU.docked = false; perFrame.delete(dockStep); return; }
   EMU.docked = false; perFrame.delete(dockStep); hubEl.classList.remove('live'); hubEl.classList.add('pip');
   hubEl.style.transition = 'transform .8s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = pipMatrix(); EMU.mx = ''; await wait(.8); }
+/* end of an automation: pull back to the whole home, unless we are about to return to the hub or a product anyway */
+function finale(){ const b = MODE.back; return b && (b.kind || b.focus) ? wait(.4) : fly(SH.home()); }
 async function atHub(){ await fly(SH.hub()); if(!SKIP.on) await toDock(); }
 async function offHub(){ if(EMU.docked && !SKIP.on) await toPip(); }
 async function toDock(){ const m = dockMatrix(); if(!m){ showDock(false); return; }
@@ -559,7 +561,7 @@ function automation(name, o = {}){
     if(away){ capStep(2, 'Lights off'); await fly(SH.great()); await LIT.to(.15, 1.6);
       capStep(3, `Eco mode ${ECO}°`); await fly(SH.therm()); await TH.to(ECO, 'cool'); HUBDO.therm(); await wait(.5); }
     capStep(away ? 4 : 2, away ? 'Armed Away' : 'Armed Stay'); await atHub(); HUBDO.home(); HUBDO.arm(name); paintArm(); await wait(1.6);
-    capDone(away ? 'Armed Away' : 'Armed Stay'); await offHub(); await fly(SH.home()); });
+    capDone(away ? 'Armed Away' : 'Armed Stay'); await offHub(); await finale(); });
   if(name === 'welcome') return sequence('welcome', async () => {
     const armed = M.arm !== 'dis';
     caption('Automation', 'Welcome Home', ['keys', 'shield', 'unlock', 'door', 'bulb', 'temp']);
@@ -584,7 +586,7 @@ function automation(name, o = {}){
     capStep(2, 'Lights off'); await fly(SH.great()); await LIT.to(.15, 1.8);
     capStep(3, 'Sleep 68°'); await fly(SH.therm()); M.th.cur = Math.max(M.th.cur, 72); await TH.to(68, 'cool'); HUBDO.therm(); await wait(.5);
     capStep(4, 'Armed Stay'); await atHub(); HUBDO.home(); M.arm = 'stay'; HUBDO.arm('stay'); paintArm(); await wait(1.6); await offHub();
-    capDone('Goodnight'); await fly(SH.home()); });
+    capDone('Goodnight'); await finale(); });
   if(name === 'smoke') return sequence('smoke', async () => {
     caption('Life safety', 'Smoke detected', ['fire', 'bell', 'bulb', 'temp', 'unlock'], true);
     capStep(0); setFill(1.4, RED); await fly(SH.smoke()); SMOKE.on(); await wait(1.6);
@@ -611,4 +613,4 @@ addEventListener('resize', () => { if(MODE.kind === 'panel' && !MODE.run){ const
 
 /* ------------------------------------------------------------------ boot */
 DOOR.init(); GAR.init(); TH.paint(); paintArm(); syncAct();
-window.__demo = { M, MODE, EMU, automation, device, enterPanel, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };
+window.__demo = { stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, automation, device, enterPanel, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };

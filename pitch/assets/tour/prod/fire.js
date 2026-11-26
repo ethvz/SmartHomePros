@@ -7,7 +7,7 @@ export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
   const W = 43.4, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3.0, NW = 4.5, ND = .5;
-  const white = new THREE.MeshPhysicalMaterial({ color: 0xececee, roughness: .38, clearcoat: .35, clearcoatRoughness: .28 });
+  const white = new THREE.MeshPhysicalMaterial({ color: 0xd6d6db, roughness: .38, clearcoat: .35, clearcoatRoughness: .28 });
 
   // chamfered outline from y0 to y1; chTop/chBot: corner chamfers; notch: the 9 x 0.5 mm top-edge notch
   const outline = (y0, y1, chTop, chBot, notch) => { const s = new THREE.Shape();
@@ -17,7 +17,7 @@ export default H => {
     s.lineTo(-X + (chTop ? C : 0), y1); if (chTop) s.lineTo(-X, y1 - C);
     s.lineTo(-X, y0 + (chBot ? C : 0)); s.closePath(); return s; };
 
-  const PH = Y - 27.8, RIB = Y - 7.6;                    // pinhole 27.8 mm below the top; face plate stops 7.6 mm below the top
+  const PH = Y - 27.8, RIB = Y - 7.3;                    // pinhole 27.8 mm below the top; face plate stops 7.6 mm below the top
   // rear solid: z 0 .. 20, back perimeter R 0.5
   add(g, ext(outline(-Y, Y, true, true, true), 20, .5, white));
 
@@ -29,8 +29,11 @@ export default H => {
     t.repeat.set(1 / 4, 1 / 4); t.offset.set(2 / 4, (2 - PH) / 4); return t; })();
   const pm = splitMat(white, white, 'y', Y - 38, .22, 0xdcdddb); pm.alphaMap = mask; pm.alphaTest = .5;
   { const bs = 3.8, bt = 1.4, d = 16.6, nose = 2.3;
-    const ge = new THREE.ExtrudeGeometry(outline(-Y, RIB, false, true), { depth: d - 2 * bt, bevelEnabled: true, bevelThickness: bt,
-      bevelSize: bs, bevelOffset: -bs, bevelSegments: 3, curveSegments: 12 });
+    const ps = new THREE.Shape(), Rc = 4.2;               // plate outline: bottom chamfers, top corners rounded so the nose band has round ends
+    ps.moveTo(-X + C, -Y); ps.lineTo(X - C, -Y); ps.lineTo(X, -Y + C); ps.lineTo(X, RIB - Rc); ps.absarc(X - Rc, RIB - Rc, Rc, 0, Math.PI / 2, false);
+    ps.lineTo(-X + Rc, RIB); ps.absarc(-X + Rc, RIB - Rc, Rc, Math.PI / 2, Math.PI, false); ps.lineTo(-X, -Y + C); ps.closePath();
+    const ge = new THREE.ExtrudeGeometry(ps, { depth: d - 2 * bt, bevelEnabled: true, bevelThickness: bt,
+      bevelSize: bs, bevelOffset: -bs, bevelSegments: 3, curveSegments: 16 });
     ge.translate(0, 0, bt);
     const p = ge.attributes.position;                    // squeeze the top-edge roll from 3.8 mm to the 1 mm nose
     for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y > RIB - bs - 1e-4) p.setY(i, RIB - (RIB - y) * nose / bs); }

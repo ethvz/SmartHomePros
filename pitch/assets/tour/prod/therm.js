@@ -33,7 +33,7 @@ export default H => {
       if(skip){ const mx = (P[i][0]+P[i2][0])/2, my = (P[i][1]+P[i2][1])/2, mz = (prof[j][1]+prof[j+1][1])/2; if(skip(mx, my, mz)) continue; }
       const a = j*N+i, b = j*N+i2, c = (j+1)*N+i2, d = (j+1)*N+i; idx.push(a,b,d, b,c,d); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    if(colFn) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    if(colFn) g.setAttribute('color', new THREE.Float32BufferAttribute(col, col.length/(prof.length*N)));   // rgb or rgba
     g.setIndex(idx); g.computeVertexNormals(); const x = new THREE.Mesh(g, m); x.castShadow = x.receiveShadow = true; return x;
   }
   /* flat cap over the outline inset by `ins` at height z; front = faces +z */
@@ -54,7 +54,7 @@ export default H => {
   /* ---- materials */
   const cover = new THREE.MeshPhysicalMaterial({color:0xbababa, roughness:.7, sheen:.15, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.08, clearcoatRoughness:.35});
   const coverSide = cover.clone(); coverSide.color.set(0xffffff); coverSide.vertexColors = true;          // side band greyer than the face, blending over the roll
-  const housing = new THREE.MeshPhysicalMaterial({color:0xdddddb, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
+  const housing = new THREE.MeshPhysicalMaterial({color:0xcacac8, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
   const groove = new THREE.MeshStandardMaterial({color:0x666666, roughness:.8});
   const pocketM = housing.clone(); pocketM.side = THREE.DoubleSide;
   const hidden = new THREE.MeshBasicMaterial({visible:false});
@@ -72,7 +72,7 @@ export default H => {
   add(g, sweep(P, [[1, 14.2], [1, 15.9]], groove));
   add(g, sweep(P, [[1, 15.9], [.22, 15.9]], groove));
   /* ---- front cover z 15.9 -> 22.9, flush side wall, 3.5 mm soft front roll, flat face */
-  { const cS = new THREE.Color(0xaeaeac), cF = new THREE.Color(0xbababa), tmp = new THREE.Color();
+  { const cS = new THREE.Color(0x9c9c9a), cF = new THREE.Color(0xbababa), tmp = new THREE.Color();
     add(g, sweep(P, [[.22, 15.9], [.07, 15.97], [0, 16.15], ...arc(0, 19.4, 3.5, D, 12)], coverSide, null, (xx, yy, z) => { const f = Math.min(1, Math.max(0, (z - 19.4)/3.5)); tmp.copy(cS).lerp(cF, f*f); return [tmp.r, tmp.g, tmp.b]; })); }
   add(g, cap(P, 3.5, D, cover, true));
 
@@ -85,12 +85,12 @@ export default H => {
       for(let i=0;i<n;i++){ const j = (i+1)%n; idx.push(i, j, n+i, j, n+j, n+i); }
       const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); gg.setIndex(idx); gg.computeVertexNormals();
       return new THREE.Mesh(gg, m); };
-    const chamM = new THREE.MeshStandardMaterial({color:0xc4c4c2, roughness:.6, side:THREE.DoubleSide});
+    const chamM = new THREE.MeshStandardMaterial({color:0xb0b0ae, roughness:.75, side:THREE.DoubleSide});
     add(b, band(pill(7.7, 13.7), 0, pill(7.0, 13.0), -.35, chamM));                                   // chamfered lip
     add(b, band(pill(7.0, 13.0), -.35, pill(7.0, 13.0), -1.25, pocketM));                            // pocket wall, 0.9 deep
     const fg = new THREE.ShapeGeometry(pill(7.0, 13.0), 32); fg.scale(k,k,k); add(b, new THREE.Mesh(fg, new THREE.MeshStandardMaterial({color:0x9a9a98, roughness:.7})), 0, 0, -1.25*k);
-    const cb = .25, cg = new THREE.ExtrudeGeometry(pill(6, 12), {depth:.9-2*cb, bevelEnabled:true, bevelThickness:cb, bevelSize:cb, bevelOffset:-cb, bevelSegments:6, curveSegments:32});
-    cg.translate(0, 0, cb - .9 - .3); cg.scale(k,k,k); const cm = add(b, new THREE.Mesh(cg, housing)); cm.castShadow = cm.receiveShadow = true; }
+    const cb = .45, cg = new THREE.ExtrudeGeometry(pill(6, 12), {depth:.1, bevelEnabled:true, bevelThickness:cb, bevelSize:cb, bevelOffset:-cb, bevelSegments:6, curveSegments:32});
+    cg.translate(0, 0, cb - 1.0 - .3); cg.scale(k,k,k); const cm = add(b, new THREE.Mesh(cg, housing)); cm.castShadow = cm.receiveShadow = true; }
 
   /* ---- lit display: glyphs glowing white through the dead-front face (10 px per mm, 100 mm square) */
   { const N = 1000, cv = document.createElement('canvas'); cv.width = cv.height = 1024; const x = cv.getContext('2d'); x.setTransform(1.024, 0, 0, 1.024, 0, 0);   // 10 logical px per mm on a power-of-two canvas (mipmaps)
@@ -114,7 +114,7 @@ export default H => {
       x.lineWidth = 13; chev(46.5, true); chev(-46.5, false); num(String(Math.round(ST.current)), 0, 2.4, 15.6, String(Math.round(ST.current)).length > 1 ? 23.7 : 11, 300); };
     const small = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
       x.lineWidth = 3; if(ST.mode === 'cool') flake(0, 18.3, 3.85); else if(ST.mode === 'heat') flame(0, 18.3, 7.7);
-      if(ST.mode !== 'off') num(String(Math.round(ST.setpoint)), 0, -13.2, 6.0, 9.4, 400); };
+      if(ST.mode !== 'off') num(String(Math.round(ST.setpoint)), 0, -13.2, 6.0, 9.4, 500); };
     const draw = () => { x.clearRect(0, 0, N, N); x.fillStyle = 'rgba(255,255,255,0.004)'; x.fillRect(0, 0, N, N);   // white (near-zero alpha) under everything so edge texels filter to white, not grey
       if(!ST.display){ t && (t.needsUpdate = true); return; }
       const halo = (fn, blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4096; x.shadowColor = col; x.shadowBlur = blur; fn(); x.restore(); };   // shadow only, glyphs stay thin
@@ -123,7 +123,7 @@ export default H => {
       big(); small(); };
     let t = null; draw();
     t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter;
-    if(document.fonts) Promise.all(['300', '400', '500'].map(w => document.fonts.load(`${w} 60px "Vivint Sans"`))).then(() => { draw(); t.needsUpdate = true; }).catch(() => {});
+    if(document.fonts) Promise.all(['300', '400', '500', '600'].map(w => document.fonts.load(`${w} 60px "Vivint Sans"`))).then(() => { draw(); t.needsUpdate = true; }).catch(() => {});
     const m = new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
     const dispMesh = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), m), 0, 0, (D + .03)*k);
     var display = { mesh:dispMesh, texture:t, canvas:cv, state:ST, redraw:() => { draw(); t.needsUpdate = true; } }; }
@@ -138,23 +138,23 @@ export default H => {
       polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})), 0, -36.6*k, (D + .02)*k); }
 
   /* ---- status light: blue glow out of the BOTTOM of the groove only, strongest over the central ~70 mm */
-  { const blue = new THREE.Color(0x4c7dff), fall = x => { const a = Math.abs(x); return a < 30 ? 1 : a > 50 ? 0 : (t => 1 - t*t*(3-2*t))((a-30)/20); };
-    const colFn = (xx, y) => { const f = y < -W/2 + 3 ? fall(xx) : 0; return [f, f, f]; };          // falloff only; the colour lives on the material
-    const gm = new THREE.MeshBasicMaterial({color:blue, vertexColors:true, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-1});
+  { const blue = new THREE.Color(0x2060ff), fall = x => { const a = Math.abs(x); return a < 30 ? 1 : a > 50 ? 0 : (t => 1 - t*t*(3-2*t))((a-30)/20); };
+    const colFn = (xx, y) => { const f = y < -W/2 + 3 ? fall(xx) : 0; return [1, 1, 1, f]; };          // falloff as per-vertex alpha; the colour lives on the material
+    const gm = new THREE.MeshBasicMaterial({color:blue, vertexColors:true, transparent:true, opacity:.95, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-1});
     const bar = add(g, sweep(P, [[.98, 14.25], [.98, 15.85]], gm, (mx, my) => my > -W/2 + 3, colFn)); bar.castShadow = bar.receiveShadow = false;
-    const lip = add(g, sweep(P, [[.3, 14.2], [.95, 14.2]], gm, (mx, my) => my > -W/2 + 3, (xx, y, z) => colFn(xx, y).map(v => v*.3))); lip.castShadow = lip.receiveShadow = false;
+    const lip = add(g, sweep(P, [[.3, 14.2], [.95, 14.2]], gm, (mx, my) => my > -W/2 + 3, colFn)); lip.material = gm.clone(); lip.material.opacity = .35; lip.castShadow = lip.receiveShadow = false;
     // soft fan on the wall below
     const c = document.createElement('canvas'); c.width = 512; c.height = 192; const x = c.getContext('2d');
     x.save(); x.translate(256, 0); x.scale(1, .42); const gr = x.createRadialGradient(0, 0, 0, 0, 0, 250);
-    gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(.35, 'rgba(255,255,255,.3)'); gr.addColorStop(.7, 'rgba(255,255,255,.08)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    gr.addColorStop(0, 'rgba(255,255,255,.8)'); gr.addColorStop(.35, 'rgba(255,255,255,.45)'); gr.addColorStop(.7, 'rgba(255,255,255,.12)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
     x.fillStyle = gr; x.fillRect(-256, 0, 512, 460); x.restore();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-    const wash = new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({color:blue, map:t, transparent:true, depthWrite:false, toneMapped:false}));
-    wash.position.set(0, (-W/2 + 3 - 20.6)*k, .4*k); wash.renderOrder = 2;
+    const wash = new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({color:blue, map:t, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false}));
+    wash.position.set(0, (-W/2 + 2 - 20.65)*k, .4*k); wash.renderOrder = 2;
     bar.onBeforeRender = () => { if(!wash.parent) g.add(wash); };   // a wall effect: attached on the first frame so it stays out of the product's size/framing box
-    var led = { meshes:[bar, lip, wash], material:gm, washMaterial:wash.material, colors:{cool:0x4c7dff, heat:0xffa040},
-      setColor(hex){ gm.color.set(hex); wash.material.color.set(hex); },
-      setIntensity(v){ gm.opacity = v; wash.material.opacity = v; [bar, lip, wash].forEach(o => o.visible = v > 0); } };
+    var led = { meshes:[bar, lip, wash], material:gm, washMaterial:wash.material, colors:{cool:0x2060ff, heat:0xff6a10},
+      setColor(hex){ gm.color.set(hex); lip.material.color.set(hex); wash.material.color.set(hex); },
+      setIntensity(v){ gm.opacity = .95*v; lip.material.opacity = .35*v; wash.material.opacity = v; [bar, lip, wash].forEach(o => o.visible = v > 0); } };
   }
   /* ---- live state for the interactive demo: g.userData.parts.setState({mode:'cool'|'heat'|'off', setpoint, current, display}) */
   const setState = (o = {}) => { Object.assign(display.state, o); display.redraw();
