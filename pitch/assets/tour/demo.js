@@ -136,11 +136,11 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
   #card.dmHas .c-name{display:none!important}
   #card #dmAct{gap:4px;margin:0}
   #card #dmAct .t{display:none}
-  #card #dmAct .nm{display:block;font-size:12.5px;font-weight:700;color:#fff;margin:0 4px 0 2px;white-space:nowrap}
+  #card #dmAct .nm{display:block;font-size:11.5px;letter-spacing:-.01em;font-weight:700;color:#fff;margin:0 4px 0 2px;white-space:nowrap}
   #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
   #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock]{width:40px;padding:0;justify-content:center}
-  #card #dmAct button.rnd{width:36px;height:36px}
-  #card #dmAct .tv{min-width:42px;font-size:16px}
+  #card #dmAct button.rnd{width:34px;height:34px}
+  #card #dmAct .tv{min-width:40px;font-size:16px}
   #card #dmAct .tv small{font-size:8.5px;letter-spacing:.1em}
 }
 /* live caption while an automation plays */
@@ -273,7 +273,7 @@ const KEYC = new THREE.Color();
 /* Smart Lock: status LEDs, thumb-turn, keys; it rides on the front door when the door swings */
 const LOCK = {
   flash(hex, n = 2){ const leds = (parts('lock').led || []).concat(parts('lock').interiorLed || []);
-    return tween(.45*n, (e, k) => { const on = Math.sin(k*n*Math.PI) ** 2; leds.forEach(m => meshMats(m).forEach(x => { glowMat(x, hex, (hex === BAD ? 1.1 : 2.4)*on); if(x.color){ if(x.userData.c0 == null) x.userData.c0 = x.color.getHex(); x.color.setHex(on > .05 ? hex : x.userData.c0); } })); }, t => t); },
+    return tween(.45*n, (e, k) => { const on = Math.sin(k*n*Math.PI) ** 2; leds.forEach(m => meshMats(m).forEach(x => { const bad = hex === BAD; glowMat(x, bad ? 0xff0000 : hex, (bad ? .42 : 2.4)*on); if(x.color){ if(x.userData.c0 == null) x.userData.c0 = x.color.getHex(); x.color.setHex(on > .05 ? (bad ? 0x500000 : hex) : x.userData.c0); }   /* red stays red under ACES only at low brightness */ })); }, t => t); },
   async set(locked){ const t = parts('lock').turn; M.locked = locked; syncAct();
     const from = t ? t.rotation.z : 0, to = locked ? 0 : -Math.PI/2;
     await Promise.all([ t ? tween(.55, e => { t.rotation.z = from + (to - from)*e; }, easeIO) : Promise.resolve(), this.flash(locked ? 0xff7a1a : GREEN, 2) ]); },
