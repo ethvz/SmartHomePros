@@ -58,9 +58,13 @@
 .shpn-corner .shpn-logo svg { height: 20px; width: auto; display: block; fill: #fff; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55)); }
 .shpn-corner > button:active, .shpn-corner > button.pressed { transform: scale(.9); background-color: rgba(255, 255, 255, .1); }
 html.shpn-open .shpn-corner::before { opacity: 0; }
-/* the corner hides while something full screen is up (a video, a sheet that covers it) */
-.shpn-corner.off { opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .2s ease, transform .3s var(--shpn-e); }
-.shpn-corner.off > button { pointer-events: none; }
+/* HOOK: the corner hides while a full-screen sheet or modal is up. Any sheet calls
+   document.documentElement.classList.toggle('shp-sheet', open)   (or SHPNav.sheet(open)) when it opens / closes. */
+html.shp-sheet .shpn-corner, .shpn-corner.off { opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s ease, transform .3s var(--shpn-e); }
+html.shp-sheet .shpn-corner > button, .shpn-corner.off > button { pointer-events: none; }
+/* Fast Recruit: under its own overlays (pages opened over a page, section menus); above them only while its menu is open */
+html.shpn-recruit .shpn-corner { z-index: 95; }
+html.shpn-recruit.shpn-open .shpn-corner { z-index: 100001; }
 .shpn-corner:not(.off) { transition: opacity .25s ease, transform .35s var(--shpn-e); }
 
 /* ---------- menu card (SHP page) ---------- */
@@ -68,7 +72,7 @@ html.shpn-open .shpn-corner::before { opacity: 0; }
 .shpn-dw.on { visibility: visible; pointer-events: auto; }
 .shpn-scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); opacity: 0; transition: opacity .3s ease; }
 .shpn-dw.on .shpn-scrim { opacity: 1; }
-.shpn-card { position: absolute; left: var(--shpn-l); top: var(--shpn-t); bottom: calc(var(--shpn-foot) + 8px); width: min(460px, calc(100vw - 2 * var(--shpn-l)));
+.shpn-card { position: absolute; left: var(--shpn-l); bottom: calc(var(--shpn-foot) + 8px); max-height: calc(100% - var(--shpn-t) - var(--shpn-foot) - 8px); width: min(460px, calc(100vw - 2 * var(--shpn-l)));
   box-sizing: border-box; padding: 22px 20px 18px; border-radius: 30px; background: #121212; box-shadow: 0 30px 80px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .06);
   display: flex; flex-direction: column; overflow: hidden auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   clip-path: inset(var(--ct, 90%) var(--cr, 80%) var(--cb, 0px) var(--cl, 0px) round 30px); transition: clip-path .42s var(--shpn-e); }
@@ -104,6 +108,7 @@ html.shpn-open .shpn-corner::before { opacity: 0; }
 .shpn-leave.on { opacity: 1; pointer-events: auto; }
 
 @media (prefers-reduced-motion: reduce) {
+  html.shp-sheet .shpn-corner, .shpn-corner.off { transform: none; }
   .shpn-app, .shpn-corner > button, .shpn-x, .shpn-t { transition: background-color .15s ease, color .15s ease; }
   .shpn-app:active, .shpn-app.pressed, .shpn-corner > button:active, .shpn-corner > button.pressed, .shpn-x:active, .shpn-t:active { transform: none; }
   .shpn-app.nope { animation: none; }
@@ -117,6 +122,11 @@ html.shpn-open .shpn-corner::before { opacity: 0; }
 /* ======================= Fast Pitch (html.shpn-pitch): the selector in its menu (stage px) ======================= */
 #drawer .shpn-apps { font-size: 19px; margin: 0 0 16px; }
 #drawer .m2-app { display: none !important; }   /* the selector replaces the old "Switch app" button */
+/* landscape: the menu keeps its height, so its tiles give up a little room to the selector */
+html:not(.pp):not(.ipp) #drawer .shpn-apps { font-size: 16px; margin-bottom: 12px; }
+html:not(.pp):not(.ipp) #drawer .m2-t { height: 70px !important; }
+html:not(.pp):not(.ipp) #drawer .m2-s { height: 40px !important; }
+html:not(.pp):not(.ipp) #drawer .m2-l { margin: 14px 4px 4px !important; }
 html.pp #drawer .shpn-apps { font-size: 22px; margin: 0 0 14px; }
 html.pp #drawer .shpn-app span { white-space: normal; }
 @media (max-height: 700px) { html.pp #drawer .shpn-apps { font-size: 19px; margin-bottom: 10px; } }
@@ -128,8 +138,8 @@ html.ipp #drawer .shpn-apps { font-size: 20px; }
 
 /* ======================= Fast Recruit (html.shpn-recruit) ======================= */
 /* the header's own hamburger + logo move to the corner */
-html.shpn-recruit .board [data-name="Header"] [data-x="Menu button"],
-html.shpn-recruit .board [data-name="Header"] img[data-name="Vivint Logo"] { visibility: hidden !important; pointer-events: none !important; }
+html.shpn-recruit .board [data-x="Menu button"],
+html.shpn-recruit .board img[data-name="Vivint Logo"] { visibility: hidden !important; pointer-events: none !important; }
 html.shpn-recruit #phdr .ph-fix { display: none !important; }
 html.shpn-recruit #phdr .ph-scroll { padding-left: 8px; }
 /* status bar / Dynamic Island: the phone header starts below it */

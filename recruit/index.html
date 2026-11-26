@@ -122,7 +122,7 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .board nav.frscrub a { transform-origin: 36px 50%; }
   .board nav.frsettle a { transition: translate .3s cubic-bezier(.22,.9,.2,1), scale .3s cubic-bezier(.22,.9,.2,1); }
   /* pinned section backgrounds: one fixed layer of section photos behind the scrolling page (setupPin) */
-  .pinbg { position: absolute; left: 0; top: 0; width: var(--FW, 1466px); height: var(--H, 1024px); overflow: hidden; pointer-events: none; background: #000; }
+  .pinbg { position: absolute; left: 0; top: 0; z-index: 0; isolation: isolate; width: var(--FW, 1466px); height: var(--H, 1024px); overflow: hidden; pointer-events: none; background: #000; }
   .pinbg > .pbsec { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background: #000; opacity: 0; visibility: hidden; transform: scale(1.05);
     transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform 1.2s cubic-bezier(.2,.8,.2,1), visibility 0s linear .8s; }
   .pinbg > .pbsec.on { opacity: 1; visibility: visible; transform: none; transition: opacity .8s cubic-bezier(.2,.8,.2,1), transform 1.2s cubic-bezier(.2,.8,.2,1), visibility 0s; }
@@ -1239,8 +1239,8 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 // Phones: skip the live glass blur (it's what runs the Claude app out of memory, especially when zoomed in).
 try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim === 'phone' : Math.min(screen.width, screen.height) < 600) document.documentElement.classList.add('lite'); } catch (e) {}
 </script>
-<link rel="stylesheet" href="../nav/shpnav.css?v=f4a93772">
-<script src="../nav/shpnav.js?v=f4a93772" defer></script>
+<link rel="stylesheet" href="../nav/shpnav.css?v=ae05d976">
+<script src="../nav/shpnav.js?v=ae05d976" defer></script>
 </head>
 <body>
 <div id="stage"><div id="viewport"><div id="frame"></div></div></div>
@@ -3726,7 +3726,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
   // bottom only (the old fades on the left, top and right are taken away). Upright photos instead fill the right half of the
   // screen to its edge, fading in from the left. (Portrait screens keep their own layout.)
   const LBG_HALF = new Set(['opportunity', 'environment', 'swag', 'rookie-scenarios', 'preseason-projections', 'six-streams', 'pay-scales', 'override-calculator', 'positions']);
-  const LBG_SKIP = new Set(['awards', 'nrg', 'marketing', 'products', 'package-costs', 'sales-tools', 'schedule', 'vs-pest-control', 'vs-solar', 'vs-life-insurance']);
+  const LBG_SKIP = new Set(['awards', 'nrg', 'marketing', 'products', 'package-costs', 'sales-tools', 'schedule', 'vs-pest-control', 'vs-life-insurance']);
   const LBG_KEEP = new Set(['incentive-trips']);   // (its own sliding destination photos: only the fades change)
   const LBG_OV = /^(Scrim|Fade to black|Blend to black|Sky shade|Photo fade|Seam)$/;
   function landSec(sec) {

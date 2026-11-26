@@ -571,6 +571,9 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 .hscene::before { top: 0; height: calc(var(--sat) + clamp(120px, 16vmin, 170px)); background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.16) 60%, rgba(0,0,0,0)); }   /* header stays readable */
 .hscene::after { top: var(--ft, 52%); bottom: 0; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.62) 12%, rgba(0,0,0,.92) 30%, #000 48%); }   /* no hard edge into the sections */
 .more { background: #000; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; border-radius: 0; }
+/* at rest only the grab handle peeks; the first heading starts just below the fold, leaving the bottom-left corner
+   (shared Vivint logo + menu) clear. The peek is .hero's --peek: clamp(64px, 9vh, 92px). */
+.more .grab { margin-bottom: max(6px, calc(clamp(64px, 9vh, 92px) - 14px - clamp(16px, 2.6vmin, 26px))); }
 /* Conveyour: the presenter (40% across the square clip) centred in the tile at any tile shape */
 .card.book .ph { background: #1a1410; container-type: size; }
 .card.book .ph .pv { --s: max(124cqw, 100cqh); inset: auto; width: var(--s); height: var(--s); left: calc(50cqw - .405 * var(--s)); top: clamp(100cqh - var(--s), 40cqh - .36 * var(--s), 0px); }
@@ -578,6 +581,9 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 @media (orientation: portrait) and (min-width: 700px) {
   .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; height: clamp(300px, 29vh, 410px); }
   .calls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .card .nm { font-size: clamp(20px, 2.9vw, 30px); white-space: nowrap; }
+  .card .ln { font-size: 13px; }
+  .card .tag { display: none; }
 }
 </style>
 <link rel="stylesheet" href="nav/shpnav.css?v=1">
@@ -1426,7 +1432,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
   document.addEventListener('selectstart', function (e) { if (body.classList.contains('rearr')) e.preventDefault(); }, true);
 })();
 </script>
-<script src="connect/hero/hero.js?v=2" defer></script>
+<script src="connect/hero/hero.js?v=3" defer></script>
 <script src="connect/contacts.js?v=1" defer></script>
 <!-- shared navigation (corner logo + menu with the app selector): same in all three apps -->
 <script src="nav/shpnav.js?v=1" data-app="home" defer></script>

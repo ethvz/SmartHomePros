@@ -11,7 +11,8 @@ html.pp #stage{--ppB:8px;--ppFoot:84px;--ppHomeFoot:160px;--ppE:cubic-bezier(.2,
 html.pp #bar{height:calc(var(--ppB) + 68px)!important;padding:0 12px var(--ppB)!important;box-sizing:border-box;gap:4px!important;align-items:center}
 html.pp #burger{width:68px!important;height:68px!important;flex:none;margin:0!important;transition:transform 80ms var(--ppE)}
 html.pp #burger:active{transform:scale(.9)}
-html.pp #barlogo,html.pp #bar.home #barlogo{flex:none!important;height:27px!important;width:auto!important;margin:0 0 0 2px!important}
+html.pp #barlogo,html.pp #bar.home #barlogo{flex:none!important;height:24px!important;width:auto!important;margin:0 0 0 2px!important;padding:22px 8px!important;box-sizing:content-box!important;transition:transform 80ms var(--ppE)}
+html.pp #barlogo:active{transform:scale(.94)}
 /* all footer pills: one height (68), readable labels, a press state */
 html.pp #bar #hmode,html.pp #bar #homeX,html.pp #barRight.pnav{bottom:var(--ppB)!important;padding:5px!important;gap:2px!important}
 html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #bar.home #barRight.pnav .bbtn{height:58px!important;border-radius:29px!important;gap:4px!important}
@@ -37,11 +38,11 @@ html.pp #homeX .hxi{width:84px!important;height:58px!important;border-radius:29p
 /* About / Videos / Yard Sign pages: their pill sits in the middle of the footer */
 html.pp #bar.hx-ctr #homeX{right:auto!important;left:50%!important;transform:translateX(-50%)!important}
 
-/* Home button (every page but Home): the Vivint house mark over "Home", beside the burger. On Home the logo stays.
-   Footer on section pages: burger 12-80 | Home 84-152 | section nav 158-514 | Products 520-588 */
+/* Shared navigation (nav/shpnav.css): the Vivint logo sits beside the burger on every page, as in every app; the logo is
+   Fast Pitch's Home button (data-home). The old round Home pill (#ppHome, made by pp/shell.js) stays hidden.
+   Footer on section pages: burger 12-80 | logo 82-200 | section nav 204-514 | Products 520-588 */
 #ppHome{display:none}
-html.pp #bar:not(.home) #barlogo{display:none!important}
-html.pp #bar:not(.home) #ppHome{display:flex;position:absolute;left:84px;bottom:var(--ppB);width:68px;height:68px;margin:0;padding:0;border:0;border-radius:34px;
+html.pp #bar:not(.home) #ppHome{display:none;position:absolute;left:84px;bottom:var(--ppB);width:68px;height:68px;margin:0;padding:0;border:0;border-radius:34px;
   flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#1c1c1c;color:#fff;z-index:31;pointer-events:auto;
   -webkit-tap-highlight-color:transparent;transition:transform 80ms var(--ppE),background-color .15s ease}
 html.pp #ppHome svg{width:24px;height:24px;display:block}
@@ -57,8 +58,8 @@ html.pp #bar #prodBtn::after{content:"Products";font-size:12px;font-weight:500;l
 /* Section nav on section pages: a pill along the footer between Home and Products.
    Up to 5 sections: equal tabs with names. More: fixed 58px icon tabs that scroll sideways (the current one keeps its
    name and is scrolled into view), with an edge fade where more tabs hide. */
-html.pp #stage #bar:not(.home) #barRight.pnav.pph{position:absolute!important;top:auto!important;right:auto!important;left:158px!important;bottom:var(--ppB)!important;transform:none!important;
-  flex-direction:row!important;width:calc(100% - 158px - 86px)!important;height:68px!important;box-sizing:border-box;margin:0!important;padding:5px!important;gap:2px!important;justify-content:space-between;touch-action:none;animation:none!important}
+html.pp #stage #bar:not(.home) #barRight.pnav.pph{position:absolute!important;top:auto!important;right:auto!important;left:204px!important;bottom:var(--ppB)!important;transform:none!important;
+  flex-direction:row!important;width:calc(100% - 204px - 86px)!important;height:68px!important;box-sizing:border-box;margin:0!important;padding:5px!important;gap:2px!important;justify-content:space-between;touch-action:none;animation:none!important}
 html.pp #bar:not(.home) #barRight.pnav.pph .bbtn{flex:1 1 0!important;width:auto!important;min-width:0;height:58px!important;border-radius:29px!important;gap:4px}
 html.pp #bar:not(.home) #barRight.pnav.pph .rdiv{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn span{display:none}

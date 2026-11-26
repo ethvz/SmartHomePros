@@ -82,3 +82,50 @@ html.ipp #prScroll .smk-c:nth-of-type(3){top:calc(var(--ipTop) + 238px + var(--c
 html.ipp #prScroll .smk-c h3{width:auto!important}
 html.ipp #prScroll .smk-c img{right:36px!important;left:auto!important;top:50%!important;translate:0 -50%;width:190px!important;height:62%!important;object-fit:contain!important}
 html.ipp #prScroll .smk-c .go{left:40px!important;bottom:32px!important}
+
+/* ---------- Hardware | Specs (.strip.fsx): two 1032-wide panes; ipp/prodA.js sizes and places the render ---------- */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .strip.fsx{left:0!important;width:2064px!important;height:var(--H)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .strip.fsx>.fsp-pane{width:1032px!important;height:var(--H)!important;transform:none!important;box-sizing:border-box}
+/* Hardware: render on top, feature dots on it, callouts as two columns under it */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-f{display:grid!important;grid-template-columns:1fr 1fr;grid-auto-flow:row dense;align-content:end;gap:30px 64px;padding:0 var(--ipR) calc(var(--ipBot) + 136px) var(--ipL)}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-f .fsp-ln line{display:none}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-f .fsp-co{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:15px!important;line-height:21px!important;color:rgba(255,255,255,.8);padding-left:24px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-f .fsp-co b{font-size:20px!important;line-height:24px!important;margin-bottom:8px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-f .fsp-co::before{content:"";position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:50%;background:var(--vg,#05E5AF);box-shadow:0 0 10px rgba(5,229,175,.6)}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-f .fsp-note{position:relative!important;left:auto!important;top:auto!important;bottom:auto!important;grid-column:1/-1;order:99999;font-size:13px}
+/* Specs: the table at a readable size */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-s .fst-h{font-size:15px;margin:-46px 0 16px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-s .fst .r{min-height:64px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-s .fst .r b{width:170px!important;font-size:17px;line-height:21px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-s .fst .r span{font-size:17px;line-height:23px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ipA-s .fst .r span i{font-size:14px;line-height:18px}
+/* the Hardware | Specs pill (and the Surface | Recessed toggle) sit above the footer */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .psec>.fsp,html.ipp :is(#prScroll,#hbScroll,#thScroll) .otab>.fsp{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
+html.ipp #prScroll .psec[data-t=specs] .hl .dwseg{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important;left:var(--ipL)!important}
+html.ipp #prScroll .psec[data-t=specs] .hl .dwseg{left:50%!important;width:340px!important;margin-left:-170px!important;bottom:calc(var(--ipBot) + 118px)!important}
+html.ipp #prScroll .psec[data-t=specs]:has(.hl .dwseg) .fsp-pane.ipA-f{padding-bottom:calc(var(--ipBot) + 214px)}
+
+/* ---------- hero toggles: Surface | Recessed, Detector | Monitor sit under the copy ---------- */
+html.ipp #prScroll [data-t=hero] .dwseg,html.ipp #prScroll .smk-tog{left:var(--ipL)!important;top:auto!important;bottom:calc(var(--ipBot) + 140px)!important;margin-left:0!important}
+html.ipp #prScroll .lhero.smk .lh-txt{bottom:calc(var(--ipBot) + 236px)!important}
+/* Door & Window hero: two full-screen photos side by side in the strip, headline top left on a soft shade */
+html.ipp #prScroll .strip.wide>.dws{width:1032px!important;height:var(--H)!important;background:#000}
+html.ipp #prScroll .strip.wide{height:var(--H)!important}
+html.ipp #prScroll .strip.wide>.dws img{width:100%!important;height:100%!important;object-fit:cover}
+html.ipp #prScroll .strip.wide>.dws::before{content:"";position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(0,0,0,.6) 0,rgba(0,0,0,.28) 55%,rgba(0,0,0,0) 100%);z-index:1;pointer-events:none}
+html.ipp #prScroll .dws-t{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 60px)!important;bottom:auto!important;z-index:2}
+html.ipp #prScroll .dws-t h1{color:#fff!important;text-shadow:0 2px 24px rgba(0,0,0,.4)}
+
+/* ---------- picture sections (ipp/prodA.js wraps the artwork in .ipart and lifts its tiles into .ipctl) ---------- */
+html.ipp #prScroll .ipart{position:absolute;left:0;top:0;width:1376px;height:964px;transform-origin:0 0;pointer-events:none}
+html.ipp #prScroll .ipart>*{pointer-events:auto}
+html.ipp #prScroll .ipart.ipx,html.ipp #prScroll .ipart.ipx video{pointer-events:none}
+html.ipp #prScroll .ipart[data-ipl]{transition:translate .5s cubic-bezier(.2,.8,.2,1),scale .5s cubic-bezier(.2,.8,.2,1),clip-path .5s cubic-bezier(.2,.8,.2,1)}
+html.ipp #prScroll .ipctl{position:absolute;left:var(--ipL);right:var(--ipR);display:flex;flex-wrap:wrap;justify-content:center;gap:12px;z-index:6}
+html.ipp #prScroll .ipctl .lvt{position:relative!important;left:auto!important;top:auto!important;flex:0 0 calc((100% - (var(--cols,2) - 1)*12px)/var(--cols,2));min-width:0;height:var(--th,120px)!important;width:auto!important;box-sizing:border-box;background:#141414}
+html.ipp #prScroll .ipctl .lvt.on{background:#262628}
+html.ipp #prScroll .ipctl .lvt:active{transform:scale(.96)}
+html.ipp #prScroll .ipctl .lvl{position:relative!important;left:auto!important;top:auto!important;width:100%!important}
+html.ipp #prScroll .iplab{position:absolute;z-index:6;text-align:center;font-size:22px;font-weight:500;color:#fff;letter-spacing:-.2px}
+html.ipp #prScroll .psec.ipA-tiles>.nxa{display:none!important}
+@media (prefers-reduced-motion:reduce){ html.ipp #prScroll .ipart[data-ipl]{transition:none} }

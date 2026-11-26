@@ -47,24 +47,51 @@
       if (pw === 920) { const port = ph.classList.contains('port'); phs = port ? Math.min(mh / 732, 1.1) : Math.min(.86, bw / 920); phh = port ? 732 * phs : 454 * phs; }
       else { phs = Math.min(mh / 748, 1.12); phh = 748 * phs; }
       const v = { '--capT': capT + 'px', '--lbh': bh + 'px', '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
-      if (pw === 372) v['--cl'] = (96 + 30 + 372 * phs + 10).toFixed(1) + 'px';
+      if (pw === 372) { const pl = 96 + 44; v['--pl'] = pl + 'px'; v['--cl'] = (pl + 188 * phs).toFixed(1) + 'px'; v['--ct'] = Math.max(mt - 70 * phs, mt + phh / 2 - 482 * phs).toFixed(1) + 'px';
+        /* balance() pins these inline with !important: put ours back (only when different, so the watcher settles) */
+        setI(ph, 'left', pl + 'px'); const c = Q('#dbmCap'); setI(c, 'transform', 'none'); }
       Object.entries(v).forEach(([k, x]) => setP(sec, k, x));
     });
   }
   /* the page's own balance() re-places these with inline styles: lay ours out again whenever it does (writes go to the tab, not the watched nodes) */
   function featWatch() {
     ['#dbmPhone', '#dbmCap', '#ocmPhone', '#ocmCap'].forEach(q => { const el = Q(q); if (!el || el.__ippw) return; el.__ippw = 1;
-      new MutationObserver(() => { if (isIPP()) featLayout(); }).observe(el, { attributes: true, attributeFilter: ['class'] }); });
+      new MutationObserver(() => { if (isIPP()) featLayout(); }).observe(el, { attributes: true, attributeFilter: ['class', 'style'] }); });
     ['#ocmH', '#dbmH'].forEach(q => { const el = Q(q); if (!el || el.__ippw) return; el.__ippw = 1;
       new MutationObserver(() => { if (isIPP()) requestAnimationFrame(featLayout); }).observe(el, { childList: true }); });
   }
 
-  function layout() { galFocus(); if (!isIPP()) return; spinFit(); featLayout(); }
+
+  /* ---------- OCP vs Arlo: a second, synced copy of the split clip so each half gets its own full-width row ---------- */
+  function arloTwin() {
+    const v = Q('#ocArloVid'); if (!v) return; let t = Q('#ocArloVid3');
+    if (!isIPP()) { if (t && !t.paused) t.pause(); return; }
+    if (!t) { t = v.cloneNode(false); t.id = 'ocArloVid3'; t.removeAttribute('style'); t.muted = true; t.setAttribute('aria-hidden', 'true'); v.after(t);
+      const sync = () => { if (!isIPP()) return; if (Math.abs(t.currentTime - v.currentTime) > .12) { try { t.currentTime = v.currentTime; } catch (e) {} }
+        if (v.paused !== t.paused) v.paused ? t.pause() : t.play().catch(() => {}); };
+      ['play', 'pause', 'seeked', 'timeupdate'].forEach(ev => v.addEventListener(ev, sync)); }
+    if (!t.getAttribute('src') && v.currentSrc) t.src = v.currentSrc;
+  }
+
+
+  /* ---------- Smart Actions: an oversized product render rises from the bottom-right edge under the list ---------- */
+  function actBleed() {
+    [['#ocScroll', 'assets/och/c0.webp?v=87'], ['#dbScroll', 'assets/db/dbcp_a1.webp?v=55']].forEach(([q, src]) => {
+      const sec = Q(q + '>[data-t=act]'); if (!sec || sec.querySelector('.ippBleed')) return;
+      const im = D.createElement('img'); im.className = 'ippBleed'; im.alt = ''; im.decoding = 'async'; im.loading = 'lazy'; im.src = src; im.draggable = false;
+      sec.insertBefore(im, sec.firstChild); });
+  }
+
+  function featClear() {
+    const ph = Q('#dbmPhone'); if (ph && ph.style.getPropertyValue('left') === '140px') ph.style.removeProperty('left');
+    const c = Q('#dbmCap'); if (c && c.style.getPropertyValue('transform') === 'none') c.style.removeProperty('transform');
+  }
+  function layout() { galFocus(); arloTwin(); if (!isIPP()) { featClear(); return; } spinFit(); featLayout(); }
   function galEager(sec) { sec.querySelectorAll('.hgl img[loading=lazy]').forEach(im => { im.loading = 'eager'; }); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ippo) return; el.__ippo = 1;
     /* writes only to children / other elements, never to the observed page's class */
     new MutationObserver(() => { if (isIPP() && el.classList.contains('on')) { requestAnimationFrame(layout); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
-  function boot() { secWatch(); featWatch(); layout(); }
+  function boot() { actBleed(); secWatch(); featWatch(); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);

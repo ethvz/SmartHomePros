@@ -70,9 +70,115 @@ html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important
 html.ipp #ocScroll .ocm-bv{left:calc(var(--gx) + 10px)!important;width:calc(1032px - var(--gx) - 30px)!important;top:var(--mt)!important;height:var(--mh)!important;-webkit-mask-image:none!important;mask-image:none!important;border-radius:28px;overflow:hidden}
 
 /* DBCP: the upright phone on the left of the band, the product close-up beside it */
-html.ipp #dbScroll .dbm-phone{left:calc(var(--gx) + 30px)!important;top:var(--mt)!important;transform:none!important;transform-origin:0 0;scale:var(--phs);margin:0!important}
+html.ipp #dbScroll .dbm-phone{left:var(--pl)!important;top:var(--mt)!important;transform:none!important;transform-origin:0 0;scale:var(--phs);margin:0!important}
 html.ipp #dbScroll .dbm-phone.off{opacity:0}
-html.ipp #dbScroll .dbm-card{left:var(--cl)!important;width:calc(1012px - var(--cl))!important;top:var(--mt)!important;height:var(--mh)!important;margin:0!important;-webkit-mask-image:none!important;mask-image:none!important}
-html.ipp #dbScroll .dbm-card img,html.ipp #dbScroll .dbm-card img.rr,html.ipp #dbScroll .dbm-card img.dflt{padding:10px 20px!important;translate:none!important;scale:none!important;object-fit:contain!important}
+html.ipp #dbScroll .dbm-phone.big{transform:translateX(calc(250px / var(--phs))) scale(1.04)!important}
+/* the product close-up keeps its landscape art direction (same card, same crop) at the phone's scale, running off the right edge */
+html.ipp #dbScroll .dbm-card{left:var(--cl)!important;top:var(--ct)!important;width:820px!important;height:964px!important;transform-origin:0 0;scale:var(--phs);margin:0!important}
 html.ipp #dbScroll .dbm-hub{left:calc(var(--gx) + 10px)!important;width:calc(1032px - var(--gx) - 30px)!important;top:var(--mt)!important;height:var(--mh)!important;margin:0!important;-webkit-mask-image:none!important;mask-image:none!important}
 html.ipp #dbScroll .dbm-hubdb{display:none}
+
+/* ---------- Compare (cmp): title, our camera as a wide hero row, rivals in a 2-column grid that fills the rest ---------- */
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=cmp]{--cg:calc(var(--bT) + 520px)}
+html.ipp #ocScroll .ocpk h2,html.ipp #dbScroll .dbc-h{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important;margin:0!important}
+html.ipp #ocScroll .ocpk .me,html.ipp #dbScroll .dbc-me{left:calc(var(--gx) + 48px)!important;top:calc(var(--bT) + 170px)!important;width:360px!important}
+html.ipp #ocScroll .ocpk .me img,html.ipp #dbScroll .dbc-me img{position:absolute!important;left:440px!important;top:-56px!important;width:auto!important;height:330px!important;margin:0!important;object-fit:contain}
+html.ipp #dbScroll .dbc-me img{left:470px!important;top:-70px!important;height:350px!important}
+html.ipp #dbScroll .dbc-div{display:none}
+html.ipp #ocScroll .ocpk .vs,html.ipp #dbScroll .dbc-vs{left:calc(var(--gx) + 48px)!important;top:calc(var(--cg) - 64px)!important}
+html.ipp :is(#ocScroll,#dbScroll) .dbcards{left:calc(var(--gx) + 30px)!important;right:36px;width:auto!important;top:var(--cg)!important;gap:16px!important;grid-auto-rows:var(--cdh)}
+html.ipp #ocScroll .ocpk .dbcards{--cdh:min(190px,calc((var(--H) - var(--bF) - var(--cg) - 30px - 48px) / 4))}
+html.ipp #dbScroll .dbcards{--cdh:min(230px,calc((var(--H) - var(--bF) - var(--cg) - 30px - 32px) / 3))}
+html.ipp :is(#ocScroll,#dbScroll) .dbcard{height:auto!important;transition:transform .12s cubic-bezier(.2,.8,.2,1)}
+html.ipp :is(#ocScroll,#dbScroll) .dbcard:active{transform:scale(.97)}
+html.ipp :is(#ocScroll,#dbScroll) .dbwell{width:150px!important;height:calc(100% - 24px)!important}
+
+/* OCP vs Arlo: the split clip becomes two stacked halves, Vivint on top, Arlo below (prodB.js adds the synced second copy).
+   Each copy is exactly half the clip's shape (so it shows one side whole) and is clipped top and bottom to --vh */
+#ocArloVid3{display:none}
+html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vf:calc(var(--vw) * .5612);--vh:clamp(260px,calc((var(--H) - var(--bT) - var(--bF) - 600px) / 2),var(--vf));--vt:calc(var(--bT) + 200px)}
+html.ipp #ocArlo h2{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important;font-size:58px!important;gap:22px!important}
+html.ipp #ocArlo h2 i{width:90px!important}
+html.ipp #ocArlo .ocar-back{left:calc(var(--gx) + 44px)!important;right:auto!important;top:calc(var(--bT) + 116px)!important}
+html.ipp #ocArloVid,html.ipp #ocArloVid3{position:absolute;display:block;left:calc(var(--gx) + 30px)!important;width:var(--vw)!important;height:var(--vf)!important;border-radius:0!important;object-fit:cover!important;top:calc(var(--vt) - (var(--vf) - var(--vh)) / 2)!important;clip-path:inset(calc((var(--vf) - var(--vh)) / 2) 0 round 24px);-webkit-clip-path:inset(calc((var(--vf) - var(--vh)) / 2) 0 round 24px)}
+html.ipp #ocArloVid{object-position:0 50%!important}
+html.ipp #ocArloVid3{object-position:100% 50%;top:calc(var(--vt) + var(--vh) + 16px - (var(--vf) - var(--vh)) / 2)!important}
+html.ipp #ocArlo .ocar-l{left:calc(var(--gx) + 50px)!important;top:calc(var(--vt) + 20px)!important}
+html.ipp #ocArlo .ocar-l+.ocar-l{top:calc(var(--vt) + var(--vh) + 36px)!important}
+html.ipp #ocArlo .ocar-w{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--vt) + 2 * var(--vh) + 56px)!important}
+
+/* DBCP head-to-head: the two stills stay side by side (as in landscape), reasons below */
+html.ipp #dbVs .dbvs-h{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important}
+html.ipp #dbVs .dbback{left:calc(var(--gx) + 44px)!important;right:auto!important;top:calc(var(--bT) + 116px)!important}
+html.ipp #dbVs .dbvs-h{font-size:58px!important;gap:22px!important}html.ipp #dbVs .dbvs-h i{width:90px!important}
+html.ipp #dbVs{--iw:calc((1032px - var(--gx) - 86px) / 2);--ih:calc(var(--iw) * 1.12);--it:calc(var(--bT) + 190px + max(0px,(var(--H) - var(--bT) - var(--bF) - 190px - var(--ih) - 240px) / 3))}
+html.ipp #dbVs .dbvs-im{width:var(--iw)!important;height:var(--ih)!important;top:var(--it)!important;left:calc(var(--gx) + 30px)!important}
+html.ipp #dbVs .dbvs-im:nth-of-type(2){left:calc(var(--gx) + 50px + var(--iw))!important}
+html.ipp #dbVs .dbwin{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--it) + var(--ih) + 40px)!important}
+
+/* ---------- Specs (Hardware | Specs strip): each pane is one upright screen: the product large on top, callouts in a 2-column grid
+   (or the spec table) below it. Panes keep their 1376px step, so only their left 1032px is used. ---------- */
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs]{--sh:calc(var(--H) - var(--bF) - 104px)}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx{left:0!important;top:0!important;width:2752px!important;height:var(--sh)!important}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx>.fsp-pane{width:1376px!important;height:var(--sh)!important;transform:none!important;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);grid-auto-rows:auto;gap:20px 40px;padding:calc(var(--bT) + 16px) calc(344px + 48px) 8px calc(var(--gx) + 48px);box-sizing:border-box;overflow:hidden}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-pane>svg,html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .hl{display:none}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-im{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:100%!important;min-height:0;grid-row:1;grid-column:1/-1;object-fit:contain;object-position:50% 50%;translate:none!important;scale:none!important}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-im~.fsp-im{grid-column:2}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-im:has(~.fsp-im){grid-column:1}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-co{position:relative!important;left:auto!important;top:auto!important;right:auto!important;width:auto!important;text-align:left!important;font-size:15px!important;line-height:1.38!important;color:rgba(255,255,255,.8)!important}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-co b{font-size:19px!important;line-height:1.2!important;margin-bottom:6px!important}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-note{position:relative!important;left:auto!important;top:auto!important;grid-column:1/-1}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx>.fsp-pane:has(.fst){grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst{position:relative!important;left:auto!important;top:auto!important;width:auto!important;padding-top:36px}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst-h{margin:-36px 0 10px;font-size:14px}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r{min-height:0;padding:11px 0}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r b{font-size:16px!important;line-height:20px;width:34%!important}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r span{font-size:16px!important;line-height:21px}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r span i{font-size:13px;line-height:17px;margin-top:4px}
+/* the pills: one row just above the footer, centred on the content (OCP: the Spotlight pill beside them) */
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp.spill{left:calc(var(--gx) / 2 + 516px - 110px)!important;top:calc(var(--H) - var(--bF) - 84px)!important}
+html.ipp #ocScroll>[data-t=specs] .fsp.spill{left:calc(var(--gx) / 2 + 516px + 10px)!important}
+html.ipp #ocScroll>[data-t=specs] .fsp.spot{left:calc(var(--gx) / 2 + 516px - 10px - 322px)!important;top:calc(var(--H) - var(--bF) - 84px)!important}
+html.ipp #ocStrip img.fsp-im[src*="oc_f0"]{content:url(../assets/och/c0.webp?v=87)}
+
+/* ---------- History (OCP): the landscape grid, re-spaced to the upright width ---------- */
+html.ipp #ocHist.hx{left:0!important;width:1032px;padding:calc(var(--bT) + 20px) 36px 0 calc(var(--gx) + 30px);box-sizing:border-box}
+html.ipp #ocHist .hgrid{grid-template-columns:132px repeat(4,1fr);column-gap:10px;row-gap:12px;margin-top:30px}
+html.ipp #ocHist .hgrid .hd{height:140px;font-size:15px}
+html.ipp #ocHist .hgrid .rl{font-size:16px}
+html.ipp #ocHist .hc{min-height:92px;padding:12px 12px;font-size:14px}
+/* footage: a column per generation (as in landscape); each column's clips stack, the notes run full width underneath */
+html.ipp #ocHist .fgrid{position:relative;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+html.ipp #ocHist .fcol .big{aspect-ratio:4/3}
+html.ipp #ocHist .fcol .sm{grid-template-columns:1fr;gap:12px;margin-top:12px}
+html.ipp #ocHist .fcol .sm img{height:auto;aspect-ratio:16/10}
+html.ipp #ocHist .fnote{position:absolute;left:0;right:0;top:calc(100% + 22px);width:auto!important;margin:0;columns:3;column-gap:26px;font-size:14px!important;line-height:1.4!important;padding:18px 22px}
+
+/* ---------- Smart Actions / Works With / FAQs (.xs) ---------- */
+html.ipp :is(#ocScroll,#dbScroll)>.xs .xeb{left:calc(var(--gx) + 48px)!important;top:calc(var(--bT) + 40px)!important}
+html.ipp :is(#ocScroll,#dbScroll)>.xs .xh{left:calc(var(--gx) + 48px)!important;right:40px;top:calc(var(--bT) + 68px)!important}
+html.ipp :is(#ocScroll,#dbScroll) .xa-list{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--bT) + 270px)!important;z-index:1}
+html.ipp :is(#ocScroll,#dbScroll) .xa{gap:22px;padding:0 26px}
+html.ipp :is(#ocScroll,#dbScroll) .xa-col{width:290px}
+html.ipp :is(#ocScroll,#dbScroll) .xa-col.t{width:auto}
+html.ipp :is(#ocScroll,#dbScroll) .xa-foot{left:calc(var(--gx) + 48px)!important;right:36px!important;top:calc(var(--bT) + 790px)!important;z-index:1}
+/* Smart Actions: the product, oversized, rising from the bottom-right edge into the free space under the list */
+.ippBleed{display:none}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{display:block;position:absolute;z-index:0;pointer-events:none;opacity:0;translate:0 80px;transition:opacity .7s ease .15s,translate .9s cubic-bezier(.22,1,.36,1) .15s;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=act][data-vis="1"] .ippBleed{opacity:1;translate:none}
+html.ipp #ocScroll>[data-t=act] .ippBleed{height:500px;width:auto;right:-170px;bottom:calc(var(--bF) + 6px)}
+html.ipp #dbScroll>[data-t=act] .ippBleed{height:520px;width:auto;right:-90px;bottom:calc(var(--bF) + 6px);rotate:-10deg}
+@media (prefers-reduced-motion:reduce){html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{translate:none;transition:opacity .4s ease}}
+/* Works With */
+html.ipp :is(#ocScroll,#dbScroll) .xw-go{right:40px!important;top:calc(var(--bT) + 80px)!important}
+html.ipp :is(#ocScroll,#dbScroll) .xw-pick{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--bT) + 250px)!important;flex-wrap:wrap}
+html.ipp :is(#ocScroll,#dbScroll) .xw-stage{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--bT) + 420px)!important;height:520px!important}
+html.ipp :is(#ocScroll,#dbScroll) .xw-p{width:380px!important;height:520px!important}
+html.ipp :is(#ocScroll,#dbScroll) .xw-link{left:380px!important;right:380px!important;top:260px!important}
+html.ipp :is(#ocScroll,#dbScroll) .xw-plus{top:260px!important}
+html.ipp :is(#ocScroll,#dbScroll) .xw-why{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--bT) + 980px)!important;gap:14px!important}
+html.ipp :is(#ocScroll,#dbScroll) .xw-why div{height:96px}
+html.ipp :is(#ocScroll,#dbScroll) .xw-foot{left:calc(var(--gx) + 48px)!important;top:calc(var(--bT) + 1112px)!important}
+/* FAQs: the questions run the full width under the heading */
+html.ipp :is(#ocScroll,#dbScroll) .xf-src{left:calc(var(--gx) + 48px)!important;top:calc(var(--bT) + 222px)!important}
+html.ipp :is(#ocScroll,#dbScroll) .xf-list{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--bT) + 282px)!important;bottom:calc(var(--bF) + 24px)!important}

@@ -24,7 +24,7 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
   var fmt = function (d) { return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6); };
   var standalone = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   /* real vCards only where the files are served as text/vcard: GitHub Pages (Safari + Home Screen app) and local testing */
-  var realHost = /(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$|^\[::1\]$|\.localhost$|\.test$/.test(location.hostname);
+  var realHost = /(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$|^\[::1\]$|\.localhost$|\.test$/.test(location.hostname) && !/[?&]vcf=0/.test(location.search); /* ?vcf=0 previews the artifact (Copy) mode */
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)');
   var total = DEPTS.reduce(function (n, d) { return n + d.c.length + d.t.length + d.e.length; }, 0);
 
@@ -185,10 +185,12 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
     return ok;
   }
   function toast(msg) { var t = document.querySelector('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, 2600); }
-  function flash(b, label) {
-    var s = b.querySelector('span'); if (!b._l) b._l = s.textContent;
-    b.classList.add('go'); s.textContent = label; clearTimeout(b._t);
-    b._t = setTimeout(function () { b.classList.remove('go'); s.textContent = b._l; }, 1400);
+  function flash(b, label) { /* pressed -> done: the small tile buttons swap their icon for a check, Save all also says it */
+    var s = b.querySelector('span'), ic = b.querySelector('svg'), tile = b.classList.contains('mc-b');
+    if (!b._l) { b._l = s.textContent; b._i = ic.outerHTML; }
+    b.classList.add('go'); clearTimeout(b._t);
+    if (tile) ic.outerHTML = svg('ok'); else s.textContent = label;
+    b._t = setTimeout(function () { b.classList.remove('go'); s.textContent = b._l; b.querySelector('svg').outerHTML = b._i; }, 1400);
   }
   if (!realHost) {
     el.classList.add('cp');
@@ -205,7 +207,7 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
     if (!realHost) {
       e.preventDefault();
       var txt = b.dataset.f === ALL ? DEPTS.map(plain).join('\n\n') : plain(DEPTS.filter(function (d) { return d.f === b.dataset.f; })[0]);
-      if (copy(txt)) { flash(b, 'Copied'); toast('Copied. Save to Contacts works in the installed app'); } else toast('Save to Contacts works in the installed app');
+      if (copy(txt)) { flash(b, 'Copied'); toast('Copied'); } else toast('Save to Contacts works in the installed app');
       return;
     }
     flash(b, 'Opening…');
@@ -213,6 +215,6 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
     if (navigator.onLine === false && !cached) { if (blob(b.dataset.f, b.dataset.n)) e.preventDefault(); }
   });
   el.addEventListener('keydown', function (e) { var b = e.target.closest && e.target.closest('.cp .mc-sv, .cp .mc-all'); if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); b.click(); } });
-  addEventListener('pageshow', function (e) { if (e.persisted) el.querySelectorAll('.go').forEach(function (b) { clearTimeout(b._t); b.classList.remove('go'); b.querySelector('span').textContent = b._l; }); });
+  addEventListener('pageshow', function (e) { if (e.persisted) el.querySelectorAll('.go').forEach(function (b) { clearTimeout(b._t); b.classList.remove('go'); b.querySelector('span').textContent = b._l; b.querySelector('svg').outerHTML = b._i; }); });
   if (reduce && reduce.matches) el.classList.add('rm');
 })();

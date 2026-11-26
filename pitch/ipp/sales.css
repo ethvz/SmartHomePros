@@ -16,7 +16,101 @@ html.ipp #p-moves h2{left:72px;top:max(66px,calc(var(--isT) - 30px))}
 html.ipp #p-moves .mcard{--mh:calc((var(--H) - var(--isT) - 100px - var(--isB) - 24px - 48px)/3);left:72px!important;width:888px;height:var(--mh);top:calc(var(--isT) + 100px);box-sizing:border-box;padding:26px 26px 26px 404px}
 html.ipp #p-moves .mcard:nth-of-type(2){top:calc(var(--isT) + 100px + var(--mh) + 24px)}
 html.ipp #p-moves .mcard:nth-of-type(3){top:calc(var(--isT) + 100px + 2*var(--mh) + 48px)}
-html.ipp #p-moves .mcard img{position:absolute;left:26px;top:26px;bottom:26px;width:352px;height:auto}
+html.ipp #p-moves .mcard img{position:absolute;left:26px;top:26px;width:352px;height:calc(100% - 52px)}
 html.ipp #p-moves .mcard h3{margin:14px 0 14px}
 html.ipp #p-moves .mcard h3 br{display:none}
 html.ipp #p-moves .mcard .price{left:404px;bottom:30px}
+
+/* ---------- Packages: four full-width cards; hub on the left, name + price over the kit's products ---------- */
+html.ipp #p-packages .pk2{left:40px;width:952px;top:calc(var(--isT) - 4px);height:calc(var(--H) - var(--isT) + 4px - var(--isB) - 16px);display:flex;flex-direction:column;gap:14px}
+html.ipp #p-packages .pk2::after{content:"Costs assume 60 months, 0% APR";flex:none;text-align:center;font-size:13px;color:#8e8e93}
+html.ipp #p-packages .pk2-r{position:relative;top:auto!important;left:auto;right:auto;height:auto!important;flex:1 1 0;min-height:0;box-sizing:border-box;
+  display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);column-gap:24px;align-items:center;
+  padding:18px 28px 14px 20px;border-radius:30px;background:linear-gradient(180deg,#17171a,#0d0d0f);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+html.ipp #p-packages .pk-hub{grid-column:1;grid-row:1/3;width:210px;height:141px}
+html.ipp #p-packages .pk-tx{grid-column:2;grid-row:1;width:auto;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;column-gap:16px}
+html.ipp #p-packages .pk-tx h3{grid-column:1;grid-row:1}
+html.ipp #p-packages .pk-tx .in{grid-column:1;grid-row:2;margin-top:4px;color:#a1a1a6;font-size:21px}
+html.ipp #p-packages .pk-tx .mo{grid-column:2;grid-row:1/3;text-align:right;align-self:center;margin:0;font-size:38px;font-weight:600;letter-spacing:-.8px}
+html.ipp #p-packages .pk-tx .mo small{font-size:15px;font-weight:400;letter-spacing:0;margin-top:4px}
+html.ipp #p-packages .pk-tx .pk-fine{display:none}
+html.ipp #p-packages .pk-dev{grid-column:2;grid-row:2;align-self:center;padding:0;justify-content:center}
+
+/* ---------- Pricing Options: three full-width kit cards; the price columns sit right of the kit, "best option if" runs along the bottom ---------- */
+html.ipp #p-pricing{--kT:calc(var(--isT) - 4px);--pA:calc(var(--H) - var(--kT) - var(--isB) - 16px);--kH:calc((var(--pA) - 32px)/3);--kH2:calc((var(--pA) - 16px)/2)}
+html.ipp #p-pricing .kit{left:40px!important;width:952px!important;height:var(--kH)!important;overflow:hidden}
+html.ipp #p-pricing .kit:nth-child(1){top:var(--kT)!important}
+html.ipp #p-pricing .kit:nth-child(2){top:calc(var(--kT) + var(--kH) + 16px)!important}
+html.ipp #p-pricing .kit:nth-child(3){top:calc(var(--kT) + 2*var(--kH) + 32px)!important}
+html.ipp #p-pricing.no4 .kit{height:var(--kH2)!important}
+html.ipp #p-pricing.no4 .kit:nth-child(2){top:calc(var(--kT) + var(--kH2) + 16px)!important}
+html.ipp #p-pricing.no4 .kit:nth-child(3){top:calc(var(--kT) + 2*var(--kH2) + 32px)!important}
+html.ipp #p-pricing .kit .kv{left:28px;top:28px}
+html.ipp #p-pricing .kit h4{left:336px!important;top:32px!important}
+html.ipp #p-pricing .kit .ln{left:336px!important;right:28px!important;top:88px!important}
+html.ipp #p-pricing .kc{top:104px!important}
+html.ipp #p-pricing .kc:nth-of-type(3){left:336px!important}
+html.ipp #p-pricing .kc:nth-of-type(4){left:548px!important}
+html.ipp #p-pricing .kc:nth-of-type(5){left:740px!important;width:184px}
+html.ipp #p-pricing .kbf{left:28px;right:28px;top:auto;bottom:22px;width:auto;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 26px;padding:16px 22px}
+html.ipp #p-pricing .kbf{justify-content:flex-start}html.ipp #p-pricing .kbf-h{flex:0 0 100%;margin:0}
+html.ipp #p-pricing.no4 .kit{--o:max(0px,calc((var(--kH2) - 430px)/2))}
+html.ipp #p-pricing.no4 .kit .kv{top:calc(var(--o) + 28px)}html.ipp #p-pricing.no4 .kit h4{top:calc(var(--o) + 32px)!important}html.ipp #p-pricing.no4 .kit .ln{top:calc(var(--o) + 88px)!important}html.ipp #p-pricing.no4 .kc{top:calc(var(--o) + 104px)!important}html.ipp #p-pricing.no4 .kbf{bottom:calc(var(--o) + 22px)}
+@media (min-aspect-ratio:37/50){
+  html.ipp #p-pricing .kit .kv{transform:scale(.74)}
+  html.ipp #p-pricing .kbf{padding:12px 20px;bottom:16px}html.ipp #p-pricing .kbf-h{flex:none}
+  html.ipp #p-pricing .kc .s[style]{display:none}
+}
+
+/* ---------- Comparisons: the same table, narrower brand columns, rows stretched to the screen's height ---------- */
+html.ipp #p-comparisons h2{left:40px;top:max(84px,calc(var(--isT) - 12px))}
+html.ipp .cmp{left:40px;top:calc(var(--isT) + 100px);width:952px;height:calc(var(--H) - var(--isT) - 100px - var(--isB) - 24px)}
+html.ipp .cmp col:nth-child(1){width:250px!important}
+html.ipp .cmp col:nth-child(2){width:156px!important}
+html.ipp .cmp col:nth-child(n+3){width:91px!important}
+html.ipp .cmp th{height:62px;font-size:15px;line-height:1.15}
+html.ipp .cmp td{height:auto}
+html.ipp .cmp td.l{font-size:17px;line-height:21px;width:250px}
+html.ipp .cmp td.c{border-width:0 5px 5px!important}
+
+/* ---------- Reviews: tall hero, the cards slide along under it ---------- */
+html.ipp #p-reviews{--rcH:440px;--hH:calc(var(--H) - 40px - 18px - var(--rcH) - var(--isB) - 20px)}
+html.ipp #p-reviews .rv2-hero{left:24px;top:40px;width:984px;height:var(--hH)}
+html.ipp #p-reviews .rv2-hero img{object-position:50% 40%}
+html.ipp #p-reviews .rv2-hero i{background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0) 32%),linear-gradient(0deg,rgba(0,0,0,.35),rgba(0,0,0,0) 30%)}
+html.ipp #p-reviews .rv2-sc{top:calc(40px + var(--hH) + 18px)!important;height:var(--rcH)}
+html.ipp #p-reviews .rv2-sc .rc{width:440px!important;height:var(--rcH)!important;padding:34px 34px!important;display:flex;flex-direction:column;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.ipp #p-reviews .rv2-sc .rc:active{transform:scale(.985)}
+html.ipp #p-reviews .rv2-sc .rc b{font-size:21px}
+html.ipp #p-reviews .rv2-sc .rc .st{color:var(--vg,#05e5af)}
+html.ipp #p-reviews .rv2-sc .rc h4{font-size:27px!important;line-height:1.2;margin:38px 0 14px!important}
+html.ipp #p-reviews .rv2-sc .rc p{font-size:19px!important}
+@media (min-aspect-ratio:37/50){html.ipp #p-reviews{--rcH:400px}}
+
+/* ---------- Patents: four marquee rows of larger cards fill the height ---------- */
+html.ipp #p-patents{--pT:calc(var(--isT) + 176px);--pR:calc((var(--H) - var(--pT) - var(--isB) - 8px)/4)}
+html.ipp #p-patents h2{left:40px;top:max(70px,calc(var(--isT) - 26px))}
+html.ipp #p-patents .sc{top:calc(var(--isT) + 122px)}
+html.ipp #p-patents .prow{height:calc(var(--pR) - 22px);gap:20px}
+html.ipp #p-patents .prow:nth-child(1){top:var(--pT)!important}
+html.ipp #p-patents .prow:nth-child(2){top:calc(var(--pT) + var(--pR))!important}
+html.ipp #p-patents .prow:nth-child(3){top:calc(var(--pT) + 2*var(--pR))!important}
+html.ipp #p-patents .prow:nth-child(4){top:calc(var(--pT) + 3*var(--pR))!important}
+html.ipp #p-patents .pc{height:100%;border-radius:22px}
+
+/* ---------- Social: the four phones as a 2 x 2 grid of tappable cards (crops of the same picture), icon on top ---------- */
+html.ipp #p-social>img{display:none}
+html.ipp #p-social h2{display:block!important;left:72px;top:max(70px,calc(var(--isT) - 20px));font-size:76px;font-weight:500;letter-spacing:-2px}
+html.ipp #p-social{--cT:calc(var(--isT) + 100px);--th:calc((var(--H) - var(--cT) - var(--isB) - 24px - 24px)/2)}
+html.ipp #p-social .hot{width:444px!important;height:var(--th)!important;border-radius:32px!important;background-color:#111;background-image:var(--soc);background-repeat:no-repeat;
+  background-size:calc(var(--th) * 1.938) auto;box-sizing:border-box;padding:0 calc((444px - var(--th) * .4507)/2);background-origin:border-box;background-clip:content-box;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.ipp #p-social .hot:active{transform:scale(.97)}
+html.ipp #p-social .hot:nth-of-type(odd){left:60px!important}
+html.ipp #p-social .hot:nth-of-type(even){left:528px!important}
+html.ipp #p-social .hot:nth-of-type(-n+2){top:var(--cT)!important}
+html.ipp #p-social .hot:nth-of-type(n+3){top:calc(var(--cT) + var(--th) + 24px)!important}
+html.ipp #p-social .hot:nth-of-type(1){background-position:calc(222px - var(--th) * .3155) calc(var(--th) * -.169)}
+html.ipp #p-social .hot:nth-of-type(2){background-position:calc(222px - var(--th) * .7634) calc(var(--th) * -.169)}
+html.ipp #p-social .hot:nth-of-type(3){background-position:calc(222px - var(--th) * 1.2169) calc(var(--th) * -.169)}
+html.ipp #p-social .hot:nth-of-type(4){background-position:calc(222px - var(--th) * 1.6676) calc(var(--th) * -.169)}
+@media (prefers-reduced-motion:reduce){html.ipp #p-social .hot:active,html.ipp #p-reviews .rv2-sc .rc:active{transform:none}}

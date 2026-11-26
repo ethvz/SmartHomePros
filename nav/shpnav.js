@@ -87,6 +87,11 @@
     return w;
   }
 
+  /* ---------- HOOK for full-screen sheets / modals: the corner hides while one is up ----------
+     document.documentElement.classList.toggle('shp-sheet', open), or SHPNav.sheet(open) (counts nested sheets). */
+  var sheets = 0;
+  function sheet(open) { sheets = Math.max(0, sheets + (open ? 1 : -1)); var on = sheets > 0; if (H.classList.contains('shp-sheet') !== on) H.classList.toggle('shp-sheet', on); }
+
   /* ---------- close whichever menu is open ---------- */
   function close() {
     if (dw && dw.classList.contains('on')) return shpClose();
@@ -225,10 +230,14 @@
     } else {
       makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); try { scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { scrollTo(0, 0); } }, 'Smart Home Pros: back to top');
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && dw && dw.classList.contains('on')) shpClose(); });
+      /* the SHP page's Settings sheet: hide the corner while it is up (attribute writes only when the state differs) */
+      var st = document.querySelector('.sheet');
+      if (st) { var sync = function () { var on = st.classList.contains('on'); if (st.__shpn !== on) { st.__shpn = on; sheet(on); } };
+        new MutationObserver(sync).observe(st, { attributes: true, attributeFilter: ['class'] }); sync(); }
     }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.SHPNav = { app: APP, root: ROOT, selector: selector, close: close, toast: toast,
+  window.SHPNav = { app: APP, root: ROOT, selector: selector, close: close, toast: toast, sheet: sheet,
     open: function () { if (APP === 'home') shpOpen(); else if (APP === 'recruit') frMenu(); else if (typeof window.openMenu === 'function') window.openMenu(); } };
 })();

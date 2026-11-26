@@ -62,7 +62,7 @@
       const pp = PP(), home = bar.classList.contains('home'), items = [...rail.children].filter(e => e.matches('.bbtn') && e.id !== 'amtBtn');
       const flat = pp && !home && rail.classList.contains('pnav') && !bar.classList.contains('hx-ctr') && items.length > 0;
       if (rail.classList.contains('pph') !== flat) rail.classList.toggle('pph', flat);
-      /* the pill is 356 wide (346 inside): up to 5 named tabs; more = fixed 58px icon tabs that scroll sideways */
+      /* the pill is 310 wide (300 inside, beside the logo): up to 5 named tabs; more = fixed 58px icon tabs that scroll sideways */
       const ico = flat && items.length > 5;
       if (rail.classList.contains('ico') !== ico) rail.classList.toggle('ico', ico);
       if (bar.classList.contains('ppnav') !== flat) bar.classList.toggle('ppnav', flat);

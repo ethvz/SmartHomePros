@@ -144,6 +144,17 @@
       R(c, x, y, 1, h - y, '#7fd09c'); R(c, x, y, 1, 1, '#b2ecc2'); if ((x + y) % 5 === 0) R(c, x, y + 3, 1, 1, '#6bbd89');
     }
   }, 26);
+  var PEAKS = strip(function (c, h) {   // far faceted mountains with snow caps
+    var pk = [], r = 11;
+    for (var i = 0; i < 9; i++) { r = (r * 16807) % 2147483647; pk.push([i * STRIP / 9 + (r % 30), 18 + (r % 26)]); }
+    for (var x = 0; x < STRIP; x++) {
+      var best = 0, side = 0;
+      pk.forEach(function (q) { for (var w = -1; w <= 1; w++) { var d = x - q[0] - w * STRIP, v = q[1] - M.abs(d) * .9; if (v > best) { best = v; side = d; } } });
+      var y = round(h - best); if (y >= h) continue;
+      R(c, x, y, 1, h - y, side < 0 ? '#8fa9ea' : '#7590d6');
+      if (best > 24) R(c, x, y, 1, min(4, best - 24), side < 0 ? '#f4f8ff' : '#d6e2fb');
+    }
+  }, 46);
   var ROWS = strip(function (c, h) {
     for (var i = 0; i < STRIP / 24; i++) {
       var x = i * 24 + 2, wh = 6 + (i * 5 % 3), col = ['#6aa3d6', '#5f97cc', '#74acdc'][i % 3];
@@ -173,7 +184,7 @@
     var bb = br ? br.getBoundingClientRect() : { bottom: hr.top + 90, right: hr.right - 20 }, gy = cr ? cr.getBoundingClientRect().top - hr.top : hr.height * .55;
     W = round(hr.width); H = round(hr.height);
     var band = max(60, gy - (bb.bottom - hr.top));
-    S = max(2, min(6, round(min(band / 88, W / 230))));
+    S = max(2, min(6, round(min(band / 88, W / 270))));
     LW = M.ceil(W / S); LH = M.ceil(H / S);
     if (cv.width !== LW || cv.height !== LH) { cv.width = LW; cv.height = LH; }
     var cw = LW * S + 'px', ch = LH * S + 'px'; if (cv.style.width !== cw || cv.style.height !== ch) { cv.style.width = cw; cv.style.height = ch; }
@@ -194,15 +205,23 @@
     var bh = max(1, hz / SKY.length);
     for (i = 0; i < SKY.length; i++) { y = round(i * bh); R(ctx, 0, y, LW, round((i + 1) * bh) - y + 1, SKY[i]); if (i) for (x = (y & 1); x < LW; x += 2) R(ctx, x, y, 1, 1, SKY[i - 1]); }
     // clouds drift on their own and a little with the camera
-    for (i = 0; i < 6; i++) {
+    var nc = max(4, min(12, round(hz / 18)));
+    for (i = 0; i < nc; i++) {
       var span = LW + 80, cxp = ((i * 97 + 40 - t * (2 + i % 3) - cam * .08) % span + span) % span - 40;
-      var cyp = round(hz * (.18 + ((i * 37) % 60) / 100));
+      var cyp = round((hz - 40) * (.12 + ((i * 37) % 70) / 100));
       ctx.drawImage(i % 2 ? CLOUD2 : CLOUD, round(cxp), cyp);
     }
     // parallax strips
     var o1 = ((-round(cam * .2)) % STRIP + STRIP) % STRIP, o2 = ((-round(cam * .45)) % STRIP + STRIP) % STRIP;
-    for (x = o1 - STRIP; x < LW; x += STRIP) ctx.drawImage(HILLS, x, hz - 26 + 4);
-    for (x = o2 - STRIP; x < LW; x += STRIP) ctx.drawImage(ROWS, x, hz - 18 + 2);
+    var o0 = ((-round(cam * .08)) % STRIP + STRIP) % STRIP;
+    // layers rise above the rooftops; each one's base is filled down to the lawn so nothing floats in the gaps
+    var yP = hz - 46 - 34, yH = hz - 26 - 16, yR = hz - 18 - 6;
+    for (x = o0 - STRIP; x < LW; x += STRIP) ctx.drawImage(PEAKS, x, yP);
+    R(ctx, 0, yP + 46, LW, hz - yP - 46, '#7590d6');
+    for (x = o1 - STRIP; x < LW; x += STRIP) ctx.drawImage(HILLS, x, yH);
+    R(ctx, 0, yH + 26, LW, hz - yH - 26, '#7fd09c');
+    for (x = o2 - STRIP; x < LW; x += STRIP) ctx.drawImage(ROWS, x, yR);
+    R(ctx, 0, yR + 18, LW, hz - yR - 18, '#6bbd89');
     // lawn with mown stripes, sidewalk, curb, road
     R(ctx, 0, hz, LW, G - hz, '#4cc85e');
     for (x = ((ox % 16) + 16) % 16 - 16; x < LW; x += 16) R(ctx, x, hz, 8, G - hz, '#58d26a');
@@ -244,6 +263,7 @@
     // coin counter: icon, x, count
     var b = cnt.b, str = 'x' + (got < 10 ? '0' : '') + (got % 1000), tw2 = str.length * 4 * b - b, cx2 = cnt.x - tw2, cy2 = cnt.y;
     var bump = (s.coin > .78 && s.coin < .9) ? -1 : 0;
+    ctx.globalAlpha = .28; R(ctx, cx2 - 13, cy2, tw2 + 16, 5 * b + 6, K); R(ctx, cx2 - 12, cy2 - 1, tw2 + 14, 5 * b + 8, K); ctx.globalAlpha = 1;   // plate
     text(str, cx2 + 1, cy2 + 3 + b + bump, b, K); text(str, cx2, cy2 + 2 + b + bump, b, '#ffffff');
     ctx.drawImage(COIN[0], cx2 - 11, cy2 + bump + max(0, (5 * b - 10) >> 1) + 2);
     if (s.coin > .78 && s.coin < .95) sparkle(cx2 - 7, cy2 + 6, floor(t * 10) % 3);

@@ -31,7 +31,7 @@
     mon_medical: [[[110, 270, 540, 330, 540, , , , { x: 52 }]], [[640, 120, 736, 420, W, 0, 762, , { g: 1.4, f: .56 }]], N3],
     mon_duress: [[[110, 260, 540, 400, 540, , , , { x: 52 }]], [[660, 40, 716, 440, W, 0, 762, , { g: 1.4, f: .57 }]], N3],
     mon_trusted: [[[80, 180, 900, 190, 900]], [[95, 415, 285, 385, 340], [408, 415, 285, 385, 340]], [[722, 415, 285, 385, 340], [1035, 415, 285, 385, 340]]],
-    military_hero: { at: 'bottom', fade: 1, rows: [[[566, 272, 784, 692, W]]],
+    military_hero: { at: 'bottom', fade: 1, rows: [[[604, 272, 746, 692, W]]],
       html: '<div class="ipmil"><h2>We’re proud to protect those who sacrifice to protect us.</h2><ul><li>Special offers for deployed family members</li><li>24/7 monitoring and support</li><li>$4 million in charitable donations to military families</li></ul></div>' }
   };
   const GAP = 24;
