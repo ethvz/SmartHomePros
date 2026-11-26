@@ -1,6 +1,6 @@
 // Vivint Motion Sensor (VS-PIR300): 70 W x 78.5 H x 50 D mm, wall mounted (back at z=0, face +z).
 // Grey body and white front cover share ONE continuous side wall (flush hairline split at z=35.5), R15 squircle corners,
-// top/bottom bowed 1 mm, R7-8 front roll into a 2.5 mm crowned face, Fresnel lens recessed 1.5 mm, mounting-plate step at the back, tone-on-tone wordmark,
+// top/bottom bowed 1 mm, R7-8 front roll into a 2.5 mm crowned face, Fresnel lens recessed 1 mm behind a thin inner lip, mounting-plate step at the back, tone-on-tone wordmark,
 // recessed TEST pill on the right side. Built in millimetres inside a 0.001-scaled group.
 export default H => {
   const { THREE, G, add, DEC, decal, printPlane, rslab } = H;
@@ -28,15 +28,15 @@ export default H => {
   const outer = rings[rings.length - 1];
   const LX = 54, LY0 = -10.5, LY1 = 27.7, LCY = (LY0 + LY1) / 2;
   const lensO = K.rr(LX, LY1 - LY0, [4, 4, 6, 6], { cy: LCY });
-  const LR = 1.0, lensG = K.rr(LX + 2 * LR, LY1 - LY0 + 2 * LR, [4 + LR, 4 + LR, 6 + LR, 6 + LR], { cy: LCY });   // opening lip rolls R1.4 into the recess
+  const LR = .6, lensG = K.rr(LX + 2 * LR, LY1 - LY0 + 2 * LR, [4 + LR, 4 + LR, 6 + LR, 6 + LR], { cy: LCY });   // opening lip rolls R1.4 into the recess
   for (let k = 1; k <= 8; k++){ const t = k / 8;
     rings.push(outer.map(([x, y], i) => { const X = x + (lensG[i][0] - x) * t, Y = y + (lensG[i][1] - y) * t; return [X, Y, FZ + crown(X, Y)]; })); }
   for (let i = 1; i <= 6; i++){ const a = i / 6 * Math.PI / 2, f = Math.sin(a);
     rings.push(lensG.map(([x, y], j) => { const X = x + (lensO[j][0] - x) * f, Y = y + (lensO[j][1] - y) * f, gx = lensG[j][0], gy = lensG[j][1]; return [X, Y, FZ + crown(gx, gy) - LR * (1 - Math.cos(a))]; })); }
   const lip = rings[rings.length - 1];
-  rings.push(lip.map(([x, y, z]) => [x, y, z - .9]));
+  rings.push(lip.map(([x, y, z]) => [x, y, z - .4]), lip.map(([x, y, z]) => [x, y, z - .75]));   // inner lip wall, then the lens
 
-  const grey = 0x9fa0a4, white = 0xf2f2f0;
+  const grey = 0x929397, white = 0xf2f2f0;
   const PILL = { y: 8, z: 14.5, len: 21, wid: 7.5, gap: .35 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
@@ -45,21 +45,21 @@ export default H => {
   const body = add(u, new THREE.Mesh(K.skin(rings, { start: true }), bodyM));
   body.castShadow = body.receiveShadow = true;
 
-  /* Fresnel lens: frosted neutral grey (a hint of lavender), broad soft vertical facet bands (about +/-6 %), shade under the top lip; follows the crown 1.5 mm down */
+  /* Fresnel lens: frosted neutral grey (a hint of lavender), broad soft vertical facet bands (about +/-6 %), shade under the top lip; follows the crown 1 mm down */
   const lensRings = [];
-  for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27) ** 2)]; }));
+  for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.0 + .2 * (1 - (X / 27) ** 2)]; }));
   const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa9a8b0, roughness: .62, map: K.bandsTex(true), specularIntensity: .15 });
-  add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
+  add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - .8], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
 
   /* wordmark, tone-on-tone, flush on the crowned face */
   add(u, decal(DEC.logo, 36, 9, { color: 0xbcbdc0, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .25);
 
-  /* TEST pill: dark gap ring pocket (1.2 mm deep), softly domed grey cap whose top is 0.5 mm below the side surface,
+  /* TEST pill: dark gap ring pocket (1.2 mm deep), softly domed grey cap whose top is 0.25 mm below the side surface,
      printed TEST reading downward */
-  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 35, PILL.y, PILL.z, 0x3c3e41);
-  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55, bumpMap: grain, bumpScale: .15 })), 35 - .5 - 1, PILL.y, PILL.z);
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 35, PILL.y, PILL.z, 0x2e3033);
+  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55, bumpMap: grain, bumpScale: .15 })), 35 - .25 - 1, PILL.y, PILL.z);
   cap.rotation.y = Math.PI / 2;
-  const tg = add(u, G(), 35 - .5 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
+  const tg = add(u, G(), 35 - .25 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = '400 24px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
   tx.scale.setScalar(1000); tx.rotation.z = -Math.PI / 2;
@@ -142,8 +142,8 @@ function kit(THREE){
   function bandsTex(ao){
     const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
     for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
-      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 2.5 + .6) * .5 + Math.sin(t * Math.PI * 2 * 5 + 2) * .15;
-      let l = 230 + v * 22;
+      const t = i / 512, P2 = Math.PI * 2, v = .5 * Math.sin(P2 * (2.3 * t + .13)) + .3 * Math.sin(P2 * (3.7 * t + .5)) + .2 * Math.sin(P2 * (5.9 * t + .8));   // non-periodic soft facets
+      let l = 234 + v * 12 + 6 * Math.exp(-(((t - .5) / .3) ** 2));   // plus a broad centre lift
       if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
         l *= (1 - .28 * Math.exp(-top / .06) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
       const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }

@@ -1,7 +1,7 @@
 // Vivint Glass Break Detector: 66 W x 99.1 H x 22.9 D mm, portrait, wall mounted (back at z=0, face +z).
 // Grey back plate inset 0.5 mm behind a dark shadow gap, light-grey side shell and white front cap on ONE continuous wall
 // (flush hairline at z=19.6), R16.5 squircle corners, R3.5 front roll, 1.8 mm dome, concave 26.5 mm mic dish (2.8 mm deep,
-// matched to the render) with a 5.6 mm white bore and dark acoustic felt 2.2 mm down, recessed 21 x 6.5 TEST pill on the right side,
+// matched to the render) with a 5.6 mm white bore and dark acoustic felt 1.3 mm down, recessed 21 x 6.5 TEST pill on the right side,
 // fine bead-blast grain. Built in millimetres inside a 0.001-scaled group.
 export default H => {
   const { THREE, G, add, printPlane, rslab } = H;
@@ -38,31 +38,31 @@ export default H => {
   const body = add(u, new THREE.Mesh(K.skin(rings, { start: true }), bodyM));
   body.castShadow = body.receiveShadow = true;
 
-  /* concave spherical dish (2.8 deep at the centre), following the dome, crisp rim; white bore 1.8 deep, then a white ledge
-     ringing the dark felt 2.2 below the dish floor */
+  /* concave spherical dish (2.8 deep at the centre), following the dome, crisp rim; white bore 1.0 deep, then a white ledge
+     ringing the dark felt 1.3 below the dish floor */
   const DD = 2.8, SR = (RD * RD + DD * DD) / (2 * DD), sag = r => SR - Math.sqrt(SR * SR - r * r), D0 = sag(RD);
   const dz = (x, y) => { const r = Math.hypot(x, y); return FZ + dome(x, y) - (D0 - sag(r)); };
   const dish = [];
   for (const s of [1, .995, .96, .85, .74, .62, .5, .4, .3, 2.8 / RD]) dish.push(rim.map(([x, y]) => [x * s, y * s, dz(x * s, y * s)]));
   const hb = dish[dish.length - 1].map(([x, y, z]) => [x, y, z]);
   const zf = dz(0, 0);
-  dish.push(hb.map(([x, y]) => [x, y, zf - .15]), hb.map(([x, y]) => [x, y, zf - 1.8]), hb.map(([x, y]) => [x, y, zf - 2.2]),
-    hb.map(([x, y]) => [x * 2.4 / 2.8, y * 2.4 / 2.8, zf - 2.2]));
+  dish.push(hb.map(([x, y]) => [x, y, zf - .15]), hb.map(([x, y]) => [x, y, zf - 1.0]), hb.map(([x, y]) => [x, y, zf - 1.3]),
+    hb.map(([x, y]) => [x * 2.2 / 2.8, y * 2.2 / 2.8, zf - 1.3]));
   const wm = new THREE.MeshPhysicalMaterial({ color: white, roughness: .3, envMapIntensity: 1.2, bumpMap: grain, bumpScale: .1 });
   const dg = K.skin(dish), dp = dg.attributes.position, dc = [];
   for (let i = 0; i < dp.count; i++){                 // baked occlusion: the upper-left inner wall (turned away from the room's light)
     const x = dp.getX(i), y = dp.getY(i), r = Math.hypot(x, y), q = r > 3 ? Math.max(0, (.75 * y - .45 * x) / r) : 0;   // and the rim shadow line
-    const k = 1 - .3 * q * Math.pow(Math.min(1, r / RD), 1.2) - (r > RD * .97 ? .08 * q : 0); dc.push(k, k, k); }
+    const k = 1 - .18 * q * Math.pow(Math.min(1, r / RD), 1.2) - (r > RD * .95 ? .24 * q : 0); dc.push(k, k, k); }
   dg.setAttribute('color', new THREE.Float32BufferAttribute(dc, 3)); wm.vertexColors = true;
   add(u, new THREE.Mesh(dg, wm));
-  add(u, new THREE.Mesh(new THREE.CircleGeometry(2.45, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,
-    bumpMap: K.noiseTex(3), bumpScale: 1.2 })), 0, 0, zf - 2.15);
+  add(u, new THREE.Mesh(new THREE.CircleGeometry(2.25, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,
+    bumpMap: K.noiseTex(3), bumpScale: 1.2 })), 0, 0, zf - 1.27);
 
   /* TEST pill */
-  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 33, PILL.y, PILL.z, 0x3e4043);
-  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: shell, roughness: .5, bumpMap: grain, bumpScale: .12 })), 33 - .5 - 1, PILL.y, PILL.z);
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 33, PILL.y, PILL.z, 0x2e3033);
+  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: shell, roughness: .5, bumpMap: grain, bumpScale: .12 })), 33 - .25 - 1, PILL.y, PILL.z);
   cap.rotation.y = Math.PI / 2;
-  const tg = add(u, G(), 33 - .5 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
+  const tg = add(u, G(), 33 - .25 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = '400 25px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
   tx.scale.setScalar(1000); tx.rotation.z = -Math.PI / 2;
@@ -145,8 +145,8 @@ function kit(THREE){
   function bandsTex(ao){
     const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
     for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
-      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 2.5 + .6) * .5 + Math.sin(t * Math.PI * 2 * 5 + 2) * .15;
-      let l = 230 + v * 22;
+      const t = i / 512, P2 = Math.PI * 2, v = .5 * Math.sin(P2 * (2.3 * t + .13)) + .3 * Math.sin(P2 * (3.7 * t + .5)) + .2 * Math.sin(P2 * (5.9 * t + .8));   // non-periodic soft facets
+      let l = 234 + v * 12 + 6 * Math.exp(-(((t - .5) / .3) ** 2));   // plus a broad centre lift
       if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
         l *= (1 - .28 * Math.exp(-top / .06) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
       const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }
