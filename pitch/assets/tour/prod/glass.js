@@ -29,8 +29,8 @@ export default H => {
   for (let k = 1; k <= 10; k++){ const t = k / 10, e = t;
     rings.push(outer.map(([x, y], i) => { const X = x + (rim[i][0] - x) * e, Y = y + (rim[i][1] - y) * e; return [X, Y, FZ + dome(X, Y)]; })); }
 
-  const plate = 0xb9babd, shell = 0xc4c5c8, white = 0xf3f3f2;
-  const PILL = { y: 0, z: 10, len: 21, wid: 6.5, gap: .35 };
+  const plate = 0xb9babd, shell = 0xc4c5c8, white = 0xeaeae8;
+  const PILL = { y: 0, z: 10, len: 21, wid: 6.5, gap: .45 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 32.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
   const bodyM = K.bandMat({ color: plate, roughness: .6, bumpMap: grain, bumpScale: .12 }, 'z',
@@ -51,16 +51,17 @@ export default H => {
   const wm = new THREE.MeshPhysicalMaterial({ color: white, roughness: .3, envMapIntensity: 1.2, bumpMap: grain, bumpScale: .1 });
   const dg = K.skin(dish), dp = dg.attributes.position, dc = [];
   for (let i = 0; i < dp.count; i++){                 // baked occlusion: the upper-left inner wall (turned away from the room's light)
-    const x = dp.getX(i), y = dp.getY(i), r = Math.hypot(x, y), q = r > 3 ? Math.max(0, (.75 * y - .45 * x) / r) : 0;   // and the rim shadow line
-    const k = 1 - .18 * q * Math.pow(Math.min(1, r / RD), 1.2) - (r > RD * .95 ? .24 * q : 0); dc.push(k, k, k); }
+    const x = dp.getX(i), y = dp.getY(i), r = Math.hypot(x, y), d = r > 3 ? (.75 * y - .45 * x) / r : 0, q = Math.max(0, d), l = Math.max(0, -d);
+    const f = Math.pow(Math.min(1, r / RD), 1.2);                              // and the lit lower-right wall, and a 0.4 mm rim shadow line
+    const k = Math.min(1.06, 1 - .35 * q * f + .06 * l * f - (r > RD - .4 ? .3 * q : 0)); dc.push(k, k, k); }
   dg.setAttribute('color', new THREE.Float32BufferAttribute(dc, 3)); wm.vertexColors = true;
   add(u, new THREE.Mesh(dg, wm));
   add(u, new THREE.Mesh(new THREE.CircleGeometry(2.25, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,
     bumpMap: K.noiseTex(3), bumpScale: 1.2 })), 0, 0, zf - 1.27);
 
   /* TEST pill */
-  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 33, PILL.y, PILL.z, 0x2e3033);
-  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: shell, roughness: .5, bumpMap: grain, bumpScale: .12 })), 33 - .25 - 1, PILL.y, PILL.z);
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.5, 'x', 33, PILL.y, PILL.z, 0x2e3033);
+  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .35, new THREE.MeshPhysicalMaterial({ color: shell, roughness: .45, bumpMap: grain, bumpScale: .12 })), 33 - .25 - 1, PILL.y, PILL.z);
   cap.rotation.y = Math.PI / 2;
   const tg = add(u, G(), 33 - .25 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';

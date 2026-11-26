@@ -37,7 +37,7 @@ export default H => {
   rings.push(lip.map(([x, y, z]) => [x, y, z - .4]), lip.map(([x, y, z]) => [x, y, z - .75]));   // inner lip wall, then the lens
 
   const grey = 0x929397, white = 0xf2f2f0;
-  const PILL = { y: 8, z: 14.5, len: 21, wid: 7.5, gap: .35 };
+  const PILL = { y: 8, z: 14.5, len: 21, wid: 7.5, gap: .45 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
   const bodyM = K.bandMat({ color: grey, roughness: .6, bumpMap: grain, bumpScale: .15 }, 'z',
@@ -54,10 +54,10 @@ export default H => {
   /* wordmark, tone-on-tone, flush on the crowned face */
   add(u, decal(DEC.logo, 36, 9, { color: 0xbcbdc0, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .25);
 
-  /* TEST pill: dark gap ring pocket (1.2 mm deep), softly domed grey cap whose top is 0.25 mm below the side surface,
+  /* TEST pill: dark gap ring pocket (1.5 mm deep), grey cap with a soft 0.35 edge whose top is 0.25 mm below the side surface,
      printed TEST reading downward */
-  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 35, PILL.y, PILL.z, 0x2e3033);
-  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55, bumpMap: grain, bumpScale: .15 })), 35 - .25 - 1, PILL.y, PILL.z);
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.5, 'x', 35, PILL.y, PILL.z, 0x2e3033);
+  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .35, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .45, bumpMap: grain, bumpScale: .15 })), 35 - .25 - 1, PILL.y, PILL.z);
   cap.rotation.y = Math.PI / 2;
   const tg = add(u, G(), 35 - .25 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
