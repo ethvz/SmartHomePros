@@ -17,19 +17,21 @@
      leftover height inside that band. opt: g = may zoom up to g x (photos crop narrower around focal point f; with x / r it grows
      wider instead), x = fixed left edge on the stage, r = share of it kept past the right edge (oversized product bleeding off).
      The sub-tab row (NAV) is pinned just above the footer so its buttons never move between sub-slides. */
-  const N1 = [[340, 774, 660, 160, 660, , , 'ft']], N3 = [[256, 774, 832, 160, 832, , , 'ft']];
+  const N1 = [[340, 774, 660, 160, 660, , , 'ft']], N3 = [[262, 774, 800, 160, 800, , , 'ft']];
+  /* photo crops (fb) fade out at the bottom: the source slides' dark text mattes leave ragged blotches on the lower part of the photos.
+     Products and faces stay left of the footer's section rail (~x 900 on the stage). Baked step lists are shown 1.15x. */
   const SPEC = {
-    mon_hero: { html: '<div class="ipmon"><h2>The industry’s most trusted emergency support.</h2></div>', rows: [[[640, 60, 736, 520, W, 0, 964, , { g: 1.3, f: .5 }]]] },
-    mon_home: [[[100, 180, 720, 390, W, 132, 762, , { g: 1.3, f: .47 }]], [[806, 214, 394, 466, 394, , , 'fe']], N1],
-    mon_trained: [[[0, 160, 720, 400, W, 132, 762, , { g: 1.3, f: .5 }]], [[730, 290, 600, 370, 600, , , 'fe']], N1],
-    mon_911: [[[470, 0, 906, 500, W, 0, 498, , { g: 1.3, f: .8 }]], [[700, 500, 560, 160, 560, , , 'fe']], N1],
-    mon_simple: [[[0, 160, 700, 420, W, 132, 762, , { g: 1.3, f: .36 }]], [[700, 390, 580, 290, 580, , , 'fe']], N1],
-    mon_insurance: { bg: 1, rows: [[[60, 150, 1316, 814, W]]] },
-    mon_breakin: [[[110, 236, 470, 418, 470, , , , { x: 52 }]], [[588, 140, 788, 600, 620, , , 'bl', { r: .16, g: 1.7 }]], N3],
-    mon_smoke: [[[110, 230, 560, 380, 560, , , , { x: 52 }]], [[716, 126, 660, 590, 500, , , 'bl', { r: .14, g: 1.8 }]], N3],
-    mon_water: [[[110, 270, 540, 320, 540, , , , { x: 52 }]], [[700, 160, 676, 440, 560, , , 'bl', { r: .18, g: 1.8 }]], N3],
-    mon_medical: [[[110, 270, 540, 330, 540, , , , { x: 52 }]], [[640, 120, 736, 420, W, 0, 762, , { g: 1.4, f: .56 }]], N3],
-    mon_duress: [[[110, 260, 540, 400, 540, , , , { x: 52 }]], [[660, 40, 716, 440, W, 0, 762, , { g: 1.4, f: .57 }]], N3],
+    mon_hero: { html: '<div class="ipmon"><h2>The industry’s most trusted emergency support.</h2></div>', rows: [[[560, 60, 680, 520, W, 0, 964, 'fb']]] },
+    mon_home: [[[100, 160, 720, 390, W, 132, 700, 'fb']], [[806, 214, 394, 466, 394, , , 'fe']], N1],
+    mon_trained: [[[0, 150, 720, 400, W, 132, 640, 'fb']], [[730, 290, 600, 370, 600, , , 'fe']], N1],
+    mon_911: [[[470, 0, 906, 470, W, 0, 470, 'fb']], [[700, 500, 560, 160, 560, , , 'fe']], N1],
+    mon_simple: [[[0, 150, 700, 400, W, 132, 600, 'fb']], [[700, 390, 580, 290, 580, , , 'fe']], N1],
+    mon_insurance: { bg: 1, rows: [[[60, 460, 760, 230, 760, , , 'fe', { x: 52 }]], [[640, 20, 736, 600, W, 0, 964, 'fb']]] },
+    mon_breakin: [[[110, 236, 470, 418, 540, , , , { x: 46 }]], [[588, 140, 788, 600, 700, , , 'bl', { x: 196 }]], N3],
+    mon_smoke: [[[110, 230, 560, 380, 644, , , , { x: 46 }]], [[716, 126, 660, 590, 560, , , 'bl', { x: 320 }]], N3],
+    mon_water: [[[110, 270, 540, 320, 620, , , , { x: 46 }]], [[700, 160, 676, 440, 640, , , 'bl', { x: 250 }]], N3],
+    mon_medical: [[[110, 270, 520, 330, 598, , , , { x: 46 }]], [[640, 250, 736, 420, W, 240, 760, 'fb']], N3],
+    mon_duress: [[[110, 260, 540, 400, 620, , , , { x: 46 }]], [[660, 40, 716, 440, W, 0, 730, 'fb']], N3],
     mon_trusted: [[[80, 180, 900, 190, 900]], [[95, 415, 285, 385, 340], [408, 415, 285, 385, 340]], [[722, 415, 285, 385, 340], [1035, 415, 285, 385, 340]]],
     military_hero: { at: 'bottom', fade: 1, rows: [[[604, 272, 746, 692, W, 272, 964]]],
       html: '<div class="ipmil"><h2>We’re proud to protect those who sacrifice to protect us.</h2><ul><li>Special offers for deployed family members</li><li>24/7 monitoring and support</li><li>$4 million in charitable donations to military families</li></ul></div>' }

@@ -54,16 +54,17 @@ html.ipp #p-pricing .kc:nth-of-type(4){left:548px!important}
 html.ipp #p-pricing .kc:nth-of-type(5){left:740px!important;width:184px}
 html.ipp #p-pricing .kbf{left:28px;right:28px;top:auto;bottom:22px;width:auto;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 26px;padding:16px 22px}
 html.ipp #p-pricing .kbf{justify-content:flex-start}html.ipp #p-pricing .kbf-h{flex:0 0 100%;margin:0}
+html.ipp #p-pricing.no4 .kit .kv{transform:scale(.8)}
 html.ipp #p-pricing.no4 .kit{--o:max(0px,calc((var(--kH2) - 430px)/2))}
 html.ipp #p-pricing.no4 .kit .kv{top:calc(var(--o) + 28px)}html.ipp #p-pricing.no4 .kit h4{top:calc(var(--o) + 32px)!important}html.ipp #p-pricing.no4 .kit .ln{top:calc(var(--o) + 88px)!important}html.ipp #p-pricing.no4 .kc{top:calc(var(--o) + 104px)!important}html.ipp #p-pricing.no4 .kbf{bottom:calc(var(--o) + 22px)}
 @media (min-aspect-ratio:37/50){
-  html.ipp #p-pricing .kit .kv{transform:scale(.74)}
+  html.ipp #p-pricing .kit .kv,html.ipp #p-pricing.no4 .kit .kv{transform:scale(.74)}
   html.ipp #p-pricing .kbf{padding:12px 20px;bottom:16px}html.ipp #p-pricing .kbf-h{flex:none}
   html.ipp #p-pricing .kc .s[style]{display:none}
 }
 
 /* ---------- Comparisons: the same table, narrower brand columns, rows stretched to the screen's height ---------- */
-html.ipp #p-comparisons h2{left:40px;top:max(84px,calc(var(--isT) - 12px))}
+html.ipp #p-comparisons h2{left:72px;top:max(84px,calc(var(--isT) - 12px))}
 html.ipp .cmp{left:40px;top:calc(var(--isT) + 100px);width:952px;height:calc(var(--H) - var(--isT) - 100px - var(--isB) - 24px)}
 html.ipp .cmp col:nth-child(1){width:250px!important}
 html.ipp .cmp col:nth-child(2){width:156px!important}
@@ -89,7 +90,7 @@ html.ipp #p-reviews .rv2-sc .rc p{font-size:19px!important}
 
 /* ---------- Patents: four marquee rows of larger cards fill the height ---------- */
 html.ipp #p-patents{--pT:calc(var(--isT) + 176px);--pR:calc((var(--H) - var(--pT) - var(--isB) - 8px)/4)}
-html.ipp #p-patents h2{left:40px;top:max(70px,calc(var(--isT) - 26px))}
+html.ipp #p-patents h2{left:72px;top:max(70px,calc(var(--isT) - 26px))}
 html.ipp #p-patents .sc{top:calc(var(--isT) + 122px)}
 html.ipp #p-patents .prow{height:calc(var(--pR) - 22px);gap:20px}
 html.ipp #p-patents .prow:nth-child(1){top:var(--pT)!important}
@@ -97,6 +98,8 @@ html.ipp #p-patents .prow:nth-child(2){top:calc(var(--pT) + var(--pR))!important
 html.ipp #p-patents .prow:nth-child(3){top:calc(var(--pT) + 2*var(--pR))!important}
 html.ipp #p-patents .prow:nth-child(4){top:calc(var(--pT) + 3*var(--pR))!important}
 html.ipp #p-patents .pc{height:100%;border-radius:22px}
+html.ipp #p-patents .pc .no{font-size:10px}
+html.ipp #p-patents .pc h4{font-size:17px;line-height:20px;max-height:60px}
 
 /* ---------- Social: the four phones as a 2 x 2 grid of tappable cards (crops of the same picture), icon on top ---------- */
 html.ipp #p-social>img{display:none}

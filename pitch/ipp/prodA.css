@@ -194,3 +194,8 @@ html.ipp #p-hub #hbScroll #hbCmp .hbt{grid-template-columns:150px repeat(6,1fr)!
 html.ipp #p-hub #hbScroll #hbCmp .hbt>*{min-width:0}
 html.ipp #p-hub #hbCmp .hbt .well img{width:108px!important;height:84px!important}
 html.ipp #p-hub #hbCmp .hbt .well{height:92px!important}
+
+/* ---------- pressed states (instant feedback on every tap target; transform only) ---------- */
+html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.sns-c .go,.smk-c .go,.fsp button,.xw-pick button,.xw-go,.smk-tog button,.dwseg button,.hb3pill button,.th-list button,.dbm-list button,.dbai,.hbm):active{transform:scale(.95)}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.xf-q,.xa-tog):active{transform:scale(.98)}
+@media (prefers-reduced-motion:reduce){ html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.sns-c .go,.smk-c .go,.fsp button,.xw-pick button,.xw-go,.dbm-list button,.th-list button):active{transform:none} }
