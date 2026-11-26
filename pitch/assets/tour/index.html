@@ -433,7 +433,7 @@ body.focus #cFeats.on .feat{animation:none!important}
       if(real > r0 || stage > s0){ lastAdv = Date.now(); if(failed === 1) unfail(); } },
     finish: function(cb){ if(failed === 2) return; if(gone){ cb(); return; } if(failed === 1) unfail(); if(!fin) fin = cb; },
     fail: function(){ fail(true); },
-    get shown(){ return shown; }
+    get shown(){ return shown; }, get failed(){ return failed; }
   };
   /* Fast Pitch pauses the tour when it is off screen: stop the timer and the bob, and don't count the pause as a stall */
   addEventListener('message', function(e){ var d = e.data; if(!d || !d.fpTourCtl || d.fpTourCtl === 'cat' || gone) return;
@@ -462,6 +462,7 @@ const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=22'); if(!r.
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
   for(const k in idx){ const [o2,l,t]=idx[k]; m[k]=URL.createObjectURL(new Blob([new Uint8Array(buf,base+o2,l)],{type:t})); } return m; }catch(e){ window.__ld&&__ld.fail(); return {}; } })();   /* no pack: the loader shows the failure + Try again and never reveals the bare scene */
+if(window.__ld && __ld.failed === 2) await new Promise(()=>{});   /* ...and nothing else is built or rendered behind it (Try again reloads) */
 const PK = p => __PK[p] || p;
 /* Smart Hub Pro 2 mesh (quantised, from CAD): header json + int16 positions, int8 normals, indices */
 const HUB = await (async()=>{ try{ if(!__PK['mdl/hub.bin']) return null; const buf=await (await fetch(__PK['mdl/hub.bin'])).arrayBuffer(); const n=new DataView(buf).getUint32(0,true);
@@ -1653,7 +1654,7 @@ const homeView = () => { const a = innerWidth/innerHeight;
   if(a < .6) return {...HOME, target:V(-2.6,.6,0), r:53, lim:{...HOME.lim, maxD:60}};    // phone
   /* iPad portrait: closer and a little higher so the house fills the width (and more of the height); the distance follows the
      visible width (fov x aspect), so 768x1024, 820x1180 and 1024x1366 all frame the same */
-  if(a < 1)  return {...HOME, target:V(-2.6,1.2,0), phi:1.15, r:Math.min(40, 11/(Math.tan(camera.fov*Math.PI/360)*a)), lim:{...HOME.lim, maxD:48}};
+  if(a < 1)  return {...HOME, target:V(-2.6,1.2,0), phi:1.15, r:Math.min(40, 11.5/(Math.tan(camera.fov*Math.PI/360)*a)), lim:{...HOME.lim, maxD:48}};
   return HOME; };
 const state = { focus:null, fly:null, idleAt:performance.now(), cat:'all' };
 const shown = p => state.cat==='all' || CATS[state.cat].includes(p.k);
