@@ -74,7 +74,7 @@ export default H => {
       x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.15, rh*.64, 0, 0, Math.PI*2); x.fill(); x.restore(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/12.8, 1/14.4); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
-    const fab = new THREE.MeshPhysicalMaterial({color:0xb0b0b0, map:t, bumpMap:bt, bumpScale:3, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
+    const fab = new THREE.MeshPhysicalMaterial({color:0xc2c2c2, map:t, bumpMap:bt, bumpScale:3, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
     const b = .3, fg = new THREE.ExtrudeGeometry(offsetShape(P, 2.0), {depth:1.1-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:4, curveSegments:24});
     fg.translate(0, 0, 29.7 + b); fg.scale(k, k, k); const fm = add(g, new THREE.Mesh(fg, fab)); fm.receiveShadow = true; }
 

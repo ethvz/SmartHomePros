@@ -56,9 +56,9 @@ html.pp #p-buyouts .step:not(:last-child):after{left:33px;top:74px;height:auto;b
 html.pp #p-buyouts .fine{left:30px;right:30px;width:auto;top:auto;bottom:var(--sF);font-size:13.5px;line-height:17px}
 
 /* ===== Reviews: tall hero on top, big swipeable cards fill the rest ===== */
-html.pp #p-reviews{--hT:max(20px,calc(var(--brsat,0px) + 8px));--hH:calc(var(--H) * .58 - var(--hT) + 20px)}
+html.pp #p-reviews{--hT:max(20px,calc(var(--brsat,0px) + 8px));--hH:min(600px,calc(var(--H) * .5 - var(--hT) + 20px))}
 html.pp #p-reviews .rv2-hero{left:16px;top:var(--hT);width:568px;height:var(--hH);border-radius:28px}
-html.pp #p-reviews .rv2-hero img{object-position:40% 40%}
+html.pp #p-reviews .rv2-hero img{object-position:53% 40%}
 html.pp #p-reviews .rv2-hero i{background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0) 42%),linear-gradient(0deg,rgba(0,0,0,.35),rgba(0,0,0,0) 35%)}
 html.pp #p-reviews .rv2-hero .tx{left:30px;top:66px}
 html.pp #p-reviews .rv2-hero h2{font-size:70px}

@@ -30,7 +30,8 @@ export default H => {
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
-      geo.setIndex(new THREE.BufferAttribute(p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni),1));
+      let I = p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni);
+      geo.setIndex(new THREE.BufferAttribute(I,1));
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
         for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
           uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0354)/.0708; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
@@ -40,7 +41,6 @@ export default H => {
       if(k === 0) m.visible = false;                         // the CAD's inner chassis: a tab of it pokes out below the shell
       if(p.g === 2) m.visible = false;                       // CAD collar: replaced by the dimpled locking collar below
     }
-    add(g, H.rslab(.074, .097, .002, .008, .0006, mountW), 0, -.0005, .001);   // flat back plate closing the mount against the wall
   } else {                                                    // offline fallback: plain mount block of the CAD size
     add(M, H.rslab(77, 99, 29, 10, 4, mountW), 0, 0, 14.5);
     add(M, H.rslab(71, 42, 1, 7, .4, grilleMat(0xc4c6c8,[60,36])), 0, -28, 29.1);

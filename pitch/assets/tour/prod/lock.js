@@ -114,25 +114,25 @@ export default H => {
   /* ================= INTERIOR (other side of the door) ================= */
   // built facing +z with the turn rose at the origin, then turned 180 deg about y onto the interior door face
   const inn = add(g, G(), 0, ROSE_Y, ZI); inn.rotation.y = Math.PI;
-  const CY = mm(36);                                                                                 // housing centre, 36 mm above the rose
-  add(inn, rslab(mm(66.5), mm(147), mm(21.7), mm(2.5), mm(.9), powder), 0, CY, mm(10.85));            // housing (its side rails show beside the cover)
-  add(inn, rslab(mm(65.1), mm(145.6), mm(1.2), mm(2), mm(.3), rubber), 0, CY, mm(.4));              // dark back edge on the door
+  const CY = mm(42.5);                                                                                 // housing centre, 42.5 mm above the rose
+  add(inn, rslab(mm(69), mm(147), mm(21.7), mm(2.5), mm(.9), powder), 0, CY, mm(10.85));            // housing (its side rails show beside the cover)
+  add(inn, rslab(mm(67.6), mm(145.6), mm(1.2), mm(2), mm(.3), rubber), 0, CY, mm(.4));              // dark back edge on the door
   // gloss battery cover, top part between the rails
-  const covTop = mm(109.0), covBot = mm(36.6);
-  add(inn, rslab(mm(56), covTop - covBot, mm(3.0), mm(1.4), mm(1.0), glossM), 0, (covTop + covBot) / 2, mm(22.0));
+  const covTop = mm(115.5), covBot = mm(39.6);
+  add(inn, rslab(mm(58.2), covTop - covBot, mm(3.0), mm(1.4), mm(1.0), glossM), 0, (covTop + covBot) / 2, mm(22.0));
   add(inn, printPlane(mm(30), mm(7), (x, P) => { x.fillStyle = '#f4f4f4'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = 'italic 800 64px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, 0)); x.scale(1.05, 1); x.fillText('Kwikset', 0, 0); x.restore(); }),
-    0, mm(42.6), mm(23.53));
+    0, mm(46.0), mm(23.53));
   // matte lower panel (a touch prouder than the cover), hairline seam under the cover
-  const panTop = mm(36.2), panBot = mm(-34.0), PZ = mm(24.2);
-  add(inn, rslab(mm(57.6), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));
+  const panTop = mm(39.2), panBot = mm(-27.0), PZ = mm(24.2);
+  add(inn, rslab(mm(57.8), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));
   // status LED (lit green, as in the 2025 render)
-  add(inn, rslab(mm(8), mm(3.2), mm(.6), mm(1.6), mm(.2), ledOn), 0, mm(21.9), PZ - mm(.12));
-  add(inn, rslab(mm(8.8), mm(4.0), mm(.2), mm(2), mm(.05), gapM), 0, mm(21.9), PZ + mm(.02));
+  add(inn, rslab(mm(8), mm(2.6), mm(.6), mm(1.3), mm(.2), ledOn), 0, mm(25.0), PZ - mm(.12));
+  add(inn, rslab(mm(8.8), mm(3.4), mm(.2), mm(1.7), mm(.05), gapM), 0, mm(25.0), PZ + mm(.02));
   // thumb-turn rose: raised ring with a groove
   add(inn, lathe([[11.2, 23.9], [11.0, 24.6], [10.8, 25.1], [10.3, 25.45], [9.0, 25.5], [8.7, 25.45], [8.6, 25.0], [8.2, 24.95], [8.1, 25.3], [7.8, 25.5], [0, 25.5]], powderL), 0, 0, 0);
   // thumb-turn: 10 mm wide, 41 mm long, its face sloping out toward the bottom (9 mm proud at the top, 13 mm at the bottom)
-  { const s = new THREE.Shape(), T = mm(14.8), B = mm(-21.5), r = mm(1.6);
+  { const s = new THREE.Shape(), T = mm(17.2), B = mm(-21.2), r = mm(1.6);
     const pts = [[0, T], [mm(8.6), T], [mm(12.8), B], [0, B]];
     s.moveTo(0, T); s.lineTo(mm(8.6) - r, T); s.quadraticCurveTo(mm(8.6), T, mm(8.6) + r * .1, T - r);
     s.lineTo(mm(12.8) - r * .05, B + r); s.quadraticCurveTo(mm(12.8), B, mm(12.8) - r, B); s.lineTo(0, B); s.lineTo(0, T);
