@@ -54,7 +54,7 @@ button { font: inherit; color: inherit; }
 
 /* ---- the street: full-bleed rep photo, graded so everything on top reads ---- */
 .bg { position: fixed; inset: 0; pointer-events: none; overflow: hidden; background: var(--ink); }
-.bg i { position: absolute; inset: 0; background: url(connect/bg.webp?v=2) 47% 30% / cover no-repeat; transform: scale(1.07); animation: settle 2.6s var(--ease) forwards; }
+.bg i { position: absolute; inset: 0; background: url(connect/bg.webp?v=3) 72% 30% / cover no-repeat; transform: scale(1.07); animation: settle 2.6s var(--ease) forwards; }
 .bg::before { content: ''; position: absolute; inset: 0; z-index: 1; background:
   linear-gradient(180deg, rgba(var(--dusk), .86) 0%, rgba(var(--dusk), .42) 26%, rgba(var(--dusk), .30) 44%, rgba(var(--dusk), .74) 72%, rgba(var(--dusk), .96) 100%),
   radial-gradient(120% 90% at 66% 30%, transparent 40%, rgba(var(--dusk), .55) 100%); }
@@ -510,7 +510,7 @@ button { font: inherit; color: inherit; }
       </span>
     </button>
     <button class="card recruit" data-app="recruit" aria-label="Open Fast Recruit">
-      <span class="ph"></span><span class="sh"></span>
+      <span class="ph"><video class="pv" src="connect/recruit_ho.mp4?v=1" poster="connect/recruit_ho.jpg?v=1" muted playsinline loop autoplay preload="auto" disablepictureinpicture aria-hidden="true"></video></span><span class="sh"></span>
       <img class="ic" src="recruit/icon.png" alt="">
       <span class="last"><i></i>Last used</span>
       <span class="bd">
