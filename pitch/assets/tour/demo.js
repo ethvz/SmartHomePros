@@ -477,7 +477,9 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
   placeAct();
   showTry(want === 'hub'); }
 /* dock the control just above the tour's slim product bar (#card), centred on it; never over the product */
-function placeAct(){ const c = tour.card; if(!c) return; const top = c.offsetTop, cx = c.offsetLeft + c.offsetWidth/2;
+function placeAct(){ const c = tour.card; if(!c) return; const r = c.getBoundingClientRect(), cs = getComputedStyle(c);
+  const m = new DOMMatrix(cs.transform === 'none' ? undefined : cs.transform), tr = (cs.translate || '').split(' ');   // the bar slides in: measure where it rests
+  const top = r.top - m.m42 - (parseFloat(tr[1]) || 0), cx = r.left + r.width/2 - m.m41 - (parseFloat(tr[0]) || 0);
   actEl.style.left = cx + 'px'; actEl.style.bottom = Math.max(12, innerHeight - top + 10) + 'px'; }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }
 actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; const a = b.dataset.a;
@@ -485,6 +487,7 @@ actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(
   if(a === 'lock') device('lock', !M.locked); if(a === 'gar') device('garage', !M.garageOpen);
   if(a === 'tup') device('therm', Math.min(90, M.th.sp + 1)); if(a === 'tdn') device('therm', Math.max(50, M.th.sp - 1));
   if(a === 'away' || a === 'stay') automation(a, { from:'keypad' }); });
+tour.card && tour.card.addEventListener('transitionend', () => { if(actK) placeAct(); });
 /* watch the tour's focus changes cheaply (it has no events): body class + data attribute */
 new MutationObserver(() => syncAct()).observe(document.body, { attributes:true, attributeFilter:['class', 'data-fk'] });
 
