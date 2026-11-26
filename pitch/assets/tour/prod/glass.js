@@ -52,7 +52,7 @@ export default H => {
   const dg = K.skin(dish), dp = dg.attributes.position, dc = [];
   for (let i = 0; i < dp.count; i++){                 // baked occlusion: the upper-left inner wall (turned away from the room's light)
     const x = dp.getX(i), y = dp.getY(i), r = Math.hypot(x, y), q = r > 3 ? Math.max(0, (.75 * y - .45 * x) / r) : 0;   // and the rim shadow line
-    const k = 1 - .16 * q * Math.pow(Math.min(1, r / RD), 1.5) - (r > RD * .97 ? .05 * q : 0); dc.push(k, k, k); }
+    const k = 1 - .3 * q * Math.pow(Math.min(1, r / RD), 1.2) - (r > RD * .97 ? .08 * q : 0); dc.push(k, k, k); }
   dg.setAttribute('color', new THREE.Float32BufferAttribute(dc, 3)); wm.vertexColors = true;
   add(u, new THREE.Mesh(dg, wm));
   add(u, new THREE.Mesh(new THREE.CircleGeometry(2.45, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,
