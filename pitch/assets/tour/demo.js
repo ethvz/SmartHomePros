@@ -137,6 +137,9 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmCap button{height:40px;padding:0 16px;border-radius:20px;background:rgba(255,255,255,.1);font-weight:600;font-size:14px;flex:none}
 #dmCap.alarm .st i.cur{box-shadow:inset 0 0 0 2px #ff3b30}
 #dmShieldRun{position:fixed;inset:0;z-index:9}
+#dmRed{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .6s;box-shadow:inset 0 0 160px 30px rgba(255,36,24,.75)}
+#dmRed.on{opacity:1;animation:dmRedP 1.1s ease-in-out infinite}
+@keyframes dmRedP{50%{opacity:.35}}
 #dmShieldRun[hidden]{display:none}
 /* while a close-up or automation plays, the tour's own chrome steps aside */
 body.dmMode #rail,body.dmMode #spots,body.dmMode #card,body.dmMode #cFeats,body.dmMode #back,body.dmMode #brand,body.dmMode #hint,body.dmMode #dmAct,body.dmMode #dmTry{opacity:0!important;pointer-events:none!important}
@@ -192,6 +195,7 @@ const padEl = el('div', { id:'dmPad', class:'glass', hidden:'' }, '<div class="d
 const actEl = el('div', { id:'dmAct', class:'glass off' });
 const capEl = el('div', { id:'dmCap', class:'glass off' }, '<div class="tt"><small></small><b></b></div><div class="st"></div><button id="dmSkip">Skip</button>');
 const runShield = el('div', { id:'dmShieldRun', hidden:'' });
+const redEl = el('div', { id:'dmRed' });
 document.body.appendChild(capEl);   // keep the caption above the run shield
 
 /* ------------------------------------------------------------------ the house's live state */
@@ -307,15 +311,15 @@ const HUBLED = (() => { const p = P('hub'); if(!p) return { set(){} };
 const LIT = { base:null, exp0:renderer.toneMappingExposure,
   list(){ const L = HOUSE.lights || {}; return (L.interior || []).filter(Boolean); },
   to(v, sec = 1.4){ const ls = this.list(); if(!this.base) this.base = ls.map(l => l.intensity); const from = M.lights; M.lights = v;
-    return tween(sec, e => { const k = from + (v - from)*e; ls.forEach((l, i) => l.intensity = this.base[i]*(.12 + .88*k)); renderer.toneMappingExposure = this.exp0*(.72 + .28*k); }, easeSine); } };
+    return tween(sec, e => { const k = from + (v - from)*e; ls.forEach((l, i) => l.intensity = this.base[i]*(.12 + .88*k)); renderer.toneMappingExposure = this.exp0*(.45 + .55*k); }, easeSine); } };
 /* a soft red pulse at the smoke detector */
 const SMOKE = (() => { const p = P('smokeco'); if(!p) return { on(){}, off(){} };
   const m = new THREE.SpriteMaterial({ color:RED, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending, toneMapped:false,
     map:(() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
       g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.25, 'rgba(255,255,255,.45)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })() });
-  const s = new THREE.Sprite(m); s.scale.setScalar(.9); s.position.copy(p.center).add(V(0, -.05, .08)); s.visible = false; scene.add(s);
-  let f = null; return { on(){ s.visible = true; f = now => { m.opacity = .25 + .75*Math.abs(Math.sin(now/300)); fill.color.setHex(RED); }; perFrame.add(f); kick(); },
-    off(){ if(f) perFrame.delete(f); f = null; tween(.5, e => { m.opacity *= 1 - e; }).then(() => { s.visible = false; }); } }; })();
+  m.blending = THREE.NormalBlending; const s = new THREE.Sprite(m); s.scale.setScalar(1.1); s.position.copy(p.center).add(V(0, -.05, .08)); s.visible = false; scene.add(s);
+  let f = null; return { on(){ s.visible = true; redEl.classList.add('on'); f = now => { m.opacity = .25 + .75*Math.abs(Math.sin(now/300)); fill.color.setHex(RED); }; perFrame.add(f); kick(); },
+    off(){ redEl.classList.remove('on'); if(f) perFrame.delete(f); f = null; tween(.5, e => { m.opacity *= 1 - e; }).then(() => { s.visible = false; }); } }; })();
 
 /* ------------------------------------------------------------------ the Smart Hub emulator (same-origin iframe) */
 const EMU = { frame:null, w:null, doc:null, UI:null, S:null, ready:null, driving:false, docked:true, mx:'' };
@@ -388,6 +392,8 @@ function showDock(on){ if(on){ emu(); EMU.docked = true; hubEl.classList.remove(
 async function toPip(){ if(!hubEl.classList.contains('vis')) { hubEl.style.transition = 'none'; hubEl.style.transform = pipMatrix(); hubEl.classList.add('pip'); void hubEl.offsetWidth; hubEl.style.transition = ''; hubEl.classList.add('vis'); EMU.docked = false; perFrame.delete(dockStep); return; }
   EMU.docked = false; perFrame.delete(dockStep); hubEl.classList.remove('live'); hubEl.classList.add('pip');
   hubEl.style.transition = 'transform .8s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = pipMatrix(); EMU.mx = ''; await wait(.8); }
+async function atHub(){ await fly(SH.hub()); if(!SKIP.on) await toDock(); }
+async function offHub(){ if(EMU.docked && !SKIP.on) await toPip(); }
 async function toDock(){ const m = dockMatrix(); if(!m){ showDock(false); return; }
   hubEl.style.transition = 'transform .75s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = m; EMU.mx = m; await wait(.75);
   hubEl.classList.remove('pip'); hubEl.style.transition = ''; EMU.docked = true; perFrame.add(dockStep); kick(); }
@@ -516,7 +522,7 @@ function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async
 /* make every device match the model in one go (after a skip) */
 function settle(){ GAR.place(M.garage = M.garageOpen ? 1 : 0); GAR.leds(0); const t = parts('lock').turn; if(t) t.rotation.z = M.locked ? 0 : -Math.PI/2;
   if(DOOR.pivot) DOOR.pivot.rotation.y = DOOR.sign*1.35*M.door; TH.glow = 1; TH.paint(); paintArm();
-  const ls = LIT.list(); if(LIT.base) ls.forEach((l, i) => l.intensity = LIT.base[i]*(.12 + .88*M.lights)); renderer.toneMappingExposure = LIT.exp0*(.72 + .28*M.lights);
+  const ls = LIT.list(); if(LIT.base) ls.forEach((l, i) => l.intensity = LIT.base[i]*(.12 + .88*M.lights)); renderer.toneMappingExposure = LIT.exp0*(.45 + .55*M.lights);
   syncEmu(); }
 
 /* a single device, driven from the hub, the action bar or a 3D tap */
@@ -552,8 +558,8 @@ function automation(name, o = {}){
     capStep(1, 'Locking the doors'); HUBDO.lock(true); await fly(SH.lock()); await LOCK.set(true); await wait(.3);
     if(away){ capStep(2, 'Lights off'); await fly(SH.great()); await LIT.to(.15, 1.6);
       capStep(3, `Eco mode ${ECO}°`); await fly(SH.therm()); await TH.to(ECO, 'cool'); HUBDO.therm(); await wait(.5); }
-    capStep(away ? 4 : 2, away ? 'Armed Away' : 'Armed Stay'); await fly(SH.hub()); HUBDO.home(); HUBDO.arm(name); paintArm(); await wait(1.4);
-    capDone(away ? 'Armed Away' : 'Armed Stay'); await fly(SH.home()); });
+    capStep(away ? 4 : 2, away ? 'Armed Away' : 'Armed Stay'); await atHub(); HUBDO.home(); HUBDO.arm(name); paintArm(); await wait(1.6);
+    capDone(away ? 'Armed Away' : 'Armed Stay'); await offHub(); await fly(SH.home()); });
   if(name === 'welcome') return sequence('welcome', async () => {
     const armed = M.arm !== 'dis';
     caption('Automation', 'Welcome Home', ['keys', 'shield', 'unlock', 'door', 'bulb', 'temp']);
@@ -577,13 +583,13 @@ function automation(name, o = {}){
     capStep(1, M.garageOpen ? 'Closing the garage' : 'Garage closed'); await fly(SH.garage()); HUBDO.garage(false); await GAR.set(false); await wait(.3);
     capStep(2, 'Lights off'); await fly(SH.great()); await LIT.to(.15, 1.8);
     capStep(3, 'Sleep 68°'); await fly(SH.therm()); M.th.cur = Math.max(M.th.cur, 72); await TH.to(68, 'cool'); HUBDO.therm(); await wait(.5);
-    capStep(4, 'Armed Stay'); await fly(SH.hub()); HUBDO.home(); M.arm = 'stay'; HUBDO.arm('stay'); paintArm(); await wait(1.3);
+    capStep(4, 'Armed Stay'); await atHub(); HUBDO.home(); M.arm = 'stay'; HUBDO.arm('stay'); paintArm(); await wait(1.6); await offHub();
     capDone('Goodnight'); await fly(SH.home()); });
   if(name === 'smoke') return sequence('smoke', async () => {
     caption('Life safety', 'Smoke detected', ['fire', 'bell', 'bulb', 'temp', 'unlock'], true);
     capStep(0); setFill(1.4, RED); await fly(SH.smoke()); SMOKE.on(); await wait(1.6);
-    capStep(1, 'Fire dept. alerted'); await fly(SH.hub()); M.alarm = true; HUBDO.alarm('Smoke detected in the living room. The fire department has been requested.'); paintArm(); await wait(1.8);
-    capStep(2, 'Lights on'); await fly(SH.great()); await LIT.to(1, .8);
+    capStep(1, 'Fire dept. alerted'); await atHub(); M.alarm = true; HUBDO.alarm('Smoke detected in the living room. The fire department has been requested.'); paintArm(); await wait(2);
+    await offHub(); capStep(2, 'Lights on'); await fly(SH.great()); await LIT.to(1, .8);
     capStep(3, 'HVAC off'); await fly(SH.therm()); await TH.to(M.th.sp, 'off'); HUBDO.therm(); await wait(.7);
     capStep(4, 'Doors unlock'); HUBDO.lock(false); await fly(SH.door()); await LOCK.set(false); await DOOR.swing(true, 1.8); await wait(.8);
     capDone('Clear path out'); await wait(1.2);
