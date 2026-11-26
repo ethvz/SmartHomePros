@@ -76,14 +76,15 @@
           const tx=(L.labels||[])[i]||''; if(lb.textContent!==tx) lb.textContent=tx;
           /* the locks overlap in the artwork: fade the edge where the neighbour cuts in, so every tile reads the same */
           const fd=(L.fade||[])[i]; fadeEdge(el,r,fd); Object.assign(lb.style,{left:(x0+col*(cw+gx))+'px',top:(y+ch+6).toFixed(0)+'px',width:cw+'px'}); });
-        c.style.top=(y0+blockH+gap).toFixed(0)+'px'; }
+        }
       else { const ws=L.w||cr.map(()=>1), sg=16;
         let k=Math.min(...cr.map((r,i)=>600/(r[2]*ws[i])), (avail-sg*(cr.length-1))/cr.reduce((a,r,i)=>a+r[3]*ws[i],0));
         blockH=cr.reduce((a,r,i)=>a+r[3]*k*ws[i],0)+sg*(cr.length-1); let y=top0+Math.max(0,(H-top0-bot-ctlH-gap-blockH)/2);
         cr.forEach((r,i)=>{ const kk=k*ws[i], el=i?ghost(sec,w,i):w; used.add(i); place(el,r,kk,300-r[2]*kk/2,y); fadeEdge(el,r,(L.fade||[])[i]); y+=r[3]*kk+sg; });
-        c.style.top=(y-sg+gap).toFixed(0)+'px'; }
+        }
       sec.querySelectorAll(':scope>.ppart.ppx,:scope>.pplab').forEach(x=>{ if(!used.has(+x.dataset.i)||(x.classList.contains('pplab')&&L.mode!=='grid')) x.remove(); });
-      c.style.height=ctlH+'px';
+      /* the tile row stays put (anchored above the footer) whichever tile is picked; only the picture moves */
+      const ct=(H-bot-ctlH).toFixed(0)+'px'; if(c.style.top!==ct) c.style.top=ct; c.style.height=ctlH+'px';
     }); }
 
   /* thermostat Features picture: as large as the upright screen leaves room for (headline + feature grid under it) */
@@ -117,7 +118,7 @@
      fx = where the product sits across the source image (0..1); the object-position is worked out from the box and image shapes. ---- */
   const setI=(el,p,v)=>{ if(el.style.getPropertyValue(p)!==v||el.style.getPropertyPriority(p)!=='important') el.style.setProperty(p,v,'important'); };
   const FOC={'ph/motion':.57,'ph/glass':.26,'ph/water':.60,'ph/smoke':.70,'ph/pendant':.30,'ph/fob':.38,'ph/keypad':.33,'ph/lock3':.70,
-    'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.23,'ph/firefighter':.55,'ph/therm2':.71,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.47,
+    'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.25,'ph/firefighter':.55,'ph/therm2':.675,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.46,
     'gal/lock_0':.40,'gal/lock_1':.27,'gal/lock_2':.27,'gal/lock_3':.53,'gal/lock_4':.40,'gal/lock_5':.55,'gal/lock_6':.52,'gal/lock_7':.52,'gal/lock_8':.28,
     'gal/therm_0':.50,'gal/therm_1':.83,'gal/therm_2':.42,'gal/therm_3':.66,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
     'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.83,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
@@ -160,7 +161,7 @@
         let cap=9; P.forEach(i=>{ const im=ims[i]; if(im.naturalWidth) cap=Math.min(cap,im.naturalWidth*1.15/R[i][2]); else if(!im.__ppl){ im.__ppl=1; im.addEventListener('load',later,{once:true}); } });
         const k=Math.min((Q.length?500:760)/gw,(Q.length?.86:1)*free/gh,cap), w=gw*k, h=gh*k, right=pi%2===0;
         /* how much the screen edge cuts: less for narrow renders and long flat ones, so they still read as the product */
-        const off=w<=320?.08:w/h>1.8?.1:Q.length?.18:.26, L=right?600-w*(1-off):-w*off, Y=T+(free-h)/2;
+        const off=w<=250?0:w<=320?.08:w/h>1.8?.1:Q.length?.18:.26, L=right?600-w*(1-off):-w*off, Y=T+(free-h)/2;
         P.forEach(i=>{ const r=R[i], im=ims[i]; setI(im,'left',(L+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); setI(im,'z-index','2'); });
         Q.forEach(i=>{ const r=R[i], im=ims[i], ph=Math.min(free,h*1.1), pw=ph*r[2]/r[3];
           let x=right?L-pw*.88:L+w-pw*.12; x=right?Math.max(28,x):Math.min(600-28-pw,x);
