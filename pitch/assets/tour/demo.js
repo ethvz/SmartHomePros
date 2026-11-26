@@ -10,7 +10,7 @@ const HOUSE = T.house || {};
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const CODE = '1234';
-const GREEN = 0x05e5af, LIME = 0xdfff1a, RED = 0xff3b30, AMBER = 0xff8a1f;
+const GREEN = 0x05e5af, LIME = 0xdfff1a, RED = 0xff3b30, AMBER = 0xff8a1f, BAD = 0xff2020;
 const $ = s => document.querySelector(s);
 const easeIO = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
 const easeOut = t => 1 - Math.pow(1 - t, 3);
@@ -126,6 +126,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 /* docked inside the tour's product bar */
 #card #dmAct{position:static;transform:none;left:auto;bottom:auto;padding:0;margin:0 2px;gap:6px;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0;flex:none}
 #card #dmAct.off{display:none}
+#dmAct .nm{display:none}
 #card #dmAct button{height:44px;padding:0 15px;font-size:14px;gap:7px;background:rgba(255,255,255,.1)}
 #card #dmAct button.pri{background:var(--vg);color:#04110d}
 #card #dmAct button.rnd{width:44px;padding:0}
@@ -135,6 +136,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
   #card.dmHas .c-name{display:none!important}
   #card #dmAct{gap:4px;margin:0}
   #card #dmAct .t{display:none}
+  #card #dmAct .nm{display:block;font-size:12.5px;font-weight:700;color:#fff;margin:0 4px 0 2px;white-space:nowrap}
   #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
   #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock]{width:40px;padding:0;justify-content:center}
   #card #dmAct button.rnd{width:36px;height:36px}
@@ -271,7 +273,7 @@ const KEYC = new THREE.Color();
 /* Smart Lock: status LEDs, thumb-turn, keys; it rides on the front door when the door swings */
 const LOCK = {
   flash(hex, n = 2){ const leds = (parts('lock').led || []).concat(parts('lock').interiorLed || []);
-    return tween(.45*n, (e, k) => { const on = Math.sin(k*n*Math.PI) ** 2; leds.forEach(m => meshMats(m).forEach(x => { glowMat(x, hex, 2.4*on); if(x.color){ if(x.userData.c0 == null) x.userData.c0 = x.color.getHex(); x.color.setHex(on > .05 ? hex : x.userData.c0); } })); }, t => t); },
+    return tween(.45*n, (e, k) => { const on = Math.sin(k*n*Math.PI) ** 2; leds.forEach(m => meshMats(m).forEach(x => { glowMat(x, hex, (hex === BAD ? 1.1 : 2.4)*on); if(x.color){ if(x.userData.c0 == null) x.userData.c0 = x.color.getHex(); x.color.setHex(on > .05 ? hex : x.userData.c0); } })); }, t => t); },
   async set(locked){ const t = parts('lock').turn; M.locked = locked; syncAct();
     const from = t ? t.rotation.z : 0, to = locked ? 0 : -Math.PI/2;
     await Promise.all([ t ? tween(.55, e => { t.rotation.z = from + (to - from)*e; }, easeIO) : Promise.resolve(), this.flash(locked ? 0xff7a1a : GREEN, 2) ]); },
@@ -395,7 +397,8 @@ const HUBDO = {
     S.th.cur = t.cur; let n = 0; while(S.th.sp < t.sp && n++ < 40) emuClick('[data-act="tup"]'); while(S.th.sp > t.sp && n++ < 80) emuClick('[data-act="tdn"]');
     if(!n){ emuClick('[data-act="tup"]'); emuClick('[data-act="tdn"]'); } },
   alarm(msg){ if(!EMU.UI) return; EMU.driving = true; EMU.UI.demo(3); EMU.driving = false; const s = q('#almS'); if(s) s.innerHTML = 'Enter PIN to silence alarm.<br>' + msg; },
-  clearAlarm(){ if(!EMU.S || !EMU.S.alarm) return; for(const d of CODE) emuClick(`[data-pin="${d}"]`); },
+  clearAlarm(){ if(!EMU.S || !EMU.S.alarm) return; if(SKIP.on){ EMU.driving = true; EMU.UI.demo(0); EMU.driving = false; return; }   // instant; a reconcile restores anything demo(0) reset
+    for(const d of CODE) emuClick(`[data-pin="${d}"]`); },
   home(){ if(EMU.UI){ emuClick('[data-act="close"]'); } },
 };
 const lockBusy = () => !!q('[data-act="lock"][data-lk="front"].busy');
@@ -511,7 +514,7 @@ const digitOf = m => (m.name || '').replace(/^key/, '');
 function padKey(m){ const d = digitOf(m); if(!/^\d$/.test(d) || PAD.code.length >= 4) return; pressKey(m, GREEN); PAD.code += d; padDots();
   if(PAD.code.length === 4) setTimeout(padCheck, 260); }
 async function padCheck(){ const ok = PAD.code === CODE, k = PAD.k;
-  if(!ok){ padEl.classList.remove('bad'); void padEl.offsetWidth; padEl.classList.add('bad'); if(k === 'lock'){ LOCK.flash(RED, 2); LOCK.shake(); } else KP.flashBad();
+  if(!ok){ padEl.classList.remove('bad'); void padEl.offsetWidth; padEl.classList.add('bad'); if(k === 'lock'){ LOCK.flash(BAD, 2); LOCK.shake(); } else KP.flashBad();
     await wait(.7); PAD.code = ''; padDots(); padEl.classList.remove('bad'); return; }
   padEl.classList.add('ok');
   if(k === 'lock') automation('welcome', { typed:true });
@@ -546,13 +549,14 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
   if(!want){ if(actK){ actEl.classList.add('off'); tour.card.classList.remove('dmHas'); actK = null; } showTry(false); return; }
   if(want === 'therm') adoptTherm();
   const a = TH.active(), lab = a === 'cool' ? 'Cooling' : a === 'heat' ? 'Heating' : M.th.mode === 'off' ? 'Off' : 'Idle';
-  const H = {
+  let H = {
     lock:`<button class="pri" data-a="pad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="lock" aria-label="${M.locked ? 'Unlock' : 'Lock'}">${M.locked ? IC.unlock + T_('Unlock') : IC.lock + T_('Lock')}</button>`,
     garage:`<button class="pri" data-a="gar">${IC.garage}${M.garageOpen ? 'Close' : 'Open'}</button>`,
     therm:`<button class="rnd" data-a="tdn" aria-label="Cooler">${IC.down}</button><div class="tv">${M.th.sp}°<small class="${a || ''}">${lab}</small></div><button class="rnd" data-a="tup" aria-label="Warmer">${IC.up}</button>`,
     keypad:`<button class="pri" data-a="kpad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
     hub:`<button class="pri" data-a="panel">${IC.hub}${T_('Use the hub')}</button>`,
   }[want];
+  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', keypad:'Keypad', hub:'Smart Hub' }[want]}</span>` + H;
   if(want === 'therm' && actEl.dataset.k === 'therm' && actEl.querySelector('.tv')){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
   else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
   actEl.dataset.k = want;
@@ -575,11 +579,11 @@ function caption(kicker, title, steps, alarm){ capEl.querySelector('small').text
   capEl.querySelector('.st').innerHTML = (steps || []).map(s => `<i>${STEPI[s] || IC.check}</i>`).join(''); capEl.classList.toggle('alarm', !!alarm); capEl.classList.remove('off'); }
 function capStep(i, title){ const st = [...capEl.querySelectorAll('.st i')]; st.forEach((s, j) => { s.classList.toggle('done', j < i); s.classList.toggle('cur', j === i); }); if(title) capEl.querySelector('b').textContent = title; }
 function capDone(title){ capEl.querySelectorAll('.st i').forEach(s => { s.classList.add('done'); s.classList.remove('cur'); }); if(title) capEl.querySelector('b').textContent = title; }
-function skip(){ if(!MODE.run || SKIP.on || performance.now() - MODE.runT0 < 800) return; SKIP.on = true;
+function skip(){ if(!MODE.run || SKIP.on) return; if(performance.now() - MODE.runT0 < 800){ nudgeSkip(); return; } SKIP.on = true;
   hubEl.style.transition = 'none'; if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix();   // no half-way hub UI left floating
   flushAll(); }
 function nudgeSkip(){ const b = $('#dmSkip'); b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge'); }
-$('#dmSkip').addEventListener('click', skip); runShield.addEventListener('click', nudgeSkip);
+$('#dmSkip').addEventListener('click', e => { e.stopPropagation(); skip(); }); runShield.addEventListener('click', nudgeSkip); capEl.addEventListener('click', nudgeSkip);
 let queue = Promise.resolve();
 /* run one sequence at a time; `body(ctx)` does the moves; `withHub` floats the hub UI as picture-in-picture */
 function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async () => {
