@@ -184,7 +184,7 @@
     var bb = br ? br.getBoundingClientRect() : { bottom: hr.top + 90, right: hr.right - 20 }, gy = cr ? cr.getBoundingClientRect().top - hr.top : hr.height * .55;
     W = round(hr.width); H = round(hr.height);
     var band = max(60, gy - (bb.bottom - hr.top));
-    S = max(2, min(6, round(min(band / 88, W / 270))));
+    S = max(2, min(6, round(min(band / 88, W / (H > W && W >= 700 ? 200 : 270)))));   // iPad portrait: bigger pixels, the street fills the band
     LW = M.ceil(W / S); LH = M.ceil(H / S);
     if (cv.width !== LW || cv.height !== LH) { cv.width = LW; cv.height = LH; }
     var cw = LW * S + 'px', ch = LH * S + 'px'; if (cv.style.width !== cw || cv.style.height !== ch) { cv.style.width = cw; cv.style.height = ch; }
@@ -228,8 +228,7 @@
     R(ctx, 0, hz, LW, 1, '#3aa84e');
     R(ctx, 0, G, LW, 8, '#e4e2da'); R(ctx, 0, G, LW, 1, '#ffffff'); R(ctx, 0, G + 7, LW, 1, '#b8b6ae');
     for (x = ((ox % 12) + 12) % 12; x < LW; x += 12) R(ctx, x, G + 1, 1, 6, '#c2c0b8');
-    R(ctx, 0, G + 8, LW, 2, '#8d8f96'); R(ctx, 0, G + 10, LW, LH - G - 10, '#3d4250');
-    for (x = ((ox % 24) + 24) % 24; x < LW; x += 24) R(ctx, x, G + 17, 12, 2, '#ffd84a');
+    R(ctx, 0, G + 8, LW, 2, '#8d8f96'); R(ctx, 0, G + 10, LW, LH - G - 10, '#2a2e38');
 
     var base = G - 6, k0 = floor((cam - LW / 2 - HW - 40) / PS), k1 = M.ceil((cam + LW / 2 + 20) / PS);
     var s = state(u, k);
@@ -251,22 +250,24 @@
     ctx.drawImage(s.spr, rx - 7, fy - 22);
     if (s.knockFx) { var kx = rx + 6, ky = fy - 22; R(ctx, kx + 3, ky - 1, 2, 1, '#fff'); R(ctx, kx + 4, ky + 2, 3, 1, '#fff'); R(ctx, kx + 3, ky + 5, 2, 1, '#fff'); }
     // the coin and its sparkles
-    var got = max(0, floor((t - GOT) / CYC) + 1);
+    var got = max(0, floor((t - GOT) / CYC) + 1), b = cnt.b, str = '' + min(got, 99999), tw2 = str.length * 4 * b - b;
+    var ph = max(14, 5 * b + 6), pw = tw2 + 19, px = cnt.x - pw, py = cnt.y;   // the counter plate
     if (s.coin >= 0) {
       var c = s.coin, ccx, ccy, sx = rx - 4;
       if (c < .28) { var e = 1 - M.pow(1 - c / .28, 3); ccx = sx + e * 3; ccy = fy - 22 - e * 20; }
       else if (c < .62) { ccx = sx + 3; ccy = fy - 42 + round(sin((c - .28) * 18)); }
-      else { var f = ease((c - .62) / .16); ccx = sx + 3 + (cnt.x - 26 - sx - 3) * f; ccy = fy - 42 + (cnt.y - fy + 42) * f - sin(f * PI) * 10; }
+      else { var f = ease((c - .62) / .16); ccx = sx + 3 + (px + 3 - sx - 3) * f; ccy = fy - 42 + (py + ((ph - 10) >> 1) - fy + 42) * f - sin(f * PI) * 10; }
       if (c < .78) ctx.drawImage(COIN[floor(t * 14) % 6], round(ccx), round(ccy));
       if (c > .2 && c < .7) for (i = 0; i < 3; i++) { var a = t * 3 + i * 2.1, tw = (floor(t * 8) + i) % 3; sparkle(round(ccx + 4 + M.cos(a) * 9), round(ccy + 5 + sin(a) * 8), tw); }
     }
-    // coin counter: icon, x, count
-    var b = cnt.b, str = 'x' + (got < 10 ? '0' : '') + (got % 1000), tw2 = str.length * 4 * b - b, cx2 = cnt.x - tw2, cy2 = cnt.y;
-    var bump = (s.coin > .78 && s.coin < .9) ? -1 : 0;
-    ctx.globalAlpha = .28; R(ctx, cx2 - 13, cy2, tw2 + 16, 5 * b + 6, K); R(ctx, cx2 - 12, cy2 - 1, tw2 + 14, 5 * b + 8, K); ctx.globalAlpha = 1;   // plate
-    text(str, cx2 + 1, cy2 + 3 + b + bump, b, K); text(str, cx2, cy2 + 2 + b + bump, b, '#ffffff');
-    ctx.drawImage(COIN[0], cx2 - 11, cy2 + bump + max(0, (5 * b - 10) >> 1) + 2);
-    if (s.coin > .78 && s.coin < .95) sparkle(cx2 - 7, cy2 + 6, floor(t * 10) % 3);
+    // coin counter: a Vivint-green pill with the coin and the count in the pixel font
+    var bump = (s.coin > .78 && s.coin < .9) ? -1 : 0, y0 = py + bump;
+    R(ctx, px + 1, y0 + 1, pw, ph, 'rgba(0,0,0,.3)');                         // soft drop
+    R(ctx, px + 1, y0, pw - 2, ph, '#05e5af'); R(ctx, px, y0 + 1, pw, ph - 2, '#05e5af');
+    R(ctx, px + 2, y0 + 1, pw - 4, 1, '#8ff7e0'); R(ctx, px + 1, y0 + ph - 2, pw - 2, 1, '#03b88c');
+    ctx.drawImage(COIN[0], px + 3, y0 + ((ph - 10) >> 1));
+    text(str, px + 14, y0 + ((ph - 5 * b) >> 1), b, '#04241e');
+    if (s.coin > .78 && s.coin < .95) sparkle(px + 7, y0 + (ph >> 1), floor(t * 10) % 3);
   }
   function sparkle(x, y, f) {
     var c = f === 2 ? PAL.Y : '#ffffff', r = f === 1 ? 3 : 2;
