@@ -105,8 +105,8 @@ export default H => { const { THREE, G, add, rbox } = H;
   /* post (buried 60 mm) and cap */
   const postM = new THREE.MeshPhysicalMaterial({ color: 0xedede9, roughness: .6, clearcoat: .1, clearcoatRoughness: .6 });
   add(S, rbox(19, 805.5, 19, 1, postM), 0, (745.5 - 60) / 2, 0);
-  const capM = new THREE.MeshPhysicalMaterial({ color: 0x0a0b0c, roughness: .35, clearcoat: .2, clearcoatRoughness: .3, envMapIntensity: .6 });
-  add(S, rbox(22.5, 32, 22.5, 1.0, capM), 0, 744 + 16, 0); add(S, rbox(23.5, 3, 23.5, .8, capM), 0, 744 + 1.5, 0);   // cap with its flared bottom lip
+  const capM = new THREE.MeshPhysicalMaterial({ color: 0x040405, roughness: .4, clearcoat: .2, clearcoatRoughness: .3, envMapIntensity: .45 });
+  add(S, rbox(22.5, 32, 22.5, 1.0, capM), 0, 744 + 16, 0); add(S, rbox(23.2, 1.6, 23.2, .6, capM), 0, 744 + .8, 0);   // cap with its flared bottom lip
   const grime = plane(19, 90, 6, (x) => { const gr = x.createLinearGradient(0, 0, 0, 540); gr.addColorStop(0, 'rgba(120,120,115,.22)'); gr.addColorStop(1, 'rgba(120,120,115,0)');
     x.fillStyle = gr; x.fillRect(0, 0, 114, 540); for (let i = 0; i < 9; i++) { x.fillStyle = 'rgba(110,110,105,.12)'; x.fillRect(10 + i * 11 % 90, 20 + i * 37 % 200, 3 + i % 3, 18 + i * 7 % 30); } }, { r: .6 });
   for (const s of [1, -1]) { const p = grime.clone(); p.rotation.y = s > 0 ? 0 : Math.PI; add(S, p, 0, 745.5 - 45, s * 9.52); }
