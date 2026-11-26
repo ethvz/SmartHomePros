@@ -21,12 +21,12 @@
   /* photo crops (fb) fade out at the bottom: the source slides' dark text mattes leave ragged blotches on the lower part of the photos.
      Products and faces stay left of the footer's section rail (~x 900 on the stage). Baked step lists are shown 1.15x. */
   const SPEC = {
-    mon_hero: { html: '<div class="ipmon"><h2>The industry’s most trusted emergency support.</h2></div>', rows: [[[560, 60, 680, 520, W, 0, 964, 'fb']]] },
+    mon_hero: { html: '<div class="ipmon"><h2>The industry’s most trusted emergency support.</h2></div>', rows: [[[650, 60, 700, 520, W, 0, 964, 'fb']]] },
     mon_home: [[[100, 160, 720, 390, W, 132, 700, 'fb']], [[806, 214, 394, 466, 394, , , 'fe']], N1],
     mon_trained: [[[0, 150, 720, 400, W, 132, 640, 'fb']], [[730, 290, 600, 370, 600, , , 'fe']], N1],
     mon_911: [[[470, 0, 906, 470, W, 0, 470, 'fb']], [[700, 500, 560, 160, 560, , , 'fe']], N1],
     mon_simple: [[[0, 150, 700, 400, W, 132, 600, 'fb']], [[700, 390, 580, 290, 580, , , 'fe']], N1],
-    mon_insurance: { bg: 1, rows: [[[60, 460, 760, 230, 760, , , 'fe', { x: 52 }]], [[640, 20, 736, 600, W, 0, 964, 'fb']]] },
+    mon_insurance: { rows: [[[700, 0, 676, 440, W, 0, 470]]], [[60, 460, 760, 230, 760, , , 'fe', { x: 52 }]]] },
     mon_breakin: [[[110, 236, 470, 418, 540, , , , { x: 46 }]], [[588, 140, 788, 600, 700, , , 'bl', { x: 196 }]], N3],
     mon_smoke: [[[110, 230, 560, 380, 644, , , , { x: 46 }]], [[716, 126, 660, 590, 560, , , 'bl', { x: 320 }]], N3],
     mon_water: [[[110, 270, 540, 320, 620, , , , { x: 46 }]], [[700, 160, 676, 440, 640, , , 'bl', { x: 250 }]], N3],
