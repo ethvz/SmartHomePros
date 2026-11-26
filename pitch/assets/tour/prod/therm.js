@@ -99,12 +99,13 @@ export default H => {
       [...s].forEach((c, i) => { x.fillText(c, px + ms[i].actualBoundingBoxLeft, Y(cy) + capH*5); px += iw[i] + gap; }); };
     const glyphs = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
       x.lineWidth = 10; chev(46.5, true); chev(-46.5, false);
-      x.lineWidth = 3; flake(0, 18.3, 3.75);
+      x.lineWidth = 2.4; flake(0, 18.3, 3.8);
       num('73', 0, 2.4, 15.6, 23.7, 300); num('75', 0, -13.2, 6.0, 9.4, 300); };
     const draw = () => { x.clearRect(0, 0, N, N);
-      x.save(); x.shadowColor = 'rgba(255,255,255,.95)'; x.shadowBlur = 22; x.globalAlpha = .55; glyphs(); x.restore();   // soft halo
-      x.save(); x.shadowColor = 'rgba(255,255,255,.8)'; x.shadowBlur = 7; glyphs(); x.restore();                          // glyphs + tight bloom
-      x.save(); x.fillStyle = 'rgba(255,255,255,.16)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
+      const halo = (blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4000; x.shadowColor = col; x.shadowBlur = blur; glyphs(); x.restore(); };   // shadow only, glyphs stay thin
+      halo(34, 'rgba(255,255,255,.75)'); halo(12, 'rgba(255,255,255,.6)');
+      glyphs();
+      x.save(); x.fillStyle = 'rgba(255,255,255,.1)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
       x.font = `500 ${100*120/w0}px ${F}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('vivint', X(0), Y(-36.6)); x.restore(); };
     draw();
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.premultiplyAlpha = true;

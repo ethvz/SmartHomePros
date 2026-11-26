@@ -17,7 +17,7 @@ export default H => {
   const faceZ = r => 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - RL) / (RF - RL))) ** 2);
   const SC = { x: -52, y: 0, R: 11, d: 3.4 };          // half-moon scoop at 9 o'clock
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(r);
-    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** 1.15; return z; };
+    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** .6; return z; };
 
   /* ---------- body lathe: back, base seam, straight side, fillet into the face */
   const prof = [V2(0, 0), V2(69.6, 0), V2(70.7, .25), V2(71, 1), V2(71, 2.85), V2(70.7, 2.9), V2(70.7, 3.1), V2(71, 3.15)];
@@ -40,7 +40,7 @@ export default H => {
   const holes = [
     { pts: rrPts(42, 46.6, -10.5, 10.5, [2.2, 2.2, 2.2, 2.2], 0), phi: 0, u: [42, 46.6], v: 10.5 },
     { pts: rrPts(49.2, 56, -9.5, 9.5, [1.6, 6, 6, 1.6], 0), phi: 0, u: [49.2, 56], v: 9.5 },
-    { pts: rrPts(43.6, 48.2, -6.8, 6.8, [2.2, 2.2, 2.2, 2.2], 180), phi: 180, u: [43.6, 48.2], v: 6.8 },
+    { pts: rrPts(43.4, 48.8, -8.2, 8.2, [2.4, 2.4, 2.4, 2.4], 180), phi: 180, u: [43.4, 48.8], v: 8.2 },
   ];
 
   /* ---------- canvases: printed map + hole mask, planar over the 142 mm disc */
@@ -89,7 +89,7 @@ export default H => {
     const [gx0, gy0] = P(0, 0); const gr = x.createRadialGradient(gx0, gy0, 44 * k, gx0, gy0, 56 * k);
     gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,.10)'); x.fillStyle = gr; x.fillRect(0, 0, N, N); x.restore(); }
   // printed text: straight lines tangent to the circle, letters' tops toward the centre, condensed caps
-  const txt = (s, r, phi, cap, w = 500, col = '#6f6f6f', cond = .86) => { const [px, py] = P(r * Math.cos(phi * D2R), r * Math.sin(phi * D2R));
+  const txt = (s, r, phi, cap, w = 500, col = '#5e5e5e', cond = .86) => { const [px, py] = P(r * Math.cos(phi * D2R), r * Math.sin(phi * D2R));
     x.save(); x.translate(px, py); x.rotate(Math.atan2(-Math.cos(phi * D2R), -Math.sin(phi * D2R))); x.scale(cond, 1);
     x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = `${w} ${Math.round(cap * k / .72)}px "Helvetica Neue", Helvetica, Arial, sans-serif`; x.fillText(s, 0, 0); x.restore(); };
@@ -98,8 +98,8 @@ export default H => {
   txt('GREEN/VERT - OK', 51.2, 154, 1.75); txt('YLW - FAULT JUANE - PANNE', 53.8, 154.5, 1.75); txt('RED - ALARM ROUGE - ALARME', 56.4, 155, 1.75);
   txt('ENTRETIEN - 1 BIP', 52, 22, 1.75); txt('FEU ALARME - 3 BIPS', 54.7, 22.5, 1.75); txt('MONOXYDE DE CARBONE - 4 BIPS', 57.4, 23, 1.75);
   txt('SERVICE - 1 BEEP', 52, -22, 1.75); txt('FIRE ALARM - 3 BEEPS', 54.7, -22.5, 1.75); txt('CARBON MONOXIDE ALARM - 4 BEEPS', 57.4, -23, 1.75);
-  txt('ATTENTION', 44.6, 239, 4.3, 500, '#666', 1); txt('NOTICE', 50, 239.5, 3.2, 500, '#6c6c6c', 1); txt('SUPPLÉMENTAIRE AU DOS', 55, 240, 3.1, 500, '#6c6c6c', 1);
-  txt('CAUTION', 44.6, 299.5, 4.3, 500, '#666', 1); txt('ADDITIONAL', 50, 299.5, 3.2, 500, '#6c6c6c', 1); txt('MARKINGS ON BACK', 55, 299, 3.1, 500, '#6c6c6c', 1);
+  txt('ATTENTION', 44.6, 239, 4.3, 500, '#555', 1); txt('NOTICE', 50, 239.5, 3.2, 500, '#5a5a5a', 1); txt('SUPPLÉMENTAIRE AU DOS', 55, 240, 3.1, 500, '#5a5a5a', 1);
+  txt('CAUTION', 44.6, 299.5, 4.3, 500, '#555', 1); txt('ADDITIONAL', 50, 299.5, 3.2, 500, '#5a5a5a', 1); txt('MARKINGS ON BACK', 55, 299, 3.1, 500, '#5a5a5a', 1);
   // no-paint icon: ring, brush + roller, slash
   { const [cx, cy] = P(50.5 * Math.cos(57 * D2R), 50.5 * Math.sin(57 * D2R)), R = 6.5 * k; x.save(); x.translate(cx, cy);
     x.strokeStyle = x.fillStyle = '#4a4a4a'; x.lineWidth = 1.3 * k; x.beginPath(); x.arc(0, 0, R - .65 * k, 0, Math.PI * 2); x.stroke();
@@ -109,8 +109,8 @@ export default H => {
     x.beginPath(); x.moveTo(-1.2 * u, 2.2 * u); x.lineTo(.8 * u, 2.2 * u); x.lineTo(.5 * u, 4.6 * u); x.lineTo(-.9 * u, 4.6 * u); x.closePath(); x.fill();   // brush
     x.restore(); x.lineWidth = 1.3 * k; x.beginPath(); x.moveTo(-R * .68, -R * .68); x.lineTo(R * .68, R * .68); x.stroke(); x.restore(); }
   // pinhole at 6 o'clock
-  { x.fillStyle = '#1e1e1e'; x.beginPath(); x.arc(...P(0, -64.5), .95 * k, 0, Math.PI * 2); x.fill();
-    x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = .25 * k; x.beginPath(); x.arc(...P(0, -64.5), 1.05 * k, 0, Math.PI * 2); x.stroke(); }
+  { x.fillStyle = '#1e1e1e'; x.beginPath(); x.arc(...P(0, -61.5), .95 * k, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = .25 * k; x.beginPath(); x.arc(...P(0, -61.5), 1.05 * k, 0, Math.PI * 2); x.stroke(); }
   const tex = c => { const t = new THREE.CanvasTexture(c); t.anisotropy = Math.min(8, maxAniso); return t; };
   const mapT = tex(cv); mapT.colorSpace = THREE.SRGBColorSpace; const maskT = tex(mk);
 
@@ -161,12 +161,12 @@ export default H => {
   /* ---------- floating cap (TEST/HUSH button) with a shallow centre dimple */
   { const cp = [V2(0, 54.2), V2(25.8, 54.2), V2(26.6, 54.45), V2(26.95, 55), V2(27, 55.6), V2(27, 57.5), V2(26.9, 58.2), V2(26.6, 58.7), V2(26.1, 59.05),
       V2(25.2, 59.25), V2(22, 59.6), V2(17, 60), V2(11, 60.35), V2(6, 60.55), V2(4.7, 60.6), V2(4.5, 60.57), V2(4.1, 60.42), V2(3.3, 60.26), V2(2, 60.15), V2(0, 60.1)];
-    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp, 160), capM)); cap.rotation.x = Math.PI / 2; }
+    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y)), 160), capM)); cap.rotation.x = Math.PI / 2; }
 
   /* ---------- six arched spokes: foot on the face, arc up and in, joining the cap rim */
   { const s = new THREE.Shape(); const f0 = faceZ(44.2) - 1.5, f1 = faceZ(48.4) - 1.5;
-    s.moveTo(25.5, 55.2); s.lineTo(37.5, 55.2); s.bezierCurveTo(42.2, 55.2, 44.2, 52.5, 44.2, 47); s.lineTo(44.2, f0); s.lineTo(48.4, f1); s.lineTo(48.4, 47.5);
-    s.bezierCurveTo(48.4, 55.6, 44.6, 58.6, 37.5, 58.6); s.lineTo(25.5, 58.6); s.lineTo(25.5, 55.2);
+    s.moveTo(24, 55.2); s.lineTo(37.5, 55.2); s.bezierCurveTo(42.2, 55.2, 44.2, 52.5, 44.2, 47); s.lineTo(44.2, f0); s.lineTo(48.4, f1); s.lineTo(48.4, 47.5);
+    s.bezierCurveTo(48.4, 55.6, 44.6, 58.6, 37.5, 58.6); s.lineTo(24, 58.6); s.lineTo(24, 55.2);
     const bv = .9, W0 = 9.2;
     const sg = new THREE.ExtrudeGeometry(s, { depth: W0 - 2 * bv, bevelEnabled: true, bevelThickness: bv, bevelSize: bv, bevelOffset: -bv, bevelSegments: 4, curveSegments: 20 });
     sg.translate(0, 0, -(W0 - 2 * bv) / 2);

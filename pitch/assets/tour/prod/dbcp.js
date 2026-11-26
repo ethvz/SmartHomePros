@@ -93,7 +93,7 @@ export default H => {
   add(g, H.ext(loPad, 2.25, .5, plate));
   add(g, H.rslab(4.2, 13.2, .3, 2, .05, phys(0xcfd0d0, { roughness: .7 })), 0, -43.5, 1.5);
   const boss = rrS(14.5, 14.5, 3, 0, -7); boss.holes.push(circ(-1.75, -7, .75), circ(1.75, -7, .75));
-  const bm = add(g, H.ext(boss, 1.1, .3, plate), 0, 0, 1.15);
+  const bm = add(g, H.ext(boss, .6, .2, plate), 0, 0, 1.65);
   for (const x of [-1.75, 1.75]) add(g, disc(0, .8, voidM), x, -7, 1.6).rotation.y = PI;
 
   /* ---------- bottom face: notch, speaker slots, security-screw tab ---------- */
