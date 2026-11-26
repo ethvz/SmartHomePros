@@ -46,7 +46,7 @@ html.pp #bar:not(.home) #barRight.pnav.pph .rdiv{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn span{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn .ic{width:24px!important;height:24px!important}
 html.pp #bar:not(.home) #barRight.pnav.pph.idle{opacity:1}
-html.pp #bar.ppnav #barlogo,html.pp #bar.hx-ctr #barlogo{display:none!important}
+html.pp #bar.ppnav #barlogo,html.pp #bar.hx-ctr #barlogo,html.pp #bar.ppnologo #barlogo{display:none!important}
 /* the vertical rail that stays (Yard Sign's 2 buttons, beside the centred About/Videos/Yard Sign pill): mid-screen on the right */
 html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph){top:calc((var(--ppFoot) - var(--H)) / 2)!important;right:10px!important;left:auto!important}
 /* Buyouts amount button: centred, the same height as the other pills */
@@ -63,9 +63,9 @@ html.pp #drawer .m2-h{gap:10px;flex-wrap:nowrap}
 html.pp #drawer .m2-h img{height:26px}
 html.pp #drawer .m2-h .sub{font-size:14px;white-space:nowrap}
 html.pp #drawer .m2-wn{height:44px;padding:0 16px;font-size:15px;white-space:nowrap}
-html.pp #drawer .m2-t{height:88px!important;font-size:20px!important;padding:0 18px!important;gap:12px!important;border-radius:22px}
+html.pp #drawer .m2-t{height:92px!important;font-size:20px!important;padding:0 18px!important;gap:12px!important;border-radius:22px}
 html.pp #drawer .m2-t .ic{width:26px;height:26px}
-html.pp #drawer .m2-s{height:52px!important;font-size:17px!important;padding:0 10px!important;gap:10px!important}
+html.pp #drawer .m2-s{height:56px!important;font-size:17px!important;padding:0 10px!important;gap:10px!important}
 html.pp #drawer .m2-f{flex-wrap:wrap;gap:12px 20px}
 
 /* ---------- product sheet (Products pill) ---------- */

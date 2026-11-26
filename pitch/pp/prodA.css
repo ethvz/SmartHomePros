@@ -85,3 +85,47 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fst .r span{font-size:17px
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fst .r span i{font-size:14px;line-height:18px}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp{left:50%!important;top:auto!important;bottom:96px!important;width:280px!important;height:68px!important;margin-left:-140px;z-index:8}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp button{font-size:19px}
+
+/* ---------- hero toggles (Surface/Recessed, Detector/Monitor): centred above the scroll cue ---------- */
+html.pp #prScroll [data-t=hero] .dwseg,html.pp #prScroll .smk-tog{left:50%!important;top:auto!important;bottom:250px!important;margin-left:-170px!important;width:340px!important;height:68px!important}
+html.pp #prScroll [data-t=hero] .dwseg button,html.pp #prScroll .smk-tog button{height:56px!important;font-size:18px!important}
+html.pp #prScroll .lhero.smk .lh-txt{bottom:350px!important}
+html.pp #prScroll .psec[data-t=specs] .hl .dwseg{left:50%!important;top:auto!important;bottom:186px!important;margin-left:-170px!important;width:340px!important;height:68px!important}
+html.pp #prScroll .psec[data-t=specs] .hl .dwseg button{height:56px!important}
+/* Door & Window hero: two full-screen photos side by side in the strip */
+html.pp #prScroll .strip.wide>.dws{width:600px!important;height:var(--H)!important}
+html.pp #prScroll .strip.wide>.dws img{width:100%!important;height:100%!important;object-fit:cover}
+html.pp #prScroll .strip.wide>.dws:first-child img{object-position:62% 50%}
+html.pp #prScroll .dws-t{left:36px!important;right:36px;top:110px!important;bottom:auto!important}
+html.pp #prScroll .dws-t h1{font-size:64px!important;line-height:1!important}
+
+/* ---------- Indoor Camera Pro hero: headline on top, camera below ---------- */
+html.pp #prScroll .ichv .ich-txt{left:36px!important;right:36px;top:110px!important;width:auto!important}
+html.pp #prScroll .ichv .ich-txt h1{font-size:62px!important;margin-bottom:16px}
+html.pp #prScroll .ichv .ich-txt p{font-size:22px!important}
+html.pp #prScroll .ichv .ich-vid{object-fit:cover;object-position:40% 50%}
+html.pp #prScroll .ichv .dbai{top:auto!important;bottom:250px!important;right:30px!important;left:auto!important}
+
+/* ---------- Smoke: Which one is right for you? two cards stacked ---------- */
+html.pp #prScroll .smk-w .eb{left:36px!important;top:104px!important}
+html.pp #prScroll .smk-w h2{left:36px!important;right:36px;top:132px!important;font-size:50px!important}
+html.pp #prScroll .smk-c{left:20px!important;right:20px!important;width:auto!important;height:calc((var(--H) - 460px)/2)!important;padding:26px 170px 0 28px!important;box-sizing:border-box}
+html.pp #prScroll .smk-c:nth-of-type(2){top:220px!important}
+html.pp #prScroll .smk-c:nth-of-type(3){top:calc(236px + (var(--H) - 460px)/2)!important}
+html.pp #prScroll .smk-c img{right:24px!important;left:auto!important;top:50%!important;width:130px!important;height:130px!important;transform:translateY(-50%)}
+html.pp #prScroll .smk-c h3{width:auto!important;min-height:0!important;font-size:28px!important}
+html.pp #prScroll .smk-c>p,html.pp #prScroll .smk-c ul{display:none!important}
+html.pp #prScroll .smk-c .go{left:28px!important;bottom:22px!important}
+
+/* ---------- picture sections (pp/prodA.js wraps the artwork in .ppart and lifts its tiles into .ppctl) ---------- */
+html.pp #prScroll .ppart{position:absolute;left:0;top:0;width:1376px;height:964px;transform-origin:0 0;pointer-events:none}
+html.pp #prScroll .ppart>*{pointer-events:auto}
+html.pp #prScroll .ppart .hot{overflow:visible}
+html.pp #prScroll .ppart .hot::before{content:"";position:absolute;inset:-36px}   /* the scaled-down hotspot keeps a finger-sized target */
+html.pp #prScroll .ppctl{position:absolute;left:20px;right:20px;display:flex;flex-wrap:wrap;gap:12px;z-index:6}
+html.pp #prScroll .ppctl .lvt{position:relative!important;left:auto!important;top:auto!important;flex:1 1 0;min-width:calc(50% - 6px);height:112px!important;width:auto!important;font-size:18px;gap:8px;background:#141414}
+html.pp #prScroll .ppctl[data-n="3"] .lvt,html.pp #prScroll .ppctl[data-n="5"] .lvt,html.pp #prScroll .ppctl[data-n="6"] .lvt{min-width:calc(33.3% - 8px)}
+html.pp #prScroll .ppctl .lvt.on{background:#262628}
+html.pp #prScroll .ppctl .lvt:active{transform:scale(.96)}
+html.pp #prScroll .ppctl .lvl{position:relative!important;left:auto!important;top:auto!important;width:100%!important}
+html.pp #prScroll .ppctl .lvl button{height:60px;font-size:20px}

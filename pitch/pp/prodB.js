@@ -77,8 +77,58 @@
       y += h + gap; });
   }
 
-  function layout() { if (!isPP()) return; aiLayout(); cmLayout(); }
-  function boot() { aiBuild(); cmBuild(); layout(); }
+
+  /* ---------- OCP / DBCP Highlights: media band between the title and the 2-column list ---------- */
+  function featLayout() {
+    [['#ocScroll', '#ocmPhone', '#ocmList', 920, 454], ['#dbScroll', '#dbmPhone', '#dbmList', 372, 748]].forEach(([bq, pq, lq, pw, phh0]) => {
+      const box = Q(bq), ph = Q(pq), L = Q(lq); if (!box || !ph || !L) return;
+      const sec = L.closest('.otab'), H = window.SH || 1230, st = Q('#stage'), pf = parseFloat(getComputedStyle(st).getPropertyValue('--ppFoot')) || 76;
+      const rows = Math.ceil(L.children.length / 2), listH = rows * 60 + (rows - 1) * 6;
+      const head = H < 1100 ? 168 : 186, mt = head, mh = Math.max(240, H - pf - 14 - listH - 18 - mt);
+      let phs, phh;
+      if (pw === 920) { const port = ph.classList.contains('port'); phs = port ? mh / 732 : 560 / 920; phh = port ? mh : 454 * phs; }
+      else { phs = Math.min(mh / 748, 330 / 372); phh = 748 * phs; }
+      const v = { '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
+      if (pw === 372) { const pl = 16; v['--cl'] = (pl + 372 * phs + 6).toFixed(1) + 'px';
+        if (ph.style.getPropertyValue('left') !== pl + 'px') ph.style.setProperty('left', pl + 'px', 'important');
+        const c = Q('#dbmCap'); if (c && c.style.getPropertyValue('transform') !== 'none') c.style.setProperty('transform', 'none', 'important'); }
+      Object.entries(v).forEach(([k, x]) => sec.style.setProperty(k, x));
+    });
+  }
+  /* the page's own balance() re-places these with inline !important styles: put ours back whenever it does */
+  function featWatch() {
+    ['#dbmPhone', '#dbmCap', '#ocmPhone'].forEach(q => { const el = Q(q); if (!el || el.__ppw) return; el.__ppw = 1;
+      new MutationObserver(() => { if (isPP()) featLayout(); }).observe(el, { attributes: true, attributeFilter: ['style', 'class'] }); });
+  }
+  function featClear() {
+    D.querySelectorAll('#ocScroll>.dbm,#dbScroll>.dbm').forEach(s => ['--mt', '--mh', '--phs', '--phh', '--cl'].forEach(k => s.style.removeProperty(k)));
+    const ph = Q('#dbmPhone'); if (ph && ph.style.getPropertyValue('left') === '16px') ph.style.removeProperty('left');
+  }
+
+
+  /* ---------- Specs strips: panes are 600 wide here, so the strip steps by its pane width (.wide) and drags 1:1 with the finger ---------- */
+  function stripMode() {
+    D.querySelectorAll('#ocScroll>[data-t=specs] .strip,#dbScroll>[data-t=specs] .strip').forEach(st => {
+      const on = isPP(); if (st.classList.contains('wide') === on && st.__ppw === on) return;
+      st.classList.toggle('wide', on); st.__ppw = on;
+      /* keep the pane the pill shows */ const sec = st.closest('[data-t]'), pill = sec && sec.querySelector('.spill'), i = pill && pill.querySelectorAll('button')[1] && pill.querySelectorAll('button')[1].classList.contains('on') ? 1 : 0;
+      st.style.transition = 'none'; st.style.transform = `translate3d(${-(on ? 600 : 1376) * i}px,0,0)`;
+    });
+  }
+  function stripDrag(box) {
+    if (!box || box.__ppd) return; box.__ppd = 1; let d = null;
+    box.addEventListener('pointerdown', e => { if (!isPP()) return; const sec = e.target.closest('[data-t]'), st = sec && sec.querySelector(':scope>.strip'); if (!st) { d = null; return; }
+      const m = new DOMMatrix(getComputedStyle(st).transform); d = { sec, st, x: e.clientX, y: e.clientY, p0: -m.m41 / 600, k: sec.getBoundingClientRect().width / 600, ax: null }; }, { passive: true });
+    /* runs after the page's own handler (registered earlier on the same box) and re-places the strip at finger speed */
+    box.addEventListener('pointermove', e => { if (!d) return; const dx = e.clientX - d.x, dy = e.clientY - d.y;
+      if (!d.ax) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; d.ax = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
+      if (d.ax !== 'x') return; let p = d.p0 - dx / d.k / 600; if (p < 0) p *= .3; if (p > 1) p = 1 + (p - 1) * .3;
+      d.st.style.transition = 'none'; d.st.style.transform = `translate3d(${-600 * p}px,0,0)`; }, { passive: true });
+    const end = () => { d = null; }; box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+  }
+
+  function layout() { stripMode(); if (!isPP()) { featClear(); return; } aiLayout(); cmLayout(); featLayout(); }
+  function boot() { aiBuild(); cmBuild(); featWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);

@@ -153,3 +153,125 @@ html.pp :is(#ocScroll,#dbScroll) .xf-list{left:20px!important;right:20px!importa
 html.pp :is(#ocScroll,#dbScroll) .xf-q{min-height:76px;padding:14px 22px;font-size:20px}
 html.pp :is(#ocScroll,#dbScroll) .xf-a p{padding:0 22px 22px;font-size:18px}
 html.pp :is(#ocScroll,#dbScroll) .xf.on .xf-a{max-height:420px}
+
+/* ---------- Highlights (feat): title up top, the visual in the middle, the feature list as a 2-column grid at the bottom.
+   prodB.js sets --mt / --mh (media band top / height), --phs (phone scale) and --phh (phone height) on the scroller ---------- */
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-col{left:20px!important;right:20px;width:auto!important;top:0!important;bottom:calc(var(--pf) + 14px)!important;margin:0!important;justify-content:space-between!important;gap:0!important;transform:none!important;z-index:6}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h{left:0!important;width:auto!important;min-height:0!important;padding:30px 12px 0;font-size:38px;line-height:1.06;display:block!important}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h small{font-size:18px;line-height:1.38;margin-top:10px}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;gap:6px 8px;width:auto!important;left:0!important}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button{height:60px!important;font-size:17px!important;line-height:1.12;padding:0 12px!important;gap:10px;border-radius:18px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.72);transition:background .2s,color .2s,transform .12s cubic-bezier(.2,.8,.2,1)}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button.on{background:#1f2a27;color:var(--vg)}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button:active{transform:scale(.96)}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button svg{width:24px;height:24px;flex:none}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap{left:28px!important;top:calc(var(--mt) + 4px)!important;margin:0!important;transform:none!important;z-index:7}
+html.pp #ocScroll .ocm-fade{display:none}
+
+/* OCP: photo / render fills the band, the landscape phone sits at the bottom of it */
+html.pp #ocScroll .ocm-card{left:0!important;width:600px!important;top:var(--mt)!important;height:calc(var(--mh) - var(--phh) + 60px)!important;-webkit-mask-image:linear-gradient(180deg,#000 78%,transparent)!important;mask-image:linear-gradient(180deg,#000 78%,transparent)!important;transition:height .5s cubic-bezier(.22,1,.36,1)}
+html.pp #ocScroll .ocm.solo .ocm-card,html.pp #ocScroll .ocm.bleed .ocm-card{height:var(--mh)!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #ocScroll .ocm-card img{left:0!important;top:0!important;right:auto!important;bottom:auto!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important;padding:0!important;translate:none!important;scale:none!important}
+html.pp #ocScroll .ocm.bleed .ocm-card img.bleedim{object-fit:cover!important}
+html.pp #ocScroll .ocm-phone{left:20px!important;top:calc(var(--mt) + var(--mh) - var(--phh))!important;transform-origin:0 0;scale:var(--phs)}
+html.pp #ocScroll .ocm-phone.port{left:calc(300px - 278px * var(--phs))!important;top:var(--mt)!important}
+html.pp #ocScroll .ocm-svw{left:0!important;right:auto!important;width:600px;top:var(--mt)!important;bottom:auto!important;height:calc(var(--mh) - var(--phh) + 30px);-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important}
+html.pp #ocScroll .ocm-bv{left:0!important;width:600px!important;top:var(--mt)!important;height:var(--mh)!important;-webkit-mask-image:none!important;mask-image:none!important;border-radius:28px;overflow:hidden}
+
+/* DBCP: the upright phone on the left of the band, the product close-up beside it */
+html.pp #dbScroll .dbm-phone{top:var(--mt)!important;transform:none!important;transform-origin:0 0;scale:var(--phs);margin:0!important}
+html.pp #dbScroll .dbm-phone.off{opacity:0}
+html.pp #dbScroll .dbm-card{left:var(--cl)!important;width:calc(600px - var(--cl))!important;top:var(--mt)!important;height:var(--mh)!important;margin:0!important}
+html.pp #dbScroll .dbm-card img,html.pp #dbScroll .dbm-card img.rr,html.pp #dbScroll .dbm-card img.dflt{padding:0 10px!important;translate:none!important;scale:none!important;object-fit:contain!important}
+html.pp #dbScroll .dbm-hub{left:0!important;width:600px!important;top:var(--mt)!important;height:var(--mh)!important;margin:0!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #dbScroll .dbm-hubdb{display:none}
+
+/* ---------- Compare (cmp): title, our camera as a wide card, rivals in a 2-column grid ---------- */
+html.pp #ocScroll .ocpk h2,html.pp #dbScroll .dbc-h{left:32px!important;top:40px!important;font-size:50px!important;letter-spacing:-1.3px}
+html.pp #ocScroll .ocpk .vs,html.pp #dbScroll .dbc-vs{left:32px!important;top:372px!important;font-size:22px}
+html.pp #ocScroll .ocpk .me,html.pp #dbScroll .dbc-me{left:32px!important;top:124px!important;width:300px!important}
+html.pp #ocScroll .ocpk .me b,html.pp #dbScroll .dbc-me h3{font-size:28px!important}
+html.pp #ocScroll .ocpk .me img{position:absolute;left:330px;top:-6px;width:auto!important;height:230px;margin:0!important;object-fit:contain}
+html.pp #dbScroll .dbc-me img{left:360px!important;top:-14px!important;height:250px!important}
+html.pp #dbScroll .dbc-div{display:none}
+html.pp :is(#ocScroll,#dbScroll) .dbcards{left:16px!important;right:16px;width:auto!important;top:408px!important;gap:10px!important;grid-auto-rows:var(--cdh)}
+html.pp #ocScroll .ocpk .dbcards{--cdh:min(150px,calc((var(--H) - var(--pf) - 408px - 60px) / 4))}
+html.pp #dbScroll .dbcards{--cdh:min(200px,calc((var(--H) - var(--pf) - 408px - 60px) / 3))}
+html.pp :is(#ocScroll,#dbScroll) .dbcard{height:auto!important;padding:0 10px 0 8px!important;gap:10px!important;border-radius:22px;transition:transform .12s cubic-bezier(.2,.8,.2,1)}
+html.pp :is(#ocScroll,#dbScroll) .dbcard:active{transform:scale(.97)}
+html.pp :is(#ocScroll,#dbScroll) .dbwell{width:92px!important;height:calc(100% - 20px)!important}
+html.pp :is(#ocScroll,#dbScroll) .dbcard .nm{font-size:17px!important;line-height:1.18}
+html.pp :is(#ocScroll,#dbScroll) .dbcard .nm .dbbadge{margin-bottom:6px}
+html.pp :is(#ocScroll,#dbScroll) .dbplus{position:absolute;right:8px;top:8px;width:34px!important;height:34px!important}
+html.pp :is(#ocScroll,#dbScroll) .dbplus svg{width:14px;height:14px}
+
+/* OCP head-to-head (Arlo): split-screen clip across the width, reasons below */
+html.pp #ocArlo h2{left:32px!important;top:40px!important;font-size:42px!important;gap:16px!important;flex-wrap:wrap;width:536px}
+html.pp #ocArlo h2 i{width:60px!important}
+html.pp #ocArlo .ocar-back{left:32px!important;right:auto!important;top:118px!important;height:60px}
+html.pp #ocArloVid{left:16px!important;top:262px!important;width:568px!important;height:160px!important;border-radius:20px!important;object-fit:cover}
+html.pp #ocArlo .ocar-l{top:210px!important;height:40px;font-size:14px}
+html.pp #ocArlo .ocar-l:nth-of-type(1){left:28px!important}
+html.pp #ocArlo .ocar-l:nth-of-type(2){left:312px!important}
+html.pp #ocArlo .ocar-w{left:24px!important;right:24px!important;top:452px!important}
+html.pp #ocArlo .ocar-w b{font-size:28px}
+html.pp #ocArlo .ocar-w div{gap:10px}
+html.pp #ocArlo .ocar-w span{height:52px;font-size:17px;padding:0 20px}
+
+/* DBCP head-to-head: the two stills side by side, reasons below */
+html.pp #dbVs .dbvs-h{left:32px!important;top:40px!important;font-size:42px!important;gap:16px!important;flex-wrap:wrap;width:536px}
+html.pp #dbVs .dbvs-h i{width:60px!important}
+html.pp #dbVs .dbback{left:32px!important;right:auto!important;top:118px!important;height:60px;font-size:17px}
+html.pp #dbVs .dbvs-im{top:212px!important;width:278px!important;height:278px!important;border-radius:22px}
+html.pp #dbVs .dbvs-im:nth-of-type(1){left:16px!important}
+html.pp #dbVs .dbvs-im:nth-of-type(2){left:306px!important}
+html.pp #dbVs .dbwin{left:24px!important;right:24px!important;top:520px!important}
+html.pp #dbVs .dbwin h4{font-size:26px}
+html.pp #dbVs .dbchip{height:46px;font-size:14px}
+
+/* ---------- Specs (Hardware | Specs strip): each pane is one upright screen; product on top, callouts / table below ---------- */
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs]{--sh:calc(var(--H) - var(--pf) - 92px)}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx{left:0!important;top:0!important;width:1200px!important;height:var(--sh)!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx>.fsp-pane{width:600px!important;height:var(--sh)!important;transform:none!important;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);grid-auto-rows:auto;gap:14px 18px;padding:34px 26px 4px;box-sizing:border-box}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-pane>svg{display:none}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-im{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:100%!important;min-height:0;grid-row:1;object-fit:contain;translate:none!important;scale:none!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-im:only-of-type{grid-column:1/-1}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-co{position:relative!important;left:auto!important;top:auto!important;right:auto!important;width:auto!important;text-align:left!important;font-size:14.5px!important;line-height:1.3!important;color:rgba(255,255,255,.78)!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-co b{font-size:18px!important;line-height:1.15!important;margin-bottom:5px!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-co p{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-pane:has(.fst){grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;padding-top:28px}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst{position:relative!important;left:auto!important;top:auto!important;width:auto!important;padding-top:30px}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst-h{margin:-30px 0 8px;font-size:13px}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r{min-height:0;padding:9px 0}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r b{font-size:15px!important;line-height:19px;width:40%!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r span{font-size:15px!important;line-height:19px}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fst .r span i{font-size:12.5px;line-height:16px;margin-top:4px}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .hl{display:none}
+/* the pills: one row just above the footer */
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp.spill{left:190px!important;top:calc(var(--H) - var(--pf) - 80px)!important;height:62px!important}
+html.pp #ocScroll>[data-t=specs] .fsp.spill{left:356px!important}
+html.pp #ocScroll>[data-t=specs] .fsp.spot{left:24px!important;top:calc(var(--H) - var(--pf) - 80px)!important;height:62px!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp button{font-size:17px!important}
+
+/* ---------- History (OCP): every generation in 4 columns, each row's name on its own line above its cells ---------- */
+html.pp #ocHist.hx{padding:34px 14px 0;left:0;width:600px;box-sizing:border-box}
+html.pp #ocHist .hh{flex-wrap:wrap;height:auto;gap:12px 14px;padding:0 10px}
+html.pp #ocHist h2{font-size:40px;width:100%;letter-spacing:-.8px}
+html.pp #ocHist .htog{height:56px!important}
+html.pp #ocHist .hgrid{grid-template-columns:repeat(4,1fr);column-gap:8px;row-gap:5px;margin-top:14px}
+html.pp #ocHist .hgrid>div:not([class]){display:none}
+html.pp #ocHist .hgrid .hd{height:auto;font-size:13.5px;line-height:1.2;gap:6px;padding-bottom:4px}
+html.pp #ocHist .hgrid .hd img{height:54px}
+html.pp #ocHist .hgrid .rl{grid-column:1/-1;font-size:15px;margin:7px 0 0 4px;color:rgba(255,255,255,.6);letter-spacing:.2px}
+html.pp #ocHist .hc{min-height:0;padding:8px 8px;font-size:13px;line-height:1.28;border-radius:12px}
+html.pp #ocHist .hcmp:nth-last-child(3){grid-column:2}
+html.pp #ocHist .hcmp{padding-top:8px}
+html.pp #ocHist .cpill{width:100%;height:46px;font-size:15px}
+html.pp #ocHist .fgrid{gap:10px;margin-top:18px}
+html.pp #ocHist .fcol .hd{font-size:13.5px;line-height:1.2;text-align:center}
+html.pp #ocHist .fcol .hd img{height:52px}
+html.pp #ocHist .fcol .big{border-radius:12px}
+html.pp #ocHist .fcol .sm{grid-template-columns:1fr;gap:8px;margin-top:8px}
+html.pp #ocHist .fcol .sm img{height:auto;aspect-ratio:16/10;border-radius:10px}
+html.pp #ocHist .fnote{font-size:14px;line-height:1.3}

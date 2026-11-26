@@ -38,8 +38,6 @@
     const P = ppGrid(600, Ht);
     $$('#allTiles .ht[data-k]').forEach(el => { const r = P[el.dataset.k]; if (!r) return; const [x, y, w, h] = r;
       Object.assign(el.style, { left: x.toFixed(1) + 'px', top: y.toFixed(1) + 'px', width: w.toFixed(1) + 'px', height: h.toFixed(1) + 'px' }); });
-    $$('#allTiles .ht.small').forEach(e => e.classList.remove('small'));
-    Object.keys(P).forEach(k => { const r = P[k]; if (r[2] < 140) { const e = $('#allTiles .ht[data-k="' + k + '"]'); if (e) e.classList.add('small'); } });
   }
   const _hl = window.homeLayout;
   if (_hl) window.homeLayout = function () { _hl.apply(this, arguments); setGeo(); ppHome(); };
@@ -56,6 +54,22 @@
       if (rail.classList.contains('ico') !== ico) rail.classList.toggle('ico', ico);
       if (bar.classList.contains('ppnav') !== flat) bar.classList.toggle('ppnav', flat);
     } finally { busy = false; }
+    logoFit(); setTimeout(logoFit, 120); setTimeout(logoFit, 700);
+  }
+  /* the logo steps aside whenever another footer control (a page's own toggle, a centred pill) would sit on it */
+  let logoR = 0;
+  function logoFit() {
+    const lg = $('#barlogo'); if (!lg) return;
+    if (!PP()) { bar.classList.remove('ppnologo'); return; }
+    const sc = (st.getBoundingClientRect().width / st.offsetWidth) || 1, b0 = bar.getBoundingClientRect().left;
+    if (!bar.classList.contains('ppnologo')) { const r = lg.getBoundingClientRect(); if (r.width) logoR = (r.right - b0) / sc; }
+    if (!logoR) return;
+    let hit = false;
+    $$('#bar > *:not(#burger):not(#barlogo):not(#back):not(#barRight), #barRight > *').forEach(e => { if (hit) return;
+      const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) return;
+      const r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
+      if ((r.left - b0) / sc < logoR + 8 && (r.right - b0) / sc > 70 && r.bottom > bar.getBoundingClientRect().top - 4) hit = true; });
+    if (bar.classList.contains('ppnologo') !== hit) bar.classList.toggle('ppnologo', hit);
   }
   new MutationObserver(navMode).observe(rail, { childList: true, attributes: true, attributeFilter: ['class'] });
   new MutationObserver(navMode).observe(bar, { attributes: true, attributeFilter: ['class'] });

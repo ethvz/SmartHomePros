@@ -87,11 +87,12 @@ html.pp #p-install .lh-txt h1{font-size:78px;letter-spacing:-2.4px}
 html.pp #p-install .lh-txt p{margin-top:20px;font-size:21px;max-width:none}
 
 /* ================= MAP: full-width map, counter stacked above it ================= */
-html.pp #p-map .usm{left:0!important;width:600px!important;height:372px!important;top:calc(var(--U)*.6)!important;transform:translateY(-50%)!important}
-html.pp #p-map .usm-t{top:auto!important;bottom:calc(100% + 18px);left:50%;transform:translateX(-50%)!important;padding:0;background:none;white-space:nowrap}
-html.pp #p-map .usm-t i{font-size:24px;letter-spacing:4px}
-html.pp #p-map .usm-t b{font-size:104px;letter-spacing:-3.5px;margin:10px 0 6px}
-html.pp #p-map .usm-t span{font-size:42px}
+html.pp #p-map{background:radial-gradient(120% 60% at 50% 62%,rgba(5,229,175,.10),rgba(0,0,0,0) 60%),#000}
+html.pp #p-map .usm{left:-50px!important;width:700px!important;height:434px!important;top:calc(var(--U)*.5 + 130px)!important;transform:translateY(-50%)!important}
+html.pp #p-map .usm-t{top:auto!important;bottom:calc(100% + 34px);left:50%;transform:translateX(-50%)!important;padding:0;background:none;white-space:nowrap}
+html.pp #p-map .usm-t i{font-size:26px;letter-spacing:5px}
+html.pp #p-map .usm-t b{font-size:128px;letter-spacing:-4.5px;margin:14px 0 10px}
+html.pp #p-map .usm-t span{font-size:50px;letter-spacing:4px}
 
 /* ================= YARD SIGN: slides fill the upright screen ================= */
 html.pp #p-sign .sgn-sc{left:0!important;width:100%!important;height:100%!important}
