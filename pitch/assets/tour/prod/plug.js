@@ -103,13 +103,13 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   const g = G(), Q = new URLSearchParams(location.search), bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search)), nocord = bare || Q.has('nocord');
   const P = G(); P.scale.setScalar(.001); P.position.y = .006; g.add(P);                  // body sits a little above the plate centre (upper receptacle)
   const W = 96, HH = 53, D = 38, R = 6, crown = .6;
-  const white = new THREE.MeshPhysicalMaterial({ color: 0xdedcda, roughness: .55, clearcoat: .04, clearcoatRoughness: .5, envMapIntensity: .6 });
+  const white = new THREE.MeshPhysicalMaterial({ color: 0xb6b4b2, roughness: .55, clearcoat: .04, clearcoatRoughness: .5, envMapIntensity: .6 });
 
   /* 1-2. housing + collar: one shell, hairline at x = +36 */
   const hx = W / 2 - R, hy = HH / 2 - R;
   const wOf = (x, y, nx, ny) => {                           // plan width of the front roll-off: wide mid-edge, narrow at the corners, a tight 4 mm on the collar
     const tl = Math.min(1, Math.max(0, (x + 42) / 72)), wl0 = 4.5 + 6 * Math.sin(Math.PI * tl), wl = wl0 + (4 - wl0) * sm(26, 36, x);
-    const ws = x > 0 ? 4 : 5 + 5.5 * Math.sin(Math.PI * Math.min(1, Math.max(0, (y + 20.5) / 41)));
+    const ws = x > 0 ? 4 : 5 + 8 * Math.sin(Math.PI * Math.min(1, Math.max(0, (y + 20.5) / 41)));
     return ny * ny * wl + nx * nx * ws; };
   const VX = []; for (let i = 0; i < 15; i++) VX.push(-37.5 + i * 67 / 14);       // vent grooves across the top wall (they notch the silhouette)
   const groove = (x, y) => { if (y < hy || Math.abs(x) > hx) return 0; let gmax = 0; for (const v of VX) gmax = Math.max(gmax, 1 - sm(.6, .85, Math.abs(x - v))); return gmax; };

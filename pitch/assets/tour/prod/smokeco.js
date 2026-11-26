@@ -149,12 +149,12 @@ export default H => {
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
-    const mg = new THREE.CylinderGeometry(41.5, 41.5, 12.4, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, ZB + 33.6 + 6.2);
+    const mg = new THREE.CylinderGeometry(41.5, 41.5, 11, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, ZB + 33.6 + 5.5);
     // cylinder UV u starts at +z (pre-rotation) i.e. -y here; rotate so the tabs sit at 0, 60, 120 ... degrees
     const mesh = add(g, new THREE.Mesh(mg, new THREE.MeshStandardMaterial({ map: t, roughness: .75, metalness: .1 }))); mesh.rotation.z = -Math.PI / 2; }
-  { const cp = [V2(41.6, 45.6), V2(42.3, 45.9), V2(42.3, 46.3), V2(37, 46.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
+  { const cp = [V2(41.6, 44.2), V2(43.1, 44.5), V2(43.1, 44.9), V2(42.6, 45.3), V2(37, 45.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
       V2(35.1, 50.6), V2(35.1, 52.1), V2(34.9, 52.7), V2(34.5, 53), V2(34.1, 52.8), V2(33.9, 52.2), V2(33.85, 51.4)];
-    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 4 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
+    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 5 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
     const dk = [V2(33.85, 51.4), V2(33.4, 50.6), V2(0, 50.6)];
     const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + ZB + LIFT)), 120), mat(0x2e3032, { r: .8 }))); di.rotation.x = Math.PI / 2; }
 
