@@ -237,7 +237,7 @@ html.pp #hbScroll .hbh-vid{left:-322px!important;width:1238px!important;height:9
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:24px!important;right:24px;top:96px!important;font-size:40px!important;line-height:1.05}
 html.pp #p-hub #hbScroll .hbsub{left:24px!important;right:24px;top:150px!important;font-size:18px}
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:12px!important;right:12px!important;top:168px!important;column-gap:6px!important;row-gap:6px!important}
-html.pp #p-hub #hbOut .hbt{top:200px!important}
+html.pp #p-hub #hbScroll #hbOut .hbt{top:206px!important}
 html.pp #p-hub #hbHist .hbt{grid-template-columns:150px repeat(3,1fr)!important}
 html.pp #p-hub #hbOut .hbt{grid-template-columns:170px repeat(2,1fr)!important}
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:16px!important;line-height:1.2;padding-right:4px}
@@ -245,13 +245,15 @@ html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{font-size:15px!important;min-h
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c small{font-size:13px!important}
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd{font-size:15px;line-height:1.15;gap:6px}
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd small{font-size:13px}
-html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:52px!important}
+html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:46px!important}
 html.pp #p-hub #hbOut .hbfoot{left:24px!important;right:24px;top:auto!important;bottom:186px!important;font-size:15px}
 /* Competitive: six rivals do not fit 600 wide, so the table slides sideways with the feature names pinned */
-html.pp #p-hub #hbCmp .hbt{grid-template-columns:150px repeat(6,124px)!important;right:0!important;padding-right:12px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x pan-y;top:168px!important}
+html.pp #p-hub #hbScroll #hbCmp .hbt{grid-template-columns:150px repeat(6,124px)!important;right:0!important;padding-right:12px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x pan-y;top:168px!important}
 html.pp #p-hub #hbCmp .hbt::-webkit-scrollbar{display:none}
 html.pp #p-hub #hbCmp .hbt>:nth-child(7n+1){position:sticky;left:0;z-index:2;background:#000;box-shadow:8px 0 12px -6px #000}
-html.pp #p-hub #hbCmp .hbt .c{min-height:56px!important}
+html.pp #p-hub #hbScroll #hbCmp .hbt .c{min-height:70px!important;font-size:16px!important}
+html.pp #p-hub #hbScroll #hbCmp .hbt .rl{font-size:17px!important}
+html.pp #p-hub #hbScroll #hbHist .hbt .c{min-height:38px!important}
 html.pp #p-hub #hbCmp .hbt .well{height:90px!important}
 html.pp #p-hub #hbCmp .hbt .well img{width:96px!important;height:84px!important}
 /* Vivint App "App" section: copy on top, the live phone centred and scaled below it (--aek from prodA.js) */
@@ -272,11 +274,12 @@ html.pp.ppA-ngt #gTitle{opacity:0!important;pointer-events:none}
   html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{top:80px!important;font-size:32px!important}
   html.pp #p-hub #hbScroll .hbsub{top:122px!important;font-size:16px}
   html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{top:126px!important;row-gap:3px!important}
-  html.pp #p-hub #hbOut .hbt{top:156px!important}
+  html.pp #p-hub #hbScroll #hbOut .hbt{top:160px!important}
   html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{min-height:30px!important;font-size:13.5px!important;padding:2px 4px!important}
   html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:14px!important}
   html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:34px!important}
-  html.pp #p-hub #hbCmp .hbt .c{min-height:44px!important}
+  html.pp #p-hub #hbScroll #hbCmp .hbt .c{min-height:50px!important;font-size:14px!important}
+  html.pp #p-hub #hbScroll #hbHist .hbt .c{min-height:28px!important}
   html.pp #p-hub #hbCmp .hbt .well{height:64px!important}
   html.pp #p-hub #hbCmp .hbt .well img{width:72px!important;height:60px!important}
   html.pp #prScroll .appemu .ae-copy h2{font-size:38px!important}

@@ -23,9 +23,9 @@
   const LAY={
     'lock:lock':{mode:'stack',crops:[[70,200,820,590],[930,190,420,610]],w:[1,.78]},
     'lock:colors':{mode:'grid',crops:[[60,200,320,450],[360,200,320,450],[650,200,320,450],[960,200,340,450]],labels:['Bronze','Nickel','Brass','Matte Black']},
-    'garage:garage':{mode:'stack',crops:[[80,130,520,320],[560,190,740,720]],w:[.82,1]},
+    'garage:garage':{mode:'stack',crops:[[80,130,500,320],[592,190,696,710]],w:[.85,1]},
     'garage:gphone':{crops:[[224,36,448,900]]},
-    'app:hero':{mode:'stack',crops:[[40,90,690,640],[660,0,716,964]],w:[1,.8]},
+    'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.8]},
     'app:phone':{crops:[[90,60,700,840]]}};
   const ART='img.full,video.ovid,.hl,.tip,.xf-ghost';
   const footH=()=>parseFloat(getComputedStyle($('#stage')).getPropertyValue('--ppFoot'))||86;

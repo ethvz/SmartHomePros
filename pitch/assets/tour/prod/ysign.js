@@ -26,6 +26,7 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
     const cap = (C, k0, holes, up) => { const pts = [ring(C, k0)], map = []; for (let i = 0; i < C.n; i++) map.push(C.base + k0 * C.n + i);
       for (const [I, k] of holes) { pts.push(ring(I, k)); for (let i = 0; i < I.n; i++) map.push(I.base + k * I.n + i); }
       const all = pts.flat();
+      for (let i = 0; i < map.length; i++) { const e = map[i], o = pos.length / 3; pos.push(pos[e * 3], pos[e * 3 + 1], pos[e * 3 + 2]); col.push(col[e * 3], col[e * 3 + 1], col[e * 3 + 2]); map[i] = o; }   // flat caps get their own vertices (crisp normals, no streaks)
       for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(pts[0], pts.slice(1))) {
         const A = all[a], B = all[b], D = all[c], cr = (B.x - A.x) * (D.y - A.y) - (B.y - A.y) * (D.x - A.x);
         if ((cr > 0) === up) idx.push(map[a], map[b], map[c]); else idx.push(map[a], map[c], map[b]); } };
@@ -132,7 +133,19 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
     cx.fillStyle = '#fbfaf7'; fitText('Protected by', -33, 33, 71, 8, 500);
     fitText('855.484.8468', -94.2, -12.5, -73.5, 10, 400); fitText('vivint.com', 11.9, 90.5, -73.5, 10, 400);
     { const [a, b] = P(-.5, -64.4), [c, d] = P(.5, -82); cx.fillRect(a, b, c - a, d - b); }
-    if (logo) { const [a, b] = P(-114.2, 35.6), [c, d] = P(116.3, -35.6); cx.drawImage(logo.img, logo.x, logo.y, logo.w, logo.h, a, b, c - a, d - b); }
+    { // the vivint logotype as vector strokes (13 mm heavy strokes, rounded v vertices, round i dots, arched n, hooked t)
+      const S = 13, base = -35.6, xh = 15.3, L = (pts, cap = 'butt') => { cx.lineWidth = S * k; cx.lineCap = cap; cx.lineJoin = 'round'; cx.beginPath(); pts.forEach(([x, y], i) => i ? cx.lineTo(...P(x, y)) : cx.moveTo(...P(x, y))); cx.stroke(); };
+      const R = (x0, x1, y0, y1) => { const [a, b] = P(x0, y1), [c, d] = P(x1, y0); cx.fillRect(a, b, c - a, d - b); };
+      const dot = (x, y) => { cx.beginPath(); cx.arc(...P(x, y), 7.5 * k, 0, Math.PI * 2); cx.fill(); };
+      cx.strokeStyle = '#fbfaf7';
+      const v = (x0, x1) => { const m = (x0 + x1) / 2; L([[x0 + 6.2, xh + 2], [x0 + 6.2 + (m - x0 - 6.2) * (2 / (xh - base)) * 0, xh], [m, base + 6.5], [x1 - 6.2, xh], [x1 - 6.2, xh + 2]]); };
+      cx.save(); cx.beginPath(); cx.rect(0, P(0, xh)[1], N, N); cx.clip(); v(-114.2, -63.7); v(-40.7, 12.5); cx.restore();
+      R(-59.3, -44.7, base, xh); dot(-51.2, 28.1); R(16.3, 29.2, base, xh); dot(22.7, 28.1);
+      { const l = 35.6 + S / 2, r = 83.1 - S / 2, rr = (r - l) / 2, cy = xh - S / 2 - rr; R(35.6, 35.6 + S, base, xh);
+        cx.lineWidth = S * k; cx.lineCap = 'butt'; cx.beginPath(); cx.moveTo(...P(l, cy)); cx.arc(...P((l + r) / 2, cy), rr * k, Math.PI, 0); cx.lineTo(...P(r, base)); cx.stroke(); }
+      { const sx = 89.8 + S / 2; L([[sx, 29.8 - S / 2], [sx, -22.1]], 'round'); L([[sx, -22.1]]);
+        cx.lineWidth = S * k; cx.lineCap = 'butt'; cx.beginPath(); cx.moveTo(...P(sx, -20)); cx.arc(...P(sx + 7, -22.1), 7 * k, Math.PI, Math.PI / 2, true); cx.lineTo(...P(116.3, -29.1)); cx.stroke();
+        R(sx, 116.3, 3.4, xh); } }
     art.needsUpdate = true; };
   draw();
   whenImg(DEC.logo, img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g2 = c.getContext('2d'); g2.drawImage(img, 0, 0);
@@ -140,7 +153,7 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
     for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (D[(y * c.width + x) * 4 + 3] > 100) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
     logo = { img, x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 }; draw(); });
   if (document.fonts) document.fonts.load(font(500, 8)).then(draw, () => {});
-  const face = new THREE.MeshStandardMaterial({ map: art, color: 0xa0a0a0, roughness: .5, envMapIntensity: .4, bumpMap: peel, bumpScale: .6 });
+  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0xb8b8b8, roughness: .55, envMapIntensity: .12, specularIntensity: .2, toneMapped: false, bumpMap: peel, bumpScale: .6 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
   return g;

@@ -246,7 +246,7 @@ import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
-const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=19'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
+const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=20'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
   for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const b=document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.min(92,Math.round(92*got/tot))+'%'); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
@@ -361,6 +361,14 @@ const TXC = {
   batten: canvasTex(512,64, (g,w,h)=>{ g.fillStyle='#2b2d2f'; g.fillRect(0,0,w,h); for(let x=0;x<w;x+=w/4){ const gr=g.createLinearGradient(x,0,x+w/4,0);
       gr.addColorStop(0,'#1d1f21'); gr.addColorStop(.08,'#34373a'); gr.addColorStop(.14,'#2a2c2e'); gr.addColorStop(1,'#26282a'); g.fillStyle=gr; g.fillRect(x,0,w/4,h); } }, [1.2,1]),
 };
+/* fine albedo detail for the baked house (which draws unlit, so bump maps would be lost): hand-trowelled stucco and
+   poured concrete, both near-white so they only modulate the base colour by a few percent */
+const speckle = (base, n, a, blots, ba) => (g,w,h) => { g.fillStyle = base; g.fillRect(0,0,w,h);
+  for(let i=0;i<blots;i++){ const x=rnd()*w, y=rnd()*h, r=20+rnd()*70, gr=g.createRadialGradient(x,y,0,x,y,r), d=rnd()<.5;
+    gr.addColorStop(0, d ? `rgba(0,0,0,${ba})` : `rgba(255,255,255,${ba})`); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(x-r,y-r,2*r,2*r); }
+  for(let i=0;i<n;i++){ const d=rnd()<.55; g.fillStyle = d ? `rgba(0,0,0,${rnd()*a})` : `rgba(255,255,255,${rnd()*a})`; g.fillRect(rnd()*w,rnd()*h,1+rnd()*1.6,1+rnd()*1.6); } };
+TXC.stucco = canvasTex(512,512, speckle('#f4f4f4', 26000, .09, 90, .035), [1.7,1.7]);
+TXC.concD = canvasTex(512,512, speckle('#f2f2f1', 18000, .12, 140, .05), [2.6,2.6]);
 const camera = new THREE.PerspectiveCamera(40, 1, 0.03, 400);
 
 /* ------------------------------------------------------------------ helpers */
@@ -420,6 +428,8 @@ const M = {
   rug:    mat(0xcfc7b9, {r:1, x:{bumpMap:TX.plaster, bumpScale:2.5}}),
   bulb:   mat(0xfff4e0, {x:{emissive:0xffdcaa, emissiveIntensity:3}}),
 };
+M.siding.map = M.paint.map = M.cut.map = M.ceil.map = TXC.stucco; M.conc.map = TXC.concD;
+M.roof.color.set(0x575c63);                  // charcoal shingles, as in the reference
 
 /* ------------------------------------------------------------------ site */
 const FL = 0.15;           // finished floor

@@ -110,9 +110,13 @@ export default H => {
     strip(wY0 + .2, wY0 - 2, smoke, .06); strip(wY1 + 2, wY1 - .2, smoke, .06);
   }
 
-  // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below)
-  { const yP = -97, th = .33, zP = zBack(yP);
-    const p = add(M, H.rslab(70, 22, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
-    for(const sx of [-30, 30]){ const c = add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, .3, 32), mat(0xd9dadb,{r:.45}))), sx, 0, .65); } }
+  // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below),
+  // and the two wall screws on the band's back (ocspot_back_1)
+  { const yP = -97, th = .33, zP = zBack(yP);                 // on the bar's upper back, under the bracket saddle
+    const p = add(M, H.rslab(64, 18, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
+    for(const sx of [-26, 26]) add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, .3, 32), mat(0xd3d4d5,{r:.4}))), sx, 0, .65);
+    const scr = mat(0xb9bbbd, {r:.35, m:.6});
+    for(const sx of [-27, 27]){ const sc = add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, .6, 24), scr)), sx, -56, -.2);
+      for(const r of [0, Math.PI/2]){ const sl = add(M, new THREE.Mesh(new THREE.BoxGeometry(2.6, .45, .2), mat(0x55585b,{r:.6})), sx, -56, -.55); sl.rotation.z = r; } } }
   return g;
 };
