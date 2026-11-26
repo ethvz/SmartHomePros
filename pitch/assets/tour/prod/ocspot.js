@@ -33,7 +33,7 @@ export default H => {
   // ---------------------------------------------------------------- light bar housing
   // plan (x, z): centre face z = 88 (~80 wide), wings back to (+-88, 20), rounded back; section: top y = -84, bottom y = -150,
   // the back a half-ellipse (rearmost z = 8 at mid height), all three LED faces leaning back 12 mm toward the bottom.
-  const zF = 86, yT = -85, yB = -149, lean = 10, wing = V2(66, 47).normalize(), cW = wing.x*50 + wing.y*zF;   // centre face ~100 wide, wings ~54 deg to the wall (front photo)
+  const zF = 90, yT = -85, yB = -149, lean = 10, wing = V2(66, 47).normalize(), cW = wing.x*50 + wing.y*zF;   // centre face ~100 wide, wings ~54 deg to the wall (front photo)
   const zBack = y => 20 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/33)**2));   // half-ellipse back, rearmost z = 6
   const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, zF - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
   const RC = [4, 4, 4, 4];                                    // corner radii: front corners R4; the wings run right back to the rounded (half-ellipse) back

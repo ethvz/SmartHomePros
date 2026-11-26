@@ -17,13 +17,13 @@ K = 1.4 / 3.3            # main roof pitch (23 deg: 1.4 m rise over a 3.3 m run)
 # plan
 BX0, BX1, BZ0, BZ1 = -6.9, 5.5, -7.0, 4.0      # house body (entry block + great room + core)
 EX1 = -2.5                                     # entry block x -6.9..-2.5 (two storeys, closed)
-GX0, GX1 = -2.5, 1.8                           # cross gable (outer wall lines); vault inside x -2.3..1.6
+GX0, GX1 = -2.5, 2.6                           # cross gable (outer wall lines); vault inside x -2.3..2.4
 GC = (GX0 + GX1) / 2; GH = (GX1 - GX0) / 2 + OV   # gable centre, half span incl. overhang
 RISE = K * 3.3                                 # 1.4 m: run 3.3 m (half the 6.6 m front hip incl. overhang)
 DECK = YS + FA + RISE                          # 8.15: hip deck and gable ridge
 KG = RISE / GH                                 # gable pitch so its ridge meets the deck
 IX0, IX1, IZ0 = -2.3, 5.3, -6.8                # great room inside
-CORE = (2.4, 5.5, -7.0, -2.6)                  # solid core behind the shelf wall (x0,x1,z0,z1)
+CORE = (2.9, 5.5, -7.0, -2.6)                  # solid core behind the shelf wall (x0,x1,z0,z1)
 def U(x): return YS + KG * (GH - abs(x - GC))  # gable underside height at x
 
 def B(x, y, z): return Vector((x, -z, y))      # three -> blender
@@ -104,8 +104,8 @@ entry = box('entry', BX0, EX1, .03, YS, BZ0, BZ1, 'stucco')
 DOOR = (-4.35, -3.4)
 WF = [(-6.35,-5.1, 4.7,5.95), (-4.7,-3.45, 4.7,5.95)]            # upstairs front
 WG = (-6.3,-5.05, FL+1.1, FL+2.3)                                 # ground floor front (mullioned; Door & Window Sensor)
-WB = [(-6.3,-5.05, 4.55,5.85), (-4.4,-3.15, 4.55,5.85), (-6.1,-4.6, FL+1.05,FL+2.4)]   # back
-WS = [(-5.6,-4.3, 4.55,5.85), (-5.6,-4.3, FL+1.05,FL+2.4)]         # left side (z ranges), behind the garage
+WB = [(-6.3,-5.05, 4.7,5.95), (-4.4,-3.15, 4.7,5.95), (-6.1,-4.6, FL+1.1,FL+2.3)]   # back
+WS = [(-5.6,-4.3, 4.7,5.95), (-5.6,-4.3, FL+1.1,FL+2.3)]         # left side (z ranges), behind the garage
 cuts = [cutter(a,b,lo,hi,BZ1-.3,BZ1+.1) for a,b,lo,hi in WF + [WG]] + [cutter(DOOR[0],DOOR[1],FL-.01,FL+2.35,BZ1-.3,BZ1+.1)]
 cuts += [cutter(a,b,lo,hi,BZ0-.1,BZ0+.3) for a,b,lo,hi in WB] + [cutter(BX0-.1,BX0+.3,lo,hi,a,b) for a,b,lo,hi in WS]
 boolean(entry, cuts)
@@ -116,12 +116,12 @@ KWIN = (-1.0, .2, FL+1.12, FL+2.25)                                  # window ov
 back = prism('gr_back', [(GX0,.03),(CORE[0]+.01,.03),(CORE[0]+.01,YS),(GX1,YS),(GX1,U(GX1)),(GC,U(GC)),(GX0,U(GX0))], 'z', BZ0, IZ0, 'stucco')
 boolean(back, [cutter(KWIN[0],KWIN[1],KWIN[2],KWIN[3],BZ0-.1,IZ0+.1)] + [cutter(c-.225,c+.225,6.58,7.03,BZ0-.1,IZ0+.1) for c in CL])
 right = box('gr_right', IX1, BX1, .03, YS, CORE[3], BZ1, 'stucco')
-WR = [(-2.1,-.7, 4.55,5.85), (-2.1,-.7, FL+1.05,FL+2.4)]          # right side (z ranges), behind the tower
+WR = [(-2.1,-.7, 4.7,5.95), (-2.1,-.7, FL+1.1,FL+2.3)]          # right side (z ranges), behind the tower
 boolean(right, [cutter(IX1-.1,BX1+.1,lo,hi,a,b) for a,b,lo,hi in WR])
 core = box('core', CORE[0], CORE[1], .03, YS, CORE[2], CORE[3], 'stucco')
-NICHE = [(3.15, 5.0, FL+.95, FL+1.35), (3.15, 5.0, FL+1.75, FL+2.15), (3.15, 5.0, FL+2.55, FL+2.95)]
-WC = [(3.45,4.75, 4.55,5.85), (3.45,4.75, FL+1.05,FL+2.4)]
-WCS = [(-5.6,-4.3, 4.55,5.85), (-5.6,-4.3, FL+1.05,FL+2.4)]       # core's right side
+NICHE = [(3.55, 5.05, FL+.95, FL+1.35), (3.55, 5.05, FL+1.75, FL+2.15), (3.55, 5.05, FL+2.55, FL+2.95)]
+WC = [(3.6,4.85, 4.7,5.95), (3.6,4.85, FL+1.1,FL+2.3)]
+WCS = [(-5.6,-4.3, 4.7,5.95), (-5.6,-4.3, FL+1.1,FL+2.3)]       # core's right side
 boolean(core, [cutter(a,b,lo,hi,CORE[3]-.32,CORE[3]+.1) for a,b,lo,hi in NICHE] + [cutter(a,b,lo,hi,BZ0-.1,BZ0+.3) for a,b,lo,hi in WC]
               + [cutter(BX1-.3,BX1+.1,lo,hi,a,b) for a,b,lo,hi in WCS])
 
@@ -175,8 +175,8 @@ def window(name, face, c, a, b, lo, hi, lit, mv=(), mh=(), depth=.12):
     o = new_obj(name+'_frame', bm); o.data.materials.append(MATS['trim'])
     bm = bmesh.new(); L(bm, a+fw, b-fw, lo+fw, hi-fw, -depth+.005, -depth+.025)
     o = new_obj(name+'_glass', bm); o.data.materials.append(MATS['glassLit' if lit else 'glassDark'])
-for i,(a,b,lo,hi) in enumerate(WF): window('wf%d'%i, 'z+', BZ1, a,b,lo,hi, True, mv=(.5,))
-window('wg', 'z+', BZ1, *WG, True, mv=(.5,), mh=(.3,))
+for i,(a,b,lo,hi) in enumerate(WF): window('wf%d'%i, 'z+', BZ1, a,b,lo,hi, False, mv=(.5,))
+window('wg', 'z+', BZ1, *WG, False, mv=(.5,), mh=(.3,))
 for i,(a,b,lo,hi) in enumerate(WB): window('wb%d'%i, 'z-', BZ0, a,b,lo,hi, i < 2, mv=(.5,))
 for i,(a,b,lo,hi) in enumerate(WS): window('ws%d'%i, 'x-', BX0, a,b,lo,hi, False, mv=(.5,))
 for i,(a,b,lo,hi) in enumerate(WC): window('wc%d'%i, 'z-', BZ0, a,b,lo,hi, True, mv=(.5,))

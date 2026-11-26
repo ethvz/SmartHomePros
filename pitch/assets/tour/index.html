@@ -461,11 +461,11 @@ const meshesOf = g => { const a=[]; g.traverse(o=>o.isMesh&&a.push(o)); return a
 const setMat = (g, m) => g.traverse(o=>{ if(o.isMesh && o.material===M.siding) o.material = m; });
 
 /* House plan (matches the owner's reference video): narrow and deep. Garage x -9.9..-6.9 (z -2.6..4), two-storey entry
-   block x -6.9..-2.5, great room x -2.3..5.3 / z -6.8..4 with its FRONT cut away (vaulted cross gable over x -2.3..1.6),
-   solid core x 2.4..5.5 / z -7..-2.6 whose front face holds the shelf niches, dark tower x 5.5..6.5 at the front right.
+   block x -6.9..-2.5, great room x -2.3..5.3 / z -6.8..4 with its FRONT cut away (vaulted cross gable over x -2.3..2.4),
+   solid core x 2.9..5.5 / z -7..-2.6 whose front face holds the shelf niches, dark tower x 5.5..6.5 at the front right.
    The shell itself is tools/house/shell.py. */
-const GR = {x0:-2.3, x1:5.3, z0:-6.8, z1:4.0, cx:2.4, cz:-2.6};
-const ceilY = x => (x >= -2.3 && x <= 1.6) ? 6.5 + .5185*(2.7 - Math.abs(x + .35)) : 6.5;   // vault / flat ceiling height
+const GR = {x0:-2.3, x1:5.3, z0:-6.8, z1:4.0, cx:2.9, cz:-2.6};
+const ceilY = x => (x >= -2.3 && x <= 2.4) ? 6.5 + .4516*(3.1 - Math.abs(x - .05)) : 6.5;   // vault / flat ceiling height
 /* Garage: x -9.9..-6.9, z -2.6..4 (tall single garage, 2.4 x 2.75 m door) */
 const GDM = {door:phys(0x3a3d40,{r:.5,m:.3}), groove:phys(0x1c1e20,{r:.42,m:.35})};   // garage door fades when a garage product is open
 { const gd = new THREE.Group(); scene.add(gd);
@@ -511,25 +511,25 @@ slab(GR.x0-.2,GR.x1+.2,FL-.14,FL,GR.z1,GR.z1+.1,M.cut);       // the floor's cut
 /* ------------------------------------------------------------------ interior build-outs (procedural) */
 // kitchen run on the back wall (z -6.8): base cabinets, quartz top, low backsplash, hood over the cooktop, window over the sink
 const KZ = GR.z0;
-slab(-2.1,1.0,FL,FL+.86,KZ,KZ+.6,M.cab);
-slab(-2.12,1.0,FL+.86,FL+.92,KZ,KZ+.64,M.quartz);
-slab(-2.1,1.0,FL+.92,FL+1.1,KZ,KZ+.02,M.quartz);                // backsplash
-slab(.35,1.0,FL+1.55,FL+2.35,KZ,KZ+.35,M.cab);                   // uppers
-for(let x=-2.1;x<1.0;x+=.62){ slab(x+.005,x+.01,FL+.05,FL+.82,KZ+.6,KZ+.61,M.trim,null,false); }
-slab(.67,.68,FL+1.57,FL+2.33,KZ+.35,KZ+.36,M.trim,null,false);
+slab(-2.1,1.45,FL,FL+.86,KZ,KZ+.6,M.cab);
+slab(-2.12,1.45,FL+.86,FL+.92,KZ,KZ+.64,M.quartz);
+slab(-2.1,1.45,FL+.92,FL+1.1,KZ,KZ+.02,M.quartz);                // backsplash
+slab(.6,1.45,FL+1.55,FL+2.35,KZ,KZ+.35,M.cab);                   // uppers
+for(let x=-2.1;x<1.45;x+=.59){ slab(x+.005,x+.01,FL+.05,FL+.82,KZ+.6,KZ+.61,M.trim,null,false); }
+slab(1.02,1.03,FL+1.57,FL+2.33,KZ+.35,KZ+.36,M.trim,null,false);
 slab(-.75,.15,FL+.9,FL+.93,KZ+.15,KZ+.5,M.steel);                // sink
 { const f = cyl(.018,.32,M.steel,16); f.position.set(-.3,FL+1.08,KZ+.1); scene.add(f); const s = cyl(.016,.2,M.steel,16); s.rotation.x = Math.PI/2; s.position.set(-.3,FL+1.23,KZ+.2); scene.add(s); }
 slab(-1.85,-1.15,FL+.92,FL+.94,KZ+.1,KZ+.55,M.blackM);           // cooktop
 slab(-1.9,-1.1,FL+1.62,FL+2.1,KZ,KZ+.45,M.steel);                // hood
 slab(-1.62,-1.38,FL+2.1,FL+3.4,KZ,KZ+.2,M.steel);                // hood flue
 // tall column by the white pillar: oven stack and a french-door fridge
-slab(1.0,1.65,FL,FL+2.9,KZ,KZ+.62,M.cab);
-slab(1.06,1.59,FL+.95,FL+1.55,KZ+.62,KZ+.63,M.steel); slab(1.06,1.59,FL+1.62,FL+2.15,KZ+.62,KZ+.63,M.steel);
-slab(1.1,1.55,FL+1.05,FL+1.45,KZ+.63,KZ+.635,M.blackM); slab(1.1,1.55,FL+1.72,FL+2.05,KZ+.63,KZ+.635,M.blackM);
-slab(1.65,2.4,FL,FL+2.2,KZ,KZ+.68,M.steel);                      // fridge
-slab(2.02,2.03,FL+.75,FL+2.18,KZ+.68,KZ+.685,M.blackM,null,false); slab(1.67,2.38,FL+.72,FL+.73,KZ+.68,KZ+.685,M.blackM,null,false);
-slab(1.96,1.99,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM); slab(2.06,2.09,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM);
-slab(1.65,2.4,FL+2.2,FL+2.9,KZ,KZ+.62,M.cab);
+slab(1.45,2.1,FL,FL+2.9,KZ,KZ+.62,M.cab);
+slab(1.51,2.04,FL+.95,FL+1.55,KZ+.62,KZ+.63,M.steel); slab(1.51,2.04,FL+1.62,FL+2.15,KZ+.62,KZ+.63,M.steel);
+slab(1.55,2.0,FL+1.05,FL+1.45,KZ+.63,KZ+.635,M.blackM); slab(1.55,2.0,FL+1.72,FL+2.05,KZ+.63,KZ+.635,M.blackM);
+slab(2.1,2.85,FL,FL+2.2,KZ,KZ+.68,M.steel);                      // fridge
+slab(2.47,2.48,FL+.75,FL+2.18,KZ+.68,KZ+.685,M.blackM,null,false); slab(2.12,2.83,FL+.72,FL+.73,KZ+.68,KZ+.685,M.blackM,null,false);
+slab(2.41,2.44,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM); slab(2.51,2.54,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM);
+slab(2.1,2.85,FL+2.2,FL+2.9,KZ,KZ+.62,M.cab);
 // island with waterfall top
 slab(-1.25,1.05,FL,FL+.88,-4.6,-3.8,M.cab);
 slab(-1.3,1.1,FL+.88,FL+.94,-4.65,-3.75,M.quartz);
@@ -556,10 +556,10 @@ slab(TVX+.03,TVX+.08,FL+1.18,FL+2.0,0.62,2.08,phys(0x070809,{r:.12,x:{clearcoat:
 { const shelfM = phys(0xffffff,{r:.6,x:{map:TX.floor,color:0xd9c2a0}});
   const bookC = [0x6b4e3a,0x2f3b44,0xc9b79a,0x8a8f86,0x3d2f28,0xe2ddd2,0x51615a];
   for(const y of [FL+.95, FL+1.75, FL+2.55]){
-    slab(3.15,5.0,y,y+.03,GR.cz-.3,GR.cz,shelfM);
-    let x = 3.22; let i = Math.round(y*7);
-    while(x < 4.95){ const w = .03+.025*((i*37)%5)/4, h = .22+.12*((i*53)%7)/6, gap = (i%6===0) ? .22 : .004;
-      if(x+w > 4.95) break; slab(x,x+w,y+.03,y+.03+h,GR.cz-.27,GR.cz-.06,mat(bookC[i%bookC.length],{r:.75}),null,false); x += w+gap; i++; } }
+    slab(3.55,5.05,y,y+.03,GR.cz-.3,GR.cz,shelfM);
+    let x = 3.62; let i = Math.round(y*7);
+    while(x < 5.0){ const w = .03+.025*((i*37)%5)/4, h = .22+.12*((i*53)%7)/6, gap = (i%6===0) ? .22 : .004;
+      if(x+w > 5.0) break; slab(x,x+w,y+.03,y+.03+h,GR.cz-.27,GR.cz-.06,mat(bookC[i%bookC.length],{r:.75}),null,false); x += w+gap; i++; } }
   for(const [x,y] of [[5.12,FL+2.2],[5.12,FL+1.72]]) slab(x-.11,x+.11,y-.14,y+.14,GR.cz,GR.cz+.02,mat(0x1d1e20,{r:.5}),null,false); }
 // big canvas art above the kitchen, and a floor lamp beside the sofa
 { const c=document.createElement('canvas'); c.width=512; c.height=256; const x=c.getContext('2d');

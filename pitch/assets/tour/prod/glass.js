@@ -57,7 +57,7 @@ export default H => {
   cap.rotation.y = Math.PI / 2;
   const tg = add(u, G(), 33 - .6 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = '400 31px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
+    x.font = '400 28px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
   tx.scale.setScalar(1000); tx.rotation.z = -Math.PI / 2;
   return g;
 };

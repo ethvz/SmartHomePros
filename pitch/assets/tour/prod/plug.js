@@ -113,9 +113,9 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   const groove = (x, y) => { if (y < hy || Math.abs(x) > hx) return 0; let gmax = 0; for (const v of VX) gmax = Math.max(gmax, 1 - sm(.6, .85, Math.abs(x - v))); return gmax; };
   const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [], g0 = 2.2 * groove(x, y);
     for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)) + g0; out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
-    const gv = 2.2 * groove(x, y), zs = D - h, dr = z => .6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
+    const gv = 2.2 * groove(x, y), zs = D - h, dr = z => 1.6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
     for (const [z, d] of [[1.8, gv], [2.3, gv], [zs - 1.8, gv], [zs - 1.1, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
-    for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = .6 + (w - .6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
+    for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = 1.6 + (w - 1.6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
