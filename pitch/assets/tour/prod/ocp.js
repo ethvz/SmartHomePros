@@ -148,6 +148,9 @@ export default H => {
     hg.computeVertexNormals(); }
   const head = G();
   const shell = add(head, new THREE.Mesh(hg, [bezelK, shellW])); shell.castShadow = shell.receiveShadow = true;
+  // flat exit pad where the neck leaves through the underside of the head (ocp_bottom_1): 20 x 13, 0.2 proud of the curve
+  { const a = .62, P = V3(0, cyB - Rbt*Math.sin(a), czB - Rbt*Math.cos(a)), n = V3(0, -Math.sin(a), -Math.cos(a));
+    const pad = add(head, H.rslab(20, 13, 1.2, 4, .4, shellW), ...P.clone().addScaledVector(n, -.4).toArray()); pad.rotation.x = Math.PI - a; }
 
   // light ring (flush, 75 -> 70, R10/R7, hairline gaps) and the front glass (70 x 70 R7, holes for the lens and the light sensor)
   { const s = rrShape(74.7, 74.7, 9.85); s.holes.push(rrShape(70.3, 70.3, 7.15));
@@ -181,7 +184,7 @@ export default H => {
   add(piv, head, Gp.x - B.x, Gp.y - B.y, Gp.z - B.z);
   const ballM = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.38, clearcoat:.25, clearcoatRoughness:.35, sheen:.3, sheenColor:0xffffff});
   add(M, new THREE.Mesh(new THREE.SphereGeometry(rBall, 48, 32), ballM), B.x, B.y, B.z).castShadow = true;
-  { const L = Dn + 2.5, pr = [[.01,5.5],[9.75,5.5],[9.1,7.5],[8.4,8.7],[7.9,9.5],[7.6,10.2],[7.5,11],[7.5,L],[.01,L]];
+  { const L = Dn + 2.5, pr = [[.01,5.5],[9.75,5.5],[9.1,7.5],[8.4,8.7],[7.9,9.5],[7.6,10.2],[7.5,11],[7.5,Dn-5.5],[7.9,Dn-3.8],[9.6,Dn-1.2],[10,Dn-.6],[10,L],[.01,L]];   // flared trapezoid foot into the slot
     const nk = add(piv, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,y]) => new THREE.Vector2(r, y)), 56), ballM), 0, 0, 0);
     nk.quaternion.setFromUnitVectors(V3(0,1,0), u); nk.castShadow = true; }
   g.userData.headPose = { ball: B.clone().multiplyScalar(.001), glass: Gp.clone().multiplyScalar(.001) };

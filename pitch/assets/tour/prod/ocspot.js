@@ -108,6 +108,13 @@ export default H => {
       return add(M, new THREE.Mesh(ge, m)); };
     strip(wY0 + .2, wY1 - .2, glass).renderOrder = 2;                 // flush outer window over the whole band
     strip(wY0 + .2, wY0 - 2, smoke, .06); strip(wY1 + 2, wY1 - .2, smoke, .06);
+    // smoky cut edge on the window's vertical ends (rear ends of both wings): first / last chain segment, full window height
+    for(const end of [0, 1]){ const lv = [wY0 + .2, (wY0+wY1)/2, wY1 - .2], pos = [], idx = [];
+      for(const y of lv){ const C = chainAt(leanAt(y) + .06, y), a = end ? C[C.length-1] : C[0], b = end ? C[C.length-2] : C[1];
+        const t = 2.2/Math.hypot(b[0]-a[0], b[1]-a[1]); pos.push(a[0], y, a[1], a[0] + (b[0]-a[0])*t, y, a[1] + (b[1]-a[1])*t); }
+      for(let r=0;r<2;r++){ const o = r*2; idx.push(o, o+1, o+2, o+1, o+3, o+2); }
+      const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
+      add(M, new THREE.Mesh(ge, smoke)); }
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below),
