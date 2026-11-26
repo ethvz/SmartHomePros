@@ -254,7 +254,7 @@ html.pp #p-hub #hbCmp .hbt>:nth-child(7n+1){position:sticky;left:0;z-index:2;bac
 html.pp #p-hub #hbScroll #hbCmp .hbt .c{min-height:70px!important;font-size:16px!important}
 html.pp #p-hub #hbScroll #hbCmp .hbt .rl{font-size:17px!important}
 html.pp #p-hub #hbScroll #hbHist .hbt .c{min-height:38px!important}
-html.pp #p-hub #hbScroll #hbOut .hbt .c{min-height:72px!important;font-size:16px!important}
+html.pp #p-hub #hbScroll #hbOut .hbt .c{min-height:88px!important;font-size:17px!important}
 html.pp #p-hub #hbScroll #hbOut .hbt .c small{font-size:14px!important}
 html.pp #p-hub #hbScroll #hbOut .hbt .rl{font-size:17px!important}
 html.pp #p-hub #hbScroll #hbOut .hbt .hd img{height:64px!important}
@@ -283,7 +283,7 @@ html.pp.ppA-ngt #gTitle{opacity:0!important;pointer-events:none}
   html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:34px!important}
   html.pp #p-hub #hbScroll #hbCmp .hbt .c{min-height:50px!important;font-size:14px!important}
   html.pp #p-hub #hbScroll #hbHist .hbt .c{min-height:28px!important}
-  html.pp #p-hub #hbScroll #hbOut .hbt .c{min-height:56px!important;font-size:15px!important}
+  html.pp #p-hub #hbScroll #hbOut .hbt .c{min-height:66px!important;font-size:16px!important}
   html.pp #p-hub #hbCmp .hbt .well{height:64px!important}
   html.pp #p-hub #hbCmp .hbt .well img{width:72px!important;height:60px!important}
   html.pp #prScroll .appemu .ae-copy h2{font-size:38px!important}

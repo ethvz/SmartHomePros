@@ -88,7 +88,7 @@ export default H => {
     for(const cx of F.cols){ const p = new THREE.Path(); p.absarc(cx, 12, 6, 0, Math.PI, false); p.absarc(cx, -12, 6, Math.PI, 2*Math.PI, false); p.closePath(); plate.holes.push(p); }
     const pm = ext(plate, 2.5, .5, refl); add(f, pm, 0, 0, -insetR - 2.5); pm.castShadow = false; pm.receiveShadow = true;
     for(const cx of F.cols) for(const cy of [-12, 12]){
-      add(f, H.dome(4.5, 2.2, ledM), cx, cy, -insetR - 2.5 - .2);
+      add(f, H.dome(5.2, 2.8, ledM), cx, cy, -insetR - 2.5 - .5);   // TIR lens ~10.4 mm (detail_sidebar)
       add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, .2, 20), ledIn)), cx, cy, -insetR - 2.5 + .9);
     }
   }
@@ -119,7 +119,12 @@ export default H => {
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below),
   // and the two wall screws on the band's back (ocspot_back_1)
-  { const yP = -97, th = .33, zP = zBack(yP);                 // on the bar's upper back, under the bracket saddle
+  { // bracket saddle: the band's foot wraps 2.5 mm thick over the bar's rounded upper back, down to y = -104 (detail_backbar)
+    const sd = new THREE.Shape(), y0 = yT + 1, y1 = -104, n = 14;
+    for(let i=0;i<=n;i++){ const y = y0 + (y1-y0)*i/n; i ? sd.lineTo(zBack(y) - 2.5, y) : sd.moveTo(zBack(y) - 2.5, y); }
+    for(let i=n;i>=0;i--){ const y = y0 + (y1-y0)*i/n; sd.lineTo(zBack(y) + .3, y); }
+    const sm = ext(sd, Wb, .8, white); sm.geometry.rotateY(-Math.PI/2); sm.geometry.translate(Wb/2, 0, 0); M.add(sm); sm.castShadow = true; }
+  { const yP = -99, th = .5, zP = zBack(yP) - 2.5;            // grey screw panel on the saddle's lower end
     const p = add(M, H.rslab(64, 18, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
     for(const sx of [-26, 26]) add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, .3, 32), mat(0xd3d4d5,{r:.4}))), sx, 0, .65);
     const scr = mat(0xb9bbbd, {r:.35, m:.6});
