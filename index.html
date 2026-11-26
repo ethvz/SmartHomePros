@@ -90,7 +90,7 @@ button { font: inherit; color: inherit; }
 .sc.all .ring { background: rgba(255,255,255,.3); }
 .sc.all .ring b { background: rgba(20,26,30,.72); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .sc.all .ring b { align-content: center; gap: 2px; }
-.sc.all .ring b svg { width: 34%; height: 34%; fill: rgb(var(--g)); justify-self: center; }
+.sc.all .ring b svg { width: clamp(18px, 2.6vmin, 24px); height: clamp(18px, 2.6vmin, 24px); fill: rgb(var(--g)); justify-self: center; }
 .sc.all .ring b i { font-size: clamp(12px, 1.6vmin, 14px); font-weight: 700; font-style: normal; line-height: 1; color: #fff; text-align: center; }
 .sc.all { width: auto; min-width: clamp(66px, 9vmin, 84px); }
 .sc.all > span { -webkit-line-clamp: 3; }
@@ -863,11 +863,11 @@ button { font: inherit; color: inherit; }
     setTimeout(function () { $('.x', st).focus({ preventScroll: true }); }, 60);
   }
   function closeStory() { unzoom(true); st.classList.remove('on'); cancelAnimationFrame(raf); if (opener) opener.focus({ preventScroll: true }); }
-  /* zoom: the picture at 2.2x, pan it with a finger; the timer waits */
+  /* zoom: the picture at 2.2x (at least full height), pan it with a finger; the timer waits */
   function zoom() {
     var w = pic.clientWidth; if (!w) return;
     zoomed = true; pauseAt = performance.now(); view.classList.add('zoom'); zb.classList.add('on'); zb.setAttribute('aria-pressed', 'true');
-    pic.style.width = Math.round(w * 2.2) + 'px';
+    pic.style.width = Math.round(Math.max(w * 2.2, view.clientHeight * pic.naturalWidth / (pic.naturalHeight || 1))) + 'px';
     view.scrollLeft = (view.scrollWidth - view.clientWidth) / 2; view.scrollTop = (view.scrollHeight - view.clientHeight) / 2;
   }
   function unzoom(quiet) {

@@ -1371,7 +1371,7 @@ controls.touches = {ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN};
 
 /* one diorama view: from the street, a little left of the cutaway and above it (the reference video's camera); orbit all
    the way round the sides (the back is modelled too) */
-const HOME = {target:V(-2.6,3.0,0), r:26, phi:1.43, theta:.09, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-2.4, maxA:2.4}};
+const HOME = {target:V(-2.4,1.9,0), r:31, phi:1.4, theta:.08, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-2.4, maxA:2.4}};
 const state = { focus:null, fly:null, idleAt:performance.now(), cat:'all' };
 const shown = p => state.cat==='all' || CATS[state.cat].includes(p.k);
 

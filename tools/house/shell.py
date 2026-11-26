@@ -16,7 +16,7 @@ OV = .55                 # eave overhang
 K = 1.4 / 3.3            # main roof pitch (23 deg: 1.4 m rise over a 3.3 m run)
 # plan
 BX0, BX1, BZ0, BZ1 = -6.9, 5.5, -7.0, 4.0      # house body (entry block + great room + core)
-EX1 = -2.5                                     # entry block x -6.9..-2.5 (two storeys, closed)
+EX1 = -2.3                                     # entry block x -6.9..-2.3 (two storeys, closed; its right face is the great room's left wall)
 GX0, GX1 = -2.5, 2.6                           # cross gable (outer wall lines); vault inside x -2.3..2.4
 GC = (GX0 + GX1) / 2; GH = (GX1 - GX0) / 2 + OV   # gable centre, half span incl. overhang
 RISE = K * 3.3                                 # 1.4 m: run 3.3 m (half the 6.6 m front hip incl. overhang)
@@ -135,7 +135,7 @@ gab = hull('roof_gable', [(x,YS,z) for x in (gx0,gx1) for z in (Z0,Z1)] + [(x,YS
 boolean(hip, [gab], 'UNION')
 roof = hip; roof.name = 'roof'
 vault = prism('cut', [(IX0,YS-.3),(GX1-.2,YS-.3),(GX1-.2,U(GX1-.2)),(GC,U(GC)),(IX0,U(IX0))], 'z', IZ0, Z1+.5, 'trim')
-backcut = prism('cut', [(GX0,YS-.3),(GX1,YS-.3),(GX1,U(GX1)),(GC,U(GC)),(GX0,U(GX0))], 'z', Z0-.2, BZ0+.001, 'trim')
+backcut = prism('cut', [(GX0,YS-.3),(GX1,YS-.3),(GX1,U(GX1)),(GC,U(GC)),(GX0,U(GX0))], 'z', Z0-.2, IZ0+.01, 'trim')   # the back wall supplies the gable triangle
 boolean(roof, [vault, backcut])
 # porch: dark lean-to roof across the entry block, on two slim brackets
 PZ0, PZE, PY0 = BZ1, BZ1+1.45, 4.35
@@ -145,7 +145,7 @@ box('porch_fascia', BX0+.02, EX1+.2, py1-.04, py1+pt+.01, PZE, PZE+.03, 'fascia'
 for bx in (BX0+.3, EX1-.1):
     prism('brk', [(PZ0, PY0-.9), (PZ0, PY0-.05), (PZE-.25, py1+.08), (PZE-.35, py1-.02)], 'x', bx-.035, bx+.035, 'fascia')
 # downpipes
-for x, y1 in ((BX0+.08, gy(BX0)+.1), (EX1+.1, YS)):
+for x, y1 in ((BX0+.08, gy(BX0)+.1), (EX1-.1, YS)):
     box('pipe', x-.04, x+.04, .05, y1, BZ1+.02, BZ1+.1, 'fascia')
 # ---------------- dark board-clad tower at the right front corner, fence behind it
 TW = (BX1, BX1+1.0, .4, 3.0)

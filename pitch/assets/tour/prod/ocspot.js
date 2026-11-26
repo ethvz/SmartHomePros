@@ -95,7 +95,7 @@ export default H => {
     f.matrix.makeBasis(t, up, out); f.matrix.setPosition(new THREE.Vector3(F.p.x, yT, F.p.y).addScaledVector(down, vMid)); f.matrixAutoUpdate = false;
     const zr = -band*dv.y;                                     // reflector (housing band) surface along the face normal
     for(const cx of F.cols){
-      add(f, new THREE.Mesh(capGeo, capM), cx, 0, zr + .03);
+      add(f, new THREE.Mesh(capGeo, capM), cx, 0, zr + .25);
       for(const cy of [-12, 12]){
         const l = add(f, new THREE.Mesh(tirGeo, lensC), cx, cy, zr - .4); l.rotation.x = Math.PI/2;
         const cn = add(f, new THREE.Mesh(coneGeo, lensCore), cx, cy, zr + .4); cn.rotation.x = -Math.PI/2;
@@ -113,7 +113,7 @@ export default H => {
       return [C[k-1][0] + (C[k][0]-C[k-1][0])*f, C[k-1][1] + (C[k][1]-C[k-1][1])*f, L[L.length-1]]; };
     const Ltot = sample(chainAt(leanAt((wY0+wY1)/2), (wY0+wY1)/2), 1)[2], Rw = 6, K = 200;
     const yTopAt = s => wY0 + .2 - (s < Rw ? Rw - Math.sqrt(Rw*Rw - (Rw - s)**2) : 0);
-    const glass = new THREE.MeshPhysicalMaterial({color:0xe9eef2, roughness:.04, metalness:0, transparent:true, opacity:.32, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:1.6, side:THREE.DoubleSide, depthWrite:false});
+    const glass = new THREE.MeshPhysicalMaterial({color:0xe9eef2, roughness:.04, metalness:0, transparent:true, opacity:.14, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:1.6, side:THREE.DoubleSide, depthWrite:false});
     const smoke = new THREE.MeshPhysicalMaterial({color:0x606366, roughness:.18, transparent:true, opacity:.85, clearcoat:.6, side:THREE.DoubleSide, depthWrite:false});
     // a sheet over the window region; rows(s) gives the y list for the column at arc length s from the nearest end
     const sheet = (rows, d, m, cols) => { const pos = [], idx = []; let R = 0;
