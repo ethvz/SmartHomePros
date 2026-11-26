@@ -109,7 +109,9 @@ WF = [(-6.35,-5.1, 4.7,5.95), (-4.7,-3.45, 4.7,5.95)]            # upstairs fron
 WG = (-6.3,-5.05, FL+1.1, FL+2.3)                                 # ground floor front (mullioned; Door & Window Sensor)
 WB = [(-6.3,-5.05, 4.7,5.95), (-4.4,-3.15, 4.7,5.95), (-6.1,-4.6, FL+1.1,FL+2.3)]   # back
 WS = [(-5.6,-4.3, 4.7,5.95), (-5.6,-4.3, FL+1.1,FL+2.3)]         # left side (z ranges), behind the garage
+HALL = (-4.5, -3.25, 1.5, BZ1-.2, FL+2.7)                         # entry hall behind the front door (x0,x1,z0,z1,ceiling)
 cuts = [cutter(a,b,lo,hi,BZ1-.3,BZ1+.1) for a,b,lo,hi in WF + [WG]] + [cutter(DOOR[0],DOOR[1],FL-.01,FL+2.35,BZ1-.3,BZ1+.1)]
+cuts += [cutter(HALL[0],HALL[1],FL-.01,HALL[4],HALL[2],HALL[3]+.01)]
 cuts += [cutter(a,b,lo,hi,BZ0-.1,BZ0+.3) for a,b,lo,hi in WB] + [cutter(BX0-.1,BX0+.3,lo,hi,a,b) for a,b,lo,hi in WS]
 boolean(entry, cuts)
 
@@ -196,7 +198,8 @@ def slot(o, m):
     i = o.data.materials.find(m.name)
     if i < 0: o.data.materials.append(m); i = len(o.data.materials)-1
     return i
-def in_room(X, Y, Z, e=.06): return IX0-e < X < IX1+e and IZ0-e < Z < BZ1+e and Y > FL-.06 and not (X > CORE[0]-e and Z < CORE[3]+e)
+def in_hall(X, Y, Z, e=.06): return HALL[0]-e < X < HALL[1]+e and HALL[2]-e < Z < BZ1-.1 and Y < HALL[4]+e
+def in_room(X, Y, Z, e=.06): return in_hall(X, Y, Z) or IX0-e < X < IX1+e and IZ0-e < Z < BZ1+e and Y > FL-.06 and not (X > CORE[0]-e and Z < CORE[3]+e)
 for o in SC.objects:
     if o.type != 'MESH': continue
     me = o.data
