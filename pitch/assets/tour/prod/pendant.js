@@ -105,11 +105,11 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
 
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
   const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6 });
-  const shell = lineMat(body, [{ ax: 'y', at: 9.5, B: 0x6e6e6c, rB: .55, w: .35, col: 0x5a5a58, k: 1 }, { ax: 'y', at: 9.15, w: .35, col: 0xffffff, k: .6 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
-  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5, st = 8, out = [];
-    const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);
+  const shell = lineMat(body, [{ ax: 'y', at: 9.5, B: 0x7e7e7c, rB: .55, w: .35, col: 0x5a5a58, k: 1 }, { ax: 'y', at: 9.15, w: .35, col: 0xffffff, k: .6 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
+  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 4, st = 8, out = [];
+    const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97, .985, .995);
     for (const u of T) { const t = u * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
-    for (const u of T) { const t = u * Math.PI / 2, d = rf * Math.pow(1 - Math.cos(t), 1.4); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }   // G2-ish blend into the face
+    for (const u of T) { const t = u * Math.PI / 2, d = rf * Math.pow(1 - Math.cos(t), 1.6); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }   // G2-ish blend into the face
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
   const dishP = [[-2.8, D - 4.1], [-2.8, D - 3.5], [-1.9, D - 2.45], [-1.0, D - 1.25], [-.3, D - .4], [-.08, D - .15], [.15, D - .03], [.4, D]];   // crisp ~53-degree cone, 3.5 mm deep, 0.4 mm rim fillet

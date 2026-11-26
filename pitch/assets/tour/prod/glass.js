@@ -29,7 +29,7 @@ export default H => {
   for (let k = 1; k <= 10; k++){ const t = k / 10, e = t;
     rings.push(outer.map(([x, y], i) => { const X = x + (rim[i][0] - x) * e, Y = y + (rim[i][1] - y) * e; return [X, Y, FZ + dome(X, Y)]; })); }
 
-  const plate = 0xb9babd, shell = 0xc4c5c8, white = 0xeaeae8;
+  const plate = 0xb9babd, shell = 0xc4c5c8, white = 0xe2e2e0;
   const PILL = { y: 0, z: 10, len: 21, wid: 6.5, gap: .45 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 32.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
@@ -48,12 +48,12 @@ export default H => {
   const zf = dz(0, 0);
   dish.push(hb.map(([x, y]) => [x, y, zf - .15]), hb.map(([x, y]) => [x, y, zf - 1.0]), hb.map(([x, y]) => [x, y, zf - 1.3]),
     hb.map(([x, y]) => [x * 2.2 / 2.8, y * 2.2 / 2.8, zf - 1.3]));
-  const wm = new THREE.MeshPhysicalMaterial({ color: white, roughness: .3, envMapIntensity: 1.2, bumpMap: grain, bumpScale: .1 });
+  const wm = new THREE.MeshPhysicalMaterial({ color: white, roughness: .5, envMapIntensity: .7, bumpMap: grain, bumpScale: .1 });
   const dg = K.skin(dish), dp = dg.attributes.position, dc = [];
   for (let i = 0; i < dp.count; i++){                 // baked occlusion: the upper-left inner wall (turned away from the room's light)
-    const x = dp.getX(i), y = dp.getY(i), r = Math.hypot(x, y), d = r > 3 ? (.75 * y - .45 * x) / r : 0, q = Math.max(0, d), l = Math.max(0, -d);
-    const f = Math.pow(Math.min(1, r / RD), 1.2);                              // and the lit lower-right wall, and a 0.4 mm rim shadow line
-    const k = Math.min(1.06, 1 - .35 * q * f + .06 * l * f - (r > RD - .4 ? .3 * q : 0)); dc.push(k, k, k); }
+    const x = dp.getX(i), y = dp.getY(i), r = Math.hypot(x, y), d = r > 3 ? (.86 * y - .5 * x) / r : 0, q = Math.max(0, d), l = Math.max(0, -d);
+    const f = Math.min(1, r / RD) ** .6;                              // and the lit lower-right wall, and a 0.4 mm rim shadow line
+    const k = Math.min(1.06, 1 - .6 * q * f + .06 * l * f - (r > RD - .4 ? .3 * q : 0)); dc.push(k, k, k); }
   dg.setAttribute('color', new THREE.Float32BufferAttribute(dc, 3)); wm.vertexColors = true;
   add(u, new THREE.Mesh(dg, wm));
   add(u, new THREE.Mesh(new THREE.CircleGeometry(2.25, 40), new THREE.MeshStandardMaterial({ color: 0x151515, roughness: .95,

@@ -49,14 +49,14 @@ export default H => {
   const bezel = phys(0x0a0a0a, { roughness: .12, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: .7 });
   const smoke = phys(0x2a2a2e, { roughness: .1, clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: 1 });
   const voidM = new THREE.MeshBasicMaterial({ color: 0x000000, side: DS });
-  const btn = phys(0x0a0a0a, { roughness: .12, clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: 1 });
+  const btn = phys(0x0a0a0a, { roughness: .12, clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: .35 });
   const lip = phys(0x0a0a0a, { roughness: .3 });
   const ringMat = (c, k) => new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: c, emissiveIntensity: k, envMapIntensity: .1, toneMapped: false, side: DS });
   const rgc = document.createElement('canvas'); rgc.width = 4; rgc.height = 128; const rgx = rgc.getContext('2d'), rgg = rgx.createLinearGradient(0, 128, 0, 0);
   rgg.addColorStop(0, '#ffa060'); rgg.addColorStop(.17, '#ffa060'); rgg.addColorStop(.45, '#ff6a2a'); rgg.addColorStop(.8, '#e8401a'); rgg.addColorStop(1, '#e8401a');
   rgx.fillStyle = rgg; rgx.fillRect(0, 0, 4, 128); const rgt = new THREE.CanvasTexture(rgc); rgt.colorSpace = THREE.SRGBColorSpace;
   const ringM = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: 0xffffff, emissiveMap: rgt, emissiveIntensity: 1, envMapIntensity: .1, toneMapped: false, side: DS });
-  const ringWall = ringMat(0xff4a1c, .4), btnRim = phys(0x0a0a0a, { roughness: .5 });
+  const ringWall = ringMat(0xff4a1c, .4), btnRim = phys(0x050505, { roughness: .6, envMapIntensity: .2 });
   const lensM = phys(0x05040a, { roughness: .02, metalness: .2, clearcoat: 1, clearcoatRoughness: 0, iridescence: .6, iridescenceIOR: 1.6, iridescenceThicknessRange: [250, 400], envMapIntensity: .8 });
   const glint = phys(0x2e2e34, { roughness: .05, clearcoat: 1, metalness: .3 });
 
@@ -87,9 +87,10 @@ export default H => {
     for (const zc of [22.4, 19.7, 16.9]) out.holes.push(stad(zc, 19.5, .9));
     out.holes.push(new THREE.Path(rrS(6.5, 1.1, .2, 0, 27.2).getPoints()));
     const toBot = (geo, dy) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getY(i); p.setXYZ(i, x, bodyAt(z).bot + dy, z); } geo.computeVertexNormals(); return geo; };
-    add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(out, 24), 0), white));
+    add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(out, 48), 0), white));
     const fl = new THREE.Shape([...L].map(([x, z]) => new THREE.Vector2(x * .8, z)).concat([...L].reverse().map(([x, z]) => new THREE.Vector2(-x * .8, z))));
-    add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(fl, 8), .8), phys(0x4a4a4a, { roughness: .7 })));       // grey groove floors
+    const grooveM = phys(0x4a4a4a, { roughness: .7 });
+    for (const zc of [22.4, 19.7, 16.9]) { const st = new THREE.Shape(stad(zc, 19.7, 1.1).getPoints(24)); add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(st, 24), .8), grooveM)); }   // rounded groove floors
     add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(new THREE.Shape(rrS(6.6, 1.2, .2, 0, 27.2).getPoints()), 4), 1.2), phys(0x1a1a1a, { roughness: .8 }))); }
   // dark cores fill the hairline seams so they read as fine dark lines
   add(g, shell([[27.7, W - .6, HH - .6, sub(R, .3)], [28.1, W - .6, HH - .6, sub(R, .3)]], voidM));
@@ -125,9 +126,9 @@ export default H => {
   add(g, H.ext(loPad, ZB + .05, .3, plate));
   add(g, H.rslab(4.2, 13.2, .3, 2, .05, phys(0xcfd0d0, { roughness: .7 })), 0, -38, ZB - .2);
   // terminal boss: raised rounded square, raised pill on it, two grey ringed terminals
-  add(g, H.ext(rrS(18, 18, 4.5, 0, -3.5), .75, .25, plate), 0, 0, ZB - .7);            // boss .7 proud, pill on it reaches the wall plane
-  add(g, H.ext(rrS(11, 5.5, 2.75, 0, -3.5), .4, .15, plate), 0, 0, ZB - 1.0);
-  for (const x of [-2.8, 2.8]) { add(g, disc(.55, 1.05, phys(0xb5b5b5, { roughness: .35, metalness: .5 })), x, -3.5, ZB - 1.01).rotation.y = PI; add(g, disc(0, .55, voidM), x, -3.5, ZB - 1.01).rotation.y = PI; }
+  add(g, H.ext(rrS(18, 18, 4.5, 0, -3.5), 1.3, .5, plate), 0, 0, ZB - .7);             // boss .7 proud (soft .5 edge), pill on it reaches the wall plane
+  add(g, H.ext(rrS(11, 5.5, 2.75, 0, -3.5), .7, .25, plate), 0, 0, ZB - 1.0);
+  for (const x of [-2.8, 2.8]) { add(g, disc(.25, 1.0, phys(0xa8a8a8, { roughness: .4, metalness: .4 })), x, -3.5, ZB - 1.01).rotation.y = PI; add(g, disc(0, .25, voidM), x, -3.5, ZB - 1.01).rotation.y = PI; }
 
   /* ---------- bottom face: notch, speaker slots, security-screw tab ---------- */
   const slope = 1.3 / (zb1 - zb0), ybAt = z => bodyAt(z).bot;
@@ -161,7 +162,7 @@ export default H => {
     add(B, lathe(rp, ringM)); }                                                          // one band: bright inner edge grading to deep red-orange
   add(B, tube(13.3, -1.15, -.12, ringWall));                                             // diffuser inner wall, lit
   add(B, lathe([[0, -2.1], [1.5, -2.08], [4, -1.97], [8, -1.65], [11, -1.3], [12.6, -1.13]], btn));   // dished button, flat at the pole
-  add(B, lathe([[12.6, -1.13], [13.0, -1.12], [13.2, -1.2], [13.25, -1.4], [13.25, -2.8]], btnRim));
+  add(B, lathe([[12.6, -1.13], [13.05, -1.12], [13.25, -1.2], [13.3, -1.4], [13.3, -2.8]], btnRim));      // closes up to the lit ring wall
   add(B, disc(13.25, 15.5, voidM), 0, 0, -1.6);
   g.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = false; } });
   return out;

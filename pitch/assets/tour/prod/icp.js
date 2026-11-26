@@ -40,8 +40,8 @@ export default H => {
   const foot = phys(0x0e0f10, { roughness: .75 });
   const pivot = phys(0x2a2b2d, { roughness: .4, clearcoat: .2 });
   const grey = phys(0x3a3b3e, { roughness: .42, specularIntensity: .4 });
-  const glass = phys(0x050506, { roughness: .06, clearcoat: .5, clearcoatRoughness: .1, specularIntensity: .5, specularColor: 0x222222, envMapIntensity: .2 });
-  const discM = phys(0x2c2d31, { roughness: .08, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1 });
+  const glass = phys(0x050506, { roughness: .07, clearcoat: 1, clearcoatRoughness: .02, specularIntensity: 1, envMapIntensity: .35 });   // same glass as the doorbell
+  const discM = phys(0x18191c, { roughness: .05, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: .5 });
   const barrel = phys(0x0b0b0c, { roughness: .3 });
   const voidM = new THREE.MeshBasicMaterial({ color: 0x000000, side: DS });
   const btnM = phys(0x45464a, { roughness: .55, sheen: .3, sheenColor: 0x8a8c90 });
@@ -109,15 +109,16 @@ export default H => {
   const hd = add(g, G(), 0, HC, 0), ZF = 23.8;
   // pillow head: flat for the first 16 mm behind the face, then rounding ~R20 into a 20 x 20 back
   const ZC = 8, CL = 22.2, CI = 20, inAt = z => { const a = Math.asin(Math.min(1, Math.max(0, (ZC - z) / CL))); return CI * (1 - Math.cos(a)); };
+  const ZB0 = 2.8, BR = 17, inB = z => { const b = Math.asin(Math.min(1, Math.max(0, (ZB0 - z) / BR))); return BR * (1 - Math.cos(b)); };
   const gS = [[22.5, 60, 60, 12, 0], [ZC, 60, 60, 12, 0]];
-  for (let i = 1; i <= 16; i++) { const a = i / 16 * PI / 2, k = 1 - Math.cos(a);
-    gS.push([ZC - CL * Math.sin(a), 60 - 2 * CI * k, 60 - 2 * CI * k, 12 - 4 * k, 0]); }
-  add(hd, shell(gS, grey, { skip: (k, i) => k === 16 && i === 32 }));    // flat bottom strip z 8..22.5 rebuilt below with real holes
+  for (let i = 1; i <= 24; i++) { const a = i / 24 * PI / 2, k = 1 - Math.cos(a), z = ZC - CL * Math.sin(a), iT = CI * k, iB = i === 24 ? BR : inB(z);
+    gS.push([z, 60 - 2 * CI * k, 60 - iT - iB, 12 - 4 * k, (iB - iT) / 2]); }
+  add(hd, shell(gS, grey, { skip: (k, i) => k === 24 && i === 32 }));    // flat bottom strip z 8..22.5 rebuilt below with real holes
   { const S = new THREE.Shape([[-18, ZC], [18, ZC], [18, 22.5], [-18, 22.5]].map(([x, z]) => new THREE.Vector2(x, z)));
-    [8, 9, 10, 11, 10, 9, 8].forEach((n, r) => { for (let i = 0; i < n; i++) S.holes.push(circ((i - (n - 1) / 2) * 2.75, 15.2 + (r - 3) * 2.15, .6)); });
+    [8, 9, 10, 11, 10, 9, 8].forEach((n, r) => { for (let i = 0; i < n; i++) S.holes.push(circ((i - (n - 1) / 2) * 2.5, 15.25 + (r - 3) * 2.165, .65)); });
     const toB = (geo, y) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i), y, p.getY(i)); geo.computeVertexNormals(); return geo; };
     add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(S, 12), -30), grey));
-    add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(rrS(36, 18, 5, 0, 15.2), 24), -29.6), voidM)); }
+    add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(rrS(36, 18, 5, 0, 15.25), 24), -29.6), voidM)); }
   const cS = [[22.6, 60, 60, 12]];                                        // gloss-black front wraps only 1.2 mm (the R1.2 roll)
   for (let i = 1; i <= 8; i++) { const a = i / 8 * PI / 2, s = 1.2 * (1 - Math.cos(a)); cS.push([22.6 + 1.2 * Math.sin(a), 60 - 2 * s, 60 - 2 * s, 12 - s]); }
   add(hd, shell(cS, glass, { front: false }));
@@ -131,7 +132,7 @@ export default H => {
   add(hd, lathe([[8.5, -.005], [8.45, -.1], [8.2, -.5], [4.8, -.5], [4.5, -.65], [4.5, -1.7]], barrel), 0, 0, ZF);
   add(hd, disc(0, 4.6, voidM), 0, 0, ZF - 1.7);
   add(hd, disc(3.1, 4.5, phys(0x3a3a40, { roughness: .35 })), 0, 0, ZF - 1.65);   // graphite inner barrel
-  add(hd, H.dome(3.1, .25, lensM), 0, 0, ZF - 1.66);
+  { const dm = new THREE.Mesh(new THREE.SphereGeometry(3.1, 96, 24, 0, 2 * PI, 0, PI / 2), lensM); dm.scale.set(1, .25 / 3.1, 1); dm.rotation.x = PI / 2; add(hd, dm, 0, 0, ZF - 1.66); }
   { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.fillStyle = '#fff';           // small crisp glint crescent
     x.beginPath(); x.arc(32, 32, 26, PI * 1.05, PI * 1.6); x.arc(36, 36, 22, PI * 1.6, PI * 1.05, true); x.closePath(); x.fill();
     const t = new THREE.CanvasTexture(c); add(hd, new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: .6, depthWrite: false })), 0, 0, ZF - 1.39); }
@@ -148,8 +149,8 @@ export default H => {
   // speaker grille (hex holes) and microSD flap on the bottom
   const sd = add(hd, pp(22, 9, (x, P) => { const [a, b] = P(-10, 3.25), [c, d] = P(10, -3.25);
     x.fillStyle = '#55565a'; x.strokeStyle = '#2a2b2d'; x.lineWidth = 2.5; x.beginPath(); x.roundRect(a, b, c - a, d - b, 30); x.fill(); x.stroke();
-    const [e, f] = P(-3, 3.25), [h, k] = P(3, 1.75); x.fillStyle = '#2f3032'; x.beginPath(); x.roundRect(e, f, h - e, k - f, 6); x.fill(); }), 0, -30 + inAt(3) - .03, 3);
-  sd.rotation.x = PI / 2 + Math.atan(20 * Math.sin(Math.asin(5 / CL)) / (CL * Math.cos(Math.asin(5 / CL))));   // follows the rounding
+    const [e, f] = P(-3, 3.25), [h, k] = P(3, 1.75); x.fillStyle = '#2f3032'; x.beginPath(); x.roundRect(e, f, h - e, k - f, 6); x.fill(); }), 0, -30 + inB(1) - .03, 1);
+  sd.rotation.x = PI / 2;
 
   /* ---------- back hub: mushroom pivot holding the loop arch ---------- */
   // fat rounded donut: smooth deep funnel to the socket, full roll round the rim, neck inside the loop arch
