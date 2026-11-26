@@ -431,6 +431,22 @@ button { font: inherit; color: inherit; }
 }
 
 /* ---- settings ---- */
+/* announcements live in the header, beside the gear, each the gear's size; a circle leaves once it has been viewed */
+.brand .news { flex: 1 1 auto; min-width: 0; margin: 0; padding: 3px 2px; gap: clamp(8px, 1.2vmin, 12px); opacity: 1; animation: none; scroll-padding: 0; }
+.brand .news > :first-child { margin-left: auto; }
+.brand .gear { margin-left: 0; }
+.brand .sc { width: clamp(44px, 5.6vmin, 50px); gap: 0; transition: width .45s var(--ease), margin .45s var(--ease), opacity .3s, transform .45s var(--ease); }
+.brand .sc > span:not(.ring) { display: none; }
+.brand .sc .ring { width: 100%; padding: 2px; }
+.brand .sc .ring b { inset: 2px; border-width: 2px; }
+.brand .sc.bye { width: 0; margin-left: calc(-1 * clamp(8px, 1.2vmin, 12px)); opacity: 0; transform: scale(.4); pointer-events: none; }
+.annb { flex: none; height: clamp(44px, 5.6vmin, 50px); border: 0; padding: 0 16px 0 12px; border-radius: 999px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: #fff; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap;
+  background: rgba(255,255,255,.1); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); transition: background .25s, transform .35s var(--ease); position: relative; }
+.annb svg { width: 22px; height: 22px; fill: none; stroke: rgb(var(--g)); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.annb i { position: absolute; top: 3px; left: 26px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: rgb(var(--g)); color: #04241e; font-size: 11px; font-weight: 700; font-style: normal; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px rgba(10,14,16,.85); }
+.annb i:empty { display: none; }
+.annb:hover { background: rgba(255,255,255,.16); } .annb:active { transform: scale(.94); }
+@media (max-width: 700px) { .annb { width: clamp(44px, 5.6vmin, 50px); padding: 0; justify-content: center; } .annb .t { display: none; } .annb i { left: auto; right: -4px; top: -3px; } .brand .t small { display: none; } }
 .gear { flex: none; margin-left: auto; width: clamp(44px, 5.6vmin, 50px); height: clamp(44px, 5.6vmin, 50px); border: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; background: rgba(255,255,255,.1); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); transition: background .25s, transform .35s var(--ease); }
 .gear svg { width: 48%; height: 48%; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .6s var(--ease); }
 .gear:hover { background: rgba(255,255,255,.16); } .gear:hover svg { transform: rotate(60deg); } .gear:active { transform: scale(.92); }
@@ -495,9 +511,9 @@ button { font: inherit; color: inherit; }
   <header class="brand">
     <img src="icon-192.png" alt="">
     <div class="t"><small>SmartHomePros</small><b>Connect</b></div>
+    <nav class="news" aria-label="New announcements"></nav>
     <button class="gear" aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1z"/></svg></button>
   </header>
-  <nav class="news" aria-label="Latest news"></nav>
   <div class="spacer"></div>
   <section class="cards" aria-label="Apps">
     <button class="card pitch" data-app="pitch" aria-label="Open Fast Pitch">
@@ -823,7 +839,8 @@ button { font: inherit; color: inherit; }
   }
   var seen = {}; try { (JSON.parse(localStorage.getItem('shpc_seen') || '[]')).forEach(function (k) { seen[k] = 1; }); } catch (e) {}
   function saveSeen() { try { localStorage.setItem('shpc_seen', JSON.stringify(Object.keys(seen))); } catch (e) {} }
-  function markSeen(p) { seen[p.id] = 1; saveSeen(); $$('[data-p="' + p.id + '"]').forEach(function (b) { b.classList.add('seen'); var n = $('em', b); if (n) n.remove(); }); }
+  function markSeen(p) { seen[p.id] = 1; saveSeen(); $$('[data-p="' + p.id + '"]').forEach(function (b) { b.classList.add('seen'); var n = $('em', b); if (n) n.remove();
+    if (b.classList.contains('sc')) { b.classList.add('bye'); setTimeout(function () { b.remove(); }, 500); } }); if (window.__annUnread) window.__annUnread(); }
 
   /* circles: running now and coming up (within 60 days) first, then the newest undated posts, then ones that are over (dimmed) */
   var news = $('.news'), ALL = POSTS.map(function (_, i) { return i; }), FS = ALL.map(function (i) { return focus(POSTS[i]); });
@@ -832,6 +849,7 @@ button { font: inherit; color: inherit; }
     ALL.filter(function (i) { return FS[i].st === 1 && FS[i].d - TODAY <= 60; }).sort(function (a, b) { return FS[a].d - FS[b].d; }),
     ALL.slice(0, STORIES).filter(function (i) { return FS[i].st === 2; }),
     ALL.slice(0, STORIES).filter(function (i) { return FS[i].st === 3; })).slice(0, STORIES);
+  LATEST = LATEST.filter(function (i) { return !seen[POSTS[i].id]; });   /* a viewed announcement leaves the header; it stays in All announcements */
   LATEST.forEach(function (i, j) {
     var p = POSTS[i], b = document.createElement('button');
     b.className = 'sc' + (seen[p.id] ? ' seen' : '') + (FS[i].st === 3 ? ' old' : ''); b.dataset.p = p.id; b.setAttribute('aria-label', p.t + (FS[i].st === 3 ? ', ended' : ''));
@@ -840,10 +858,12 @@ button { font: inherit; color: inherit; }
     b.addEventListener('click', function () { openStory(LATEST, j, b); });
     news.appendChild(b);
   });
-  var allBtn = document.createElement('button'); allBtn.className = 'sc all'; allBtn.setAttribute('aria-label', 'More announcements, ' + POSTS.length + ' in all'); allBtn.setAttribute('aria-haspopup', 'dialog');
-  allBtn.innerHTML = '<span class="ring"><b><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><i>' + POSTS.length + '</i></b></span><span>More</span>';
+  var allBtn = document.createElement('button'); allBtn.className = 'annb'; allBtn.setAttribute('aria-haspopup', 'dialog');
+  allBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 9.5a6 6 0 0 1 12 0c0 4.6 1.8 6.3 2.6 7H3.4c.8-.7 2.6-2.4 2.6-7z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/></svg><span class="t">All announcements</span><i></i>';
+  function unread() { var n = POSTS.filter(function (p) { return !seen[p.id]; }).length; $('i', allBtn).textContent = n ? n : ''; allBtn.setAttribute('aria-label', 'All announcements, ' + POSTS.length + ' in all' + (n ? ', ' + n + ' new' : '')); }
+  unread(); window.__annUnread = unread;
   allBtn.addEventListener('click', function () { openGrid(allBtn); });
-  news.appendChild(allBtn);
+  $('.gear').parentNode.insertBefore(allBtn, $('.gear'));
 
   /* ---------- every announcement: grid ---------- */
   var ax = $('.annx'), axGr = $('.gr', ax), axOpener = null;
@@ -905,7 +925,7 @@ button { font: inherit; color: inherit; }
     setTimeout(function () { $('#secCal').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
   });
   $('.x', st).addEventListener('click', closeStory);
-  $('.all', st).addEventListener('click', function () { var p = POSTS[seq[cur]]; closeStory(); openGrid($('.sc.all')); setTimeout(function () { var c = $('.ac[data-p="' + p.id + '"]', ax); if (c) c.scrollIntoView({ block: 'center' }); }, 30); });
+  $('.all', st).addEventListener('click', function () { var p = POSTS[seq[cur]]; closeStory(); openGrid($('.annb')); setTimeout(function () { var c = $('.ac[data-p="' + p.id + '"]', ax); if (c) c.scrollIntoView({ block: 'center' }); }, 30); });
   $('.nav.nx', st).addEventListener('click', next); $('.nav.pv', st).addEventListener('click', prev);
   /* touch (the stage has touch-action: none, so the browser never takes the gesture):
      tap left/right, hold to pause, swipe sideways for the next one, swipe down to close */
@@ -954,7 +974,7 @@ button { font: inherit; color: inherit; }
       r.addEventListener('click', function () {
         if (!to) return soon(name);
         closeDrawer();
-        if (to === 'news') { setTimeout(function () { openGrid($('.sc.all')); }, 200); }
+        if (to === 'news') { setTimeout(function () { openGrid($('.annb')); }, 200); }
         else setTimeout(function () { document.getElementById(to).scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
       });
       rows.appendChild(r);
