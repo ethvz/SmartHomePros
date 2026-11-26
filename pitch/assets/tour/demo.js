@@ -404,7 +404,7 @@ async function toDock(){ const m = dockMatrix(); if(!m){ showDock(false); return
 const tour = { card:$('#card'), back:$('#back') };
 function quietTour(){ state.focus = null; document.body.classList.remove('focus'); document.body.classList.add('dmMode'); tour.card.classList.add('away'); tour.back.hidden = true;
   PRODUCTS.forEach(q => q.chip && q.chip.setAttribute('aria-current', 'false')); state.idleAt = performance.now() + 1e9; controls.autoRotate = false; scenesEl.classList.add('off'); }
-function context(){ if(MODE.kind) return { kind:MODE.kind }; if(state.focus) return { focus:state.focus.k }; return {}; }
+function context(){ if(MODE.kind === 'panel') return { kind:'panel' }; if(MODE.kind && PAD.k) return { focus:PAD.k }; if(state.focus) return { focus:state.focus.k }; return {}; }
 async function restore(c){ document.body.classList.remove('dmMode'); setFill(0); state.idleAt = performance.now();
   if(c && c.kind === 'panel') return enterPanel(true);
   if(c && c.focus){ state.focus = null; T.focus(c.focus); return; }
@@ -512,7 +512,7 @@ $('#dmSkip').addEventListener('click', skip); runShield.addEventListener('click'
 let queue = Promise.resolve();
 /* run one sequence at a time; `body(ctx)` does the moves; `withHub` floats the hub UI as picture-in-picture */
 function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async () => {
-  const back = MODE.run ? null : context(), wasPanel = back && back.kind === 'panel';
+  const back = MODE.run ? null : context(), wasPanel = back && back.kind === 'panel'; MODE.back = back;
   MODE.run = name; MODE.lockCam = true; PAD.k = null; padEl.hidden = true; doneB.hidden = true; quietTour(); actEl.classList.add('off'); runShield.hidden = false; setFill(1.6);
   if(withHub){ await emu(); if(wasPanel && EMU.docked) await toPip(); else if(!hubEl.classList.contains('pip') || !hubEl.classList.contains('vis')) await toPip(); }
   try { await body(); } catch(e){ console.warn('demo', name, e); }
