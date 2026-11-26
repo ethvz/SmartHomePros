@@ -116,6 +116,9 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .board .rv.rv-in { opacity: 1; transform: none; }
   /* side-rail fast scroller (dock): the title nearest the finger grows; the rail itself stays put */
   .board nav.frscrub, #phdr .ph-prog.frscrub { touch-action: none; }
+  /* while scrubbing, the side rail holds still where the finger found it, with every title showing (a collapsed rail opens up) */
+  .board nav.frscrub { transform: var(--frT) !important; top: var(--frTop) !important; left: var(--frLeft) !important; opacity: 1 !important; visibility: visible !important; transition: none !important; }
+  .board nav.frscrub a > span:last-child { max-width: 420px !important; opacity: 1 !important; }
   .board nav.frscrub a, .board nav.frscrub a > span, #phdr .ph-prog.frscrub b { transition: translate .12s cubic-bezier(.2,.8,.2,1), scale .12s cubic-bezier(.2,.8,.2,1), color .15s ease !important; }
   .board nav.frsettle a, .board nav.frsettle a > span, #phdr .ph-prog.frsettle b { transition: translate .35s cubic-bezier(.2,.8,.2,1), scale .35s cubic-bezier(.2,.8,.2,1), color .3s ease !important; }
   #phdr .ph-prog .frtip { position: absolute; top: 16px; left: 0; translate: -50% 0; padding: 7px 13px; border-radius: 15px; background: rgba(20,22,22,.92); border: 1px solid rgba(5,229,175,.45);
@@ -138,6 +141,12 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .layer.pinon .board section[id^="sec-"] { background: transparent !important; }
   .layer.pinon .board section.pinned[id^="sec-"] > [data-name^="Background (stays"] { visibility: hidden !important; content-visibility: hidden; }
   html.safe .pinbg { display: none !important; }
+  /* a full-section dim inside the content (History) scrolls over the pinned photo: its edges are feathered, not hard */
+  .layer.pinon .board [data-name="Wheel backdrop"] { background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.72) 16%, rgba(0,0,0,.72) 84%, rgba(0,0,0,0) 100%) !important; }
+  /* iPad upright: the Hourly comparison rep's face stays on screen */
+  html.tport .pinbg .pbsec[data-sid="sec-hourly-comparison"] img { object-position: 82% 30% !important; }
+  /* iPads: the last section ends above the shared corner menu */
+  html:not(.pph) .layer .board section[id^="sec-"]:last-child { margin-bottom: calc(var(--shpn-foot, 0px) * var(--isc, 1)); }
   /* iPad upright: like iPad landscape, the section photo fills the whole screen behind the content (not just the top) */
   html.tport.pstack .board .pinbg > .pbsec[data-sid] [data-name^="Background"] > :is([data-pb], [data-pf]) { top: 0 !important; height: 100% !important; }
   html.tport.pstack .board .pinbg > .pbsec[data-sid] [data-pb]::before { background: linear-gradient(180deg, rgba(0,0,0,.12) 0%, rgba(0,0,0,.12) 55%, rgba(0,0,0,.6) 84%, rgba(0,0,0,.9) 100%) !important; }
@@ -1425,6 +1434,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     frame.querySelectorAll('section[id^="sec-"]').forEach(x => applyHr(x));
     if (relayout) frame.querySelectorAll('section[id^="sec-"]').forEach(x => { if (!x.__vout) fitSection(x); });
     if (relayout) frame.querySelectorAll('.layer').forEach(l => { navFor(l); if (l._sdim) l._sdim(); });
+    if (relayout) setTimeout(() => frame.querySelectorAll('.layer').forEach(l => { if (l._pinReset) l._pinReset(); }), 0);   // (a new layout mode: the pinned photos are copied again with its crop)
     if (relayout) saved.forEach(([l, sc, v]) => { if (sc) { sc.__map = null; sc.style.scrollBehavior = 'auto'; sc.scrollTop = rScroll(sc, v); sc.style.scrollBehavior = ''; sc.dispatchEvent(new Event('scroll')); } if (l._vupdate) l._vupdate(true); });
     viewport.style.width = Math.round(FW * scale) + 'px';
     viewport.style.height = Math.round(H * scale) + 'px';
@@ -1606,6 +1616,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     if (inst && typeof inst.setState === 'function') { const ss = inst.setState; inst.setState = function (u, ...rest) {
       // the header, footer and arrows stay on screen all the time (they no longer fade away when the page is still)
       if (u && typeof u === 'object' && u.hdrHide === true) { u = Object.assign({}, u); delete u.hdrHide; if (!Object.keys(u).length) return; }
+      if (u && typeof u === 'object' && layer.__scrubbing && 'navOpen' in u) { u = Object.assign({}, u); delete u.navOpen; if (!Object.keys(u).length) return; }   // (the side-rail scrubber holds the section menu open)
       return ss.call(this, u, ...rest); }; }
     // upright: a page re-draws itself on scroll at most every 90 ms (plus once when scrolling stops). Every re-draw rebuilds the
     // whole page, and a fast flick fired dozens a second — iPhones ran out of memory and closed the page.
@@ -4151,6 +4162,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     const show = (sec, instant) => {
       const x = sec ? pinSlot(P, sec) : null; if (x === undefined) return false;
       const L = secs(), i = L.indexOf(sec), nx = i >= 0 ? L[i + 1] : null; const nslot = nx ? pinSlot(P, nx) : null; P.next = nslot || null;
+      if (nx && nslot === undefined && nx.__frag) [...nx.__frag.querySelectorAll('[data-name^="Background (stays"] img')].slice(0, 3).forEach(im => { const u = im.dataset.vsrc || im.getAttribute('src'); if (u && u !== BLANK) { const q = new Image(); q.decoding = 'async'; q.src = u; } });   // (next section still parked: warm its photo)
       if (x === P.cur) { imgs(P.next, true); return true; }
       const prev = P.cur; P.cur = x; const tok = ++P.seq;
       if (x) imgs(x, true);
@@ -4167,6 +4179,8 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     const onScroll = () => { if (!P.raf) P.raf = requestAnimationFrame(upd); };
     sc.addEventListener('scroll', onScroll, { passive: true });
     layer._pinUpd = () => { P.want = null; onScroll(); };
+    layer._pinReset = () => { P.slots.forEach((x, sec) => { if (x) x.remove(); sec.classList.remove('pinned'); }); P.slots.clear(); P.cur = undefined; P.next = null; P.want = null; P.seq++;
+      const f = pick(); P.want = f; if (!show(f, true)) { P.want = null; setTimeout(onScroll, 200); } };
     (layer._off = layer._off || []).push(() => { sc.removeEventListener('scroll', onScroll); clearTimeout(P.t); clearTimeout(P.ft); cancelAnimationFrame(P.raf); });
     { const first = pick(); P.want = first; if (!show(first, true)) { P.want = null; setTimeout(onScroll, 200); } }
   }
@@ -4186,39 +4200,43 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     const css = document.createElement('style'); document.head.appendChild(css);
     const RM = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
     const along = e => X ? e.clientX : e.clientY;
-    const local = e => { const r = rail.getBoundingClientRect(), L = X ? rail.offsetWidth : rail.offsetHeight, k = (X ? r.width : r.height) / (L || 1) || 1; return (along(e) - (X ? r.left : r.top)) / k; };
-    const mid = b => X ? b.offsetLeft + b.offsetWidth / 2 : b.offsetTop + b.offsetHeight / 2;
+    const mid = b => { const r = b.getBoundingClientRect(); return X ? r.left + r.width / 2 : r.top + r.height / 2; };   // (screen px, read once when the drag starts)
     const title = a => { const sp = a && a.querySelector(':scope > span:last-child'); return ((sp || a || {}).textContent || '').replace(/coming soon/i, '').trim(); };
     // titles near the finger grow with a smooth falloff; the ones around them are eased apart to make room
     function paint() { if (!S || !S.map) { if (css.textContent) css.textContent = ''; return; }
-      const M = S.map, sp = M.length > 1 ? (M[M.length - 1].c - M[0].c) / (M.length - 1) : 50, rm = RM(); let out = '';
+      const M = S.map, sp = M.length > 1 ? (M[M.length - 1].c - M[0].c) / (M.length - 1) : 50, rm = RM(), kk = S.k || 1; let out = '';
       M.forEach((m, i) => { const dd = m.c - S.ly, g = Math.exp(-Math.pow(dd / (sp * 0.7), 2)), near = m === S.near;
         if (X) { out += `${o.sel(m.b)}{scale:${rm ? 1 : (1 + 0.9 * g).toFixed(3)} !important;${near ? 'background:#05E5AF !important;border-color:#05E5AF !important;' : ''}}`; return; }
-        const k = rm ? 0 : 1, scl = 1 + 0.45 * g * k, push = k * Math.tanh(dd / sp) * 9 * (1 - g);   // (push: neighbours move away from the grown title)
+        const k = rm ? 0 : 1, scl = 1 + 0.45 * g * k, push = k * Math.tanh(dd / sp) * 0.18 * (sp / kk) * (1 - g);   // (push: neighbours move away from the grown title)
         out += `${o.sel(m.b)}{translate:0 ${push.toFixed(1)}px !important}`
-          + `${o.sel(m.b)} > span:last-child{transform-origin:0 50% !important;scale:${scl.toFixed(3)} !important;${near ? 'color:#05E5AF !important;opacity:1 !important;' : g > .3 ? 'color:#fff !important;opacity:1 !important;' : ''}}`
+          + `${o.sel(m.b)} > span:last-child{transform-origin:0 50% !important;scale:${scl.toFixed(3)} !important;${near ? 'color:#05E5AF !important;opacity:1 !important;max-width:420px !important;' : g > .3 ? 'color:#fff !important;opacity:1 !important;max-width:420px !important;' : ''}}`   // (a collapsed rail shows the titles near the finger too)
           + (near && !rm ? `${o.sel(m.b)} > span:first-child{scale:1.2 !important}` : ''); });
       if (css.textContent !== out) css.textContent = out;
-      if (X && tip) { const n = S.near; tip.textContent = title(n.a); tip.style.left = S.ly + 'px'; } }
+      if (X && tip) { const n = S.near; if (tip.textContent !== title(n.a)) tip.textContent = title(n.a); tip.style.left = ((S.ly - S.r0) / kk) + 'px'; } }
     // where each section starts, in the scroller's own units (phones draw the scroller at screen size, iPads inside the scaled page)
     function begin(e) { const L = o.layer(); sc = scrollerOf(L); if (!sc) { S = null; return; } const r0 = sc.getBoundingClientRect(), u = sc.offsetHeight / (r0.height || 1), map = [];
       o.items().forEach((b, i) => { const a = o.link(b), sec = a && sc.querySelector((a.getAttribute('href') || '').replace(/[^#\w-]/g, '')); if (!sec || !sec.offsetHeight) return;
         map.push({ b, a, i, c: mid(b), top: Math.max(0, Math.min(sc.scrollHeight - sc.clientHeight, sc.scrollTop + (sec.getBoundingClientRect().top - r0.top) * u)) }); });
       if (map.length < 2) { S = null; return; }
-      S.on = true; S.map = map; rail.classList.remove('frsettle'); rail.classList.add('frscrub'); sc.__scrub = true;
+      S.on = true; S.map = map; { const rr = rail.getBoundingClientRect(); S.r0 = X ? rr.left : rr.top; S.k = (X ? rr.width / (rail.offsetWidth || 1) : rr.height / (rail.offsetHeight || 1)) || 1; }
+      // the rail is held as it is while the finger is on it: its position and size are pinned (the page may re-draw it as it scrolls)
+      { const g = getComputedStyle(rail); rail.style.setProperty('--frT', g.transform === 'none' ? 'none' : g.transform); rail.style.setProperty('--frTop', g.top); rail.style.setProperty('--frLeft', g.left); }
+      rail.classList.remove('frsettle'); rail.classList.add('frscrub'); sc.__scrub = true; if (L) L.__scrubbing = true;
       try { if (e.pointerId != null) rail.setPointerCapture(e.pointerId); } catch (_) {}
       if (sc.__stopSpring) sc.__stopSpring();
       if (X) { tip = rail.querySelector(':scope > .frtip') || rail.appendChild(Object.assign(document.createElement('span'), { className: 'frtip' })); tip.classList.add('on'); }
       update(e); }
-    function update(e) { const M = S.map, ly = Math.max(M[0].c, Math.min(M[M.length - 1].c, local(e))); S.ly = ly;
+    function update(e) { const M = S.map, ly = Math.max(M[0].c, Math.min(M[M.length - 1].c, along(e))); S.ly = ly;
       let i = 0; while (i < M.length - 2 && ly > M[i + 1].c) i++; const a = M[i], b = M[i + 1], t = Math.max(0, Math.min(1, (ly - a.c) / (b.c - a.c)));
       const near = t < .5 ? a : b; if (S.near !== near) { if (S.near) { try { haptic('select'); } catch (_) {} } S.near = near; }
-      sc.style.scrollBehavior = 'auto'; sc.scrollTop = a.top + (b.top - a.top) * t; sc.style.scrollBehavior = '';
-      if (!S.rq) S.rq = requestAnimationFrame(() => { if (S) { S.rq = 0; paint(); } }); }
+      S.y = a.top + (b.top - a.top) * t;
+      // one scroll write and one style write per frame, however many moves arrive in between
+      if (!S.rq) S.rq = requestAnimationFrame(() => { if (!S) return; S.rq = 0; if (Math.abs(sc.scrollTop - S.y) > 0.5) { sc.style.scrollBehavior = 'auto'; sc.scrollTop = S.y; sc.style.scrollBehavior = ''; } paint(); }); }
     function end() { const st = S; S = null; if (!st || !st.on) return; lastEnd = Date.now(); if (st.rq) cancelAnimationFrame(st.rq);
       rail.classList.add('frsettle'); css.textContent = ''; if (tip) tip.classList.remove('on');
+      if (Math.abs(sc.scrollTop - st.y) > 0.5) sc.scrollTop = st.y;
       setTimeout(() => { if (!S) rail.classList.remove('frscrub', 'frsettle'); }, 380);
-      sc.__scrub = false; st.near.a.click(); }
+      sc.__scrub = false; const L = o.layer(); if (L) L.__scrubbing = false; st.near.a.click(); }
     // moves are read from both pointer and touch events at window level, so iPad Safari can't swallow them on the way to the rail
     const p0 = e => X ? e.clientX : e.clientY;
     const mv = e => { if (!S) return; if (!S.on) { if (Math.abs(p0(e) - S.y0) > 6) begin(e); return; } update(e); };
