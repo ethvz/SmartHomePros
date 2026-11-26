@@ -106,13 +106,13 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
   const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6 });
   const shell = lineMat(body, [{ ax: 'y', at: 9.5, B: 0x6e6e6c, rB: .55, w: .35, col: 0x5a5a58, k: 1 }, { ax: 'y', at: 9.15, w: .35, col: 0xffffff, k: .6 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
-  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 4.5, st = 8, out = [];
+  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5, st = 8, out = [];
     const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);
     for (const u of T) { const t = u * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
     for (const u of T) { const t = u * Math.PI / 2, d = rf * Math.pow(1 - Math.cos(t), 1.4); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }   // G2-ish blend into the face
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
-  const dishP = [[-2.7, D - 4.1], [-2.7, D - 3.5], [-1.9, D - 2.45], [-1.0, D - 1.25], [-.3, D - .4], [-.08, D - .15], [.15, D - .03], [.4, D]];   // crisp ~53-degree cone, 3.5 mm deep, 0.4 mm rim fillet
+  const dishP = [[-2.8, D - 4.1], [-2.8, D - 3.5], [-1.9, D - 2.45], [-1.0, D - 1.25], [-.3, D - .4], [-.08, D - .15], [.15, D - .03], [.4, D]];   // crisp ~53-degree cone, 3.5 mm deep, 0.4 mm rim fillet
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
     { type: 'pocket', pts: circ(0, -6.5, 9, 140), prof: uni(dishP), col: (k, K, v) => (.55 + .45 * sm(D - 3.5, D - .1, v[2])) * (1 - .45 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
@@ -121,8 +121,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
   const btnM = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .6, clearcoat: .05 });
-  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.05, .68], [.1, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 4.2);
-  add(B, new THREE.Mesh(new THREE.RingGeometry(6.0, 6.22, 96), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .9 })), 0, -6.5, D - 4.05);
+  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 4.2);
+  add(B, new THREE.Mesh(new THREE.RingGeometry(6.0, 6.2, 96), new THREE.MeshStandardMaterial({ color: 0x222222, roughness: .9 })), 0, -6.5, D - 4.05);
 
   /* 3. pry notch on the back-cover seam, bottom centre */
   const notch = plane(7, 1.6, 60, (x, Pp) => { const [a, b] = Pp(-3, .5), [c, d] = Pp(3, -.5), gr = x.createLinearGradient(0, b, 0, d);

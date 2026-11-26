@@ -22,7 +22,7 @@ export default H => {
   add(g, ext(outline(-Y, Y, true, true), 20, .5, white));
   // face plate: z 8 .. 24.6 with broad side roll-offs; faint parting line 38 mm below the top (photo)
   const mask = (() => { const N = 128, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
-    x.fillStyle = '#fff'; x.fillRect(0, 0, N, N); x.fillStyle = '#000'; x.beginPath(); x.arc(N / 2, N / 2, 1.3 / 4 * N, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#fff'; x.fillRect(0, 0, N, N); x.fillStyle = '#000'; x.beginPath(); x.arc(N / 2, N / 2, 1.5 / 4 * N, 0, Math.PI * 2); x.fill();
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;   // maps a 4 mm square round the pinhole
     t.repeat.set(1 / 4, 1 / 4); t.offset.set(2 / 4, (2 - PH) / 4); return t; })();
   const pm = splitMat(white, white, 'y', Y - 38, .22, 0xdcdddb); pm.alphaMap = mask; pm.alphaTest = .5;
@@ -30,11 +30,11 @@ export default H => {
   // top rib: rounded bar W - 6 long (3 mm in from each side, square ends), 7.0-9.6 mm below the top, standing 0.8 mm proud (to 25.4)
   add(g, H.rslab(W - 6, 2.6, 1.8, .35, .75, white), 0, Y - 8.3, 25.4 - .9);
 
-  // pinhole: countersink (dia 2.6) into a dark 1.6 mm bore, 27.8 mm below the top (floor just above the hidden rear-solid face)
+  // pinhole: countersink (dia 3.0) into a dark 2.0 mm bore (photo), 27.8 mm below the top (floor just above the hidden rear-solid face)
   { const V2 = (r, z) => new THREE.Vector2(r, z);
-    const cs = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1.32, 24.62), V2(1.05, 24.4), V2(.82, 24.05), V2(.8, 23.8)], 40), white), 0, PH, 0);
+    const cs = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1.52, 24.62), V2(1.25, 24.4), V2(1.02, 24.05), V2(1, 23.8)], 40), white), 0, PH, 0);
     cs.rotation.x = Math.PI / 2;
-    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(.8, 23.8), V2(.8, 21.6), V2(0, 21.6)], 32),
+    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1, 23.8), V2(1, 21.6), V2(0, 21.6)], 32),
       new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: .9, envMapIntensity: .1, side: THREE.DoubleSide })), 0, PH, 0);
     bore.rotation.x = Math.PI / 2; }
 
