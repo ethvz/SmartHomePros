@@ -38,9 +38,9 @@ export default H => {
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
   const lensM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .05, clearcoat: 1, clearcoatRoughness: .05, transparent: true, opacity: .12, depthWrite: false });
-  const boardM = new THREE.MeshStandardMaterial({ color: 0x6a6a64, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe0b840, roughness: .35, emissive: 0xffc94a, emissiveIntensity: .35, clearcoat: .6 });
-  const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xe8e6dc, roughness: .5 });
+  const boardM = new THREE.MeshStandardMaterial({ color: 0x3e443c, roughness: .7 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe2bb48, roughness: .35, emissive: 0xffc540, emissiveIntensity: .3, clearcoat: .6 });
+  const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xf2f0e8, roughness: .5 });
   const btnM = white.clone(), outlineM = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 
@@ -74,9 +74,13 @@ export default H => {
   for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
   add(g, ringMesh(rings.slice(0, nBody), bodyM, false, true));
   { // hole walls and floor: same white plastic, darkened toward the floor (baked ambient occlusion) like the shadowed well in the photos
-    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .45, vertexColors: true }), true, false);
+    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xd4d1c4, roughness: .45, vertexColors: true }), true, false);
     const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
-    for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), f = .76 + .24 * t ** 1.5; col.push(f, f, f * .99); }
+    const n = hole.length;
+    for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), top = Math.max(0, (pa.getY(i) - mm(PC[1])) / mm(HW / 2));
+      let f = (.8 + .2 * t ** 1.5) * (1 - .12 * top * (1 - t * .5));                                     // darker toward the floor, and more on the top wall (shadowed from above)
+      if (Math.floor(i / n) === 1) f = .5;                                                                // 0.3 mm dark line right under the hole edge (0x6a6a66 on 0xd4d1c4)
+      col.push(f, f, f); }
     wm.geometry.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); add(g, wm); }
 
   /* ---------- LED board, 12 separate SMD packages, clear lens ---------- */
@@ -84,7 +88,7 @@ export default H => {
   add(g, H.rslab(mm(15.4), mm(13.6), mm(.6), mm(.8), mm(.15), boardM), lc[0], lc[1], mm(ZF + .3));
   for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = mm((c - 1.5) * 3.9), y = lc[1] + mm((1 - r) * 4.6);
     add(g, H.rslab(mm(3.0), mm(3.4), mm(.5), mm(.25), mm(.1), ledFrameM), x, y, mm(ZF + .85));
-    add(g, H.rslab(mm(2.2), mm(2.6), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
+    add(g, H.rslab(mm(2.4), mm(2.8), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
   { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.4), lensM); lens.castShadow = false; lens.renderOrder = 2; lens.material = [lensM, new THREE.MeshPhysicalMaterial({ color: 0x8c9090, roughness: .2, clearcoat: .5 })];   // caps clear, sides show the block's thickness
     add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25));
     const bev = new THREE.Mesh(new THREE.ShapeGeometry((() => { const o = new THREE.Shape(rrPts(mm(24), mm(24), mm(5.5)).map(([a, b]) => new THREE.Vector2(a, b))); o.holes.push(new THREE.Path(rrPts(mm(23.2), mm(23.2), mm(5.1)).map(([a, b]) => new THREE.Vector2(a, b)))); return o; })()),

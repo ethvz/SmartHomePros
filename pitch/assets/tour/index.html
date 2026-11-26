@@ -435,7 +435,7 @@ M.siding.color.set(0xd9dce1);                // light render; the dusk bake make
 M.conc.color.set(0x9e9e9b);                  // paving / drive at a real concrete albedo (~.35)
 M.grass.color.set(0x5f6b52);                 // lawn albedo ~.12
 /* one window glass everywhere: dark tinted pane that mirrors the dusk sky, with a faint warm glow from the rooms */
-M.glassDark = M.glassLit = phys(0x0a0e14, {r:.06, m:.1, x:{emissive:0xffc98f, emissiveIntensity:.035, clearcoat:1, clearcoatRoughness:.04, envMapIntensity:2.4}});
+M.glassDark = M.glassLit = phys(0x0b1016, {r:.06, m:.1, x:{emissive:0xffc98f, emissiveIntensity:.03, clearcoat:1, clearcoatRoughness:.04, envMapIntensity:4.5}});
 M.frost = phys(0xb9b4aa, {r:.45, x:{emissive:0xffe0bc, emissiveIntensity:.22}});   // frosted door lites
 
 /* ------------------------------------------------------------------ site */
@@ -614,8 +614,8 @@ slab(-.85,2.75,FL,FL+.012,.75,3.45,M.rug,null,false);
 
 /* ------------------------------------------------------------------ lights */
 /* dusk: a dim, cool sky and a weak low key from the west; the house's own warm (2700-3000 K) lights carry the picture */
-scene.add(new THREE.HemisphereLight(0x8a9cbd, 0x0b0c0e, .75));
-const moon = new THREE.DirectionalLight(0xa9bcdc, 1.6);
+scene.add(new THREE.HemisphereLight(0x8496b8, 0x0b0c0e, .5));
+const moon = new THREE.DirectionalLight(0xa3b6d8, .55);
 moon.position.set(-9, 20, 16); moon.target.position.set(1, 0, -1);
 moon.castShadow = true; moon.shadow.mapSize.set(2048, 2048);
 Object.assign(moon.shadow.camera, {left:-17, right:17, top:14, bottom:-12, near:4, far:60});
@@ -623,13 +623,13 @@ moon.shadow.bias = -0.0004; moon.shadow.normalBias = 0.03; moon.shadow.radius = 
 scene.add(moon, moon.target);
 const warm = 0xffc58c;                          // ~2800 K
 const pl = (x,y,z,i,d=9) => { const l = new THREE.PointLight(warm, i, d, 2); l.position.set(x,y,z); scene.add(l); return l; };
-pl(-.1,3.3,-4.2,40,11);                         // over the island
-pl(.6,3.2,2.0,30,12);                           // living
-pl(0,3.0,-1.9,22,10);                           // dining
-pl(.05,6.2,-3.0,26,13);                         // vault fill
-pl(4.1,4.6,1.4,16,10);                          // right bay under the flat ceiling
-pl(-4.78,FL+1.85,4.4,3.5,5);                    // wall lantern pool by the door
-{ const key = new THREE.SpotLight(0xffcf9c, 95, 14, 1.05, .9, 2);
+pl(-.1,3.3,-4.2,28,11);                         // over the island
+pl(.6,3.2,2.0,20,12);                           // living
+pl(0,3.0,-1.9,15,10);                           // dining
+pl(.05,6.2,-3.0,16,13);                         // vault fill
+pl(4.1,4.6,1.4,11,10);                          // right bay under the flat ceiling
+pl(-4.78,FL+1.85,4.4,2.2,4);                    // wall lantern pool by the door
+{ const key = new THREE.SpotLight(0xffcf9c, 60, 14, 1.05, .9, 2);
   key.position.set(.6,7.4,-1.0); key.target.position.set(.8,0,-.2);
   scene.add(key, key.target); }
 // warm downlights in the flat ceiling washing the shelf wall
@@ -638,9 +638,9 @@ for(const x of [3.6,4.8]){ const s = new THREE.SpotLight(0xffcf9c, 22, 8, .7, .9
 // under-cabinet LED strip
 slab(.4,.95,FL+1.535,FL+1.545,KZ+.32,KZ+.35,M.bulb,null,false);
 // exterior: porch downlights wash the entry, sconces by the garage door
-for(const x of [-6.0,-3.9]){ const s = new THREE.SpotLight(warm, 26, 7, .75, .9, 2); s.position.set(x,3.62,4.75); s.target.position.set(x,0,4.25); scene.add(s, s.target);
+for(const x of [-6.0,-3.9]){ const s = new THREE.SpotLight(warm, 11, 6, .7, .9, 2); s.position.set(x,3.62,4.75); s.target.position.set(x,0,4.25); scene.add(s, s.target);
   const d = cyl(.045,.01,M.bulb,16); d.position.set(x,3.66,4.8); scene.add(d); }
-{ const s = new THREE.SpotLight(warm, 26, 8, 1.0, .95, 2); s.position.set(-8.4,3.1,4.4); s.target.position.set(-8.4,0,5.6); scene.add(s, s.target); }
+{ const s = new THREE.SpotLight(warm, 10, 7, 1.0, .95, 2); s.position.set(-8.4,3.1,4.4); s.target.position.set(-8.4,0,5.6); scene.add(s, s.target); }
 for(const x of [-9.78,-7.02]){
   slab(x-.06,x+.06,2.6,2.85,3.9,4.02,M.blackM); slab(x-.04,x+.04,2.58,2.6,3.92,4.0,M.bulb,null,false); }
 for(const x of [-6.2,-4.3,3.6,4.9]){ const d = cyl(.05,.01,M.bulb,16); d.position.set(x,6.49,4.3); scene.add(d); }

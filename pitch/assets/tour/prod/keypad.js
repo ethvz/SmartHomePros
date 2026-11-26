@@ -36,9 +36,9 @@ export default H => {
   const FONT = '"Vivint Sans", "Circular Std", "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
   /* ---------- materials ---------- */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0x9d9d9a, roughness: .62, clearcoat: .05 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .62, envMapIntensity: .5 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xeeeeed, roughness: .45, clearcoat: .1, clearcoatRoughness: .5 });
-  const body = splitMat(grey, white, 'z', mm(10.5), mm(.2), 0x8e8e8c);
+  const body = splitMat(grey, white, 'z', mm(10.5), mm(.2), 0x707070);
   const faceM = white.clone();
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xefefee, roughness: .35, clearcoat: .3, clearcoatRoughness: .25 }), keyMV = keyM.clone(); keyMV.vertexColors = true;
   const hair = new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: .7 }), hairL = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7 });
@@ -102,7 +102,10 @@ export default H => {
   EX.forEach((x, i) => {
     add(g, lathe([[ER, .02], [ER - .15, -.04], [6.05, -.6], [6.0, -.72]], ringM), mm(x), mm(EY), FZ);              // matte grey conical bezel, meets the button
     const prof = [[6.0, -.72], [5.92, -.63], [5.75, -.6]]; for (let k = 1; k <= 10; k++) { const r = 5.7 * (1 - k / 10); prof.push([r, dish(r)]); }
-    add(g, lathe(prof, keyM), mm(x), mm(EY), FZ);                                                                       // concave white button
+    { const btn = add(g, lathe(prof, keyMV), mm(x), mm(EY), FZ);   // half-strength lower-left shade (about 4%), baked
+      const pa = btn.geometry.attributes.position, col = [];
+      for (let k = 0; k < pa.count; k++) { const p = (-pa.getX(k) + pa.getZ(k)) / Math.SQRT2 / mm(6), s = Math.min(1, Math.max(0, (p - .3) / .5)); const f = 1 - .04 * s * s * (3 - 2 * s); col.push(f, f, f); }
+      btn.geometry.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); }                                                                       // concave white button
     add(g, conform(printPlane(mm(7), mm(7), (c, P) => { c.strokeStyle = '#4a4a4a'; c.lineWidth = 4; c.lineJoin = c.lineCap = 'round'; icons[i](c, P); }),
       (px, py) => mm(dish(Math.hypot(px, py) * 1000))), mm(x), mm(EY), FZ);
   });

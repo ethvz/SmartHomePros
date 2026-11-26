@@ -34,7 +34,7 @@ export default H => {
     s.lineTo(Ro + 6, yTg - S*6); s.lineTo(Ro + 6, yTg - S*6 + tT); s.lineTo(Ro, yTg + tT);
     s.absarc(Ro, yTg + tT + Ri, Ri, 1.5*Math.PI, Math.PI, true);
     s.lineTo(Tb, yTop); s.lineTo(0, yTop);
-    const j = ext(s, Wb, 3, white); j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
+    const j = ext(s, Wb, 1, white);   // R1 side edges, the same as the mount's wall plate (no notch where they meet) j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
     // thin tongue lying on the sloped bar top: plan rounded rectangle, R10 front corners, 4 mm thick (a real step), to z = 74
     const t = ext(rr4(Wb, zTg - Ro + 2, [10, 10, 0, 0], 0, (zTg + Ro - 2)/2), tT, 1.2, white);
     t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yT + tT, 0);
