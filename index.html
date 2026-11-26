@@ -129,7 +129,7 @@ button { font: inherit; color: inherit; }
 @media (hover: hover) { .card:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 40px 70px -30px rgba(0,0,0,.95); } .card:hover .ph { transform: scale(1.08); } }
 .card:active { transform: scale(.975); transition-duration: .12s; }
 .card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-/* Pulse + The Playbook: drawn art instead of photos */
+/* Pulse + Conveyour: drawn art instead of photos */
 .card.mini { background: #101418; }
 .card.mini .art { position: absolute; inset: 0; overflow: hidden; }
 .card.mini .art svg { position: absolute; left: 0; right: 0; top: 22%; width: 100%; height: 44%; }
@@ -139,9 +139,6 @@ button { font: inherit; color: inherit; }
 .card.mini .ic svg { width: 54%; height: 54%; fill: none; stroke: #000; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .card.pulse .ic { background: linear-gradient(135deg, #ff8fdc, rgb(var(--pk)) 55%, #c34697); }
 .card.book .ic { background: linear-gradient(135deg, #ffad6e, rgb(var(--or)) 55%, #e6743e); }
-.card.book .tag i { background: rgb(var(--or)); animation: blink 1.6s ease-in-out infinite; }
-.card.book .go { background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
-.card.book .go svg { stroke: rgba(255,255,255,.45); }
 .card.book.nope { animation: nope .45s var(--ease); }
 .pl-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.6s var(--ease) .7s forwards; }
 .pb-route { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.4s var(--ease) .9s forwards; }
@@ -518,16 +515,16 @@ button { font: inherit; color: inherit; }
         <span class="go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M8.5 7H17v8.5"/></svg></span>
       </span>
     </a>
-    <button class="card mini book" data-soon="The Playbook" aria-label="The Playbook, coming soon">
+    <a class="card mini book" href="https://dthvivinttraining.conveyour.com/ui/portal/" target="_blank" rel="noopener" aria-label="Open Conveyour, the video training library">
       <span class="art"><svg viewBox="0 0 300 120" fill="none" stroke="rgb(255,135,54)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><g opacity=".9"><circle cx="70" cy="86" r="9"/><circle cx="120" cy="92" r="9"/><circle cx="170" cy="86" r="9"/><path d="M212 30l12 12m0-12l-12 12M252 64l12 12m0-12l-12 12M150 22l12 12m0-12l-12 12"/></g><path class="pb-route" pathLength="1" d="M70 76 C70 40 110 30 150 50 S 230 70 248 44" /><path class="pb-route r2" pathLength="1" d="M170 76 C190 60 210 66 236 80 L 258 92"/><path d="M242 38l7 6-9 3" class="pb-route"/></svg></span>
       <span class="sh"></span>
-      <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg></span>
-      <span class="tag"><i></i>Coming soon</span>
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3.5"/><path d="M10.2 9.2v5.6l4.6-2.8z"/></svg></span>
+      <span class="tag">Video library</span>
       <span class="bd">
-        <span class="tx"><span class="ey">Train</span><span class="nm">The Playbook</span><span class="ln">Every play, drill and script in one place.</span></span>
-        <span class="go"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>
+        <span class="tx"><span class="ey">Train</span><span class="nm">Conveyour</span><span class="ln">Every training video, any time.</span></span>
+        <span class="go"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M8.5 7H17v8.5"/></svg></span>
       </span>
-    </button>
+    </a>
   </section>
   </div>
 
@@ -592,7 +589,7 @@ button { font: inherit; color: inherit; }
       <button class="opt" role="radio" data-v="home"><span class="oi"><img src="icon-192.png" alt=""></span><span class="ot"><b>Connect home</b><small>Choose an app every time</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
       <button class="opt" role="radio" data-v="pitch"><span class="oi"><img src="pitch/assets/icon-192.png" alt=""></span><span class="ot"><b>Fast Pitch</b><small>Sell</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
       <button class="opt" role="radio" data-v="recruit"><span class="oi"><img src="recruit/icon.png" alt=""></span><span class="ot"><b>Fast Recruit</b><small>Recruit</small></span><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-      <button class="opt" role="radio" disabled><span class="oi" style="background:linear-gradient(135deg,#ffad6e,rgb(255,135,54) 55%,#e6743e)"><svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg></span><span class="ot"><b>The Playbook</b><small>Train</small></span><span class="soon">Coming soon</span></button>
+      
     </div>
         <p class="note">The Vivint logo or Switch app button inside any app always brings you back here.</p>
     </div>
