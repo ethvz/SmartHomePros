@@ -123,6 +123,24 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmAct .tv{min-width:64px;text-align:center;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
 #dmAct .tv small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted)}
 #dmAct .tv small.cool{color:#7aa2ff}#dmAct .tv small.heat{color:#ffb060}
+/* docked inside the tour's product bar */
+#card #dmAct{position:static;transform:none;left:auto;bottom:auto;padding:0;margin:0 2px;gap:6px;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0;flex:none}
+#card #dmAct.off{display:none}
+#card #dmAct button{height:44px;padding:0 15px;font-size:14px;gap:7px;background:rgba(255,255,255,.1)}
+#card #dmAct button.pri{background:var(--vg);color:#04110d}
+#card #dmAct button.rnd{width:44px;padding:0}
+#card #dmAct .tv{min-width:58px;font-size:20px;line-height:1.05}
+#card #dmAct svg{width:19px;height:19px}
+@media (max-width:560px){
+  #card.dmHas .c-name{max-width:24vw!important;font-size:14px!important}
+  #card #dmAct{gap:4px;margin:0}
+  #card #dmAct .t{display:none}
+  #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
+  #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock]{width:40px;padding:0;justify-content:center}
+  #card #dmAct button.rnd{width:40px}
+  #card #dmAct .tv{min-width:46px;font-size:17px}
+  #card #dmAct .tv small{font-size:8.5px;letter-spacing:.1em}
+}
 /* live caption while an automation plays */
 #dmCap{position:fixed;z-index:12;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px + var(--fb,0px));transform:translateX(-50%);max-width:calc(100vw - 24px);padding:12px 12px 12px 18px;border-radius:28px;display:flex;align-items:center;gap:14px;transition:opacity .4s,transform .5s var(--ease)}
 #dmCap.off{opacity:0;transform:translateX(-50%) translateY(20px);pointer-events:none}
@@ -473,32 +491,36 @@ window.__tapHook = (ray, e) => {
 
 /* ------------------------------------------------------------------ action bar for the focused smart device */
 let actK = null;
+/* the per-device control lives inside the tour's slim product bar (#card), before the › button, so nothing sits between
+   the product and the bar (the thermostat's downcast glow stays clear) */
+function adoptTherm(){ const p = parts('therm'); if(!p.getState) return; const st = p.getState();   // someone else may have set it
+  if(st.mode) M.th.mode = st.mode; if(st.setpoint != null) M.th.sp = st.setpoint; if(st.current != null) M.th.cur = st.current; }
+const T_ = s => `<span class="t">${s}</span>`;
 function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.focus.k : null;
   const want = ['lock', 'garage', 'therm', 'keypad', 'hub'].includes(f) ? f : null;
-  if(!want){ if(actK){ actEl.classList.add('off'); actK = null; } showTry(false); return; }
+  if(!want){ if(actK){ actEl.classList.add('off'); tour.card.classList.remove('dmHas'); actK = null; } showTry(false); return; }
+  if(want === 'therm') adoptTherm();
+  const a = TH.active(), lab = a === 'cool' ? 'Cooling' : a === 'heat' ? 'Heating' : M.th.mode === 'off' ? 'Off' : 'Idle';
   const H = {
-    lock:`<button class="pri" data-a="pad">${IC.keys}Enter code</button><button data-a="lock">${M.locked ? IC.unlock + 'Unlock' : IC.lock + 'Lock'}</button>`,
+    lock:`<button class="pri" data-a="pad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="lock" aria-label="${M.locked ? 'Unlock' : 'Lock'}">${M.locked ? IC.unlock + T_('Unlock') : IC.lock + T_('Lock')}</button>`,
     garage:`<button class="pri" data-a="gar">${IC.garage}${M.garageOpen ? 'Close' : 'Open'}</button>`,
-    therm:`<button class="rnd" data-a="tdn" aria-label="Cooler">${IC.down}</button><div class="tv">${M.th.sp}°<small class="${TH.active() || ''}">${TH.active() === 'cool' ? 'Cooling' : TH.active() === 'heat' ? 'Heating' : 'Idle'}</small></div><button class="rnd" data-a="tup" aria-label="Warmer">${IC.up}</button>`,
-    keypad:`<button class="pri" data-a="kpad">${IC.keys}Enter code</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
-    hub:`<button class="pri" data-a="panel">${IC.hub}Use the hub</button>`,
+    therm:`<button class="rnd" data-a="tdn" aria-label="Cooler">${IC.down}</button><div class="tv">${M.th.sp}°<small class="${a || ''}">${lab}</small></div><button class="rnd" data-a="tup" aria-label="Warmer">${IC.up}</button>`,
+    keypad:`<button class="pri" data-a="kpad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
+    hub:`<button class="pri" data-a="panel">${IC.hub}${T_('Use the hub')}</button>`,
   }[want];
-  if(want === 'therm' && actEl.dataset.k === 'therm'){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
+  if(want === 'therm' && actEl.dataset.k === 'therm' && actEl.querySelector('.tv')){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
   else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
   actEl.dataset.k = want;
-  const was = actK; actK = want; actEl.classList.remove('off');
-  placeAct(); if(!was) setTimeout(placeAct, 650);
+  const nx = tour.card.querySelector('#next'); if(actEl.parentNode !== tour.card || actEl.nextSibling !== nx) tour.card.insertBefore(actEl, nx);
+  actK = want; actEl.classList.remove('off'); tour.card.classList.add('dmHas');
   showTry(want === 'hub'); }
-/* dock the control just above the tour's slim product bar (#card), centred on it; never over the product */
-function placeAct(){ const c = tour.card; if(!c) return; const r = c.getBoundingClientRect();   // re-measured when the bar finishes sliding in
-  actEl.style.left = Math.min(innerWidth - actEl.offsetWidth/2 - 8, Math.max(actEl.offsetWidth/2 + 8, r.left + r.width/2)) + 'px'; actEl.style.bottom = Math.max(12, innerHeight - r.top + 10) + 'px'; }
+{ const p = parts('therm'); if(p.setState){ const set0 = p.setState; p.setState = o => { const r = set0(o); if(actK === 'therm') queueMicrotask(syncAct); return r; }; } }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }
 actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; const a = b.dataset.a;
   if(a === 'pad') enterPad('lock'); if(a === 'kpad') enterPad('keypad'); if(a === 'panel') enterPanel();
   if(a === 'lock') device('lock', !M.locked); if(a === 'gar') device('garage', !M.garageOpen);
   if(a === 'tup') device('therm', Math.min(90, M.th.sp + 1)); if(a === 'tdn') device('therm', Math.max(50, M.th.sp - 1));
   if(a === 'away' || a === 'stay') automation(a, { from:'keypad' }); });
-tour.card && tour.card.addEventListener('transitionend', () => { if(actK) placeAct(); });
 /* watch the tour's focus changes cheaply (it has no events): body class + data attribute */
 new MutationObserver(() => syncAct()).observe(document.body, { attributes:true, attributeFilter:['class', 'data-fk'] });
 
@@ -609,7 +631,7 @@ function leaveModeQuiet(){ MODE.kind = null; MODE.lockCam = false; padEl.hidden 
 function hudOn(){ $('#dmHubB').classList.toggle('on', MODE.kind === 'panel'); }
 addEventListener('keydown', e => { if(e.key === 'Escape'){ if(MODE.run) skip(); else if(MODE.kind) leaveMode(); } });
 addEventListener('resize', () => { if(MODE.kind === 'panel' && !MODE.run){ const p = panelPose(); camera.position.copy(p.pos); controls.target.copy(p.target); camera.lookAt(p.target); kick(); }
-  if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix(); syncAct(); });
+  if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix(); });
 /* Fast Pitch pauses the tour while it is off screen: let the emulator rest too */
 
 /* ------------------------------------------------------------------ boot */
