@@ -3,7 +3,7 @@
 // button marked only by a hairline ring, an LED glowing through the shell, vent grooves on the top wall, a 12 mm end collar
 // joined by a hairline, and the pass-through receptacle on a raised faceplate on the +x end, with a lamp cord plugged in.
 // Modelled in millimetres inside a group scaled to metres. Origin: centre of the outlet plate, back on the wall (z = 0).
-export default H => { const { THREE, G, add, rslab, rrShape } = H;
+export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   /* ---- module helpers (self-contained copy) ---- */
   const sm = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
   /* profiled solid: loops (one 'outer' outline, through 'hole's, blind 'pocket's), each swept through rings [x,y,z] listed
@@ -103,37 +103,37 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   const g = G(), Q = new URLSearchParams(location.search), bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search)), nocord = bare || Q.has('nocord');
   const P = G(); P.scale.setScalar(.001); P.position.y = .006; g.add(P);                  // body sits a little above the plate centre (upper receptacle)
   const W = 96, HH = 53, D = 38, R = 6, crown = .6;
-  const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f0ee, roughness: .45, clearcoat: .08, clearcoatRoughness: .5, sheen: .25, sheenRoughness: .8, sheenColor: 0xffffff });
+  const white = new THREE.MeshPhysicalMaterial({ color: 0xe9e8e6, roughness: .45, clearcoat: .06, clearcoatRoughness: .5 });
 
   /* 1-2. housing + collar: one shell, hairline at x = +36 */
   const hx = W / 2 - R, hy = HH / 2 - R;
-  const wOf = (x, y) => {                                   // plan width of the front roll-off at an outline point
-    if (Math.abs(x) <= hx + 1e-6 && Math.abs(y) > hy) { const t = (x + hx) / (2 * hx); return 3.8 + 6.7 * Math.sin(Math.PI * t); }
-    if (Math.abs(y) <= hy + 1e-6) { const t = (y + hy) / (2 * hy); return 3.8 + 3.2 * Math.sin(Math.PI * t); }
-    return 3.8; };
+  const wOf = (x, y, nx, ny) => {                           // plan width of the front roll-off: wide mid-edge, narrow at the corners, a tight 4 mm on the collar
+    const tl = Math.min(1, Math.max(0, (x + 42) / 72)), wl0 = 4.5 + 6 * Math.sin(Math.PI * tl), wl = wl0 + (4 - wl0) * sm(26, 36, x);
+    const ws = x > 0 ? 4 : 4.5 + 4.5 * Math.sin(Math.PI * Math.min(1, Math.max(0, (y + 20.5) / 41)));
+    return ny * ny * wl + nx * nx * ws; };
   const VX = []; for (let i = 0; i < 15; i++) VX.push(-37.5 + i * 67 / 14);       // vent grooves across the top wall (they notch the silhouette)
   const groove = (x, y) => { if (y < hy || Math.abs(x) > hx) return 0; let gmax = 0; for (const v of VX) gmax = Math.max(gmax, 1 - sm(.6, .85, Math.abs(x - v))); return gmax; };
-  const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [], g0 = 2.2 * groove(x, y);
+  const shellProf = (x, y, nx, ny) => { const w = wOf(x, y, nx, ny), h = .8 * w + .8, out = [], g0 = 2.2 * groove(x, y);
     for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)) + g0; out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
     const gv = 2.2 * groove(x, y), zs = D - h, dr = z => 1.6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
     for (const [z, d] of [[1.8, gv], [2.3, gv], [16.4, gv], [17, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
-    for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = 1.6 + (w - 1.6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
+    for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = 1.6 + (w - 1.6) * (1 - Math.pow(Math.cos(t), .6)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .6)]); }
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
-  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .3, col: 0x9c9c9a, k: .9, mask: 'vOP.z < 27.5' }]);
-  add(P, solid([{ type: 'outer', pts: pts(rrShape(W, HH, R), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat));
+  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .45, col: 0x7d7d7b, k: 1 }, { ax: 'x', at: 36.4, w: .4, col: 0xffffff, k: .5 }]);
+  add(P, solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat));
   const zTop = D + crown;
 
   /* 4. flush button: hairline ring only.  5. LED glowing through the shell */
   const ringM = new THREE.MeshStandardMaterial({ color: 0x8e8e8e, roughness: .6, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
-  add(P, new THREE.Mesh(new THREE.RingGeometry(5.0, 5.28, 72), ringM), 0, -1, zTop + .03);
-  add(P, new THREE.Mesh(new THREE.RingGeometry(5.28, 5.7, 72), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .3, transparent: true, opacity: .35,
-    depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })), 0, -1, zTop + .03);   // lit lip outside the gap
+  ringM.color.set(0x9a9a98); add(P, new THREE.Mesh(new THREE.RingGeometry(5.0, 5.4, 96), ringM), 0, -1, zTop + .03);
+  add(P, new THREE.Mesh(new THREE.RingGeometry(5.4, 5.7, 96, 1, Math.PI, Math.PI), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .3, transparent: true, opacity: .4,
+    depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })), 0, -1, zTop + .03);   // lit lip on the lower edge of the groove
   const led = plane(6, 6, 40, (x, Pp) => { const [cx, cy] = Pp(0, 0), gr = x.createRadialGradient(cx, cy, 0, cx, cy, 60);
     gr.addColorStop(0, 'rgba(236,244,255,1)'); gr.addColorStop(.25, 'rgba(221,235,255,.85)'); gr.addColorStop(1, 'rgba(200,222,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 240, 240); },
     { x: { toneMapped: false } });
-  add(P, led, 0, 9, zTop - .02);
+  if (!/[?&]studio=/.test(location.search)) add(P, led, 0, 9, zTop - .02);          // lit in the house (as in the photos), off in the product renders
 
   /* printed warning on the top wall, in front of the vents (reads from behind) */
   { const wt = plane(80, 4, 40, (x, Pp) => { x.save(); x.translate(...Pp(0, 0)); x.rotate(Math.PI); x.fillStyle = 'rgba(70,70,70,.6)'; x.textAlign = 'center'; x.textBaseline = 'middle';
@@ -147,19 +147,19 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   
 
   /* 3. receptacle faceplate on the +x end: raised 3 mm, chamfered rim, NEMA 5-15R rotated (slots horizontal, ground toward the wall) */
-  { const pp = [[0, 0], [0, 10.05], [.12, 10.25], [.68, 10.81], [.8, 11]];                // embedded 8 mm, proud 3 mm
+  { const pp = [[0, 0], [0, 9.7], [.1, 9.85], [1.1, 10.85], [1.2, 11]];   // 1.2 mm 45-degree chamfer                // embedded 8 mm, proud 3 mm
     const slotProf = [[0, 4.5], [0, 10.6], [.15, 10.85], [.3, 11]];
-    const U = []; { const r = 2.4, u0 = 7.25, u1 = 10.35; U.push(new THREE.Vector2(u0, -r));
+    const U = []; { const r = 3.4, u0 = 5.6, u1 = 9.2; U.push(new THREE.Vector2(u0, -r));
       for (let i = 0; i <= 24; i++) { const t = -Math.PI / 2 + i / 24 * Math.PI; U.push(new THREE.Vector2(u1 + r * Math.cos(t), r * Math.sin(t))); }
       U.push(new THREE.Vector2(u0, r)); }
     const dense = a => { const s = new THREE.Shape(a); return pts(s, 90); };
-    const deep = (k, K, v) => .16 + .84 * sm(5.2, 10.7, v[2]);
-    const loops = [{ type: 'outer', pts: pts(rrShape(30, 27, 1), 160), prof: uni(pp) },
-      { type: 'pocket', pts: offs(pts(rrShape(9, 2.2, .35), 80), -3.5, 6.35), prof: uni(slotProf), col: deep },
-      { type: 'pocket', pts: offs(pts(rrShape(9.5, 2.2, .35), 80), -3.5, -6.35), prof: uni(slotProf), col: deep },
+    const deep = (k, K, v) => .08 + .55 * sm(5.2, 10.7, v[2]) + .37 * sm(10.6, 11, v[2]);
+    const loops = [{ type: 'outer', pts: pts(rrShape(35, 27, .8), 160), prof: uni(pp) },
+      { type: 'pocket', pts: offs(pts(rrShape(8.5, 3.4, .4), 80), -7.5, 6.35), prof: uni(slotProf), col: deep },
+      { type: 'pocket', pts: offs(pts(rrShape(9, 3.4, .4), 80), -7.5, -6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: dense(U), prof: uni(slotProf), col: deep }];
     const boss = solid(loops, white.clone(), true); boss.material.vertexColors = true;
-    boss.rotation.y = Math.PI / 2; add(P, boss, 40, .5, 19); }
+    boss.rotation.y = Math.PI / 2; add(P, boss, 38.5, .5, 19.5); }
 
   /* 7. printed text: "Max. 330W / Incandescent" upside down under the faceplate; FCC block on the far end */
   const txt = plane(20, 7, 40, (x, Pp) => { x.save(); x.translate(...Pp(0, 0)); x.rotate(Math.PI); x.fillStyle = '#3a3a3a'; x.textAlign = 'center'; x.textBaseline = 'middle';

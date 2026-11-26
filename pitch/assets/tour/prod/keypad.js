@@ -41,9 +41,9 @@ export default H => {
   const body = splitMat(grey, white, 'z', mm(10.5), mm(.2), 0x8e8e8c);
   const faceM = white.clone();
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f3, roughness: .4, sheen: .3, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
-  const hair = new THREE.MeshStandardMaterial({ color: 0x8c8c8c, roughness: .7 }), hairL = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7 });
-  const ringM = new THREE.MeshStandardMaterial({ color: 0x5c5d5e, roughness: .9, envMapIntensity: .2, side: THREE.DoubleSide });
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x8f9193, roughness: .6 });
+  const hair = new THREE.MeshStandardMaterial({ color: 0x7a7a7a, roughness: .7 }), hairL = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7 });
+  const ringM = new THREE.MeshStandardMaterial({ color: 0x161617, emissive: 0x363738, roughness: .9, envMapIntensity: .15, side: THREE.DoubleSide });   // translucent grey ring: an even tone from every angle
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x6a6c6e, roughness: .6 });
   const lightM = new THREE.MeshPhysicalMaterial({ color: 0xc4c6c3, roughness: .7, emissive: 0x83f4b8, emissiveIntensity: 0 });
   const holeM = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .9 });
 
