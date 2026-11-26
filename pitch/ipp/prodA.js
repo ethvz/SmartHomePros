@@ -64,7 +64,7 @@
           /* callouts: left column = those left of the product in landscape, right column = the rest; landscape order top to bottom */
           cos.forEach(c=>{ const o=JSON.parse(c.dataset.ipo); setI(c,'grid-column',c.classList.contains('r')?'1':'2'); setI(c,'order',String(Math.round(parseFloat(o.top)||0))); });
           const tops=[...pn.children].filter(c=>!c.matches('img,svg')&&c.offsetHeight).map(c=>c.offsetTop), tTop=tops.length?Math.min(...tops):H-F-300;
-          const free=Math.max(200,tTop-56-(T+30)); k=Math.min(760/gw,free/gh,cap); X=(L+W-R)/2-gw*k/2; Y=T+30+(free-gh*k)/2; }
+          const free=Math.max(200,tTop-56-(T+30)); k=Math.min(600/gw,free/gh,cap); X=(L+W-R)/2-gw*k/2; Y=T+30+(free-gh*k)/2; }
         else {
           const colW=400, free=H-T-F-190; k=Math.min(colW/gw,free/gh,cap); X=L+(colW-gw*k)/2; Y=T+40+(free-gh*k)/2;
           const th=fst.offsetHeight; setI(fst,'left',(L+colW+56)+'px'); setI(fst,'width',(W-R-(L+colW+56))+'px'); setI(fst,'top',Math.max(T+60,Math.round(Y+gh*k/2-th/2+20))+'px'); }
