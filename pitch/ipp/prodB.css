@@ -166,8 +166,8 @@ html.ipp :is(#ocScroll,#dbScroll) .xa-foot{left:calc(var(--gx) + 48px)!important
 .ippBleed{display:none}
 html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{display:block;position:absolute;z-index:0;pointer-events:none;opacity:0;translate:0 80px;transition:opacity .7s ease .15s,translate .9s cubic-bezier(.22,1,.36,1) .15s;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
 html.ipp :is(#ocScroll,#dbScroll)>[data-t=act][data-vis="1"] .ippBleed{opacity:1;translate:none}
-html.ipp #ocScroll>[data-t=act] .ippBleed{height:500px;width:auto;right:-170px;bottom:calc(var(--bF) + 6px)}
-html.ipp #dbScroll>[data-t=act] .ippBleed{height:520px;width:auto;right:-90px;bottom:calc(var(--bF) + 6px);rotate:-10deg}
+html.ipp #ocScroll>[data-t=act] .ippBleed{height:min(500px,calc(var(--H) - var(--bF) - var(--bT) - 830px));width:auto;right:-170px;bottom:calc(var(--bF) + 6px)}
+html.ipp #dbScroll>[data-t=act] .ippBleed{height:min(520px,calc(var(--H) - var(--bF) - var(--bT) - 810px));width:auto;right:-30px;bottom:calc(var(--bF) + 6px);rotate:-10deg}
 @media (prefers-reduced-motion:reduce){html.ipp :is(#ocScroll,#dbScroll)>[data-t=act] .ippBleed{translate:none;transition:opacity .4s ease}}
 /* Works With */
 html.ipp :is(#ocScroll,#dbScroll) .xw-go{right:40px!important;top:calc(var(--bT) + 80px)!important}

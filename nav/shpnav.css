@@ -28,7 +28,7 @@
   transition: transform var(--shpn-press) ease-out, background-color .15s ease, color .15s ease; }
 .shpn-app svg { width: 1.55em; height: 1.55em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .shpn-app svg .f { fill: currentColor; stroke: none; }
-.shpn-app span { font-size: .74em; font-weight: 500; line-height: 1.08; letter-spacing: -.01em; text-align: center; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.shpn-app span { font-size: .74em; font-weight: 500; line-height: 1.08; letter-spacing: -.01em; text-align: center; white-space: normal; max-width: 100%; overflow: hidden; }
 .shpn-app.on { background: rgba(var(--shpn-g), .16); color: rgb(var(--shpn-g)); box-shadow: inset 0 0 0 1px rgba(var(--shpn-g), .42); }
 .shpn-app.on span { font-weight: 600; }
 .shpn-app:active, .shpn-app.pressed { transform: scale(.94); background-color: rgba(255, 255, 255, .1); }
@@ -55,7 +55,7 @@
 .shpn-corner .shpn-burger svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55)); }
 .shpn-corner .shpn-burger i { display: none; }
 .shpn-corner .shpn-logo { padding: 0 10px 0 6px; }
-.shpn-corner .shpn-logo svg { height: 20px; width: auto; display: block; fill: #fff; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55)); }
+.shpn-corner .shpn-logo svg { height: 20px; width: auto; display: block; margin-top: -3px; fill: #fff; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55)); }
 .shpn-corner > button:active, .shpn-corner > button.pressed { transform: scale(.9); background-color: rgba(255, 255, 255, .1); }
 html.shpn-open .shpn-corner::before { opacity: 0; }
 /* HOOK: the corner hides while a full-screen sheet or modal is up. Any sheet calls
@@ -128,7 +128,6 @@ html:not(.pp):not(.ipp) #drawer .m2-t { height: 70px !important; }
 html:not(.pp):not(.ipp) #drawer .m2-s { height: 40px !important; }
 html:not(.pp):not(.ipp) #drawer .m2-l { margin: 14px 4px 4px !important; }
 html.pp #drawer .shpn-apps { font-size: 22px; margin: 0 0 14px; }
-html.pp #drawer .shpn-app span { white-space: normal; }
 @media (max-height: 700px) { html.pp #drawer .shpn-apps { font-size: 19px; margin-bottom: 10px; } }
 /* iPad portrait (html.ipp, nav block owned by the shared navigation): footer = the landscape footer (burger + logo bottom left),
    lifted clear of the home indicator; the menu card a little wider. --ippFoot = height kept clear by the footer. */
@@ -155,7 +154,6 @@ html.shpn-recruit .shpn-corner .shpn-logo svg { height: 18px; }
 html.shpn-recruit .dw.shpn .dw-panel { height: auto !important; bottom: calc(var(--shpn-foot) + 8px) !important; border-radius: 30px; background: #121212; -webkit-backdrop-filter: none; backdrop-filter: none;
   border-color: rgba(255, 255, 255, .08); }
 html.shpn-recruit .dw.shpn .dw-in .shpn-apps { font-size: 14px; margin: 0 0 12px; }
-html.shpn-recruit .dw.shpn .shpn-app span { white-space: normal; }
 html.shpn-recruit .dw-foot .dw-app { display: none !important; }
 html.shpn-recruit .dw-foot { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 html.shpn-recruit .dw.shpn-rv .dw-panel { transform: none; clip-path: inset(var(--ct, 90%) var(--cr, 80%) var(--cb, 0px) var(--cl, 0px) round 30px); transition: clip-path .42s var(--shpn-e); }
