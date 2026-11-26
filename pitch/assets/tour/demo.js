@@ -475,7 +475,7 @@ async function restore(c){ document.body.classList.remove('dmMode'); setFill(0);
   T.overview(); }
 function panelPose(){ const p = P('hub'), g = p.model, c = g.localToWorld(SCR.c.clone()), n = V(0, 0, 1).applyQuaternion(g.getWorldQuaternion(new THREE.Quaternion()));
   const s = g.scale.x, d = fitDist(SCR.w*s, SCR.h*s, .8, aspect() < 1 ? .56 : .68); return { pos:c.clone().addScaledVector(n, d), target:c }; }
-async function enterPanel(back){ if(MODE.run) return; await emu(); if(EMU.S && (EMU.S.open === 'sv' || EMU.S.open === 'pd')) emuClick('[data-act="close"]');   // wake from the always-on view quietTour(); MODE.kind = 'panel'; MODE.lockCam = true; doneB.hidden = false; tryEl.classList.remove('vis'); hudOn();
+async function enterPanel(back){ if(MODE.run) return; await emu(); if(EMU.S && (EMU.S.open === 'sv' || EMU.S.open === 'pd')) emuClick('[data-act="close"]');   /* wake from the always-on view */ quietTour(); MODE.kind = 'panel'; MODE.lockCam = true; doneB.hidden = false; tryEl.classList.remove('vis'); hudOn();
   if(!EMU.docked || !hubEl.classList.contains('vis')) showDock(true);
   await fly(panelPose(), back ? 1.5 : 1.3); controls.enabled = false;
   if(!EMU.docked) await toDock();
