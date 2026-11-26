@@ -34,13 +34,14 @@ export default H => {
   const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
   /* ---------- materials ---------- */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0x9a9a98, roughness: .58, clearcoat: .05 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
-  const bodyM = splitMat(grey, white, 'z', mm(10), mm(.5), 0x4a4a4a);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xe6eaea, roughness: .06, transmission: .97, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
-  const boardM = new THREE.MeshStandardMaterial({ color: 0x34342f, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xf0de92, roughness: .35, emissive: 0xffeaa0, emissiveIntensity: .3, clearcoat: .6 });
-  const btnM = white.clone();
+  const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xdfe3e3, roughness: .15, transmission: .9, thickness: mm(2.5), ior: 1.45, clearcoat: .6, clearcoatRoughness: .1 });
+  const boardM = new THREE.MeshStandardMaterial({ color: 0x6a6a64, roughness: .7 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe6c65a, roughness: .35, emissive: 0xffe08a, emissiveIntensity: .25, clearcoat: .6 });
+  const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xe8e6dc, roughness: .5 });
+  const btnM = white.clone(), outlineM = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 
   /* ---------- body + face + light well: one watertight shell ---------- */
@@ -60,27 +61,36 @@ export default H => {
   const inner = outer.map(([ox, oy]) => { const dx = ox - PC[0], dy = oy - PC[1]; let lo = 0, hi = 1; for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; inRR(PC[0] + dx * m, PC[1] + dy * m) < 0 ? lo = m : hi = m; } return [PC[0] + dx * lo, PC[1] + dy * lo]; });
   const FK = 16;
   for (let k = 1; k <= FK; k++) { const s = k / FK, e = s; rings.push(outer.map(([ox, oy], i) => { const x = ox + (inner[i][0] - ox) * e, y = oy + (inner[i][1] - oy) * e; return [mm(x), mm(y), mm(dome(x, y))]; })); }
-  const ZF = 25.0;                                                                             // well floor
-  const well = [[.992, .025], [.978, .08], [.96, .18], [.935, .34], [.905, .55], [.88, .74], [.862, .87], [.85, .95], [.844, .99], [.842, 1], [.8, 1], [.65, 1], [.4, 1], [.15, 1]];
-  for (const [s, u] of well) rings.push(inner.map(([x, y]) => { const X = PC[0] + (x - PC[0]) * s, Y = PC[1] + (y - PC[1]) * s; return [mm(X), mm(Y), mm(dome(x, y) * (1 - u) + ZF * u)]; }));
+  // light well: a shallow soft dish (1.5 mm), then a sharp rounded-square hole 25 x 25 (r 6) with near-vertical walls down to the floor
+  const HW = 25, HR = 6, ZF = ZE - 6;
+  const inHole = (x, y) => { const qx = Math.abs(x - PC[0]) - (HW / 2 - HR), qy = Math.abs(y - PC[1]) - (HW / 2 - HR); return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - HR; };
+  const hole = inner.map(([ix, iy]) => { const dx = ix - PC[0], dy = iy - PC[1]; let lo = 0, hi = 1; for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; inHole(PC[0] + dx * m, PC[1] + dy * m) < 0 ? lo = m : hi = m; } return [PC[0] + dx * lo, PC[1] + dy * lo]; });
+  const top = inner.map(([x, y]) => dome(x, y));
+  for (let k = 1; k <= 8; k++) { const t = k / 8, dep = 1.5 * (1 - Math.cos(t * Math.PI / 2)) ** .9;   // dish: tangent to the face, steepening toward the hole
+    rings.push(inner.map(([x, y], i) => [mm(x + (hole[i][0] - x) * t), mm(y + (hole[i][1] - y) * t), mm(top[i] - dep)])); }
+  for (const [s2, dz] of [[.996, .12], [.992, .3], [.99, 2.5], [.99, 5.5], [.985, 5.85], [.97, 6]])   // crisp edge, vertical wall, small floor round
+    rings.push(hole.map(([x, y], i) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(Math.max(ZF, top[i] - 1.5 - dz))]));
+  for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
   add(g, ringMesh(rings, bodyM, true, true));
 
-  /* ---------- lens block and LED array in the well ---------- */
-  const lc = [0, mm(PC[1])];
-  add(g, H.rslab(mm(17), mm(14), mm(.8), mm(1.5), mm(.2), boardM), lc[0], lc[1], mm(ZF + .5));
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) add(g, H.rslab(mm(3.2), mm(3.6), mm(.6), mm(.3), mm(.12), ledM), mm((c - 1.5) * 3.8), lc[1] + mm((1 - r) * 3.95), mm(ZF + 1.1));
-  { const lens = H.rslab(mm(26), mm(26), mm(3.2), mm(5.5), mm(.9), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(ZF + 1.5)); }
+  /* ---------- LED board, 12 separate SMD packages, clear lens ---------- */
+  const lc = [0, mm(PC[1])], faceC = dome(0, PC[1]);
+  add(g, H.rslab(mm(15.4), mm(13.6), mm(.6), mm(.8), mm(.15), boardM), lc[0], lc[1], mm(ZF + .3));
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = mm((c - 1.5) * 3.9), y = lc[1] + mm((1 - r) * 4.6);
+    add(g, H.rslab(mm(3.0), mm(3.4), mm(.5), mm(.25), mm(.1), ledFrameM), x, y, mm(ZF + .85));
+    add(g, H.rslab(mm(2.2), mm(2.6), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
+  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.3), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(faceC - 2.5 - 1.25)); }
 
   /* ---------- printing (conformed to the dome) ---------- */
   const printAt = (cx, cy, w, h, draw) => add(g, conform(printPlane(mm(w), mm(h), draw), (px, py) => mm(dome(cx + px * 1000, cy + py * 1000))), mm(cx), mm(cy), 0);
-  printAt(0, 36.4, 48, 6, (c, P) => {                                                         // CHAMBERLAIN, its E drawn as three detached bars
-    c.fillStyle = '#626262'; c.textBaseline = 'alphabetic'; c.font = '600 34px ' + FONT;
+  printAt(0, 35.0, 50, 6, (c, P) => {                                                         // CHAMBERLAIN, its E drawn as three detached bars
+    c.fillStyle = '#6a6a6a'; c.textBaseline = 'alphabetic'; c.font = '500 34px ' + FONT;
     const parts = ['C', 'H', 'A', 'M', 'B', 'E', 'R', 'L', 'A', 'I', 'N'], sp = 7, wE = 22;
     const ws = parts.map(ch => ch === 'E' ? wE : c.measureText(ch).width * 1.18); const tot = ws.reduce((a, b) => a + b, 0) + sp * (parts.length - 1);
-    const k = 425 / tot; let [x, y] = P(mm(-21.25), mm(-1.65)); c.save(); c.translate(x, y); c.scale(k, 1);
+    const k = 435 / tot; let [x, y] = P(mm(-21.75), mm(-1.2)); c.save(); c.translate(x, y); c.scale(k, 1);
     let cx = 0; parts.forEach((ch, i) => { if (ch === 'E') { for (const b of [0, 1, 2]) c.fillRect(cx + 1, -33 + b * 13.2, wE - 3, 5.5); }
       else { c.save(); c.translate(cx, 0); c.scale(1.18, 1); c.fillText(ch, 0, 0); c.restore(); } cx += ws[i] + sp; });
-    c.restore(); c.font = '400 9px ' + FONT; c.beginPath(); const [rx, ry] = P(mm(21.9), mm(-1.0)); c.arc(rx, ry, 4.6, 0, Math.PI * 2); c.lineWidth = .9; c.strokeStyle = '#6e6e6e'; c.stroke();
+    c.restore(); c.font = '400 9px ' + FONT; c.beginPath(); const [rx, ry] = P(mm(22.4), mm(-.6)); c.arc(rx, ry, 4.6, 0, Math.PI * 2); c.lineWidth = .9; c.strokeStyle = '#6e6e6e'; c.stroke();
     c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('R', rx, ry + .5); });
   printAt(0, 25, 34, 10, (c, P) => {                                                          // vent slots: light dimples + dark through-holes, zig-zag
     const slot = (x, y, dark) => { const [px, py] = P(mm(x), mm(y)); const w = 11, h = 30;
@@ -92,10 +102,10 @@ export default H => {
     for (const x of [-8.4, 0, 8.4]) slot(x, .6, true); });
   printAt(31.0, -.6, 24, 14, (c, P) => {                                                      // myQ connected
     c.fillStyle = '#858585'; c.textBaseline = 'alphabetic'; c.textAlign = 'left';
-    let [x, y] = P(mm(-8.6), mm(.6)); c.font = '300 66px ' + FONT; c.fillText('my', x, y); const wmy = c.measureText('my').width;
-    c.font = '700 70px ' + FONT; c.fillText('Q', x + wmy + 1, y); const wq = c.measureText('Q').width;
-    c.font = '400 16px ' + FONT; c.fillText('®', x + wmy + wq + 1, y - 44);
-    c.fillStyle = '#8c8c8c'; c.font = '500 27px ' + FONT; c.textAlign = 'center'; [x, y] = P(mm(-.6), mm(-5.0)); c.fillText('connected™', x, y); });
+    let [x, y] = P(mm(-7.3), mm(.5)); c.font = '200 56px ' + FONT; c.fillText('my', x, y); const wmy = c.measureText('my').width;
+    c.font = '700 60px ' + FONT; c.fillText('Q', x + wmy + 1, y); const wq = c.measureText('Q').width;
+    c.font = '400 14px ' + FONT; c.fillText('®', x + wmy + wq + 1, y - 37);
+    c.fillStyle = '#8c8c8c'; c.font = '500 23px ' + FONT; c.textAlign = 'center'; [x, y] = P(mm(-.5), mm(-4.3)); c.fillText('connected™', x, y); });
 
   /* ---------- three near-flush pill buttons ---------- */
   const icon = [
@@ -103,18 +113,21 @@ export default H => {
     (c, x, y) => { c.beginPath(); c.arc(x, y, 4, 0, Math.PI * 2); c.stroke(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; c.beginPath(); c.moveTo(x + 6 * Math.cos(a), y + 6 * Math.sin(a)); c.lineTo(x + 8.5 * Math.cos(a), y + 8.5 * Math.sin(a)); c.stroke(); } },
     (c, x, y) => { c.beginPath(); c.roundRect(x - 5, y - 11, 10, 9, 2.5); c.roundRect(x - 5, y + 2, 10, 9, 2.5); c.stroke(); }];
   [-18.6, 0, 18.6].forEach((bx, i) => { const by = -32.6, bz = dome(bx, by);
-    printAt(bx, by, 8, 12, (c, P) => { const [px, py] = P(0, 0); c.strokeStyle = '#8e8e8e'; c.lineWidth = 3.6; c.beginPath(); c.roundRect(px - 31.5, py - 51.5, 63, 103, 31.5); c.stroke(); });
+    { const sh = new THREE.Shape(rrPts(mm(6.6), mm(10.6), mm(3.3)).map(([a, b]) => new THREE.Vector2(a, b))), hp = new THREE.Path(rrPts(mm(6.0), mm(10.0), mm(3.0)).map(([a, b]) => new THREE.Vector2(a, b)));
+      sh.holes.push(hp); add(g, new THREE.Mesh(new THREE.ShapeGeometry(sh), outlineM), mm(bx), mm(by), mm(bz + .03)); }   // single crisp groove line
     const b = add(g, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM), mm(bx), mm(by), mm(bz - .02));
-    add(g, conform(printPlane(mm(5), mm(8), (c, P) => { c.strokeStyle = '#8a8a8a'; c.lineWidth = 1.6; const [x, y] = P(0, mm(-1.2)); icon[i](c, x, y); }),
+    add(g, conform(printPlane(mm(5), mm(8), (c, P) => { c.strokeStyle = '#777'; c.lineWidth = 2.4; const [x, y] = P(0, mm(-1.2)); icon[i](c, x, y); }),
       () => mm(.32)), mm(bx), mm(by), mm(bz - .02)); void b; });
 
   /* ---------- power cord: ribbed boot out of the right side, white cord down the wall ---------- */
-  { const prof = [[3.1, -1.5], [3.1, 0]]; for (let k = 0; k < 4; k++) { const y0 = 1.6 + k * 1.9; prof.push([3.0 - k * .12, y0], [3.35 - k * .12, y0 + .5], [3.35 - k * .12, y0 + 1.0], [3.0 - k * .12, y0 + 1.5]); }
-    prof.push([2.4, 9.6], [2.0, 10.4], [1.6, 10.8], [0, 10.9]);
+  { const prof = [[3.05, -1.0], [3.05, 1.0]]; for (let k = 0; k < 5; k++) { const y0 = 1.8 + k * 2.6; prof.push([2.95 - k * .1, y0], [3.3 - k * .1, y0 + .6], [3.3 - k * .1, y0 + 1.3], [2.95 - k * .1, y0 + 1.9]); }
+    prof.push([2.3, 15.0], [1.9, 15.7], [1.6, 16.0], [0, 16.1]);
     const boot = new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(mm(r), mm(y))), 48), cordM); boot.rotation.z = -Math.PI / 2; boot.castShadow = true;
-    add(g, boot, mm(47.9), mm(-1.5), mm(6.5));
-    const curve = new THREE.CatmullRomCurve3([[57.4, -1.5, 6.5], [62, -3, 6.0], [65.5, -10, 5.2], [67, -24, 3.2], [67.2, -50, 1.8], [67, -80, 1.6]].map(([x, y, z]) => new THREE.Vector3(mm(x), mm(y), mm(z))));
-    const cord = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, mm(1.5), 16, false), cordM); cord.castShadow = true; add(g, cord);
-    if (new URLSearchParams(location.search).get('part') === 'nocord') { g.remove(cord); g.remove(boot); } }   // DEBUG
+    add(g, boot, mm(47.95), mm(-1.5), mm(6.5));
+    const sock = new THREE.Mesh(new THREE.RingGeometry(mm(3.05), mm(3.8), 48), new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .8, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    sock.rotation.y = Math.PI / 2; add(g, sock, mm(47.97), mm(-1.5), mm(6.5));   // dark socket round the boot
+    const curve = new THREE.CatmullRomCurve3([[63.6, -1.5, 6.5], [67, -3.5, 6.0], [69.5, -11, 5.2], [70.5, -25, 3.2], [70.6, -50, 2.0], [70.4, -80, 1.9]].map(([x, y, z]) => new THREE.Vector3(mm(x), mm(y), mm(z))));
+    const cord = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, mm(1.5), 16, false), cordM); cord.castShadow = true; cord.scale.z = .55; add(g, cord);   // flat twin-lead
+    if (new URLSearchParams(location.search).get('part') === 'nocord') { g.remove(cord); g.remove(boot); g.remove(sock); } }   // DEBUG
   return g;
 };

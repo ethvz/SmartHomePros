@@ -112,17 +112,17 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
     for (const u of T) { const t = u * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
-  const dishP = [[-2.7, D - 3.6], [-2.7, D - 3.0], [-1.7, D - 2.0], [-.7, D - 1.0], [-.1, D - .4], [.1, D - .18], [.3, D - .05], [.5, D]];   // crisp 45-degree cone, 3 mm deep, 0.5 mm rim fillet
+  const dishP = [[-2.7, D - 4.1], [-2.7, D - 3.5], [-1.9, D - 2.45], [-1.0, D - 1.25], [-.3, D - .4], [-.08, D - .15], [.15, D - .03], [.4, D]];   // crisp ~53-degree cone, 3.5 mm deep, 0.4 mm rim fillet
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
-    { type: 'pocket', pts: circ(0, -6.5, 9, 140), prof: uni(dishP), col: (k, K, v) => (.72 + .28 * sm(D - 3, D - .2, v[2])) * (1 - .45 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
+    { type: 'pocket', pts: circ(0, -6.5, 9, 140), prof: uni(dishP), col: (k, K, v) => (.72 + .28 * sm(D - 3.5, D - .2, v[2])) * (1 - .45 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
     { type: 'hole', pts: circ(0, 17.6, 3.0, 72), prof: uni(rrP(D, 1.0, 1.0, 9)) }];
   shell.vertexColors = true; add(B, solid(loops, shell, true));
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
   const btnM = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .6, clearcoat: .05 });
-  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 3.7);
-  add(B, new THREE.Mesh(new THREE.RingGeometry(5.98, 6.32, 96), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .9 })), 0, -6.5, D - 3.55);
+  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 4.2);
+  add(B, new THREE.Mesh(new THREE.RingGeometry(5.98, 6.32, 96), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .9 })), 0, -6.5, D - 4.05);
 
   /* 3. pry notch on the back-cover seam, bottom centre */
   const notch = plane(7, 1.6, 60, (x, Pp) => { const [a, b] = Pp(-3, .5), [c, d] = Pp(3, -.5), gr = x.createLinearGradient(0, b, 0, d);
