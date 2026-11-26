@@ -42,7 +42,7 @@ export default H => {
 
   // ---------------------------------------------------------------- light bar housing
   const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, zF - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
-  const RC = [4, 4, 14, 14];                                  // front corners R4, big round wing/back ends
+  const RC = [4, 4, 6, 6];                                    // front corners R4; the round end in side view comes from the semicircular back
   const nC = 10, nE = 14, B = nC + nE, NP = 4*B;
   const outline = (d, y) => {                                 // rounded convex polygon from half-planes n.p <= c, fixed topology
     const L = lines(d, y), P = [];

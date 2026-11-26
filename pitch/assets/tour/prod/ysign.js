@@ -2,7 +2,7 @@
 // artwork (orange field, white border ring, "Protected by / vivint / 855.484.8468 | vivint.com") in satin reflective vinyl,
 // bolted to the front of a 19 mm square white post that runs on above it to a black square cap. Two empty mounting holes.
 // Origin at the ground on the post axis, +z out of the sign face. Modelled in mm inside a group scaled to metres.
-export default H => { const { THREE, G, add, rbox, DEC } = H;
+export default H => { const { THREE, G, add, rbox } = H;
   /* ---- module helpers (self-contained copy) ---- */
   const sm = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
   /* profiled solid: loops (one 'outer' outline, through 'hole's, blind 'pocket's), each swept through rings [x,y,z] listed
@@ -44,8 +44,9 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
   const uni = P => (x, y, nx, ny) => P.map(([d, z]) => [x + nx * d, y + ny * d, z]);
   /* side profile: depth D, back round rb, front round rf (as [inset, z] back -> front) */
   const rrP = (D, rb, rf, st = 7) => { const a = [];
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2; a.push([rb * (1 - Math.sin(t)), rb * (1 - Math.cos(t))]); }
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2; a.push([rf * (1 - Math.cos(t)), D - rf + rf * Math.sin(t)]); }
+    const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);   // fine first/last steps: tangent joins to the caps
+    for (const u of T) { const t = u * Math.PI / 2; a.push([rb * (1 - Math.sin(t)), rb * (1 - Math.cos(t))]); }
+    for (const u of T) { const t = u * Math.PI / 2; a.push([rf * (1 - Math.cos(t)), D - rf + rf * Math.sin(t)]); }
     return a; };
   const pts = (shape, n) => shape.getSpacedPoints(n);
   const offs = (P, dx, dy) => P.map(q => new THREE.Vector2(q.x + dx, q.y + dy));
@@ -104,15 +105,15 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
   /* post (buried 60 mm) and cap */
   const postM = new THREE.MeshPhysicalMaterial({ color: 0xedede9, roughness: .6, clearcoat: .1, clearcoatRoughness: .6 });
   add(S, rbox(19, 805.5, 19, 1, postM), 0, (745.5 - 60) / 2, 0);
-  const capM = new THREE.MeshPhysicalMaterial({ color: 0x050506, roughness: .5, clearcoat: .1, clearcoatRoughness: .5, envMapIntensity: .25 });
-  add(S, rbox(22.5, 32, 22.5, 1.25, capM), 0, 744 + 16, 0);
+  const capM = new THREE.MeshPhysicalMaterial({ color: 0x0a0b0c, roughness: .35, clearcoat: .2, clearcoatRoughness: .3, envMapIntensity: .6 });
+  add(S, rbox(22.5, 32, 22.5, 1.0, capM), 0, 744 + 16, 0); add(S, rbox(23.5, 3, 23.5, .8, capM), 0, 744 + 1.5, 0);   // cap with its flared bottom lip
   const grime = plane(19, 90, 6, (x) => { const gr = x.createLinearGradient(0, 0, 0, 540); gr.addColorStop(0, 'rgba(120,120,115,.22)'); gr.addColorStop(1, 'rgba(120,120,115,0)');
     x.fillStyle = gr; x.fillRect(0, 0, 114, 540); for (let i = 0; i < 9; i++) { x.fillStyle = 'rgba(110,110,105,.12)'; x.fillRect(10 + i * 11 % 90, 20 + i * 37 % 200, 3 + i % 3, 18 + i * 7 % 30); } }, { r: .6 });
   for (const s of [1, -1]) { const p = grime.clone(); p.rotation.y = s > 0 ? 0 : Math.PI; add(S, p, 0, 745.5 - 45, s * 9.52); }
 
   /* sign disc: real holes, white edge, artwork on both faces (back reads correctly from behind) */
   const sh = new THREE.Shape(); sh.absarc(0, 0, Rd, 0, Math.PI * 2, false);
-  for (const y of [131, -133]) { const h = new THREE.Path(); h.absarc(0, y, 2.5, 0, Math.PI * 2, true); sh.holes.push(h); }
+  for (const y of [131, -133]) { const h = new THREE.Path(); h.absarc(0, y, 2.0, 0, Math.PI * 2, true); sh.holes.push(h); }
   const geo = new THREE.ExtrudeGeometry(sh, { depth: T - .4, bevelEnabled: true, bevelThickness: .2, bevelSize: .2, bevelOffset: -.2, bevelSegments: 2, curveSegments: 160 });
   geo.translate(0, 0, .2);
   { const p = geo.attributes.position, n = geo.attributes.normal, uv = geo.attributes.uv, Ra = Rd;
@@ -128,16 +129,15 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
   const font = (w, px) => `${w} ${px * k}px "Vivint Sans", "Avenir Next", "Montserrat", "Helvetica Neue", Arial, sans-serif`;
   const fitText = (t, x0, x1, yc, capH, w) => { cx.font = font(w, capH / .7); const m = cx.measureText(t).width, [a, b] = P(x0, yc), [c] = P(x1, yc);
     cx.save(); cx.translate(a, b); cx.scale((c - a) / m, 1); cx.textBaseline = 'middle'; cx.fillText(t, 0, 0); cx.restore(); };
-  let logo = null;
-  const draw = () => { cx.fillStyle = '#fbfaf7'; cx.fillRect(0, 0, N, N); cx.fillStyle = '#ff8200'; cx.beginPath(); cx.arc(N / 2, N / 2, 145 * k, 0, Math.PI * 2); cx.fill();
-    cx.fillStyle = '#fbfaf7'; fitText('Protected by', -33, 33, 71, 8, 500);
+  const draw = () => { cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, N, N); cx.fillStyle = '#ff8200'; cx.beginPath(); cx.arc(N / 2, N / 2, 145 * k, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#ffffff'; fitText('Protected by', -33, 33, 71, 8, 500);
     fitText('855.484.8468', -94.2, -12.5, -73.5, 10, 400); fitText('vivint.com', 11.9, 90.5, -73.5, 10, 400);
     { const [a, b] = P(-.5, -64.4), [c, d] = P(.5, -82); cx.fillRect(a, b, c - a, d - b); }
     { // the vivint logotype as vector strokes (13 mm heavy strokes, rounded v vertices, round i dots, arched n, hooked t)
       const S = 13, base = -35.6, xh = 15.3, L = (pts, cap = 'butt') => { cx.lineWidth = S * k; cx.lineCap = cap; cx.lineJoin = 'round'; cx.beginPath(); pts.forEach(([x, y], i) => i ? cx.lineTo(...P(x, y)) : cx.moveTo(...P(x, y))); cx.stroke(); };
       const R = (x0, x1, y0, y1) => { const [a, b] = P(x0, y1), [c, d] = P(x1, y0); cx.fillRect(a, b, c - a, d - b); };
       const dot = (x, y) => { cx.beginPath(); cx.arc(...P(x, y), 7.5 * k, 0, Math.PI * 2); cx.fill(); };
-      cx.strokeStyle = '#fbfaf7';
+      cx.strokeStyle = '#ffffff';
       const v = (x0, x1) => { const m = (x0 + x1) / 2; L([[x0 + 6.2, xh + 2], [x0 + 6.2 + (m - x0 - 6.2) * (2 / (xh - base)) * 0, xh], [m, base + 6.5], [x1 - 6.2, xh], [x1 - 6.2, xh + 2]]); };
       cx.save(); cx.beginPath(); cx.rect(0, P(0, xh)[1], N, N); cx.clip(); v(-114.2, -63.7); v(-40.7, 12.5); cx.restore();
       R(-59.3, -44.7, base, xh); dot(-51.2, 28.1); R(16.3, 29.2, base, xh); dot(22.7, 28.1);
@@ -148,13 +148,10 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
         R(sx, 116.3, 3.4, xh); } }
     art.needsUpdate = true; };
   draw();
-  whenImg(DEC.logo, img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g2 = c.getContext('2d'); g2.drawImage(img, 0, 0);
-    const D = g2.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
-    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (D[(y * c.width + x) * 4 + 3] > 100) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-    logo = { img, x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 }; draw(); });
   if (document.fonts) document.fonts.load(font(500, 8)).then(draw, () => {});
-  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0xb8b8b8, roughness: .55, envMapIntensity: .12, specularIntensity: .2, toneMapped: false, bumpMap: peel, bumpScale: .6 });
+  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0xffffff, roughness: .4, envMapIntensity: .6, clearcoat: .15, clearcoatRoughness: .35, bumpMap: peel, bumpScale: .25 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
+  for (const y of [131, -133]) add(S, new THREE.Mesh(new THREE.CircleGeometry(2.3, 24), new THREE.MeshStandardMaterial({ color: 0x2f3a33, roughness: .9 })), 0, yC + y, 9.52);   // shadowed post behind the holes
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
   return g;
 };
