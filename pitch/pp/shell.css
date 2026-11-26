@@ -1,73 +1,80 @@
 /* iPhone portrait (html.pp) layout: shell group. Every rule is scoped to html.pp.
    Footer geometry (stage px, set on #stage by pp/shell.js):
      --ppB     bottom clearance for the home indicator (>= 8px)
-     --ppFoot  height kept clear by the footer on section pages (one row of 60px controls + margins)
-     --ppHomeFoot  same on the Home page, where the footer has two rows */
+     --ppFoot  height kept clear by the footer on section pages (one row of 68px controls + 8px margin)
+     --ppHomeFoot  same on the Home page, where the footer has two rows
+   Every footer control is 68 stage px (44pt on a 390-wide phone) tall; round buttons are 68 wide. */
 
-html.pp #stage{--ppB:8px;--ppFoot:76px;--ppHomeFoot:148px}
+html.pp #stage{--ppB:8px;--ppFoot:84px;--ppHomeFoot:160px;--ppE:cubic-bezier(.2,.8,.2,1)}
 
 /* ---------- footer ---------- */
-html.pp #bar{height:calc(var(--ppB) + 60px)!important;padding:0 12px var(--ppB)!important;box-sizing:border-box;gap:4px!important;align-items:center}
-html.pp #burger{width:60px!important;height:60px!important;flex:none;margin:0!important}
-html.pp #burger:active{transform:scale(.92)}
+html.pp #bar{height:calc(var(--ppB) + 68px)!important;padding:0 12px var(--ppB)!important;box-sizing:border-box;gap:4px!important;align-items:center}
+html.pp #burger{width:68px!important;height:68px!important;flex:none;margin:0!important;transition:transform 80ms var(--ppE)}
+html.pp #burger:active{transform:scale(.9)}
 html.pp #barlogo,html.pp #bar.home #barlogo{flex:none!important;height:27px!important;width:auto!important;margin:0 0 0 2px!important}
-/* all footer pills: one height (60), readable labels, a press state */
+/* all footer pills: one height (68), readable labels, a press state */
 html.pp #bar #hmode,html.pp #bar #homeX,html.pp #barRight.pnav{bottom:var(--ppB)!important;padding:5px!important;gap:2px!important}
-html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #bar.home #barRight.pnav .bbtn{height:50px!important;border-radius:25px!important;gap:4px!important}
+html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #bar.home #barRight.pnav .bbtn{height:58px!important;border-radius:29px!important;gap:4px!important}
 html.pp #bar #hmode button span,html.pp #bar #homeX .bbtn span,html.pp #barRight.pnav .bbtn span{font-size:12px!important;letter-spacing:0!important}
 html.pp #bar #hmode button svg,html.pp #bar #homeX .bbtn .ic,html.pp #barRight.pnav .bbtn .ic{width:22px!important;height:22px!important}
-html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barRight.pnav .bbtn:active{transform:scale(.93)}
+html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #barRight.pnav .bbtn,html.pp #bar #prodBtn,html.pp #bar #amtBtn{transition:transform 80ms var(--ppE),opacity .2s ease,color .15s ease!important}
+html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barRight.pnav .bbtn:active,html.pp #bar #prodBtn:active,html.pp #bar #amtBtn:active{transform:scale(.92)}
+@media (prefers-reduced-motion:reduce){
+  html.pp #burger,html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #barRight.pnav .bbtn,html.pp #bar #prodBtn,html.pp #bar #amtBtn{transition:opacity .2s ease,color .15s ease!important}
+  html.pp #burger:active,html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barRight.pnav .bbtn:active,html.pp #bar #prodBtn:active,html.pp #bar #amtBtn:active{transform:none}}
 
 /* Home: two rows. Upper row = what the page shows (Tiles | 3D Home on the left, the four categories on the right);
    lower row = burger + logo, and About / Videos / Yard Sign on the right */
-html.pp #bar #hmode{left:12px!important;right:auto!important;transform:none!important;bottom:calc(var(--ppB) + 70px)!important}
+html.pp #bar #hmode{left:12px!important;right:auto!important;transform:none!important;bottom:calc(var(--ppB) + 76px)!important}
 html.pp #bar #hmode button{width:78px!important}
-html.pp #bar #hmode i{top:5px!important;left:5px!important;width:78px!important;height:50px!important;border-radius:25px!important}
+html.pp #bar #hmode i{top:5px!important;left:5px!important;width:78px!important;height:58px!important;border-radius:29px!important}
 html.pp #bar #hmode.d3 i{transform:translateX(80px)!important}
-html.pp #bar.home #barRight.pnav{left:auto!important;right:12px!important;transform:none!important;bottom:calc(var(--ppB) + 70px)!important;width:calc(100% - 12px - 12px - 166px - 10px)!important;box-sizing:border-box;justify-content:space-between}
+html.pp #bar.home #barRight.pnav{left:auto!important;right:12px!important;transform:none!important;bottom:calc(var(--ppB) + 76px)!important;width:calc(100% - 12px - 12px - 166px - 10px)!important;box-sizing:border-box;justify-content:space-between}
 html.pp #bar.home #barRight.pnav .bbtn{flex:1 1 0!important;width:auto!important;min-width:0}
 html.pp #bar #homeX{left:auto!important;right:12px!important;transform:none!important}
 html.pp #bar #homeX .bbtn{width:84px!important}
-html.pp #homeX .hxi{width:84px!important;height:50px!important;border-radius:25px!important;transform:translateX(calc(var(--hxi)*86px))!important}
+html.pp #homeX .hxi{width:84px!important;height:58px!important;border-radius:29px!important;transform:translateX(calc(var(--hxi)*86px))!important}
 /* About / Videos / Yard Sign pages: their pill sits in the middle of the footer */
 html.pp #bar.hx-ctr #homeX{right:auto!important;left:50%!important;transform:translateX(-50%)!important}
 
 /* Home button (every page but Home): the Vivint house mark over "Home", beside the burger. On Home the logo stays.
-   Footer on section pages: burger 12-72 | Home 76-140 | section nav 146-518 | Products 524-588 */
+   Footer on section pages: burger 12-80 | Home 84-152 | section nav 158-514 | Products 520-588 */
 #ppHome{display:none}
 html.pp #bar:not(.home) #barlogo{display:none!important}
-html.pp #bar:not(.home) #ppHome{display:flex;position:absolute;left:76px;bottom:var(--ppB);width:64px;height:60px;margin:0;padding:0;border:0;border-radius:30px;
+html.pp #bar:not(.home) #ppHome{display:flex;position:absolute;left:84px;bottom:var(--ppB);width:68px;height:68px;margin:0;padding:0;border:0;border-radius:34px;
   flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#1c1c1c;color:#fff;z-index:31;pointer-events:auto;
-  -webkit-tap-highlight-color:transparent;transition:transform 80ms cubic-bezier(.2,.8,.2,1),background-color .15s ease}
+  -webkit-tap-highlight-color:transparent;transition:transform 80ms var(--ppE),background-color .15s ease}
 html.pp #ppHome svg{width:24px;height:24px;display:block}
 html.pp #ppHome span{font-size:12px;font-weight:500;line-height:1;color:rgba(255,255,255,.75)}
 html.pp #ppHome:active,html.pp #ppHome.pressed{transform:scale(.92);background-color:#2c2c2e}
 @media (prefers-reduced-motion:reduce){html.pp #ppHome{transition:background-color .15s ease}html.pp #ppHome:active,html.pp #ppHome.pressed{transform:none}}
 
 /* All Products: a footer pill like the others (icon over a short label) */
-html.pp #bar #prodBtn{right:12px!important;bottom:var(--ppB)!important;height:60px!important;width:64px!important;padding:0!important;border-radius:30px!important;flex-direction:column;justify-content:center;gap:4px;font-size:0!important;color:#fff}
+html.pp #bar #prodBtn{right:12px!important;bottom:var(--ppB)!important;height:68px!important;width:68px!important;padding:0!important;border-radius:34px!important;flex-direction:column;justify-content:center;gap:4px;font-size:0!important;color:#fff}
 html.pp #bar #prodBtn svg{width:22px!important;height:22px!important}
 html.pp #bar #prodBtn::after{content:"Products";font-size:12px;font-weight:500;line-height:1;color:rgba(255,255,255,.75)}
 
-/* Section nav on section pages: a pill along the footer between the burger and Products (icons; labels when they fit).
-   Drag along it to fly through the sections. */
-html.pp #stage #bar:not(.home) #barRight.pnav.pph{position:absolute!important;top:auto!important;right:auto!important;left:146px!important;bottom:var(--ppB)!important;transform:none!important;
-  flex-direction:row!important;width:calc(100% - 146px - 82px)!important;height:60px!important;box-sizing:border-box;margin:0!important;padding:5px!important;gap:2px!important;justify-content:space-between;touch-action:none;animation:none!important}
-html.pp #bar:not(.home) #barRight.pnav.pph .bbtn{flex:1 1 0!important;width:auto!important;min-width:0;height:50px!important;border-radius:25px!important;gap:4px}
+/* Section nav on section pages: a pill along the footer between Home and Products.
+   Up to 5 sections: equal tabs with names. More: fixed 58px icon tabs that scroll sideways (the current one keeps its
+   name and is scrolled into view), with an edge fade where more tabs hide. */
+html.pp #stage #bar:not(.home) #barRight.pnav.pph{position:absolute!important;top:auto!important;right:auto!important;left:158px!important;bottom:var(--ppB)!important;transform:none!important;
+  flex-direction:row!important;width:calc(100% - 158px - 86px)!important;height:68px!important;box-sizing:border-box;margin:0!important;padding:5px!important;gap:2px!important;justify-content:space-between;touch-action:none;animation:none!important}
+html.pp #bar:not(.home) #barRight.pnav.pph .bbtn{flex:1 1 0!important;width:auto!important;min-width:0;height:58px!important;border-radius:29px!important;gap:4px}
 html.pp #bar:not(.home) #barRight.pnav.pph .rdiv{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn span{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn .ic{width:24px!important;height:24px!important}
-/* many sections: icons only, but the current one keeps its name */
-html.pp #bar:not(.home) #barRight.pnav.pph.ico .bbtn.on{flex:2.2 1 0!important}
-html.pp #barRight.pnav.pph.ico .bbtn.on span{display:block;font-size:11px!important;letter-spacing:-.1px!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.pp #stage #bar:not(.home) #barRight.pnav.pph.ico{justify-content:flex-start;overflow-x:auto!important;overflow-y:hidden!important;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--ppFL,0px),#000 calc(100% - var(--ppFR,0px)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--ppFL,0px),#000 calc(100% - var(--ppFR,0px)),transparent 100%)}
+html.pp #barRight.pnav.pph.ico::-webkit-scrollbar{display:none}
+html.pp #bar:not(.home) #barRight.pnav.pph.ico .bbtn{flex:0 0 58px!important;width:58px!important}
+html.pp #barRight.pnav.pph.ico .bbtn.on span{display:block;font-size:11px!important;letter-spacing:-.1px!important;max-width:54px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html.pp #bar:not(.home) #barRight.pnav.pph.idle{opacity:1}
-html.pp #bar:not(.home) #barRight.pnav.pph .bbtn:active{transform:scale(.92)}
 /* the vertical rail that stays (Yard Sign's 2 buttons, next to the centred About/Videos/Yard Sign pill): lower right, just above the footer */
-html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph){top:auto!important;bottom:calc(var(--ppB) + 72px)!important;right:12px!important;left:auto!important;transform:none!important;animation:none!important;width:auto!important;padding:5px!important}
+html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph){top:auto!important;bottom:calc(var(--ppB) + 80px)!important;right:12px!important;left:auto!important;transform:none!important;animation:none!important;width:auto!important;padding:5px!important}
 html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph) .bbtn{width:68px!important;height:68px!important;border-radius:34px!important}
 html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph) .bbtn span{font-size:12px!important}
 /* Buyouts amount button: centred, the same height as the other pills */
-html.pp #bar #amtBtn{bottom:var(--ppB)!important;height:60px!important;border-radius:30px!important}
+html.pp #bar #amtBtn{bottom:var(--ppB)!important;height:68px!important;border-radius:34px!important}
 
 /* ---------- page title ---------- */
 /* #gTitle and #bkPill live in #screen, which sits at left:var(--gx) (negative here): undo that offset */
