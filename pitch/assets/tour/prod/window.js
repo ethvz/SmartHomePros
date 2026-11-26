@@ -6,7 +6,7 @@ export default H => {
   const { THREE, G, add } = H;
   const K = kit(THREE);
   const g = G(), u = add(g, G()); u.scale.setScalar(.001);
-  const grey = 0xb3b4b7, white = 0xf2f2f0;
+  const grey = 0xa9aaad, white = 0xf2f2f0;
 
   /* one two-tone part: plan L x Wd, corner R, back edge rb, split at zs, straight white wall to zr, front roll rf up to D */
   const part = (L, Wd, R, D, rb, zs, rf, cut, extra = []) => {
@@ -23,12 +23,12 @@ export default H => {
   /* sensor, with the U notch (2.5 wide, 1 deep) cut into the bottom (-y) side at mid-length, from z 2.5 up to the cap seam */
   const NW = 1.25, NB = 2.5 + NW, ZS = 9.7, SW = 27.9;
   const cut = `vOP.y < -${(SW / 2 - 1).toFixed(3)} && ((abs(vOP.x) < ${NW} && vOP.z > ${NB.toFixed(3)} && vOP.z < ${ZS}) || length(vec2(vOP.x, vOP.z - ${NB.toFixed(3)})) < ${NW})`;
-  add(u, part(68.6, SW, 8.5, 12.7, .8, ZS, 2.2, cut, [2.5, 6]));
+  add(u, part(68.6, SW, 10, 12.7, .8, ZS, 2.2, cut, [2.5, 6]));
   const U = new THREE.Shape(); U.moveTo(-NW, ZS); U.lineTo(-NW, NB); U.absarc(0, NB, NW, Math.PI, 2 * Math.PI, false); U.lineTo(NW, ZS); U.lineTo(-NW, ZS);
   K.pocket(u, U, 1.0, '-y', -SW / 2, 0, 0, 0x9c9da0);
 
   /* magnet on the sill edge right below (centre 21.5 mm below the sensor's, 4 mm along x), its long side facing the notch */
-  add(u, part(47.5, 14.2, 4.5, 7.1, .6, 5.2, 1.5, null, [2.5]), 4, -21.5, 0);
+  add(u, part(47.5, 14.2, 6, 7.1, .6, 5.2, 1.5, null, [2.5]), 4, -21.5, 0);
   return g;
 };
 

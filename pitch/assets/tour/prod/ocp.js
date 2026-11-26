@@ -31,7 +31,10 @@ export default H => {
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
       geo.setIndex(new THREE.BufferAttribute(p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni),1));
-      if(p.g===1){ const uv = new Float32Array(p.nv*2); for(let i=0;i<p.nv;i++){ uv[2*i]=(pos[3*i]+.0354)/.0708; uv[2*i+1]=(pos[3*i+1]+.0493)/.0475; } geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
+      if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
+        for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
+          uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0354)/.0708; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
+        geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, Mt[p.g]); m.castShadow = m.receiveShadow = true; cad.add(m);
       const k = OCPM.parts.indexOf(p);
       if(k === 0) m.visible = false;                         // the CAD's inner chassis: a tab of it pokes out below the shell
@@ -153,7 +156,7 @@ export default H => {
   const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
   const aT = .62, Th = V3(0, cyB - Rbt*Math.sin(aT), czB - Rbt*Math.cos(aT));              // neck target on the slot floor (head-local)
   const nT = V3(0, -Math.sin(aT), -Math.cos(aT)); Th.addScaledVector(nT, -2);
-  const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 6 + 2, Tm = B.clone().addScaledVector(u, Dn);
+  const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 8 + 2, Tm = B.clone().addScaledVector(u, Dn);
   head.rotation.x = tilt; head.updateMatrix();
   const Gp = Tm.clone().sub(Th.clone().applyEuler(head.rotation));
   // the head + neck swivel on the ball: a pivot at the ball centre (studio-only ?ocpyaw=deg turns it, to match photos with a turned head)

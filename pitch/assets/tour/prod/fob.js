@@ -97,7 +97,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   /* ---- end helpers ---- */
   const g = G(), W = 29, L = 64, D = 11, lift = 4.0;                        // ring end lifted 4 mm by the ring wire under it
   const F = G(); F.scale.setScalar(.001); g.add(F);
-  const bare = /[?&]bare/.test(location.search);                          // bare: the fob alone, upright (face +z) for photo matching
+  const bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search));                          // bare: the fob alone, upright (face +z) for photo matching
   if (!bare) { F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001; }
 
   /* 1-3. shell */

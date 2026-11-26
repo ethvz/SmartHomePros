@@ -81,8 +81,10 @@ html.pp #p-military h3{font-size:22px}
 html.pp #p-military p,html.pp #p-military li{font-size:19px;line-height:28px}
 html.pp #p-military ul{margin-left:24px}
 html.pp #p-military .gap{height:56px}
-html.pp #p-military .scroll{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - var(--prB) - 56px),transparent calc(100% - var(--prB) + 4px));mask-image:linear-gradient(180deg,#000 calc(100% - var(--prB) - 56px),transparent calc(100% - var(--prB) + 4px))}
-html.pp #p-military::after{bottom:calc(var(--prB) + 44px)}
+/* fade the policy text out above the footer; the scroll cue rides with the hero instead of floating over the text */
+html.pp #p-military::before{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--prB) + 64px);background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.92) 62%);z-index:3;pointer-events:none}
+html.pp #p-military::after{display:none}
+html.pp #p-military .scroll::before{content:"";position:absolute;left:50%;top:calc(var(--H) - var(--prB) - 52px);width:20px;height:20px;margin-left:-10px;border-right:2px solid #fff;border-bottom:2px solid #fff;border-radius:2px;transform:rotate(45deg);animation:cue 1.9s ease-in-out infinite;pointer-events:none;z-index:4}
 
 /* ---------- Playback: one column; feature list takes the rest of the height ---------- */
 html.pp .pbx{bottom:calc(var(--prB) + 8px);padding:calc(var(--prT) + 4px) 28px 0;display:flex;flex-direction:column;box-sizing:border-box}

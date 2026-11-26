@@ -12,7 +12,8 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa{left:50%!important;top:auto!impo
 html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa i{top:24px}
 
 /* ---------- hero (photo / video) ---------- */
-html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.lh-media,.ochx,.ich-vid,.hbh-vid){left:0!important;width:600px!important;height:var(--H)!important}
+html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.lh-media,.lh-scrim,.hgl,.ochx,.ich-vid,.hbh-vid,.ich-scrim,.ich-sc,.hbh-scrim,.hbh-sc){left:0!important;right:auto!important;width:600px!important;height:var(--H)!important}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .hg-dots{bottom:176px!important}
 html.pp :is(#prScroll,#thScroll) .lh-ph{width:100%!important;height:100%!important;object-fit:cover}
 html.pp :is(#prScroll,#thScroll) .lh-media .smk-ghost{object-fit:cover}
 html.pp :is(#prScroll,#thScroll) .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.45) 0,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 46%,rgba(0,0,0,.86) 100%)!important}

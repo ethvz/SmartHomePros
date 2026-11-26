@@ -95,7 +95,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     x.drawImage(T, 0, 0);
   }
   /* ---- end helpers ---- */
-  const g = G(), Q = new URLSearchParams(location.search), bare = Q.has('bare'), nocord = bare || Q.has('nocord');
+  const g = G(), Q = new URLSearchParams(location.search), bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search)), nocord = bare || Q.has('nocord');
   const P = G(); P.scale.setScalar(.001); P.position.y = .006; g.add(P);                  // body sits a little above the plate centre (upper receptacle)
   const W = 96, HH = 53, D = 38, R = 6, crown = .6;
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f0ee, roughness: .45, clearcoat: .08, clearcoatRoughness: .5, sheen: .25, sheenRoughness: .8, sheenColor: 0xffffff });

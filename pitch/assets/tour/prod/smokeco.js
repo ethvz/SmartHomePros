@@ -10,14 +10,14 @@ export default H => {
   /* ---------- materials */
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .26, clearcoat: .55, clearcoatRoughness: .18 });
   const capM = new THREE.MeshPhysicalMaterial({ color: 0xf6f6f6, roughness: .4, clearcoat: .25, clearcoatRoughness: .35 });
-  const dark = mat(0x2b2b2b, { r: .7 }), fin = mat(0x333435, { r: .6 }), inner = mat(0x343536, { r: .8 });
+  const dark = mat(0x111111, { r: .8 }), fin = mat(0x1e1f20, { r: .7 }), inner = mat(0x343536, { r: .8 });
 
   /* ---------- face surface: dome + scoop (mm) */
-  const RL = 40, RF = 63, LIFT = 7;                  // LIFT: chamber/cage/cap raised to match the photos' proportions                                  // face annulus: lip ... fillet start
+  const RL = 43.5, RF = 63, LIFT = 7;                  // LIFT: chamber/cage/cap raised to match the photos' proportions                                  // face annulus: lip ... fillet start
   const faceZ = r => 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - RL) / (RF - RL))) ** 2);
-  const SC = { x: -52, y: 0, R: 11, d: 3.4 };          // half-moon scoop at 9 o'clock
+  const SC = { x: -54, y: 0, R: 9, d: 4.5 };          // half-moon scoop at 9 o'clock
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(r);
-    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** .6; return z; };
+    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** .4; return z; };
 
   /* ---------- body lathe: back, base seam, straight side, fillet into the face */
   const prof = [V2(0, 0), V2(69.6, 0), V2(70.7, .25), V2(71, 1), V2(71, 2.85), V2(70.7, 2.9), V2(70.7, 3.1), V2(71, 3.15)];
@@ -38,9 +38,9 @@ export default H => {
       const u = cu + r * Math.cos(a), v = cv + r * Math.sin(a); out.push([u * c - v * s, u * s + v * c]); } });
     return out; };
   const holes = [
-    { pts: rrPts(42, 46.6, -10.5, 10.5, [2.2, 2.2, 2.2, 2.2], 0), phi: 0, u: [42, 46.6], v: 10.5 },
-    { pts: rrPts(49.2, 56, -9.5, 9.5, [1.6, 6, 6, 1.6], 0), phi: 0, u: [49.2, 56], v: 9.5 },
-    { pts: rrPts(43.4, 48.8, -8.2, 8.2, [2.4, 2.4, 2.4, 2.4], 180), phi: 180, u: [43.4, 48.8], v: 8.2 },
+    { pts: rrPts(44.6, 48.6, -10.5, 10.5, [2, 2, 2, 2], 0), phi: 0, u: [44.6, 48.6], v: 10.5 },
+    { pts: rrPts(50.6, 58, -11, 11, [1.6, 7, 7, 1.6], 0), phi: 0, u: [50.6, 58], v: 11 },
+    { pts: rrPts(44.6, 50, -9.6, 9.6, [2.6, 2.6, 2.6, 2.6], 180), phi: 180, u: [44.6, 50], v: 9.6 },
   ];
 
   /* ---------- canvases: printed map + hole mask, planar over the 142 mm disc */
@@ -79,10 +79,10 @@ export default H => {
   const drawPts = (pts) => { x.beginPath(); pts.forEach(([px, py], i) => i ? x.lineTo(...P(px, py)) : x.moveTo(...P(px, py))); x.closePath(); };
   const pad = (pts, fill) => { drawPts(pts); x.fillStyle = fill; x.fill(); x.lineWidth = .32 * k; x.strokeStyle = '#2a2a2a'; x.stroke(); };
   // CO pad (big round corner outer / away from the LED), LED window, FIRE pad (mirror)
-  const coPts = polarPad(44.6, 55.4, 125, 139.6, [1.2, 1.4, 6.5, 1.2]);
-  const fiPts = polarPad(44.6, 55.4, 100.4, 115, [1.2, 6.5, 1.4, 1.2]);
-  pad(coPts, '#626466'); pad(fiPts, '#626466');
-  { const ledPts = polarPad(46.6, 54, 117.2, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#505355');
+  const coPts = polarPad(44.4, 56, 124.6, 141, [1.2, 1.4, 7, 1.2]);
+  const fiPts = polarPad(44.4, 56, 99, 115.4, [1.2, 7, 1.4, 1.2]);
+  pad(coPts, '#45474a'); pad(fiPts, '#45474a');
+  { const ledPts = polarPad(46.2, 54.4, 117.1, 122.9, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
     x.fillStyle = '#626567'; drawPts(polarPad(48.2, 52.4, 118.4, 121.6, [.8, .8, .8, .8])); x.fill(); }
   // soft sheen on the smoked pads (lighter toward their outer edge)
   for (const pts of [coPts, fiPts]) { x.save(); drawPts(pts); x.clip();
@@ -93,17 +93,17 @@ export default H => {
     x.save(); x.translate(px, py); x.rotate(Math.atan2(-Math.cos(phi * D2R), -Math.sin(phi * D2R))); x.scale(cond, 1);
     x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = `${w} ${Math.round(cap * k / .72)}px "Helvetica Neue", Helvetica, Arial, sans-serif`; x.fillText(s, 0, 0); x.restore(); };
-  txt('CO', 57.6, 141, 2.4); txt('FIRE/FEU', 58, 108, 2.2);
-  txt('TEST/ HUSH', 52.6, 95.5, 1.9); txt('TEST/SILENCIEUX', 55.3, 95.5, 1.9);
-  txt('GREEN/VERT - OK', 51.2, 154, 1.75); txt('YLW - FAULT JUANE - PANNE', 53.8, 154.5, 1.75); txt('RED - ALARM ROUGE - ALARME', 56.4, 155, 1.75);
+  txt('CO', 58.3, 141, 2.4); txt('FIRE/FEU', 58.4, 107, 2.2);
+  txt('TEST/ HUSH', 53.4, 84, 1.9); txt('TEST/SILENCIEUX', 56.2, 84.5, 1.9);
+  txt('GREEN/VERT - OK', 51.6, 160, 1.6); txt('YLW - FAULT JUANE - PANNE', 54.1, 160, 1.6); txt('RED - ALARM ROUGE - ALARME', 56.6, 160, 1.6);
   txt('ENTRETIEN - 1 BIP', 52, 22, 1.75); txt('FEU ALARME - 3 BIPS', 54.7, 22.5, 1.75); txt('MONOXYDE DE CARBONE - 4 BIPS', 57.4, 23, 1.75);
   txt('SERVICE - 1 BEEP', 52, -22, 1.75); txt('FIRE ALARM - 3 BEEPS', 54.7, -22.5, 1.75); txt('CARBON MONOXIDE ALARM - 4 BEEPS', 57.4, -23, 1.75);
-  txt('ATTENTION', 44.6, 239, 4.3, 500, '#555', 1); txt('NOTICE', 50, 239.5, 3.2, 500, '#5a5a5a', 1); txt('SUPPLÉMENTAIRE AU DOS', 55, 240, 3.1, 500, '#5a5a5a', 1);
-  txt('CAUTION', 44.6, 299.5, 4.3, 500, '#555', 1); txt('ADDITIONAL', 50, 299.5, 3.2, 500, '#5a5a5a', 1); txt('MARKINGS ON BACK', 55, 299, 3.1, 500, '#5a5a5a', 1);
+  txt('ATTENTION', 46.4, 239, 4.3, 500, '#555', 1); txt('NOTICE', 51.3, 239.5, 3.2, 500, '#5a5a5a', 1); txt('SUPPLÉMENTAIRE AU DOS', 55.8, 240, 3.1, 500, '#5a5a5a', 1);
+  txt('CAUTION', 46.4, 299.5, 4.3, 500, '#555', 1); txt('ADDITIONAL', 51.3, 299.5, 3.2, 500, '#5a5a5a', 1); txt('MARKINGS ON BACK', 55.8, 299, 3.1, 500, '#5a5a5a', 1);
   // no-paint icon: ring, brush + roller, slash
-  { const [cx, cy] = P(50.5 * Math.cos(57 * D2R), 50.5 * Math.sin(57 * D2R)), R = 6.5 * k; x.save(); x.translate(cx, cy);
-    x.strokeStyle = x.fillStyle = '#4a4a4a'; x.lineWidth = 1.3 * k; x.beginPath(); x.arc(0, 0, R - .65 * k, 0, Math.PI * 2); x.stroke();
-    x.save(); x.beginPath(); x.arc(0, 0, R - 1 * k, 0, Math.PI * 2); x.clip(); const u = k;
+  { const [cx, cy] = P(50.5 * Math.cos(57 * D2R), 50.5 * Math.sin(57 * D2R)), R = 7.4 * k; x.save(); x.translate(cx, cy);
+    x.strokeStyle = x.fillStyle = "#3e3e3e"; x.lineWidth = 1.5 * k; x.beginPath(); x.arc(0, 0, R - .65 * k, 0, Math.PI * 2); x.stroke();
+    x.save(); x.beginPath(); x.arc(0, 0, R - 1 * k, 0, Math.PI * 2); x.clip(); const u = k * 1.3;
     x.fillRect(-3.2 * u, -3.6 * u, 6.4 * u, 2.2 * u);                       // roller
     x.fillRect(2.6 * u, -2.8 * u, .8 * u, 2.4 * u); x.fillRect(-.4 * u, -.8 * u, 3.8 * u, .7 * u); x.fillRect(-.4 * u, -.8 * u, .8 * u, 3 * u);
     x.beginPath(); x.moveTo(-1.2 * u, 2.2 * u); x.lineTo(.8 * u, 2.2 * u); x.lineTo(.5 * u, 4.6 * u); x.lineTo(-.9 * u, 4.6 * u); x.closePath(); x.fill();   // brush
@@ -132,27 +132,27 @@ export default H => {
     for (let i = 0; i < n; i++) { const [X, Y] = pts[i]; pos.push(X, Y, surfZ(X, Y) + .05, X, Y, cz); }
     for (let i = 0; i < n; i++) { const a = 2 * i, b = 2 * ((i + 1) % n); idx.push(a, a + 1, b, b, a + 1, b + 1); }
     const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); wg.setIndex(idx); wg.computeVertexNormals();
-    add(g, new THREE.Mesh(wg, new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: .8, side: THREE.DoubleSide })));
+    add(g, new THREE.Mesh(wg, new THREE.MeshStandardMaterial({ color: 0x161616, roughness: .85, side: THREE.DoubleSide })));
     const fl = add(g, new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(pts.map(p => V2(p[0], p[1])))), dark)); fl.position.z = cz;
     const c = Math.cos(h.phi * D2R), s = Math.sin(h.phi * D2R), um = (h.u[0] + h.u[1]) / 2, ul = h.u[1] - h.u[0] - .4;
     for (const f of [-.5, 0, .5]) { const v = f * h.v, X = um * c - v * s, Y = um * s + v * c, top = surfZ(X, Y) - 1.4;
       const b = add(g, new THREE.Mesh(new THREE.BoxGeometry(ul, 1.6, 3.6), fin), X, Y, top - 1.8); b.rotation.z = h.phi * D2R; } }
 
   /* ---------- well lip, well wall + floor (dark below), insect mesh band, chamber rings, dark interior */
-  { const f = faceZ(RL), lp = [V2(30, 33.6), V2(38.2, 33.6), V2(39.2, 33.8), V2(39.2, f - 1.3), V2(39.35, f - .65), V2(39.7, f - .2), V2(RL, f)].reverse();
+  { const f = faceZ(RL), lp = [V2(30, 33.6), V2(41.7, 33.6), V2(42.7, 33.8), V2(42.7, f - 1.3), V2(42.85, f - .65), V2(43.2, f - .2), V2(RL, f)].reverse();
     const lm = splitMat(inner, white, 'y', f - 1.6, .001, 0x343536); const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), lm)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 4096, Hh = 208, c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
-    const circ = 2 * Math.PI * 38, pxmm = W / circ; y.fillStyle = '#101010'; y.fillRect(0, 0, W, Hh);
+    const circ = 2 * Math.PI * 41.5, pxmm = W / circ; y.fillStyle = '#101010'; y.fillRect(0, 0, W, Hh);
     for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 9 * pxmm); }
     y.strokeStyle = 'rgba(70,70,70,.9)'; y.lineWidth = .14 * pxmm; const pitch = .4 * pxmm;
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
-    const mg = new THREE.CylinderGeometry(38, 38, 12.4, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, 33.6 + 6.2);
+    const mg = new THREE.CylinderGeometry(41.5, 41.5, 12.4, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, 33.6 + 6.2);
     // cylinder UV u starts at +z (pre-rotation) i.e. -y here; rotate so the tabs sit at 0, 60, 120 ... degrees
     const mesh = add(g, new THREE.Mesh(mg, new THREE.MeshStandardMaterial({ map: t, roughness: .75, metalness: .1 }))); mesh.rotation.z = -Math.PI / 2; }
-  { const cp = [V2(38.2, 45.8), V2(37.6, 46.3), V2(37, 46.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
+  { const cp = [V2(41.7, 45.8), V2(41.1, 46.3), V2(37, 46.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
       V2(35.1, 50.6), V2(35.1, 52.1), V2(34.9, 52.7), V2(34.5, 53), V2(34.1, 52.8), V2(33.9, 52.2), V2(33.85, 51.4)];
     const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + (i > 4 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
     const dk = [V2(33.85, 51.4), V2(33.4, 50.6), V2(0, 50.6)];
@@ -164,15 +164,15 @@ export default H => {
     const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y + LIFT)), 160), capM)); cap.rotation.x = Math.PI / 2; }
 
   /* ---------- six arched spokes: foot on the face, arc up and in, joining the cap rim */
-  { const s = new THREE.Shape(); const f0 = faceZ(44.2) - 1.5, f1 = faceZ(48.4) - 1.5;
+  { const s = new THREE.Shape(); const f0 = faceZ(45.2) - 1.5, f1 = faceZ(49.4) - 1.5;
     const zA = 55.2 + LIFT, zB = 58.6 + LIFT;              // arm underside / top
-    s.moveTo(24, zA); s.lineTo(37, zA); s.bezierCurveTo(42.5, zA, 44.2, zA - 4, 44.2, zA - 10); s.lineTo(44.2, f0); s.lineTo(48.4, f1); s.lineTo(48.4, zA - 10);
-    s.bezierCurveTo(48.4, zB - 3, 45, zB, 37, zB); s.lineTo(24, zB); s.lineTo(24, zA);
+    s.moveTo(24, zA); s.lineTo(37, zA); s.bezierCurveTo(43.5, zA, 45.2, zA - 4, 45.2, zA - 10); s.lineTo(45.2, f0); s.lineTo(49.4, f1); s.lineTo(49.4, zA - 10);
+    s.bezierCurveTo(49.4, zB - 3, 46, zB, 37, zB); s.lineTo(24, zB); s.lineTo(24, zA);
     const bv = .9, W0 = 9.2;
     const sg = new THREE.ExtrudeGeometry(s, { depth: W0 - 2 * bv, bevelEnabled: true, bevelThickness: bv, bevelSize: bv, bevelOffset: -bv, bevelSegments: 4, curveSegments: 20 });
     sg.translate(0, 0, -(W0 - 2 * bv) / 2);
     const p = sg.attributes.position;                       // taper: 9.2 mm wide at the foot -> 7 mm at the cap
-    for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 26) / (48.4 - 26))); p.setZ(i, p.getZ(i) * (.76 + .24 * t)); }
+    for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 26) / (49.4 - 26))); p.setZ(i, p.getZ(i) * (.76 + .24 * t)); }
     sg.computeVertexNormals();
     for (const a of [90, 30, -30, -90, 150, 210]) { const c = Math.cos(a * D2R), sn = Math.sin(a * D2R);
       const M = new THREE.Matrix4().makeBasis(new THREE.Vector3(c, sn, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(sn, -c, 0));

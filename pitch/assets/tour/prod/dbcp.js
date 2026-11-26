@@ -66,8 +66,10 @@ export default H => {
   add(g, new THREE.Mesh(new THREE.ShapeGeometry(face, 48), glass), 0, 0, ZF);
 
   /* ---------- white body: z 9.05 -> 27.8, tapering toward the wall ---------- */
-  const zb0 = 9.05, zb1 = 27.8, bodyAt = z => { const t = (zb1 - z) / (zb1 - zb0); return { w: W - 1.4 * t, top: 66 - 2.6 * t, bot: -66 + 1.3 * t }; };
-  const bS = []; for (let i = 0; i <= 6; i++) { const z = zb0 + (zb1 - zb0) * i / 6, b = bodyAt(z); bS.push([z, b.w, b.top - b.bot, R, (b.top + b.bot) / 2]); }
+  const zb0 = 9.05, zb1 = 27.8, zr = zb0 + 6, Rp = 15.9;
+  const planIn = z => { const u = Math.max(0, zr - z); return Rp - Math.sqrt(Math.max(0, Rp * Rp - u * u)); };   // plan rounding of body back + plate
+  const bodyAt = z => { const t = (zb1 - z) / (zb1 - zb0); return { w: W - 1.4 * t - 2 * planIn(z), top: 66 - 2.6 * t, bot: -66 + 1.3 * t }; };
+  const bS = []; for (let i = 0; i <= 18; i++) { const z = zb0 + (zb1 - zb0) * i / 18, b = bodyAt(z); bS.push([z, b.w, b.top - b.bot, R, (b.top + b.bot) / 2]); }
   add(g, shell(bS, white));
   // dark cores fill the hairline seams so they read as fine dark lines
   add(g, H.rslab(42.4, 131.4, 1.0, 9.7, .1, voidM), 0, 0, 27.9);
@@ -77,11 +79,10 @@ export default H => {
   const pS = [], D = 6.55;
   for (let i = 0; i <= 14; i++) { const a = i / 14 * PI / 2, s = D * Math.sin(a), z = 8.75 - s;
     const top = br.top - 7.0 * (1 - Math.cos(a)), bot = br.bot + 6.0 * (1 - Math.cos(a));
-    const side = 5.0 * (1 - Math.cos(a));                                   // sides round in hard toward the wall (bottom view)
-    pS.push([z, br.w - 2 * side, top - bot, R, (top + bot) / 2]); }
+    pS.push([z, br.w + 2 * planIn(zb0) - 2 * planIn(z), top - bot, R, (top + bot) / 2]); }
   add(g, shell(pS, [plateL, plate]));
   // back face: arch cap outline, pads, wire boss
-  const yTopB = br.top - 7, wB = br.w - 10;
+  const yTopB = br.top - 7, wB = br.w + 2 * planIn(zb0) - 2 * planIn(2.2) - 1;
   const bp2 = pp(wB, 34, (x, P) => { x.strokeStyle = '#b4b6b8'; x.lineWidth = 2.5; x.beginPath(); const o = -41;   // plane centre at y 41
     x.moveTo(...P(-wB / 2, 29 + o)); x.lineTo(...P(-13.5, 29 + o)); x.lineTo(...P(-13.5, 41.5 + o));
     const [cx, cy] = P(0, 41.5 + o); x.arc(cx, cy, 135, PI, 0, false); x.lineTo(...P(13.5, 29 + o)); x.lineTo(...P(wB / 2, 29 + o)); x.stroke(); });

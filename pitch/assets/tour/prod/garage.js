@@ -1,6 +1,6 @@
-// Garage Door Controller: Chamberlain myQ Smart Garage Control hub (MYQ-G0401), 98.4 x 98.4 x 38.1 mm.
+// Garage Door Controller: Chamberlain myQ Smart Garage Control hub (MYQ-G0401), 98.4 x 98.4 x 31 mm (depth measured from the angled photos; listings say 38 mm incl. the bracket).
 // One moulded superellipse body (n = 3, no straight sides): grey base flaring 1.9 mm out to the wall, flush colour split at
-// z = 12 mm into the white cover, big R6 roll into a gently domed face. A real 6 mm deep soft-walled light well holds a raised
+// z = 10 mm into the white cover, big R6 roll into a gently domed face. A real 6 mm deep soft-walled light well holds a raised
 // frosted lens over a 3 x 4 LED array; printed CHAMBERLAIN, zig-zag vent slots, myQ connected, three near-flush pill buttons
 // with hairline grooves, and the ribbed power-cord boot on the right side with the white cord running down the wall.
 export default H => {
@@ -36,22 +36,22 @@ export default H => {
   /* ---------- materials ---------- */
   const grey = new THREE.MeshPhysicalMaterial({ color: 0x9a9a98, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
-  const bodyM = splitMat(grey, white, 'z', mm(12), mm(.22), 0x9a9a98);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xd2d6d6, roughness: .22, transmission: .9, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
+  const bodyM = splitMat(grey, white, 'z', mm(10), mm(.5), 0x4a4a4a);
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa9adad, roughness: .22, transmission: .9, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x34342f, roughness: .7 });
   const ledM = new THREE.MeshPhysicalMaterial({ color: 0xebe5c4, roughness: .35, emissive: 0xf3e6a6, emissiveIntensity: .08, clearcoat: .6 });
   const btnM = white.clone();
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 
   /* ---------- body + face + light well: one watertight shell ---------- */
-  const N = 160, A0 = 49.2, A1 = 46.9, RR = 6, ZV = 30.6, ZE = 36.6, AF = A1 - RR;        // AF: where the roll meets the face
+  const N = 160, A0 = 49.2, A1 = 46.4, RR = 5.5, ZV = 24.0, ZE = 29.5, AF = A1 - RR;        // AF: where the roll meets the face
   const dome = (x, y) => { const rho = Math.cbrt(Math.abs(x) ** 3 + Math.abs(y) ** 3); return ZE + 1.5 * (1 - Math.min(1, rho / AF) ** 2); };   // mm
   const T = [...Array(N)].map((_, i) => i / N * Math.PI * 2);
   const ringA = (a, z) => T.map(t => { const [x, y] = sq(a, t); return [mm(x), mm(y), mm(z)]; });
   const rings = [];
   for (let i = 0; i <= 5; i++) { const q = i / 5 * Math.PI / 2; rings.push(ringA(A0 - 1.5 * (1 - Math.sin(q)), 1.5 * (1 - Math.cos(q)))); }
-  for (let i = 1; i <= 8; i++) { const t = i / 8; rings.push(ringA(A0 - (A0 - A1) * t ** 1.5, 1.5 + 10.5 * t)); }
-  rings.push(ringA(A1, 18), ringA(A1, 25), ringA(A1, ZV));
+  for (let i = 1; i <= 8; i++) { const t = i / 8; rings.push(ringA(A0 - (A0 - A1) * t ** 1.5, 1.5 + 8.5 * t)); }
+  rings.push(ringA(A1, 15), ringA(A1, 19.5), ringA(A1, ZV));
   for (let i = 1; i <= 10; i++) { const q = i / 10 * Math.PI / 2; rings.push(ringA(A1 - RR * (1 - Math.cos(q)), ZV + RR * Math.sin(q))); }
   // pocket opening: rounded rect 34 x 32, r 10, centred (0, 1); each face ray runs from the pocket centre to the outer ring point
   const PC = [0, -.5], PW = 35.5, PH = 34, PR = 10.5;
@@ -60,7 +60,7 @@ export default H => {
   const inner = outer.map(([ox, oy]) => { const dx = ox - PC[0], dy = oy - PC[1]; let lo = 0, hi = 1; for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; inRR(PC[0] + dx * m, PC[1] + dy * m) < 0 ? lo = m : hi = m; } return [PC[0] + dx * lo, PC[1] + dy * lo]; });
   const FK = 16;
   for (let k = 1; k <= FK; k++) { const s = k / FK, e = s; rings.push(outer.map(([ox, oy], i) => { const x = ox + (inner[i][0] - ox) * e, y = oy + (inner[i][1] - oy) * e; return [mm(x), mm(y), mm(dome(x, y))]; })); }
-  const ZF = 32.0;                                                                             // well floor
+  const ZF = 25.0;                                                                             // well floor
   const well = [[.992, .025], [.978, .08], [.96, .18], [.935, .34], [.905, .55], [.88, .74], [.862, .87], [.85, .95], [.844, .99], [.842, 1], [.8, 1], [.65, 1], [.4, 1], [.15, 1]];
   for (const [s, u] of well) rings.push(inner.map(([x, y]) => { const X = PC[0] + (x - PC[0]) * s, Y = PC[1] + (y - PC[1]) * s; return [mm(X), mm(Y), mm(dome(x, y) * (1 - u) + ZF * u)]; }));
   add(g, ringMesh(rings, bodyM, true, true));
@@ -112,8 +112,8 @@ export default H => {
   { const prof = [[3.1, -1.5], [3.1, 0]]; for (let k = 0; k < 4; k++) { const y0 = 1.6 + k * 1.9; prof.push([3.0 - k * .12, y0], [3.35 - k * .12, y0 + .5], [3.35 - k * .12, y0 + 1.0], [3.0 - k * .12, y0 + 1.5]); }
     prof.push([2.4, 9.6], [2.0, 10.4], [1.6, 10.8], [0, 10.9]);
     const boot = new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(mm(r), mm(y))), 48), cordM); boot.rotation.z = -Math.PI / 2; boot.castShadow = true;
-    add(g, boot, mm(48.0), mm(-1.5), mm(8));
-    const curve = new THREE.CatmullRomCurve3([[57.5, -1.5, 8], [62, -3, 7.2], [65.5, -10, 5.2], [67, -24, 3.2], [67.2, -50, 1.8], [67, -80, 1.6]].map(([x, y, z]) => new THREE.Vector3(mm(x), mm(y), mm(z))));
+    add(g, boot, mm(47.9), mm(-1.5), mm(6.5));
+    const curve = new THREE.CatmullRomCurve3([[57.4, -1.5, 6.5], [62, -3, 6.0], [65.5, -10, 5.2], [67, -24, 3.2], [67.2, -50, 1.8], [67, -80, 1.6]].map(([x, y, z]) => new THREE.Vector3(mm(x), mm(y), mm(z))));
     const cord = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, mm(1.5), 16, false), cordM); cord.castShadow = true; add(g, cord);
     if (new URLSearchParams(location.search).get('part') === 'nocord') { g.remove(cord); g.remove(boot); } }   // DEBUG
   return g;

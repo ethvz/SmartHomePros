@@ -95,6 +95,9 @@ html.pp #psheet .x{width:68px!important;height:68px!important}
 html.pp .modal .x,html.pp .modal .mx,html.pp .modal [data-close]{min-width:68px;min-height:68px}
 /* .mclose buttons carry an inline landscape left (1235-1282px): pin them top right of the 600-wide stage */
 html.pp .modal .mclose{left:auto!important;right:20px!important;top:20px!important;width:68px!important;height:68px!important}
+/* an empty close (m-video relied on an X drawn in the landscape artwork): draw one */
+html.pp .modal .mclose:empty{border-radius:50%;background:rgba(28,28,30,.78) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center/26px no-repeat;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+html.pp .modal .mclose:active{transform:scale(.92)}
 
 /* ---------- video player ---------- */
 /* #vlp sits outside the stage (screen pt): the 16:9 video is centred with its native controls attached to it */
@@ -117,6 +120,7 @@ html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:c
 .ppcl{display:none}
 html.pp .ht>.ppcl{display:block;position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:15px!important;line-height:1.15;color:rgba(255,255,255,.62);pointer-events:none;z-index:3;padding:0 6px}
 html.pp .ht>.ppcl.top{top:10px;bottom:auto}
+html.pp .ht:has(>.ppcl.top)>img{top:32px!important;bottom:0!important;height:calc(100% - 32px)!important;inset:32px 0 0 0!important}
 html.pp #allTiles .ht[data-k=shp2]::after{font-size:15px!important;color:rgba(255,255,255,.62)!important}
 /* 3D Home: the frame fills the upright screen; the footer floats over it */
 html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}
