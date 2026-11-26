@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – 1Stop;;;;
+FN:Vivint – 1Stop
+ORG:Vivint
+item1.TEL;type=CELL:+18015099080
+item1.X-ABLabel:Text only
+item2.EMAIL;type=INTERNET;type=WORK:1stop@vivint.com
+item2.X-ABLabel:Email
+END:VCARD

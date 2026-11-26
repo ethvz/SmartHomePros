@@ -1,1 +1,42 @@
-/* iPad portrait (html.ipp) layout: prodB group. Every rule is scoped to html.ipp. */
+/* iPad portrait (html.ipp) layout: prodB group. Every rule is scoped to html.ipp.
+   Sections are pulled back to the stage's left edge (left:-gx, 1032 wide). Inside the product scrollers (#ocScroll, #dbScroll) every tab
+   is one upright screen (1032 x --H); var(--gx) there is the left rail's clearance (--gxl). Content stays below --ippT and above --ippFoot. */
+#aiIPP,#cmIPP{display:none}
+html.ipp #stage{--bT:var(--ippT,96px);--bF:var(--ippFoot,84px)}
+html.ipp :is(#p-ocp,#p-dbcp,#p-ai,#p-compat,#p-whatsnew,#p-preview,#p-birdseye){left:calc(-1*var(--gx,0px))!important;right:auto!important;width:1032px!important}
+
+/* ===================== product pages: one upright screen per tab ===================== */
+html.ipp :is(#ocScroll,#dbScroll){width:1032px!important}
+html.ipp :is(#ocScroll,#dbScroll)>*{width:1032px!important;height:var(--H)!important;margin:0!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;left:0!important}
+html.ipp :is(#ocScroll,#dbScroll)>[hidden]{display:none!important}
+html.ipp :is(#ocScroll,#dbScroll)>[data-t=hero]::after{display:none}
+/* next-section chevron, clear of the footer */
+html.ipp :is(#ocScroll,#dbScroll) .nxa{left:calc(50% + var(--gx,0px) / 2)!important;top:auto!important;bottom:calc(var(--bF) + 4px)!important}
+/* hero photo gallery (swipe left on the hero): one upright screen per photo; prodB.js crops each photo round its product */
+html.ipp :is(#ocScroll,#dbScroll) .hgl{left:0!important;width:1032px!important;height:var(--H)!important}
+html.ipp :is(#ocScroll,#dbScroll) .hgl figure{width:1032px!important}
+html.ipp :is(#ocScroll,#dbScroll) .hg-dots{left:calc(50% + var(--gx,0px) / 2)!important;bottom:calc(var(--bF) + 96px)!important}
+
+/* ---------- OCP hero: words up top, the camera large in the middle, Deter / Spotlight toggles in one row below it ---------- */
+html.ipp #ocScroll .ochx{left:0!important;width:1032px!important;height:var(--H)!important;margin:0!important}
+html.ipp #ocScroll .och-txt{left:calc(var(--gx) + 48px)!important;top:calc(var(--bT) + 64px)!important;width:820px!important;margin:0!important}
+html.ipp #ocScroll .och-sub{max-width:none}
+html.ipp #ocScroll .och-prod{left:calc(var(--gx) + 30px)!important;width:calc(1032px - var(--gx) - 60px)!important;top:calc(var(--bT) + 330px)!important;height:calc(var(--H) - var(--bT) - var(--bF) - 330px - 250px)!important;margin:0!important}
+html.ipp #ocScroll .och-glow{left:calc(var(--gx) / 2 + 516px - 470px)!important;width:940px!important;height:940px!important;top:calc((var(--bT) + 330px + var(--H) - var(--bF) - 250px) / 2 - 470px)!important;margin:0!important}
+html.ipp #ocHeroHot .fsp.htog{top:calc(var(--H) - var(--bF) - 220px)!important}
+html.ipp #ocHeroHot .fsp.htog:nth-of-type(1){left:calc(var(--gx) / 2 + 516px - 305px)!important}
+html.ipp #ocHeroHot .fsp.htog:nth-of-type(2){left:calc(var(--gx) / 2 + 516px - 17px)!important}
+html.ipp #ocHeroHot .ocb[data-go=ai]{left:auto!important;right:40px;top:calc(var(--bT) - 24px)!important}
+html.ipp #ocHeroHot .ocb[data-whistle]{left:auto!important;right:124px;top:calc(var(--bT) - 24px)!important}
+
+/* ---------- DBCP hero: the season video fills the screen (cropped round the doorbell), words low on the left ---------- */
+html.ipp #dbScroll .dbh-vid{left:0!important;width:1032px!important;height:var(--H)!important}
+html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:var(--H);background:linear-gradient(180deg,rgba(0,0,0,.4) 0,transparent 16%,transparent 48%,rgba(0,0,0,.78) 76%,rgba(0,0,0,.88) 100%)!important}
+html.ipp #dbScroll .dbh-txt{left:calc(var(--gx) + 48px)!important;width:720px!important;top:auto!important;bottom:calc(var(--bF) + 150px);margin:0!important}
+html.ipp #dbScroll .dbh-txt p{max-width:560px}
+html.ipp #dbScroll .dbai{top:calc(var(--bT) - 24px)!important;right:40px!important}
+
+/* ---------- 360 spin: the frame keeps its landscape shape and covers the upright screen (prodB.js sets --spk); the product sits mid-frame ---------- */
+html.ipp :is(#ocScroll,#dbScroll)>.hum{height:calc(var(--H) + 774px)!important;overflow:clip!important}
+html.ipp :is(#ocScroll,#dbScroll)>.hum .hum-st{width:1032px!important;height:var(--H)!important}
+html.ipp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{width:1376px!important;height:1032px!important;margin:0!important;left:0!important;transform-origin:0 0;transform:translate(calc(516px - 688px * var(--spk,1.2)),calc(var(--H) / 2 - 516px * var(--spk,1.2))) scale(var(--spk,1.2))}

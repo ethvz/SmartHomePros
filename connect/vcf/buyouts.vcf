@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Buyouts;;;;
+FN:Vivint – Buyouts
+ORG:Vivint
+item1.TEL;type=VOICE:+18448567254
+item1.X-ABLabel:Call
+item2.TEL;type=CELL:+14352222010
+item2.X-ABLabel:Text only
+item3.EMAIL;type=INTERNET;type=WORK:buyout@vivint.com
+item3.X-ABLabel:Email
+END:VCARD

@@ -1,1 +1,84 @@
 /* iPad portrait (html.ipp) layout: protect group. Every rule is scoped to html.ipp. */
+/* Stage is 1032 wide x var(--H) tall (~1485 on an 11" iPad). #screen sits at left:var(--gx) (-172px here), so each page is pulled back
+   to the stage's left edge (left:-gx, 1032 wide) and children use plain stage coordinates. Top reserve var(--ippT) (section title),
+   bottom reserve var(--ippFoot) (footer). Text keeps its landscape sizes; layouts re-flow into the taller canvas. */
+html.ipp #stage{--ipT:var(--ippT,96px);--ipB:var(--ippFoot,84px);--ipE:cubic-bezier(.22,1,.36,1)}
+html.ipp #p-protection,html.ipp #p-monitoring,html.ipp #p-military,html.ipp #p-playback,html.ipp #p-psa,html.ipp #p-nrg{left:calc(-1*var(--gx,0px))!important;right:auto!important;width:1032px!important}
+
+/* ---------- Protection: warranty list across the width, the "more protection" card fills the rest ---------- */
+html.ipp #p-protection h2{left:72px;top:calc(var(--ipT) + 4px)}
+html.ipp .wlist{left:72px;top:calc(var(--ipT) + 176px);width:888px}
+html.ipp .wlist .row{padding:22px 0 22px 20px;min-height:0}
+html.ipp .ptab{left:72px;width:888px;top:var(--iptT,760px);bottom:auto;height:calc(var(--H) - var(--ipB) - 28px - var(--iptT,760px));min-height:260px;overflow:hidden;
+  background:radial-gradient(90% 110% at 100% 60%,rgba(5,229,175,.16),rgba(5,229,175,0) 62%),#1c1c1c!important;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.ipp .ptab:active{transform:scale(.985)}
+html.ipp .ptab>svg:first-child,html.ipp .cvMorph>svg:first-child{left:64px!important;margin-left:0!important;top:calc(50% - 150px)!important;width:56px;height:64px}
+html.ipp .ptab>svg:nth-of-type(2),html.ipp .cvMorph>svg:nth-of-type(2){left:64px!important;margin-left:0!important;bottom:auto!important;top:calc(50% + 96px)!important;width:64px;height:64px}
+html.ipp .ptab .lbl,html.ipp .cvMorph .lbl{left:64px!important;right:46%!important;top:50%!important;transform:translateY(-50%)!important;white-space:normal!important;font-size:56px!important;line-height:1.05!important;letter-spacing:-1.2px}
+.ipBleed{display:none}
+html.ipp .ptab .ipBleed,html.ipp .cvMorph .ipBleed{display:block;position:absolute;right:-12%;top:50%;width:58%;height:auto;max-width:none;transform:translateY(-50%) rotate(-8deg);pointer-events:none;filter:drop-shadow(0 22px 36px rgba(0,0,0,.55))}
+html.ipp #p-protection.on .ptab .ipBleed{animation:ipPtIn .8s .2s var(--ipE) backwards}
+@keyframes ipPtIn{from{opacity:0;transform:translate3d(80px,-50%,0) rotate(-2deg)}to{opacity:1;transform:translateY(-50%) rotate(-8deg)}}
+/* coverage card: opens over the whole page (title to footer) instead of only the tab's height */
+html.ipp #stage #covTbl.cv2{left:calc(-1*var(--gx,0px))!important;width:1032px!important;height:var(--H)!important}
+html.ipp .cv2 .cv-card{left:40px!important;top:calc(var(--ipT) - 40px)!important;width:952px!important;height:calc(var(--H) - var(--ipT) + 40px - var(--ipB) - 20px)!important;transform:none!important;padding:44px 40px 30px!important}
+html.ipp .cv2 .cv-card .hgrid{grid-template-columns:200px repeat(3,minmax(0,1fr))!important;row-gap:10px}
+html.ipp .cv2 .cv-card .hd{padding:18px 10px 16px}
+html.ipp .cv2 .cv-card .hd b{font-size:15px}
+html.ipp .cv2 .cv-card .hd .pr{font-size:32px}
+html.ipp .cv2 .cv-card .rl{font-size:17px;display:flex;align-items:center}
+html.ipp .cv2 .cv-card .hc{font-size:14px!important;transition:background .25s,border-color .25s}
+html.ipp .cv2 .cv-card .hd{transition:background .3s,transform .12s}
+html.ipp .cv2 .cv-card .hd:active{transform:scale(.97)}
+html.ipp .cv2 .cv-card .fn{font-size:12.5px}
+html.ipp .cv2 .cvx{width:64px;height:64px;border-radius:32px}
+
+/* ---------- Verify a rep: the photo covers the upright screen with the rep centred; copy at the bottom over a scrim ---------- */
+html.ipp #vrBg img{width:100vw;height:100vh;min-height:0;object-position:31% 20%;transform-origin:40% 25%}
+html.ipp #vrBg .sc{background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.72) 26%,rgba(0,0,0,0) 52%),linear-gradient(180deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,0) 14%)}
+html.ipp #p-verify .vr-txt{left:72px;right:72px;width:auto;bottom:calc(var(--ipB) + 64px)}
+html.ipp #p-verify p{max-width:620px}
+
+@media (prefers-reduced-motion:reduce){html.ipp #p-protection.on .ptab .ipBleed{animation:none}}
+
+/* ---------- Monitoring: each landscape slide is re-cut into stacked crops (built by protect.js) ---------- */
+html.ipp #monScroll{left:0!important;width:1032px!important}
+html.ipp #p-monitoring .mtab{width:1032px!important;height:var(--H)!important;margin-left:0!important;overflow:hidden}
+html.ipp #p-monitoring .mtab>img.full,html.ipp #p-monitoring .mtab>.hot{display:none!important}
+.ipx{display:none}
+html.ipp .ipx{display:block;position:absolute;left:0;top:0;width:1032px;height:var(--H);pointer-events:none}
+html.ipp .ipx>.ipg{position:absolute;inset:0}
+html.ipp .ipx>.ipg[hidden]{display:none}
+html.ipp .ipx>.ipg.in{animation:ipFade .35s ease}
+@keyframes ipFade{from{opacity:0}to{opacity:1}}
+html.ipp .ipbg{position:absolute;inset:-60px;background-size:cover;background-position:60% 60%;filter:blur(30px) brightness(.4) saturate(1.1)}
+html.ipp .ipc{position:absolute;overflow:hidden}
+html.ipp .ipc>img{position:absolute;max-width:none;pointer-events:none}
+html.ipp .ipx .hot{pointer-events:auto;border-radius:22px;transition:transform .12s cubic-bezier(.2,.8,.2,1),background .2s}
+html.ipp .ipx .hot:active{transform:scale(.95);background:rgba(255,255,255,.08)}
+/* the slides' text boxes sit on a ragged dark matte: feather those crops (fe) and the sub-tab row's top edge (ft) */
+html.ipp .ipc.fe{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(180deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(180deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-composite:intersect}
+html.ipp .ipc.ft{-webkit-mask-image:linear-gradient(180deg,transparent,#000 16px);mask-image:linear-gradient(180deg,transparent,#000 16px)}
+@keyframes ipBl{from{opacity:0;transform:translate3d(90px,0,0) scale(1.04)}to{opacity:1;transform:none}}
+html.ipp #p-monitoring.on .ipc.bl{animation:ipBl .7s var(--ipE) backwards}
+html.ipp .ipg.in .ipc.bl{animation:ipBl .7s var(--ipE) backwards}
+/* the next-section arrow sits in its own strip between the sub-tab buttons and the footer */
+html.ipp #monScroll>.mtab>.nxa{top:auto!important;bottom:calc(var(--ipB) + 2px)!important;height:52px!important}
+html.ipp #monScroll>.mtab>.nxa i{top:10px!important}
+html.ipp #monScroll>.mtab>.nxa.ov{display:block}
+
+/* ---------- Military: heading + bullets as live text, the hero photo below; the policy sheet still scrolls up over it ---------- */
+html.ipp #p-military>img.full{display:none!important}
+html.ipp .ipc.fade{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 30%);mask-image:linear-gradient(180deg,transparent 0,#000 30%)}
+html.ipp .ipmil{position:absolute;left:72px;right:72px;top:calc(var(--ipT) + 8px);color:#fff;z-index:1}
+html.ipp #p-military .ipmil h2{margin:0;font-size:64px;line-height:1.04;font-weight:600;letter-spacing:-1.6px}
+html.ipp #p-military .ipmil ul{list-style:none;margin:44px 0 0;padding:0;display:flex;flex-direction:column;gap:26px}
+html.ipp #p-military .ipmil li{position:relative;padding-left:58px;font-size:34px;line-height:1.2;color:rgba(255,255,255,.92)}
+html.ipp .ipmil li::before{content:"";position:absolute;left:0;top:6px;width:34px;height:34px;border-radius:50%;background:#d0021b}
+html.ipp #p-military.on .ipmil>*{animation:fadeUp .8s var(--ease) backwards}html.ipp #p-military.on .ipmil>ul{animation-delay:.1s}
+html.ipp #p-military .sheet{margin:var(--H) 40px 0!important;width:952px;box-sizing:border-box;padding:64px 80px 160px}
+html.ipp #p-military .blk{margin-left:24px}
+html.ipp #p-military::after{bottom:calc(var(--ipB) + 20px)}
+@media (prefers-reduced-motion:reduce){
+  html.ipp .ipx>.ipg.in,html.ipp #p-monitoring.on .ipc.bl,html.ipp .ipg.in .ipc.bl{animation:none!important}
+}

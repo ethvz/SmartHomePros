@@ -44,7 +44,7 @@
     for (var i = 0; i < n; i++) { var t = i / n * PI * 2 + PI / n; v.push([cos(t) / 2, sin(t) / 2, -.5], [cos(t) / 2, sin(t) / 2, .5]); a.push(i * 2); b.push(i * 2 + 1); f.push([i * 2, (i * 2 + 2) % (2 * n), (i * 2 + 3) % (2 * n), i * 2 + 1]); }
     f.push(a, b); return { v: v, f: f };
   }
-  var COIN = cyl(12), FACE = (function () { var c = cyl(12); return { v: c.v, f: c.f.slice(-2) }; })();
+  var OCT = cyl(8), COIN = cyl(12), FACE = (function () { var c = cyl(12); return { v: c.v, f: c.f.slice(-2) }; })();
 
   /* ---------------- light ---------------- */
   var L = norm([-.42, .8, .6]);
@@ -130,10 +130,11 @@
       part(leg, 0, -.36, 0, .27, .72, .27, PANTS);
       part(leg, .07, -.78, 0, .44, .2, .3, SHOE);
     });
-    part(root, 0, 1.2, 0, .5, .72, .74, POLO);                       // torso
-    part(root, 0, .88, 0, .52, .1, .76, [34, 40, 56]);                // belt
+    function oct8(m, cx, cy, cz, sx, sy, sz, col) { emit(o, OCT, ch(m, T(cx, cy, cz), Rx(PI / 2), S(sx, sz, sy)), col); }
+    oct8(root, 0, 1.2, 0, .56, .72, .78, POLO);                      // torso
+    oct8(root, 0, .88, 0, .58, .1, .8, [34, 40, 56]);                 // belt
     part(root, .2, 1.52, 0, .14, .1, .4, POLO2);                     // collar
-    part(root, .26, 1.34, .2, .02, .14, .14, LIME);                  // badge
+    part(root, .27, 1.34, .17, .02, .14, .12, LIME);                 // badge
     [1, -1].forEach(function (s) {   // arms: s=1 near side (+z, holds the tablet), s=-1 far side (knocks)
       var fwd = -s * st.armA + (s < 0 ? st.knock * 1.65 : 0) + st.up * (s < 0 ? 2.7 : 1.2), side = .1 + st.up * .4;
       var a = ch(root, T(0, 1.5, s * .46), Rx(-s * side), Rz(fwd));
@@ -144,17 +145,19 @@
       if (s > 0) part(ch(a, T(.205, -.66, .06), Rz(-.15)), 0, 0, 0, .01, .48, .34, [60, 230, 190]);
     });
     var h = ch(root, T(0, 1.6, 0), Rz(st.nod || 0));
-    part(h, .02, .34, 0, .6, .6, .6, SKIN);                         // head
-    part(h, -.04, .67, 0, .66, .14, .66, HAIR);                      // hair
-    part(h, -.27, .48, 0, .14, .34, .66, HAIR);
-    part(h, .33, .43, .13, .04, st.blink ? .03 : .12, .07, [20, 20, 28]);   // eyes
-    part(h, .33, .43, -.13, .04, st.blink ? .03 : .12, .07, [20, 20, 28]);
-    part(h, .34, .3, 0, .1, .1, .1, [236, 160, 120]);                // nose
-    part(h, .33, .17, 0, .03, .05, .22, [150, 50, 50]);              // smile
-    part(h, .32, .24, .22, .02, .07, .1, [255, 150, 150]);           // cheeks
-    part(h, .32, .24, -.22, .02, .07, .1, [255, 150, 150]);
-    part(h, 0, .36, .32, .12, .16, .06, SKIN);                       // ears
-    part(h, 0, .36, -.32, .12, .16, .06, SKIN);
+    oct8(h, 0, .36, 0, .72, .64, .72, SKIN);                         // big round head
+    oct8(h, -.03, .71, 0, .76, .16, .76, HAIR);                      // hair
+    part(h, -.25, .5, 0, .2, .36, .62, HAIR);
+    [.13, -.13].forEach(function (z) {                                // eyes: white + pupil
+      part(h, .325, .44, z, .03, st.blink ? .03 : .17, .12, [255, 255, 255]);
+      if (!st.blink) part(h, .345, .43, z * .92, .03, .11, .07, [24, 24, 34]);
+    });
+    part(h, .36, .3, 0, .12, .11, .11, [236, 160, 120]);             // nose
+    part(h, .33, .17, 0, .03, .05, .24, [150, 50, 50]);              // smile
+    part(h, .32, .25, .23, .02, .07, .1, [255, 150, 150]);           // cheeks
+    part(h, .32, .25, -.23, .02, .07, .1, [255, 150, 150]);
+    part(h, 0, .38, .36, .12, .16, .06, SKIN);                       // ears
+    part(h, 0, .38, -.36, .12, .16, .06, SKIN);
   }
 
   /* ---------------- timeline: one house per cycle ---------------- */
@@ -192,7 +195,7 @@
 
   /* ---------------- frame ---------------- */
   var W = 0, H = 0, dpr = 1, f = 300, cx = 0, cy = 0, cam = [0, 0, 0], R, U, F, ground = 0, now = 0, sk = 1;
-  var CAMY = 3.7, CAMZ = 13.5, TY = 1.3, TZ = -3;
+  var CAMY = 3.1, CAMZ = 13.5, TY = 1.7, TZ = -3;
   function setCam(x) {
     cam = [x, CAMY, CAMZ]; F = norm([0, TY - CAMY, TZ - CAMZ]); R = norm(cross(F, [0, 1, 0])); U = cross(R, F);
   }
@@ -202,8 +205,8 @@
     var top = br ? br.getBoundingClientRect().bottom - hr.top : 90, gy = cr ? cr.getBoundingClientRect().top - hr.top : H * .55;
     setCam(0); cx = 0; cy = 0; f = 1;
     var a = pr([0, 0, 0])[1], b = pr([0, 5.6, FRONT - 2.5])[1];
-    var band = max(80, gy - top), span = min(band * .82, W * .4, 420);
-    f = span / (a - b); cy = (gy - 4) - f * a; cx = W / 2; ground = gy;
+    var band = max(80, gy - top);
+    f = min(band * .8 / (a - b), W * .68, 900);   // ~2.5 houses across a phone, more on wider screens cy = (gy - 4) - f * a; cx = W / 2; ground = gy;
     sk = f / 300;
     var ft = M.round(gy + 6) + 'px'; if (wrap.style.getPropertyValue('--ft') !== ft) wrap.style.setProperty('--ft', ft);
   }
@@ -229,20 +232,21 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     // sky
     var hz = pr([cam[0], 0, -4000])[1];
+    var top0 = M.max(0, hz - 260 * sk);
     var g = ctx.createLinearGradient(0, 0, 0, hz); g.addColorStop(0, '#1c5fd8'); g.addColorStop(.55, '#3d9cff'); g.addColorStop(1, '#a8e6ff');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, hz + 2);
     // clouds: chunky octagon puffs drifting slowly
     for (var i = 0; i < CLOUDS.length; i++) {
-      var c = CLOUDS[i], span = W + 400, x = ((c.x - t * 6 * sk - s.cam * f * .04) % span + span) % span - 200, y = hz * (.12 + c.y * .55), r = 26 * c.s * max(.8, sk);
+      var c = CLOUDS[i], span = W + 400, x = ((c.x - t * 6 * sk - s.cam * f * .04) % span + span) % span - 200, y = hz - (hz - top0) * (.25 + c.y * .6), r = 15 * c.s * sk;
       [[0, 0, 1], [-1.1, .25, .75], [1.05, .2, .8], [.4, -.35, .7]].forEach(function (b) { oct(x + b[0] * r, y + b[1] * r, r * b[2], '#ffffff'); });
       ctx.fillStyle = 'rgba(160,205,245,.9)'; ctx.fillRect(x - r * 1.75, y + r * .45, r * 3.6, r * .32);
     }
     // faceted hills, two layers
     [[.03, 1.25, ['#5fb6a8', '#4e9f98'], 110], [.08, .9, ['#58c96a', '#3fae5a'], 80]].forEach(function (L2, l) {
-      var step = L2[3] * max(.7, sk), off = -(s.cam * f * L2[0]) % (step * 24), x0 = off - step * 2, hs = HILLS[l];
+      var step = L2[3] * sk * .7, off = -(s.cam * f * L2[0]) % (step * 24), x0 = off - step * 2, hs = HILLS[l];
       for (var j = 0; j < 30; j++) {
         var xa = x0 + j * step, xb = xa + step, ha = hs[(j + 240) % 24], hb = hs[(j + 241) % 24];
-        var ya = hz - ha * step * L2[1] * .55, yb = hz - hb * step * L2[1] * .55;
+        var ya = hz - ha * step * L2[1] * .3, yb = hz - hb * step * L2[1] * .3;
         poly([[xa, ya], [xb, yb], [xb, hz + 4], [xa, hz + 4]], yb < ya ? L2[2][0] : L2[2][1]);
       }
     });

@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Customer Care;;;;
+FN:Vivint – Customer Care
+ORG:Vivint
+item1.TEL;type=VOICE:+18002165232
+item1.X-ABLabel:Call
+END:VCARD

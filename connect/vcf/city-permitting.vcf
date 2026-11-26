@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – City Permitting;;;;
+FN:Vivint – City Permitting
+ORG:Vivint
+item1.EMAIL;type=INTERNET;type=WORK:citypermits@vivint.com
+item1.X-ABLabel:Email
+END:VCARD

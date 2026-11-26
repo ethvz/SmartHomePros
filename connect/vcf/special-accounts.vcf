@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Special Accounts;;;;
+FN:Vivint – Special Accounts
+ORG:Vivint
+item1.TEL;type=VOICE:+18012216828
+item1.X-ABLabel:Call
+item2.EMAIL;type=INTERNET;type=WORK:specialaccounts@vivint.com
+item2.X-ABLabel:Email
+END:VCARD

@@ -1,1 +1,100 @@
-/* iPad portrait (html.ipp) layout: brand group. Every rule is scoped to html.ipp. */
+/* iPad portrait (html.ipp) layout: brand group. Every rule is scoped to html.ipp.
+   Sections sit on the 1032-wide upright stage (pulled back from #screen's -172px offset). Text sizes stay as in landscape. */
+
+html.ipp :is(#p-about,#p-gives,#p-awards,#p-install,#p-map,#p-sign,#p-videos,#p-history){
+  left:calc(-1*var(--gx,0px))!important;right:auto!important;width:1032px!important;overflow:hidden!important;
+  --ibB:calc(var(--H,1485px) - var(--ippFoot,84px) - 24px)}
+
+/* ================= ABOUT: same bento, re-stacked: hero across, four stats, then the four story tiles 2 x 2 ================= */
+html.ipp #p-about{--x0:32px;--g:16px;--T:40px;--sh:210px;--sw:230px;--tw:476px;
+  --rest:calc(var(--ibB) - var(--T) - var(--sh) - 3*var(--g));--h1:calc(var(--rest)*.38);--h4:calc((var(--rest) - var(--h1) - var(--g))/2);
+  --y2:calc(var(--T) + var(--h1) + var(--g));--y3:calc(var(--y2) + var(--sh) + var(--g));--y4:calc(var(--y3) + var(--h4) + var(--g))}
+html.ipp #p-about>.ab:nth-child(1){left:var(--x0)!important;top:var(--T)!important;width:968px!important;height:var(--h1)!important}
+html.ipp #p-about>.ab:nth-child(1)>img.bg{object-position:50% 46%}
+html.ipp #p-about>.ab:nth-child(n+2):nth-child(-n+5){top:var(--y2)!important;width:var(--sw)!important;height:var(--sh)!important}
+html.ipp #p-about>.ab:nth-child(2){left:32px!important}
+html.ipp #p-about>.ab:nth-child(3){left:278px!important}
+html.ipp #p-about>.ab:nth-child(4){left:524px!important}
+html.ipp #p-about>.ab:nth-child(5){left:770px!important}
+html.ipp #p-about>.ab:nth-child(n+2):nth-child(-n+5) .bx{left:24px;right:20px;bottom:24px}
+html.ipp #p-about>.ab:nth-child(n+2):nth-child(-n+5) .num{font-size:64px;letter-spacing:-2.2px}
+html.ipp #p-about>.ab:nth-child(n+2):nth-child(-n+5) .arr{right:16px;top:16px}
+html.ipp #p-about>.ab:nth-child(n+6){width:var(--tw)!important;height:var(--h4)!important}
+html.ipp #p-about>.ab:nth-child(6){left:32px!important;top:var(--y3)!important}
+html.ipp #p-about>.ab:nth-child(7){left:524px!important;top:var(--y3)!important}
+html.ipp #p-about>.ab:nth-child(8){left:32px!important;top:var(--y4)!important}
+html.ipp #p-about>.ab:nth-child(9){left:524px!important;top:var(--y4)!important}
+/* recognition: logos three across beside the wide tile */
+html.ipp #p-about .rec2 .logos{grid-template-columns:repeat(3,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;top:150px!important;bottom:30px}
+/* yard sign: the sign on the right half, caption on the left */
+html.ipp #p-about .ab:nth-child(8)>img:not(.bg){left:auto!important;right:28px!important;top:14px!important;width:auto!important;height:calc(var(--h4)*1.02)!important;transform:none!important}
+html.ipp #p-about .ab:nth-child(8) .sc{display:none}
+html.ipp #p-about .ab:nth-child(8) .bx{right:calc(var(--h4)*.86 + 30px)}
+html.ipp #p-about .ab:nth-child(8) .arr{display:none}
+html.ipp #p-about .ab:nth-child(9)>img.bg{object-position:62% 50%!important}
+
+/* ================= GIVES BACK: photo up top (kids + cat), the art's beige panel and stats card below ================= */
+html.ipp #p-gives{background:#000}
+html.ipp #p-gives>img.full{display:none!important}
+html.ipp #p-gives .gvp{display:flex;flex-direction:column;position:absolute;left:0;top:0;width:100%;height:calc(var(--H,1485px) - var(--ippFoot,84px) + 8px);color:#111;background:#edeae4}
+html.ipp .gvp-ph{position:relative;flex:1 1 auto;min-height:300px;overflow:hidden;background:#3a4a55}
+html.ipp .gvp-img{position:absolute;left:0;top:0;background:url(../assets/gives.webp?v=176) 0 0/100% 100% no-repeat;transform-origin:0 0}
+html.ipp #p-gives.on .gvp-img{animation:gvpZ 9s cubic-bezier(.2,.6,.2,1) both}
+@keyframes gvpZ{from{scale:1.06}to{scale:1}}
+html.ipp .gvp-ph::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,0) 18%,rgba(0,0,0,0) 80%,rgba(237,234,228,.9) 100%)}
+html.ipp .gvp-hd{position:relative;flex:none;padding:10px 48px 0;margin-top:-8px}
+html.ipp .gvp-eb{font-size:14px;font-weight:600;letter-spacing:2.6px;text-transform:uppercase;color:#1a1a1a}
+html.ipp .gvp-hd h1{margin:12px 0 0;font-size:92px;line-height:.98;font-weight:600;letter-spacing:-3px;color:#111}
+html.ipp .gvp-heart{position:absolute;right:60px;top:6px;width:150px;height:128px;
+  background:url(../assets/gives.webp?v=176) -466px -59px/1290px auto no-repeat}
+html.ipp .gvp-cd{flex:none;margin:30px 32px 32px;padding:30px 28px 30px;border-radius:32px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.07)}
+html.ipp .gvp-t{text-align:center;font-size:15px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:#1a1a1a}
+html.ipp .gvp-g{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}
+html.ipp .gvp-g div{display:flex;flex-direction:column;align-items:center;text-align:center}
+html.ipp .gvp-g svg{width:36px;height:36px;color:#e8793a}
+html.ipp .gvp-g b{margin-top:10px;font-size:44px;line-height:1.05;font-weight:500;letter-spacing:-1.3px;font-variant-numeric:tabular-nums;color:#151515}
+html.ipp .gvp-g span{margin-top:4px;font-size:18px;color:#222}
+html.ipp #p-gives.on .gvp-hd,html.ipp #p-gives.on .gvp-cd{animation:fadeUp .9s var(--ease,cubic-bezier(.22,1,.36,1)) backwards}
+html.ipp #p-gives.on .gvp-cd{animation-delay:.12s}
+
+/* ================= MAP: counter above a full-width map, both centred in the space ================= */
+html.ipp #p-map{background:radial-gradient(110% 55% at 50% 64%,rgba(5,229,175,.09),rgba(0,0,0,0) 62%),#000}
+html.ipp #p-map .usm{left:16px!important;width:1000px!important;height:620px!important;transform:none!important;
+  top:calc((var(--ibB) + 60px)/2 - 140px)!important}
+html.ipp #p-map .usm-t{top:auto!important;bottom:calc(100% + 40px);left:50%;transform:translateX(-50%)!important;padding:0;background:none;white-space:nowrap}
+html.ipp #p-map .usm-t b{margin:12px 0 8px}
+
+/* ================= AWARDS: the same two-column list on the narrower stage ================= */
+html.ipp #p-awards .scroll{padding:0 32px 150px!important}
+html.ipp #p-awards .aw-c{gap:20px;padding:22px 24px 22px 20px}
+html.ipp #p-awards .aw-b{width:120px;height:120px}
+
+/* ================= YARD SIGN: slide 1 = cut-out sign on a soft green backdrop; slide 2 = the house photo, sign centred ================= */
+html.ipp #p-sign .sgn-sc{left:0!important;width:100%!important;height:100%!important}
+html.ipp #p-sign .sgn-s{height:var(--H,1485px)!important}
+html.ipp #p-sign .sgn-s:first-child>img:first-child{object-position:0 0!important;transform-origin:0 0;transform:scale(2.6);filter:blur(8px) brightness(.85) saturate(1.1)}
+html.ipp #p-sign .sgn-s>img.sgn-pp{display:block;inset:auto!important;top:60px!important;left:96px!important;width:840px!important;
+  height:calc(var(--ibB) - 40px)!important;object-fit:contain!important;object-position:50% 0!important;filter:drop-shadow(0 30px 40px rgba(0,0,0,.45))}
+html.ipp #p-sign.on .sgn-pp{animation:sgnUp .9s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes sgnUp{from{opacity:0;transform:translateY(60px)}}
+html.ipp #p-sign .sgn-s:nth-child(2) img{object-position:50% 50%!important}
+html.ipp #p-sign .sgn-s:nth-child(2)::after{content:'';position:absolute;left:0;right:0;top:0;height:16%;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,0));pointer-events:none}
+
+/* ================= VIDEOS: featured film across the top, then three across ================= */
+html.ipp #p-videos .vl2{padding:56px 32px 150px}
+html.ipp #p-videos .vl2-g{grid-template-columns:repeat(3,1fr);gap:16px}
+html.ipp #p-videos .vl2-c{aspect-ratio:4/5}
+html.ipp #p-videos .vl2-c.big{grid-column:1/-1;grid-row:auto;aspect-ratio:16/9}
+
+/* ================= HISTORY: the wheel at landscape size, centred; the arc runs off both edges ================= */
+html.ipp #p-history>.bg,html.ipp #p-history>.sc{left:0!important;width:100%!important}
+html.ipp #p-history>.bg{object-position:50% 50%}
+html.ipp #p-history .hy2-h{left:72px;top:118px}
+html.ipp #p-history .hyx{transform:scale(1)!important;left:calc(516px - 733px)!important;
+  top:calc((var(--ibB) + 260px)/2 - 683px)!important}
+
+/* ================= INSTALL: upright crop on the installer, copy on a bottom scrim ================= */
+html.ipp #p-install .lh-media,html.ipp #p-install .lh-scrim{left:0!important;width:100%!important;height:100%!important}
+html.ipp #p-install .lh-ph{width:100%!important;height:100%!important;object-position:58% 40%!important}
+html.ipp #p-install .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.35) 0,rgba(0,0,0,0) 14%,rgba(0,0,0,0) 48%,rgba(0,0,0,.6) 66%,rgba(0,0,0,.88) 100%)!important}
+html.ipp #p-install .lh-txt{left:64px;right:64px;width:auto;bottom:calc(var(--ippFoot,84px) + 72px)}

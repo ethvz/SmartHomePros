@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Collections;;;;
+FN:Vivint – Collections
+ORG:Vivint
+item1.TEL;type=VOICE:+18883469202
+item1.X-ABLabel:Call
+END:VCARD

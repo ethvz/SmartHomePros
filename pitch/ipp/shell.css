@@ -1,1 +1,44 @@
-/* iPad portrait (html.ipp) layout: shell group. Every rule is scoped to html.ipp. */
+/* iPad portrait (html.ipp) layout: shell group. Every rule is scoped to html.ipp.
+   Stage is 1032 wide x var(--H) tall (~1485 on 820x1180). #screen stays at left:var(--gx) (-172px); pages pull back with
+   left:calc(-1*var(--gx)). Shared vars on #stage: --ippT (top area kept clear for #gTitle, owned here), --ippFoot (owned by nav). */
+
+html.ipp #stage{--ippT:96px}
+
+/* ---------- section title: on the 1032 stage, not off the left edge ---------- */
+html.ipp #gTitle{left:calc(40px - var(--gx,0px))!important;width:952px!important}
+
+/* ================= HOME: All Products grid / category panes / 3D Home ================= */
+/* panes as tall as the screen minus the footer (tiles end at H - ippFoot; the pane keeps its 14px bottom padding) */
+html.ipp #homeTrack,html.ipp #p-home .hpane{height:calc(var(--H,1485px) - var(--ippFoot,84px) + 14px)!important}
+/* All grid: tiles are placed by ipp/shell.js (two-column portrait grid built like the landscape one) */
+html.ipp #allTiles .ht.abs img.cp{height:60%}
+html.ipp #allTiles .ht .cl{font-size:15px!important}
+
+/* category panes: the rows dissolve into one 12-column grid so tiles keep landscape proportions on the taller screen */
+html.ipp .hcat{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px!important;
+  grid-auto-flow:row dense;align-content:stretch}
+html.ipp .hcat .hrow{display:contents!important}
+html.ipp .hcat .ht{min-height:0;flex:none!important}
+html.ipp .hcat .ht[data-k]{grid-column:span 6}
+/* Sensors & Security: hub | keypad | app, then the nine sensors three across */
+html.ipp .hcat[data-c=sensors]{grid-template-rows:1.3fr 1fr 1fr 1fr}
+html.ipp .hcat[data-c=sensors] .ht[data-k]{grid-column:span 4}
+html.ipp .hcat[data-c=sensors] .ht[data-k=shp2]{grid-column:span 6}
+html.ipp .hcat[data-c=sensors] .ht[data-k=keypad],html.ipp .hcat[data-c=sensors] .ht[data-k=app]{grid-column:span 3}
+/* Smart Home: hub across the top, then two pairs */
+html.ipp .hcat[data-c=smart]{grid-template-rows:1.15fr 1fr 1fr}
+html.ipp .hcat[data-c=smart] .ht[data-k=shp2]{grid-column:1/-1}
+/* Cameras: hub across the top, outdoor pair, then doorbell + indoor */
+html.ipp .hcat[data-c=cams]{grid-template-rows:.95fr 1fr 1fr}
+html.ipp .hcat[data-c=cams] .ht[data-k=shp2]{grid-column:1/-1;grid-row:1}
+html.ipp .hcat[data-c=cams] .ht[data-k=ocp]{grid-row:2;grid-column:1/span 6}
+html.ipp .hcat[data-c=cams] .ht[data-k=ocspot]{grid-row:2;grid-column:7/span 6}
+html.ipp .hcat[data-c=cams] .ht[data-k=dbcp]{grid-row:3;grid-column:1/span 6}
+html.ipp .hcat[data-c=cams] .ht[data-k=icp]{grid-row:3;grid-column:7/span 6}
+html.ipp .hcat .ht .cl{font-size:16px}
+
+/* 3D Home: the viewer fills the page above the footer, same as landscape */
+html.ipp #p-home #tour3d{left:0!important;right:0!important;width:auto!important}
+
+/* ================= product switcher sheet: a little taller so the cards breathe on the upright screen ================= */
+html.ipp #psheet .pan{left:16px!important;right:16px!important}
