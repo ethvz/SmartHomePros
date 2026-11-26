@@ -1250,6 +1250,17 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
   for(const sh of [s,bl]){ const geo = new THREE.ExtrudeGeometry(sh,{depth:.0016,bevelEnabled:true,bevelThickness:.0003,bevelSize:.0003,bevelSegments:2,curveSegments:24}); geo.rotateX(-Math.PI/2);
     const mm = new THREE.Mesh(geo, mat); mm.castShadow = true; g.add(mm); }
   return g; }
+/* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
+   floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
+   Bump TOURV when a module changes (offline copies and browser caches key on it). */
+const TOURV = 21;
+const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
+  rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
+  photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
+H.models = MODELS;                                     // so a product can build on another (the Spotlight Pro is the Outdoor Camera Pro plus its light bar)
+{ const keys = ['ocp','ocspot','dbcp','icp','lock','garage','therm','plug','keypad','motion','glass','window','water','smokeco','fire','pendant','fob','chime','ysign'];
+  const bust = /[?&]studio=/.test(location.search) ? Date.now() : TOURV;
+  await Promise.all(keys.map(k => import('./prod/' + k + '.js?v=' + bust).then(m => { const old = MODELS[k]; MODELS[k] = () => { try { return m.default(H); } catch(e){ console.warn('prod/'+k, e); if(/[?&]studio=/.test(location.search)) throw e; return old(); } }; }).catch(e => console.warn('prod/'+k, e)))); }
 /* soft fill light that follows the camera to the focused product, like a photographer's key light */
 const prodLight = new THREE.SpotLight(0xffffff, 0, 3.2, .42, .85, 1.2);
 scene.add(prodLight, prodLight.target);
