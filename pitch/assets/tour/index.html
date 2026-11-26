@@ -365,7 +365,8 @@ const SS = (k, v) => { try{ if(v === undefined) return sessionStorage.getItem(k)
 const LITE = SS('tourLite') === '1', TOUCH = navigator.maxTouchPoints > 1;
 canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); const n = +(SS('tourLost') || 0) + 1; SS('tourLost', String(n)); if(n >= 2) SS('tourLite', '1');
   document.documentElement.style.background = '#0d1014'; setTimeout(() => location.reload(), 350); }, false);
-const renderer = new THREE.WebGLRenderer({canvas, antialias:!LITE, powerPreference:'high-performance'});
+const SMALL = TOUCH && Math.min(screen.width, screen.height) < 500;   // phone: no MSAA buffers (its screen is already dense)
+const renderer = new THREE.WebGLRenderer({canvas, antialias:!LITE && !SMALL, powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, /still/.test(location.search) || LITE ? 1 : TOUCH ? 1.4 : 1.6));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -1396,7 +1397,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 25;
+const TOURV = 26;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1772,7 +1773,23 @@ window.__booted = true; clearTimeout(window.__failT);
 if(window.parent!==window) parent.postMessage({fpTour:'ready'},'*');
 /* compile every shader before the first frame, off the main thread where the browser can (KHR_parallel_shader_compile):
    drawing the first frame used to compile ~120 programs in one go and freeze the page for many seconds */
-Promise.all([assetsReady, ...MODEL_P]).then(() => Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))])).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }, 120));
+/* phones (and the light mode): shrink every big texture before its first upload. A phone's Safari has far less memory than an
+   iPad's, and the 2048 lightmaps / product canvases alone were ~120 MB on the GPU plus a decoded copy each. Static textures only. */
+const PHONE = SMALL;
+function capTextures(max0, maxLight = max0){ const seen = new Set();
+  scene.traverse(o => { const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+    for(const m of ms) for(const k in m){ const t = m[k]; if(!t || !t.isTexture || seen.has(t)) continue; seen.add(t);
+      const im = t.image; if(!im || t.isDataTexture || t.isCubeTexture || t.isCompressedTexture || t.isRenderTargetTexture || t.isVideoTexture) continue;
+      const max = (k === 'lightMap' || k === 'aoMap') ? maxLight : max0, w = im.width || 0, h = im.height || 0; if(Math.max(w, h) <= max) continue;
+      const f = max / Math.max(w, h), small = () => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w*f)); c.height = Math.max(1, Math.round(h*f));
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c; };
+      try {
+        if(im instanceof HTMLCanvasElement){   // product canvases may redraw later (fonts, states): shrink a fresh copy at each upload
+          let ver = -1, cache = null; Object.defineProperty(t, 'image', { configurable:true, set(){},
+            get(){ if(ver !== t.source.version){ ver = t.source.version; cache = small(); } return cache; } });
+        } else { const c = small(); if(im.close) im.close(); t.image = c; }   // loaded images never change: swap once, free the big one
+        t.needsUpdate = true; } catch(e){} } }); }
+Promise.all([assetsReady, ...MODEL_P]).then(() => { if(PHONE) capTextures(512, 1024); else if(LITE) capTextures(1024); }).then(() => Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))])).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }, 120));
 
 /* offline lighting bake: export the static house (no products, no overlays) plus its lights for Blender */
 if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(async () => {
