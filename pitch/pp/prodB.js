@@ -168,7 +168,8 @@
   }
 
   /* ---------- focal points: every hero gallery photo (and the DBCP hero video) is cropped so the product sits in the
-     horizontal centre of the upright screen. FOC = the product's x centre as a fraction of each source picture ---------- */
+     horizontal centre of the upright screen. FOC = the product x centre as a fraction of each source picture (for close-ups wider
+     than the screen, the camera head, so the face is whole and the mount runs off the edge) ---------- */
   const FOC = { ocp: [.59, .75, .33, .70, .24, .66, .335], dbcp: [.585, .67, .60, .69, .60, .41, .71] };
   function focusOne(el, f, nw, nh) {
     if (!isPP()) { if (el.style.objectPosition) el.style.removeProperty('object-position'); return; }
@@ -207,7 +208,9 @@
       sec.insertBefore(im, sec.firstChild); });
   }
 
-  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); arloTwin(); galFocus(); wellFit(); return; } aiLayout(); cmLayout(); featLayout(); histFit(); arloTwin(); galFocus(); wellFit(); }
+  function spinFit() { const b = Q('#dbScroll'); if (!b) return; const v = (avail() / 1032).toFixed(4); if (b.style.getPropertyValue('--spk') !== v) b.style.setProperty('--spk', v); }
+
+  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); arloTwin(); galFocus(); wellFit(); return; } aiLayout(); cmLayout(); featLayout(); spinFit(); histFit(); arloTwin(); galFocus(); wellFit(); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ppo) return; el.__ppo = 1;
     /* the wells only have a size once their page is shown: re-fit then (writes only to the images, never to the observed page) */
     new MutationObserver(() => { if (isPP() && el.classList.contains('on')) requestAnimationFrame(wellFit); }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }

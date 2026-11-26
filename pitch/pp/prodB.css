@@ -367,3 +367,8 @@ html.pp #ocScroll .ocpk .dbwell{width:108px!important}
 html.pp #ocScroll .ocpk .dbcard{gap:8px!important}
 /* hero, w/ Spotlight renders: their artwork starts at the very top and right, so nudge them down-left to clear the subtitle */
 html.pp #ocScroll .och-prod img[data-k^=s]{transform:translate(-64px,48px) scale(.93);transform-origin:50% 0}
+/* 360 spin, DBCP: its frames have a light grey studio background, so letterboxing left grey bands floating in black.
+   Cover the screen instead (prodB.js sets --spk = screen height / frame height); the doorbell sits in the middle of every frame */
+html.pp #dbScroll>.hum .hum-st canvas{transform:translate(calc((600px - 1376px * var(--spk,.62)) / 2),0) scale(var(--spk,.62))}
+/* OCP: black studio frames, kept whole; their cut top / bottom edges fade into the black instead of ending in a hard line */
+html.pp #ocScroll>.hum .hum-st canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 9%,#000 91%,transparent);mask-image:linear-gradient(180deg,transparent 0,#000 9%,#000 91%,transparent)}

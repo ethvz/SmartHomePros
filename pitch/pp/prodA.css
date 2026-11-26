@@ -15,7 +15,13 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa i{top:24px}
 html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.lh-media,.lh-scrim,.hgl,.ochx,.ich-vid,.hbh-vid,.ich-scrim,.ich-sc,.hbh-scrim,.hbh-sc){left:0!important;right:auto!important;width:600px!important;height:var(--H)!important}
 html.pp :is(#prScroll,#thScroll) .lh-ph{width:100%!important;height:100%!important;object-fit:cover}
 html.pp :is(#prScroll,#thScroll) .lh-media .smk-ghost{object-fit:cover}
-html.pp :is(#prScroll,#thScroll) .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.45) 0,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 46%,rgba(0,0,0,.86) 100%)!important}
+html.pp :is(#prScroll,#thScroll) .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.6) 0,rgba(0,0,0,.25) 9%,rgba(0,0,0,0) 18%,rgba(0,0,0,0) 46%,rgba(0,0,0,.86) 100%)!important}
+html.pp :is(#prScroll,#thScroll) .lh-media{background:#000}
+/* light lock / chime heroes: the copy sits on the dark fade under the photo, so it is white like the others */
+html.pp #prScroll .lhero .lh-txt :is(h1,p){color:#fff!important;text-shadow:0 2px 24px rgba(0,0,0,.45)!important}
+html.pp #prScroll .lhero .lh-txt p{color:rgba(255,255,255,.86)!important}
+html.pp #prScroll .lhero .nxa{filter:none!important}
+html.pp #prScroll .lhero:has(img[src*="chime3"]) .lh-txt{top:auto!important;bottom:190px!important;left:36px!important;width:auto!important}
 html.pp :is(#prScroll,#thScroll) .lhero .lh-txt{left:36px!important;right:36px!important;top:auto!important;bottom:190px!important;width:auto!important}
 html.pp :is(#prScroll,#thScroll) .lhero .lh-txt h1{font-size:64px!important;letter-spacing:-1.8px;line-height:1}
 html.pp :is(#prScroll,#thScroll) .lhero .lh-txt p{font-size:24px!important;margin-top:18px;max-width:none}
@@ -321,3 +327,8 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa:active i{transform:scale(.85)}
 @media (prefers-reduced-motion:reduce){
   html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.fsp-pane .fsp-im,.sns-c img,.smk-c img){transform:none!important;transition:opacity .3s ease!important}
 }
+/* Door & Window hero slides: white headline on a soft top shade (the recessed photo is a dark door) */
+html.pp #prScroll .strip.wide>.dws::before{content:"";position:absolute;left:0;right:0;top:0;height:42%;background:linear-gradient(180deg,rgba(0,0,0,.62) 0,rgba(0,0,0,.3) 55%,rgba(0,0,0,0) 100%);z-index:1;pointer-events:none}
+html.pp #prScroll .dws-t{z-index:2}
+html.pp #prScroll .dws-t h1{color:#fff!important;text-shadow:0 2px 24px rgba(0,0,0,.4)}
+html.pp #prScroll .strip.wide>.dws{background:#000}

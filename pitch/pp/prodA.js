@@ -101,27 +101,32 @@
 
   /* ---- focal points: landscape photos cropped to the tall screen keep the product in the horizontal centre.
      fx = where the product sits across the source image (0..1); the object-position is worked out from the box and image shapes. ---- */
-  const FOC={'ph/motion':.57,'ph/glass':.26,'ph/water':.52,'ph/smoke':.70,'ph/pendant':.30,'ph/fob':.38,'ph/keypad':.44,'ph/lock3':.70,
+  const setI=(el,p,v)=>{ if(el.style.getPropertyValue(p)!==v||el.style.getPropertyPriority(p)!=='important') el.style.setProperty(p,v,'important'); };
+  const FOC={'ph/motion':.57,'ph/glass':.26,'ph/water':.60,'ph/smoke':.70,'ph/pendant':.30,'ph/fob':.38,'ph/keypad':.33,'ph/lock3':.70,
     'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.30,'ph/firefighter':.55,'ph/therm2':.62,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.52,
     'gal/lock_0':.40,'gal/lock_1':.27,'gal/lock_2':.27,'gal/lock_3':.53,'gal/lock_4':.40,'gal/lock_5':.55,'gal/lock_6':.52,'gal/lock_7':.52,'gal/lock_8':.28,
     'gal/therm_0':.50,'gal/therm_1':.80,'gal/therm_2':.42,'gal/therm_3':.57,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
-    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.80,'gal/hub_4':.70,'gal/hub_5':.62,'gal/hub_6':.62,'gal/hub_7':.63,'gal/hub_8':.63,
+    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.80,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
     'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.68,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
+  const ZH={'ph/plug3':.72,'ph/firefighter':.74,'ph/water':.8,'ph/lock3':.72,'ph/chime3':.72,'ph/dws_surf':.76,'ph/dws_rec':.76,'gal/hub_0':.64,'gal/hub_5':.74};
   const focKey=el=>{ const u=el.getAttribute('src')||''; const m=u.match(/assets\/((?:ph|gal|p)\/[\w]+)\./); return m&&m[1]; };
   function focal(){ const pp=isPP();
     BOX.forEach(q=>{ const b=$(q); if(!b) return;
       b.querySelectorAll('img,video').forEach(el=>{ const k=focKey(el), fx=k&&FOC[k];
+        if((!pp||fx==null)&&el.dataset.ppz){ ['height','-webkit-mask-image','mask-image'].forEach(p=>el.style.removeProperty(p)); delete el.dataset.ppz; }
         if(!pp||fx==null){ if(el.dataset.ppf){ el.style.removeProperty('object-position'); if(el.dataset.ppf!=='-') el.style.objectPosition=el.dataset.ppf; delete el.dataset.ppf; } return; }
         const nw=el.naturalWidth||el.videoWidth, nh=el.naturalHeight||el.videoHeight, bw=el.offsetWidth, bh=el.offsetHeight;
         if(!nw||!bw||!bh){ if(!el.__ppfl){ el.__ppfl=1; el.addEventListener(el.tagName==='VIDEO'?'loadedmetadata':'load',later,{once:true}); } return; }
-        const vis=(bw/bh)/(nw/nh); if(vis>=1) return;   /* the box is wider than the photo: nothing is cropped sideways */
+        /* products wider than the cropped slice (or tall ones the copy would cover): a shorter photo that fades into the black under the copy */
+        const zh=ZH[k]; if(zh){ setI(el,'height',(zh*100)+'%'); const mk='linear-gradient(180deg,#000 72%,transparent 100%)'; setI(el,'-webkit-mask-image',mk); setI(el,'mask-image',mk); el.dataset.ppz=1; }
+        else if(el.dataset.ppz){ ['height','-webkit-mask-image','mask-image'].forEach(p=>el.style.removeProperty(p)); delete el.dataset.ppz; }
+        const vis=(el.offsetWidth/el.offsetHeight)/(nw/nh); if(vis>=1) return;   /* the box is wider than the photo: nothing is cropped sideways */
         const x=Math.max(0,Math.min(1,(fx-vis/2)/(1-vis))), v=(x*100).toFixed(1)+'% 50%';
         if(!el.dataset.ppf) el.dataset.ppf=el.style.objectPosition||'-';
         if(el.style.getPropertyValue('object-position')!==v||el.style.getPropertyPriority('object-position')!=='important') el.style.setProperty('object-position',v,'important'); }); }); }
 
   /* ---- Hardware | Specs panes: the copy sits at the bottom (above the pill) and the product render fills the room above it,
      oversized and cut by the screen edge: Hardware bleeds off the right, Specs off the left. ---- */
-  const setI=(el,p,v)=>{ if(el.style.getPropertyValue(p)!==v) el.style.setProperty(p,v,'important'); };
   function bleed(){ const pp=isPP();
     BOX.forEach(q=>{ const b=$(q); if(!b) return;
       b.querySelectorAll('.strip.fsx>.fsp-pane').forEach((pn,pi)=>{ const ims=[...pn.querySelectorAll(':scope>img.fsp-im')]; if(!ims.length) return;

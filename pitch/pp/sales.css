@@ -130,3 +130,50 @@ html.pp #p-social .hot:nth-of-type(2){background-position:calc(137.5px - var(--c
 html.pp #p-social .hot:nth-of-type(3){background-position:calc(137.5px - var(--chh) * 1.2329) calc(var(--chh) * -0.1886)}
 html.pp #p-social .hot:nth-of-type(4){background-position:calc(137.5px - var(--chh) * 1.6929) calc(var(--chh) * -0.1886)}
 @media (prefers-reduced-motion:reduce){html.pp #p-social .hot:active,html.pp #p-reviews .rv2-sc .rc:active{transform:none}}
+
+/* ===== Pricing Options (sub-page of Packages, menu "Pricing Options"): three stacked kit cards ===== */
+/* title + Smart Hub and app peeking in from the card's top-right edge; the three prices in a row; "best option if" as a strip */
+html.pp #p-pricing{left:50%!important;right:auto!important;width:600px!important;margin-left:-300px;
+  --sF:calc(var(--ppFoot,76px) + 12px);--sT:max(96px,calc(var(--brsat,0px) + 40px));--pA:calc(var(--H) - var(--sT) - var(--sF));--kH:calc((var(--pA) - 28px) / 3);--kH2:calc((var(--pA) - 14px) / 2)}
+html.pp #p-pricing .kit{left:16px!important;width:568px!important;height:var(--kH)!important;overflow:hidden;box-sizing:border-box}
+html.pp #p-pricing .kit:nth-child(1){top:var(--sT)!important}
+html.pp #p-pricing .kit:nth-child(2){top:calc(var(--sT) + var(--kH) + 14px)!important}
+html.pp #p-pricing .kit:nth-child(3){top:calc(var(--sT) + var(--kH) * 2 + 28px)!important}
+html.pp #p-pricing.no4 .kit{height:var(--kH2)!important}
+html.pp #p-pricing.no4 .kit:nth-child(2){top:calc(var(--sT) + var(--kH2) + 14px)!important}
+html.pp #p-pricing.no4 .kit:nth-child(3){top:calc(var(--sT) + var(--kH2) * 2 + 28px)!important}
+html.pp #p-pricing .kit .kv,html.pp #p-pricing.no4 .kit .kv{left:auto!important;right:-110px;top:10px!important;width:340px;height:170px;transform:scale(.6)!important;transform-origin:100% 0!important}
+html.pp #p-pricing .kit .kv .kvd,html.pp #p-pricing .kit .kv .ka{display:none!important}
+html.pp #p-pricing .kit h4,html.pp #p-pricing.no4 .kit h4{left:24px!important;top:24px!important;font-size:31px;letter-spacing:-.5px}
+html.pp #p-pricing .kit h4 em{display:block;margin:4px 0 0;font-size:15px}
+html.pp #p-pricing .kit .ln,html.pp #p-pricing.no4 .kit .ln{left:24px!important;right:24px!important;top:112px!important}
+html.pp #p-pricing .kc,html.pp #p-pricing.no4 .kc{top:124px!important;width:176px}
+html.pp #p-pricing .kc:nth-child(4) .s .qc{display:none}
+html.pp #p-pricing .kc:nth-child(4){left:24px!important}html.pp #p-pricing .kc:nth-child(5){left:210px!important}html.pp #p-pricing .kc:nth-child(6){left:388px!important}
+html.pp #p-pricing .kc .k{font-size:14px;line-height:1.2}
+html.pp #p-pricing .kc .v{font-size:28px;margin-top:6px;letter-spacing:-.5px;white-space:nowrap}
+html.pp #p-pricing .kc .v+.v{margin-top:4px!important}
+html.pp #p-pricing .kc .s{font-size:12.5px;line-height:1.35}
+html.pp #p-pricing .kc .s .qc{font-size:12.5px}
+html.pp #p-pricing .kc .s[style]{margin-top:6px!important}
+html.pp #p-pricing .kbf,html.pp #p-pricing.no4 .kbf{left:14px;right:14px;top:auto;bottom:14px;width:auto;padding:14px 18px;border-radius:18px;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:6px 18px}
+html.pp #p-pricing .kbf-h{flex:none;font-size:11.5px;margin:0;align-self:center}
+html.pp #p-pricing .kbf-i{font-size:15px;align-items:center;gap:6px}
+html.pp #p-pricing .kbf-i svg{width:16px;height:16px;margin:0}
+html.pp #p-pricing.no4 .kc{top:150px!important}html.pp #p-pricing.no4 .kit .ln{top:134px!important}
+html.pp #p-pricing.no4 .kc:nth-child(4) .s .qc{display:block}
+html.pp #p-pricing.no4 .kit .kv{transform:scale(.75)!important;right:-130px}
+html.pp #p-pricing.no4 .kbf-i{font-size:17px}
+html.pp #p-pricing.no4 .kbf{flex-direction:column;flex-wrap:nowrap;gap:10px;padding:18px 22px}html.pp #p-pricing.no4 .kbf-h{align-self:flex-start}
+html.pp #p-pricing .kit .kv img.kh{filter:drop-shadow(0 10px 20px rgba(0,0,0,.5))}
+@keyframes ppKvIn{from{opacity:0;transform:translate3d(40px,0,0)}to{opacity:1;transform:none}}
+html.pp #p-pricing.on .kit .kv>img{animation:ppKvIn .7s .15s cubic-bezier(.22,1,.36,1) backwards}
+@media (min-aspect-ratio:1/2){
+  html.pp #p-pricing .kit h4{font-size:27px;top:18px!important}
+  html.pp #p-pricing .kit .ln{top:84px!important}html.pp #p-pricing .kc{top:94px!important}
+  html.pp #p-pricing .kit .kv{transform:scale(.46)!important;top:6px!important;right:-78px}
+  html.pp #p-pricing .kc .v{font-size:25px}html.pp #p-pricing .kc .k{font-size:13px}
+  html.pp #p-pricing .kc .s[style],html.pp #p-pricing .kc .s .qc{display:none}
+  html.pp #p-pricing .kbf{padding:10px 14px;bottom:10px}html.pp #p-pricing .kbf-h{display:none}html.pp #p-pricing .kbf-i{font-size:13.5px}
+}
+@media (prefers-reduced-motion:reduce){html.pp #p-pricing.on .kit .kv>img{animation:none}}
