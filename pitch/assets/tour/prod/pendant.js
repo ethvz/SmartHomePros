@@ -129,6 +129,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1120, 400); deboss(x, img, 560, 200 - 0, 9.6 * 80, 5,
     'rgba(40,40,40,.42)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
 
+  if (/[?&]bare/.test(location.search)) return g;
   /* hook on the wall */
   const blk = new THREE.MeshPhysicalMaterial({ color: 0x161718, roughness: .42, metalness: .5, clearcoat: .3, clearcoatRoughness: .4 });
   add(g, rslab(.016, .034, .004, .003, .0012, blk), 0, 0, .002);

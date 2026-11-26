@@ -118,7 +118,7 @@ export default H => { const { THREE, G, add, rbox, photoTex } = H;
     for (let i = 0; i < N * N; i++) { const v = 128 + (Math.random() - .5) * 90; d.data.set([v, v, v, 255], i * 4); } x.putImageData(d, 0, 0);
     x.filter = 'blur(2px)'; x.drawImage(c, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 5); return t; })();
   const art = photoTex('ysign');
-  const face = new THREE.MeshPhysicalMaterial({ map: art, roughness: .4, clearcoat: .35, clearcoatRoughness: .35, bumpMap: peel, bumpScale: .6 });
+  const face = new THREE.MeshStandardMaterial({ map: art, color: 0xe4e4e4, roughness: .5, envMapIntensity: .5, bumpMap: peel, bumpScale: .6 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
   return g;

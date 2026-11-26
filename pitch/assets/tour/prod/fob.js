@@ -100,8 +100,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001;
 
   /* 1-3. shell */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0xcacac8, roughness: .55, clearcoat: .05, clearcoatRoughness: .6, sheen: .2, sheenRoughness: .8, sheenColor: 0xffffff });
-  const shell = lineMat(grey, [{ ax: 'y', at: -10.3, B: 0x5a5b5d, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0xbdbdbb, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
+  const shell = lineMat(grey, [{ ax: 'y', at: -10.3, B: 0x505153, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
     { ax: 'z', at: 3, w: .25, col: 0x303132, k: .6 }]);
   const pocketP = []; pocketP.push([0, 9.6], [0, 10.5]); for (let i = 1; i <= 6; i++) { const t = i / 6 * Math.PI / 2; pocketP.push([.5 * (1 - Math.cos(t)), 10.5 + .5 * Math.sin(t)]); }
   const keysY = [20.1, 10.2, .2];
@@ -111,7 +111,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   add(F, solid(loops, shell));
 
   /* 4-6. keys (recessed 0.3 mm), legends, red dots */
-  const keyM = new THREE.MeshPhysicalMaterial({ color: 0x555658, roughness: .48, clearcoat: .08, clearcoatRoughness: .5, sheen: .2, sheenColor: 0xffffff });
+  const keyM = new THREE.MeshPhysicalMaterial({ color: 0x4c4d4f, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
   const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#b5b6b7';
     x.font = '400 146px "Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -125,6 +125,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 640, 240, 12.8 * 80, 5.5,
     'rgba(40,40,40,.45)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
 
+  if (/[?&]bare/.test(location.search)) return g;
   /* 9. split ring (two coils of flat steel wire) through the slot and under the ring end, leaning over; two house keys on it */
   const steel = new THREE.MeshPhysicalMaterial({ color: 0xcfd1d3, roughness: .2, metalness: 1, clearcoat: .3 });
   const steelD = steel.clone(); steelD.side = THREE.DoubleSide;
