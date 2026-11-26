@@ -2,8 +2,8 @@
 // Built in millimetres inside a 0.001-scaled group. Outline = rectangle with crisp 45 deg corner chamfers (3 mm legs) through the full
 // depth and a shallow 9 x 0.5 mm notch centred in the top edge (photo). Rear solid + plate body share the outline; the front is ONE
 // height-field surface over that outline (so every change is flush): 2 mm side/edge roll-offs running unbroken round the chamfers, the
-// face at z 24.6; inside the side bands (4.4 mm in) a top strip set back 0.8 mm through a soft step 3.1 mm below the top (the photo's
-// highlight line), and a rib 7.4-10.1 mm below the top: a low lip and an up-facing ramp (the photo's bright band). One countersunk pinhole.
+// face at z 24.6; inside the side bands (4.4 mm in, ending in straight 45 deg ramps) a top strip set back through a steep rounded step
+// 3.4 mm below the top (the highlight line), and a rib 7.4-10.1 mm below the top: a low lip and an up-facing ramp (the photo's bright band). One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
@@ -33,15 +33,19 @@ export default H => {
       const top = y1 > Y - 1 && y2 > Y - 1, bs = top ? .8 : BS, bt = top ? .6 : BT;
       if (!top) dside = Math.min(dside, dd);
       if (dd < bs) { const q = (bs - dd) / bs; drop = Math.max(drop, bt * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1)); } }
-    // the top detail sits INSIDE the side bands (4.4 mm in, following the chamfers), so the bands and chamfers run unbroken to the top.
-    // Rib (photo's bright band, 7.4-10.1 mm below the top): a low rounded lip at its foot, then a ~25 deg up-facing ramp back 0.7 mm; above
-    // it the face curves gently back, then a soft step 3.1 mm below the top sets the strip back a further 0.5 mm (the step faces up: the
-    // photo's highlight line) and the strip keeps tipping back to the top edge.
-    const w = ss(4.4 - .6, 4.4 + .6, dside), t = y - (Y - 7.4);
-    let P = .06 * ss(Y - 10.4, Y - 9.6, y) - .7 * ss(Y - 9.7, Y - 7.4, y);
+    // the top detail sits INSIDE the side bands: it ends at x = +-(X - 4.4) with a straight 45 deg ramp (no plan radius, no blend into the
+    // chamfer), so the side bands and corner chamfers run at full face height to the top round.
+    // Rib (photo's bright band, 7.4-10.1 mm below the top): a low lip at its foot, then a ~25 deg up-facing ramp back 0.7 mm; above it the
+    // face curves gently back, then a steep rounded step 3.4 mm below the top sets the strip back a further 0.55 mm; the step faces
+    // the light and is the photo's highlight line, and the strip keeps tipping back to the top edge.
+    const t = y - (Y - 7.4), xin = (X - 4.4) - Math.abs(x);
+    let P = -.7 * ss(Y - 9.7, Y - 7.4, y);
     if (t > 0) P -= t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3);
-    P -= .5 * ss(Y - 3.1 - .22, Y - 3.1 + .22, y);
-    z += w * P;
+    P -= .55 * ss(Y - 3.4 - .2, Y - 3.4 + .2, y);
+    z += Math.max(P, -Math.max(0, xin));
+    if (xin > 0) z += .06 * ss(Y - 10.4, Y - 9.6, y) * (1 - ss(Y - 9.6, Y - 9.0, y));              // the rib's foot lip
+    // a fine concave crease 1.4 mm in from the outer edge of the side/bottom bands (photo: a dark hairline inside each band)
+    z -= .1 * Math.exp(-(((dside - 1.4) / .12) ** 2));
     z -= drop;
     return z; };
 

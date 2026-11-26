@@ -173,11 +173,12 @@ export default H => {
     for (const f of [-.5, .5]) { const v = f * h.v * (h.d ? .6 : 1), X = um * c - v * s, Y = um * s + v * c, top = surfZ(X, Y) - 4.2;
       const b = add(g, new THREE.Mesh(new THREE.BoxGeometry(ul, 1.6, 2.2), fin), X, Y, top - 1.1); b.rotation.z = h.phi * D2R; } }
 
-  // the cup inside the lip is shaded grey in the photos (no AO in the renderer, so it is baked into the colour)
-  const cupM = new THREE.MeshPhysicalMaterial({ color: 0x787878, roughness: .32, clearcoat: .4, clearcoatRoughness: .25 });
+  // the cup inside the lip is white plastic with soft shading in its inside corners (no AO in the renderer, so it is baked into vertex colours)
+  const cupM = white.clone(); cupM.vertexColors = true;
+  const wellM = white.clone(); wellM.color.multiplyScalar(.42);
   /* ---------- well lip, well wall + floor (dark below), insect mesh band, chamber rings, dark interior */
   { const f = faceZ(RL), lp = [V2(30, 33.6 + ZB), V2(43.6, 33.6 + ZB), V2(44.3, 33.9 + ZB), V2(RL, Math.min(f, 34.6 + ZB)), V2(RL, f + .02)].reverse();   // well wall under the lip
-    const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), cupM)); lip.rotation.x = Math.PI / 2; }
+    const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), wellM)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 8192, circ = 2 * Math.PI * 40.5, pxmm = W / circ, Hh = Math.round(9 * pxmm), c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
     y.fillStyle = '#2a2b2c'; y.fillRect(0, 0, W, Hh);
@@ -193,7 +194,16 @@ export default H => {
   // straight on); the grey insect-mesh disc inside it (#9a9c9e, so the slot reads as shade, not a black line) shows only at an angle
   { const cp = [V2(41.2, 44.2), V2(42.6, 44.5), V2(42.6, 44.9), V2(42.2, 45.3), V2(37, 45.3), V2(36.6, 46.6), V2(36.4, 46), V2(36.4, 45.6), V2(36.2, 46), V2(35.5, 46.1),
       V2(32.2, 46.4), V2(31.7, 46.8), V2(31.5, 47.4), V2(31.5, 50.6), V2(31.3, 51.3), V2(31, 51.5), V2(30.6, 51.3), V2(30.4, 50.7), V2(30.35, 50)];   // ring B top 1 mm under the cap
-    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 5 ? LIFT : 0))), 180), cupM)); ch.rotation.x = Math.PI / 2;
+    // resample the profile every 0.25 mm and darken toward the inside corners at the wall feet (1.0 on ring tops and rounds, 0.72 in the
+    // corner, over 1.5 mm)
+    const ab = cp.map((p, i) => V2(p.x, p.y + ZB + (i > 5 ? LIFT : 0))), rs = [ab[0]];
+    for (let i = 1; i < ab.length; i++) { const a = ab[i - 1], b = ab[i], n = Math.max(1, Math.ceil(a.distanceTo(b) / .25)); for (let k2 = 1; k2 <= n; k2++) rs.push(a.clone().lerp(b, k2 / n)); }
+    const AO0 = .56;                                       // linear vertex colours: the studio's tone curve needs ~0.6 for the photo's ~220 ring tops
+    const CR = [[V2(36.9, 48.4), 1.5], [V2(36.45, 56.1), 1.5], [V2(31.6, 56.9), 3.2]], ao = rs.map(p => Math.min(...CR.map(([c, L]) => AO0 * (.6 + .4 * Math.min(1, p.distanceTo(c) / L)))));
+    const lg = new THREE.LatheGeometry(rs, 180), cc = [];
+    for (let i = 0; i <= 180; i++) for (let j = 0; j < rs.length; j++) cc.push(ao[j], ao[j], ao[j]);
+    lg.setAttribute('color', new THREE.Float32BufferAttribute(cc, 3));
+    const ch = add(g, new THREE.Mesh(lg, cupM)); ch.rotation.x = Math.PI / 2;
     const mc = document.createElement('canvas'); mc.width = mc.height = 256; const mx = mc.getContext('2d'); mx.fillStyle = '#9a9c9e'; mx.fillRect(0, 0, 256, 256);
     mx.strokeStyle = 'rgba(70,71,72,.6)'; mx.lineWidth = 1.2; for (let i = 0; i < 256; i += 4) { mx.beginPath(); mx.moveTo(i, 0); mx.lineTo(i, 256); mx.moveTo(0, i); mx.lineTo(256, i); mx.stroke(); }
     const mt = tex(mc); mt.colorSpace = THREE.SRGBColorSpace; mt.wrapS = mt.wrapT = THREE.RepeatWrapping; mt.repeat.set(3, 3);
@@ -217,11 +227,18 @@ export default H => {
     const bv = .9, W0 = 9.6;
     const sg = new THREE.ExtrudeGeometry(s, { depth: W0 - 2 * bv, bevelEnabled: true, bevelThickness: bv, bevelSize: bv, bevelOffset: -bv, bevelSegments: 4, curveSegments: 20 });
     sg.translate(0, 0, -(W0 - 2 * bv) / 2);
-    const p = sg.attributes.position;                       // taper: 9.6 mm wide at the foot -> ~7 mm at the cap (photo front: 8-8.8 at r 45)
-    for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 27) / (49.6 - 27))); p.setZ(i, p.getZ(i) * (.72 + .28 * t)); }
+    // trapezoid cross-section: the top (outer edge) 1.2 mm narrower than the underside each side, so the side walls face the camera
+    const bez = (P0, P1, P2, P3, n) => { const o = []; for (let i = 0; i <= n; i++) { const t = i / n, u = 1 - t;
+      o.push([u*u*u*P0[0] + 3*u*u*t*P1[0] + 3*u*t*t*P2[0] + t*t*t*P3[0], u*u*u*P0[1] + 3*u*u*t*P1[1] + 3*u*t*t*P2[1] + t*t*t*P3[1]]); } return o; };
+    const outL = bez([49.6, f1], [48.5, f1 + 7], [38, 67.8], [27, 69.5], 60), inL = bez([27, 65], [37, 64.5], [44.6, 60], [44.6, f0 + 3], 60).concat([[44.6, f0]]);
+    const dl = (L, x0, y0) => { let b = 1e9; for (let i = 1; i < L.length; i++) { const [x1, y1] = L[i - 1], [x2, y2] = L[i], dx = x2 - x1, dy = y2 - y1,
+      t = Math.max(0, Math.min(1, ((x0 - x1) * dx + (y0 - y1) * dy) / (dx * dx + dy * dy || 1))); b = Math.min(b, Math.hypot(x0 - x1 - t * dx, y0 - y1 - t * dy)); } return b; };
+    const p = sg.attributes.position;                       // + taper: 9.6 mm wide at the foot -> ~7 mm at the cap (photo front: 8-8.8 at r 45)
+    for (let i = 0; i < p.count; i++) { const r = p.getX(i), h = p.getY(i), di = dl(inL, r, h), dO = dl(outL, r, h), sv = di / (di + dO + 1e-6);
+      const t = Math.min(1, Math.max(0, (r - 27) / (49.6 - 27))); p.setZ(i, p.getZ(i) * (1 - 1.2 / (W0 / 2) * sv) * (.72 + .28 * t)); }
     sg.computeVertexNormals();
     { const nn = sg.attributes.normal, col = [];             // side walls (normal across the strap) 0.85: the straps read as solid
-      for (let i = 0; i < nn.count; i++) { const v = Math.abs(nn.getZ(i)) > .7 ? .7 : 1; col.push(v, v, v); }
+      for (let i = 0; i < nn.count; i++) { const v = Math.abs(nn.getZ(i)) > .6 ? .75 : 1; col.push(v, v, v); }
       sg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); }
     const spM = white.clone(); spM.vertexColors = true;
     for (const a of [90, 30, -30, -90, 150, 210]) { const c = Math.cos(a * D2R), sn = Math.sin(a * D2R);
