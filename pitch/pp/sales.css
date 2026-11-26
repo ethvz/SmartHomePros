@@ -63,9 +63,9 @@ html.pp #p-buyouts .fine{left:30px;right:30px;width:auto;top:auto;bottom:var(--s
 /* ===== Reviews: tall hero on top, big swipeable cards fill the rest ===== */
 html.pp #p-reviews{--hT:max(20px,calc(var(--brsat,0px) + 8px));--hH:min(600px,calc(var(--H) * .5 - var(--hT) + 20px))}
 html.pp #p-reviews .rv2-hero{left:16px;top:var(--hT);width:568px;height:var(--hH);border-radius:28px}
-html.pp #p-reviews .rv2-hero img{object-position:53% 40%}
-html.pp #p-reviews .rv2-hero i{background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0) 42%),linear-gradient(0deg,rgba(0,0,0,.35),rgba(0,0,0,0) 35%)}
-html.pp #p-reviews .rv2-hero .tx{left:30px;top:66px}
+html.pp #p-reviews .rv2-hero img{object-position:53% 22%}
+html.pp #p-reviews .rv2-hero i{background:linear-gradient(0deg,rgba(0,0,0,.86) 0%,rgba(0,0,0,.6) 24%,rgba(0,0,0,0) 50%)}
+html.pp #p-reviews .rv2-hero .tx{left:30px;right:30px;top:auto;bottom:28px}
 html.pp #p-reviews .rv2-hero h2{font-size:70px}
 html.pp #p-reviews .rv2-hero p{font-size:20px}
 html.pp #p-reviews .rv2-sc{top:calc(var(--hT) + var(--hH) + 16px)!important;height:calc(var(--H) - var(--hT) - var(--hH) - 16px - var(--sF));padding:0 16px!important;scroll-padding:0 16px;gap:14px!important}
@@ -74,9 +74,9 @@ html.pp #p-reviews .rv2-sc .rc:active{transform:scale(.985)}
 html.pp #p-reviews .rv2-sc .rc b{font-size:23px}
 html.pp #p-reviews .rv2-sc .rc .d{font-size:16px}
 html.pp #p-reviews .rv2-sc .rc .st{font-size:24px!important;color:var(--vg,#05e5af)}
-html.pp #p-reviews .rv2-sc .rc h4{font-size:30px!important;line-height:1.2;margin:auto 0 14px!important}
+html.pp #p-reviews .rv2-sc .rc h4{font-size:36px!important;line-height:1.18;margin:auto 0 16px!important}
 html.pp #p-reviews .rv2-sc .rc .top{margin-bottom:20px}
-html.pp #p-reviews .rv2-sc .rc p{font-size:23px!important;margin-bottom:auto}
+html.pp #p-reviews .rv2-sc .rc p{font-size:26px!important;line-height:1.4!important;margin-bottom:auto}
 
 /* ===== Patents: four marquee rows of bigger cards fill the height ===== */
 html.pp #p-patents{--pT:calc(var(--sT) + 146px);--pR:calc((var(--H) - var(--pT) - var(--sF) + 10px) / 4)}
@@ -90,7 +90,8 @@ html.pp #p-patents .prow:nth-child(3){top:calc(var(--pT) + var(--pR) * 2)!import
 html.pp #p-patents .prow:nth-child(4){top:calc(var(--pT) + var(--pR) * 3)!important}
 html.pp #p-patents .pc{width:380px;height:100%;padding:18px 22px;border-radius:20px}
 html.pp #p-patents .pc .no{font-size:13px}
-html.pp #p-patents .pc h4{font-size:20px;line-height:24px;width:250px;max-height:72px;margin-top:8px}
+html.pp #p-patents .pc h4{font-size:20px;line-height:24px;width:250px;max-height:72px;margin-top:8px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+@media (min-aspect-ratio:1/2){html.pp #p-patents .pc h4{-webkit-line-clamp:2;max-height:48px}html.pp #p-patents .pc .seal{width:48px;height:48px;bottom:14px}}
 html.pp #p-patents .pc .seal{left:22px;bottom:20px;width:58px;height:58px}
 html.pp #p-patents .pc .ab{left:94px;right:150px;bottom:22px}
 
@@ -131,49 +132,54 @@ html.pp #p-social .hot:nth-of-type(3){background-position:calc(137.5px - var(--c
 html.pp #p-social .hot:nth-of-type(4){background-position:calc(137.5px - var(--chh) * 1.6929) calc(var(--chh) * -0.1886)}
 @media (prefers-reduced-motion:reduce){html.pp #p-social .hot:active,html.pp #p-reviews .rv2-sc .rc:active{transform:none}}
 
-/* ===== Pricing Options (sub-page of Packages, menu "Pricing Options"): three stacked kit cards ===== */
-/* title + Smart Hub and app peeking in from the card's top-right edge; the three prices in a row; "best option if" as a strip */
+/* ===== Pricing Options (sub-page of Packages, menu "Pricing Options"): in-page PI4 switch, then the kit cards ===== */
+/* each card is a grid: name / rule / three price columns / "best option if" strip; leftover height is shared between the rows */
+.pp-p4{display:none!important}
+html.pp #p-pricing .pp-p4{display:flex!important;position:absolute;left:16px;right:16px;bottom:auto;top:var(--sT);width:auto;height:68px;padding:6px;transform:none;border-radius:999px;z-index:2}
+html.pp #p-pricing .pp-p4 i{left:6px;top:6px;bottom:6px;width:calc(50% - 6px)}
+html.pp #p-pricing .pp-p4 button{font-size:19px;transition:color .3s,transform 80ms cubic-bezier(.2,.8,.2,1)}
+html.pp #p-pricing .pp-p4 button:active{transform:scale(.96)}
+html.pp #stage:has(#p-pricing.on) #barRight .p4-tog{display:none!important}
 html.pp #p-pricing{left:50%!important;right:auto!important;width:600px!important;margin-left:-300px;
-  --sF:calc(var(--ppFoot,76px) + 12px);--sT:max(96px,calc(var(--brsat,0px) + 40px));--pA:calc(var(--H) - var(--sT) - var(--sF));--kH:calc((var(--pA) - 28px) / 3);--kH2:calc((var(--pA) - 14px) / 2)}
-html.pp #p-pricing .kit{left:16px!important;width:568px!important;height:var(--kH)!important;overflow:hidden;box-sizing:border-box}
-html.pp #p-pricing .kit:nth-child(1){top:var(--sT)!important}
-html.pp #p-pricing .kit:nth-child(2){top:calc(var(--sT) + var(--kH) + 14px)!important}
-html.pp #p-pricing .kit:nth-child(3){top:calc(var(--sT) + var(--kH) * 2 + 28px)!important}
-html.pp #p-pricing.no4 .kit{height:var(--kH2)!important}
-html.pp #p-pricing.no4 .kit:nth-child(2){top:calc(var(--sT) + var(--kH2) + 14px)!important}
-html.pp #p-pricing.no4 .kit:nth-child(3){top:calc(var(--sT) + var(--kH2) * 2 + 28px)!important}
-html.pp #p-pricing .kit .kv,html.pp #p-pricing.no4 .kit .kv{left:auto!important;right:-110px;top:10px!important;width:340px;height:170px;transform:scale(.6)!important;transform-origin:100% 0!important}
-html.pp #p-pricing .kit .kv .kvd,html.pp #p-pricing .kit .kv .ka{display:none!important}
-html.pp #p-pricing .kit h4,html.pp #p-pricing.no4 .kit h4{left:24px!important;top:24px!important;font-size:31px;letter-spacing:-.5px}
-html.pp #p-pricing .kit h4 em{display:block;margin:4px 0 0;font-size:15px}
-html.pp #p-pricing .kit .ln,html.pp #p-pricing.no4 .kit .ln{left:24px!important;right:24px!important;top:112px!important}
-html.pp #p-pricing .kc,html.pp #p-pricing.no4 .kc{top:124px!important;width:176px}
+  --sF:calc(var(--ppFoot,76px) + 12px);--sT:max(96px,calc(var(--brsat,0px) + 40px));--kT:calc(var(--sT) + 82px);--pA:calc(var(--H) - var(--kT) - var(--sF));--kH:calc((var(--pA) - 28px) / 3);--kH2:calc((var(--pA) - 14px) / 2)}
+html.pp #p-pricing .kit{left:16px!important;width:568px!important;height:var(--kH)!important;overflow:hidden;box-sizing:border-box;
+  display:grid;grid-template-columns:146px 134px minmax(0,1fr);grid-template-rows:auto auto auto auto;align-content:space-between;column-gap:14px;padding:18px 20px 12px}
+html.pp #p-pricing .kit:nth-child(1){top:var(--kT)!important}
+html.pp #p-pricing .kit:nth-child(2){top:calc(var(--kT) + var(--kH) + 14px)!important}
+html.pp #p-pricing .kit:nth-child(3){top:calc(var(--kT) + var(--kH) * 2 + 28px)!important}
+html.pp #p-pricing.no4 .kit{height:var(--kH2)!important;align-content:space-evenly;padding-top:14px}
+html.pp #p-pricing.no4 .kit:nth-child(2){top:calc(var(--kT) + var(--kH2) + 14px)!important}
+html.pp #p-pricing.no4 .kit:nth-child(3){top:calc(var(--kT) + var(--kH2) * 2 + 28px)!important}
+html.pp #p-pricing .kit>*{position:static!important;transform:none!important}
+html.pp #p-pricing .kit .kv{display:none!important}
+html.pp #p-pricing .kit h4{grid-column:1/-1;margin:0;font-size:31px;letter-spacing:-.5px;line-height:1.1}
+html.pp #p-pricing .kit h4 em{margin-left:10px;font-size:16px}
+html.pp #p-pricing .kit .ln{grid-column:1/-1;margin:10px 0 0;height:0}
+html.pp #p-pricing .kc{width:auto;margin-top:10px;align-self:start}
+html.pp #p-pricing .kc .k{font-size:15px;line-height:1.2}
+html.pp #p-pricing .kc .v{font-size:27px;margin-top:4px;letter-spacing:-.5px;white-space:nowrap}
+html.pp #p-pricing .kc .v span{font-size:13px!important}
+html.pp #p-pricing .kc .v+.v{margin-top:2px!important}
+html.pp #p-pricing .kc .s,html.pp #p-pricing .kc .s .qc{font-size:15px;line-height:1.3}
+html.pp #p-pricing .kc .s[style]{margin-top:4px!important}
 html.pp #p-pricing .kc:nth-child(4) .s .qc{display:none}
-html.pp #p-pricing .kc:nth-child(4){left:24px!important}html.pp #p-pricing .kc:nth-child(5){left:210px!important}html.pp #p-pricing .kc:nth-child(6){left:388px!important}
-html.pp #p-pricing .kc .k{font-size:14px;line-height:1.2}
-html.pp #p-pricing .kc .v{font-size:28px;margin-top:6px;letter-spacing:-.5px;white-space:nowrap}
-html.pp #p-pricing .kc .v+.v{margin-top:4px!important}
-html.pp #p-pricing .kc .s{font-size:12.5px;line-height:1.35}
-html.pp #p-pricing .kc .s .qc{font-size:12.5px}
-html.pp #p-pricing .kc .s[style]{margin-top:6px!important}
-html.pp #p-pricing .kbf,html.pp #p-pricing.no4 .kbf{left:14px;right:14px;top:auto;bottom:14px;width:auto;padding:14px 18px;border-radius:18px;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:6px 18px}
-html.pp #p-pricing .kbf-h{flex:none;font-size:11.5px;margin:0;align-self:center}
-html.pp #p-pricing .kbf-i{font-size:15px;align-items:center;gap:6px}
-html.pp #p-pricing .kbf-i svg{width:16px;height:16px;margin:0}
-html.pp #p-pricing.no4 .kc{top:150px!important}html.pp #p-pricing.no4 .kit .ln{top:134px!important}
 html.pp #p-pricing.no4 .kc:nth-child(4) .s .qc{display:block}
-html.pp #p-pricing.no4 .kit .kv{transform:scale(.75)!important;right:-130px}
-html.pp #p-pricing.no4 .kbf-i{font-size:17px}
-html.pp #p-pricing.no4 .kbf{flex-direction:column;flex-wrap:nowrap;gap:10px;padding:18px 22px}html.pp #p-pricing.no4 .kbf-h{align-self:flex-start}
-html.pp #p-pricing .kit .kv img.kh{filter:drop-shadow(0 10px 20px rgba(0,0,0,.5))}
-@keyframes ppKvIn{from{opacity:0;transform:translate3d(40px,0,0)}to{opacity:1;transform:none}}
-html.pp #p-pricing.on .kit .kv>img{animation:ppKvIn .7s .15s cubic-bezier(.22,1,.36,1) backwards}
+html.pp #p-pricing .kbf{grid-column:1/-1;margin-top:8px;width:auto;padding:10px 16px;border-radius:18px;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:4px 18px}
+html.pp #p-pricing .kbf-h{flex:none;font-size:15px;letter-spacing:1.2px;margin:0}
+html.pp #p-pricing .kbf-i{font-size:17px;align-items:center;gap:6px}
+html.pp #p-pricing .kbf-i svg{width:17px;height:17px;margin:0}
+html.pp #p-pricing.no4 .kbf{flex-direction:column;align-items:flex-start;gap:8px;padding:16px 20px}
+html.pp #p-pricing.no4 .kbf-i{font-size:18px}
+@keyframes ppKitIn{from{opacity:0;transform:translate3d(0,14px,0)}to{opacity:1;transform:none}}
+html.pp #p-pricing.on .kit>*{animation:ppKitIn .5s cubic-bezier(.22,1,.36,1) backwards}
+html.pp #p-pricing.on .kit>.kbf{animation-delay:.08s}
 @media (min-aspect-ratio:1/2){
-  html.pp #p-pricing .kit h4{font-size:27px;top:18px!important}
-  html.pp #p-pricing .kit .ln{top:84px!important}html.pp #p-pricing .kc{top:94px!important}
-  html.pp #p-pricing .kit .kv{transform:scale(.46)!important;top:6px!important;right:-78px}
-  html.pp #p-pricing .kc .v{font-size:25px}html.pp #p-pricing .kc .k{font-size:13px}
+  html.pp #p-pricing{--kT:calc(var(--sT) + 72px)}
+  html.pp #p-pricing .pp-p4{height:60px}html.pp #p-pricing .pp-p4 button{font-size:17px}
+  html.pp #p-pricing .kit{padding:14px 18px 10px}
+  html.pp #p-pricing .kit h4{font-size:26px}html.pp #p-pricing .kit .ln{margin-top:6px}
+  html.pp #p-pricing .kc{margin-top:6px}html.pp #p-pricing .kc .v{font-size:25px}
   html.pp #p-pricing .kc .s[style],html.pp #p-pricing .kc .s .qc{display:none}
-  html.pp #p-pricing .kbf{padding:10px 14px;bottom:10px}html.pp #p-pricing .kbf-h{display:none}html.pp #p-pricing .kbf-i{font-size:13.5px}
+  html.pp #p-pricing .kbf{padding:8px 14px;margin-top:6px}html.pp #p-pricing .kbf-h{display:none}html.pp #p-pricing .kbf-i{font-size:15px}
 }
-@media (prefers-reduced-motion:reduce){html.pp #p-pricing.on .kit .kv>img{animation:none}}
+@media (prefers-reduced-motion:reduce){html.pp #p-pricing.on .kit>*{animation:none}}

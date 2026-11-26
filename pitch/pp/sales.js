@@ -32,6 +32,16 @@
   /* Moves: the titles' landscape line breaks are dropped on the phone; give them a space so the words don't run together */
   document.querySelectorAll('#p-moves .mcard h3 br').forEach(b=>{ const p=b.previousSibling; if(!(p&&p.nodeType===3&&/\s$/.test(p.data))) b.before(' '); });
 
+  /* Pricing Options: on the phone the With / Without PI4 switch lives in the page, above the first kit (the footer has no room for it).
+     It uses the page's own [data-p4] click handler; both switches are kept in step with the page's .no4 class. */
+  const pr=document.getElementById('p-pricing');
+  if(pr&&!pr.querySelector('.pp-p4')){
+    pr.insertAdjacentHTML('beforeend','<div class="pk-tog pp-p4"><i></i><button data-p4="1" class="on">With PI4</button><button data-p4="0">Without PI4</button></div>');
+    const syncP4=()=>{ const on4=!pr.classList.contains('no4');
+      document.querySelectorAll('.pp-p4,#barRight .p4-tog').forEach(t=>{ const i=t.querySelector('i'), v=`translateX(${on4?0:100}%)`; if(i&&i.style.transform!==v) i.style.transform=v;
+        t.querySelectorAll('button').forEach(b=>{ const want=(b.dataset.p4==='1')===on4; if(b.classList.contains('on')!==want) b.classList.toggle('on',want); }); }); };
+    new MutationObserver(syncP4).observe(pr,{attributes:true,attributeFilter:['class']}); syncP4(); }
+
   const sync=()=>{ if(window.SH) root.style.setProperty('--salesH',window.SH); requestAnimationFrame(fitPk); };
   addEventListener('resize',sync); addEventListener('orientationchange',()=>setTimeout(sync,300));
   if(window.visualViewport) visualViewport.addEventListener('resize',sync);

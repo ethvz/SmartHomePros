@@ -178,3 +178,5 @@ html.pp .ht>img.ppalt.pp-ocp{-webkit-mask-image:linear-gradient(180deg,#000 82%,
 html.pp #allTiles .ht[data-k=shp2]::after{font-size:15px!important;color:rgba(255,255,255,.62)!important}
 /* 3D Home: the frame fills the upright screen; the footer floats over it */
 html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}
+/* Doorbell / Indoor (All grid): two-line names at 16px, so the product sits higher */
+html.pp #allTiles .ht img.cp.big{top:40%!important;height:60%!important}
