@@ -89,7 +89,8 @@ export default H => {
   add(ex, rslab(mm(19.1), mm(10.3), mm(.2), mm(2.6), mm(.05), gapM), 0, mm(41.8), PF + mm(.02));
   const kb = add(ex, chamKey(mm(18.3), mm(9.5), mm(2.2), mm(.45), mm(1.0), mm(.45), mm(.1), btnS), 0, mm(41.8), PF);
   add(ex, conform(printPlane(mm(16), mm(7), (x, P) => { x.fillStyle = '#121212'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = 'italic 900 35px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, mm(.1))); x.scale(.92, 1); x.fillText('Kwikset', 0, 0); x.restore(); }),
+    x.font = 'italic 900 35px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, mm(.1))); x.scale(1.0, 1); x.fillText('Kwikset', 0, 0);
+    x.strokeStyle = '#121212'; x.lineWidth = 1.6; x.lineJoin = 'round'; x.strokeText('Kwikset', 0, 0); x.restore(); }),
     (px, py) => kb.userData.zf(inset(px, py, mm(18.3), mm(9.5), mm(2.2)))), 0, mm(41.8), PF);
 
   // ten keys, 2 rows x 5, raised 1.5 mm with a 0.3 mm crown
