@@ -162,7 +162,7 @@ html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-col{left:20px!important;right:20px;wi
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h{left:0!important;width:auto!important;min-height:0!important;padding:30px 12px 0;font-size:38px;line-height:1.06;display:block!important}
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h small{font-size:18px;line-height:1.38;margin-top:10px}
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;gap:6px 8px;width:auto!important;left:0!important}
-html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button{height:60px!important;font-size:17px!important;line-height:1.12;padding:0 12px!important;gap:10px;border-radius:18px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.72);transition:background .2s,color .2s,transform .12s cubic-bezier(.2,.8,.2,1)}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button{height:var(--lbh,60px)!important;font-size:17px!important;line-height:1.12;padding:0 12px!important;gap:10px;border-radius:18px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.72);transition:background .2s,color .2s,transform .12s cubic-bezier(.2,.8,.2,1)}
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button.on{background:#1f2a27;color:var(--vg)}
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button:active{transform:scale(.96)}
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button svg{width:24px;height:24px;flex:none}
@@ -192,13 +192,14 @@ html.pp #dbScroll .dbm-hubdb{display:none}
 /* ---------- Compare (cmp): title, our camera as a wide card, rivals in a 2-column grid ---------- */
 html.pp #ocScroll .ocpk h2,html.pp #dbScroll .dbc-h{left:32px!important;top:40px!important;font-size:50px!important;letter-spacing:-1.3px}
 html.pp #ocScroll .ocpk .vs,html.pp #dbScroll .dbc-vs{left:32px!important;top:372px!important;font-size:22px}
+html.pp #ocScroll .ocpk .vs{top:300px!important}
 html.pp #ocScroll .ocpk .me,html.pp #dbScroll .dbc-me{left:32px!important;top:124px!important;width:300px!important}
 html.pp #ocScroll .ocpk .me b,html.pp #dbScroll .dbc-me h3{font-size:28px!important}
 html.pp #ocScroll .ocpk .me img{position:absolute;left:330px;top:-6px;width:auto!important;height:230px;margin:0!important;object-fit:contain}
 html.pp #dbScroll .dbc-me img{left:360px!important;top:-14px!important;height:250px!important}
 html.pp #dbScroll .dbc-div{display:none}
 html.pp :is(#ocScroll,#dbScroll) .dbcards{left:16px!important;right:16px;width:auto!important;top:408px!important;gap:10px!important;grid-auto-rows:var(--cdh)}
-html.pp #ocScroll .ocpk .dbcards{--cdh:min(172px,calc((var(--H) - var(--pf) - 408px - 60px) / 4))}
+html.pp #ocScroll .ocpk .dbcards{top:336px!important;--cdh:min(200px,calc((var(--H) - var(--pf) - 336px - 120px) / 4))}
 html.pp #dbScroll .dbcards{--cdh:min(224px,calc((var(--H) - var(--pf) - 408px - 60px) / 3))}
 html.pp :is(#ocScroll,#dbScroll) .dbcard{height:auto!important;padding:0 10px 0 8px!important;gap:10px!important;border-radius:22px;transition:transform .12s cubic-bezier(.2,.8,.2,1)}
 html.pp :is(#ocScroll,#dbScroll) .dbcard:active{transform:scale(.97)}
@@ -268,9 +269,6 @@ html.pp #ocHist .fcol .big{border-radius:12px}
 html.pp #ocHist .fcol .sm{grid-template-columns:1fr;gap:8px;margin-top:8px}
 html.pp #ocHist .fcol .sm img{height:auto;aspect-ratio:16/10;border-radius:10px}
 html.pp #ocHist .fnote{font-size:14px;line-height:1.3}
-/* storage caption sits over the photo: give it its own glass so it always reads */
-html.pp #ocScroll>.dbm .ocm-cap.dbm-cap.on{width:auto!important;height:auto!important;max-width:290px;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:20px;padding:14px 16px;box-sizing:border-box}
-html.pp #ocScroll>.dbm .ocm-cap.dbm-cap{left:auto!important;right:20px}
 
 /* ---------- review fixes ---------- */
 /* the page title would repeat each of these pages' own heading */
@@ -281,8 +279,6 @@ html.pp #screen:has(:is(#p-ocp,#p-dbcp,#p-ai,#p-compat,#p-whatsnew,#p-preview,#p
 /* 360 spin: the canvas keeps its landscape shape (so the frame is drawn whole) and is scaled down; only the far edges crop */
 html.pp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{width:1376px!important;height:1032px!important;transform-origin:0 0;transform:translate(calc((600px - 1376px * .62) / 2),calc((var(--H) - var(--pf) - 1032px * .62) / 2)) scale(.62)}
 
-/* Highlights caption: on short screens smaller type so it stays in the band's top corner */
-@media (max-height:740px){html.pp #ocScroll>.dbm .ocm-cap.dbm-cap{gap:8px}html.pp #ocScroll>.dbm .ocm-cap.dbm-cap b{font-size:24px}html.pp #ocScroll>.dbm .ocm-cap.dbm-cap span{font-size:13px}html.pp #ocScroll>.dbm .ocm-cap.dbm-cap.on{padding:10px 12px;max-width:250px}}
 /* Spotlight Tracking render: fill most of the band */
 html.pp #ocScroll .ocm-card img[data-im="ocm/spot"]{left:10%!important;width:80%!important}
 
@@ -334,7 +330,6 @@ html.pp #ocHist .fcol .sm img{aspect-ratio:4/3}
 html.pp :is(#ocScroll,#dbScroll)>[data-t=act] .ppBleed{display:block;position:absolute;z-index:0;width:auto;pointer-events:none;opacity:0;translate:70px 0;transition:opacity .7s ease .12s,translate .9s cubic-bezier(.22,1,.36,1) .12s;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
 html.pp :is(#ocScroll,#dbScroll)>[data-t=act][data-vis="1"] .ppBleed{opacity:1;translate:0 0}
 html.pp #ocScroll .ppBleed.oc{left:392px;top:22px;height:300px}
-html.pp #dbScroll .ppBleed.db{left:468px;top:30px;height:390px}
 html.pp :is(#ocScroll,#dbScroll) .xa-list{z-index:1}
 
 /* OCP hero: the camera is oversized and runs off the right edge (its face stays whole, the mount is cut) */
@@ -344,45 +339,61 @@ html.pp #ocScroll .och-prod img{transition:opacity .45s ease,translate .9s cubic
 html.pp #p-ocp:not(.on) #ocScroll .och-prod img{translate:60px 0}
 
 /* OCP Highlights */
-/* 24/7: the SD-card render slides further off the left edge so the storage caption has its own space */
-html.pp #ocScroll .ocm-card img[data-im="ocm/sd2"]{left:-150px!important}
-html.pp #ocScroll>.dbm .ocm-cap.dbm-cap.on{max-width:232px}
 /* Spotlight: the small render is enlarged to the same presence as the others */
 html.pp #ocScroll .ocm-card img[data-im="ocm/spotv"]{scale:1.6!important;transform-origin:50% 42%}
 /* side-view renders: oversized, peeking in from the right edge */
 html.pp #ocScroll .ocm-card img:is([data-im="och/c1"],[data-im="och/c0"]){scale:1.45!important;translate:26% 8%!important}
 
-/* OCP Compare: our camera bigger, running off the right edge */
-html.pp #ocScroll .ocpk .me img{left:384px!important;top:-18px!important;height:300px!important}
 
-/* DBCP Highlights, 24/7: the storage caption stacks in the product column (it used to cover the phone screen) */
-html.pp #dbScroll #dbmCap{left:calc(var(--cl) + 2px)!important;right:10px!important;width:auto!important;top:calc(var(--mt) + 4px)!important;flex-direction:column!important;align-items:flex-start!important;gap:14px!important}
-html.pp #dbScroll #dbmCap>i{display:none!important}
-html.pp #dbScroll .dbm-card img[data-fv=sdz]{object-position:50% 100%!important}
 /* Spotlight tab plays a clip (.ocm-sv) of the small render: enlarge it too */
 html.pp #ocScroll .ocm-svw{overflow:hidden}
-html.pp #ocScroll .ocm-sv{scale:1.55;transform-origin:50% 40%}
 /* OCP rival wells a little wider so wide cameras (Nest, Blink, Eufy) reach the same size as the tall ones */
 html.pp #ocScroll .ocpk .dbwell{width:108px!important}
 html.pp #ocScroll .ocpk .dbcard{gap:8px!important}
 /* hero, w/ Spotlight renders: their artwork starts at the very top and right, so nudge them down-left to clear the subtitle */
 html.pp #ocScroll .och-prod img[data-k^=s]{transform:translate(-64px,48px) scale(.93);transform-origin:50% 0}
-/* 360 spin, DBCP: its frames have a light grey studio background, so letterboxing left grey bands floating in black.
-   Cover the screen instead (prodB.js sets --spk = screen height / frame height); the doorbell sits in the middle of every frame */
-html.pp #dbScroll>.hum .hum-st canvas{transform:translate(calc((600px - 1376px * var(--spk,.62)) / 2),0) scale(var(--spk,.62))}
-/* OCP: black studio frames, kept whole; their cut top / bottom edges fade into the black instead of ending in a hard line */
-html.pp #ocScroll>.hum .hum-st canvas{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 9%,#000 91%,transparent);mask-image:linear-gradient(180deg,transparent 0,#000 9%,#000 91%,transparent)}
-html.pp #dbScroll #dbmCap{background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:20px;padding:14px 16px;box-sizing:border-box;margin:0!important}
-/* short screens: the storage captions drop the footnote and tighten so they stay clear of the phone */
+
+/* ===================== round 2 review fixes ===================== */
+/* Highlights 24/7 storage caption (both cameras): one row in the strip between the subtitle and the media band, never over a product */
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap{left:32px!important;right:32px!important;width:auto!important;height:auto!important;top:calc(var(--mt) - 84px)!important;flex-wrap:wrap!important;gap:4px 24px!important;background:none!important;padding:0!important}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap b{font-size:26px}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap span{font-size:14px;line-height:1.28;margin-top:2px}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap em{font-size:12px;margin-top:0}
 @media (max-height:740px){
-  html.pp :is(#ocmCap,#dbmCap) em{display:none}
-  html.pp :is(#ocmCap,#dbmCap) b{font-size:24px}
-  html.pp :is(#ocmCap,#dbmCap) span{font-size:13px;line-height:1.3}
-  html.pp #dbScroll #dbmCap{gap:10px!important;padding:10px 12px}
+  html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap{top:calc(var(--mt) - 64px)!important}
+  html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap b{font-size:22px}
+  html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap span{font-size:13px}
+  html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap em{display:none}
 }
-@media (max-height:740px){
-  html.pp #ocmCap b{font-size:21px}
-  html.pp #ocmCap span{font-size:12px;line-height:1.25;margin-top:2px}
-  html.pp #ocScroll>.dbm .ocm-cap.dbm-cap{gap:6px!important}
+/* OCP 24/7: the camera head + SD card shown whole from the left edge, the mount running off the right */
+html.pp #ocScroll .ocm-card img[data-im="ocm/sd2"]{object-position:0 50%!important;scale:1.25!important;transform-origin:0 50%}
+
+/* OCP Spotlight clip: enlarged; on short screens more, grown from the top so the head stays above the phone */
+html.pp #ocScroll .ocm-sv{scale:1.55;transform-origin:50% 40%}
+@media (max-height:740px){html.pp #ocScroll .ocm-sv{scale:2.1;transform-origin:50% 18%}html.pp #ocScroll .ocm-card img[data-im="ocm/spotv"]{scale:2.1!important;transform-origin:50% 18%}}
+
+/* 360 spin, both cameras: the frame covers the screen (prodB.js sets --spk = screen height / frame height); products sit mid-frame */
+html.pp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{transform:translate(calc((600px - 1376px * var(--spk,.62)) / 2),0) scale(var(--spk,.62))}
+
+/* DBCP Smart Actions: the doorbell sits clear above the list (the list moves down into the spare space) */
+html.pp #dbScroll .ppBleed.db{left:476px;top:8px;height:300px}
+html.pp #dbScroll>[data-t=act] .xa-list{top:320px!important}
+
+/* OCP Compare: our camera beside its name, running off the right edge, clear of the rival cards */
+html.pp #ocScroll .ocpk .me img{left:388px!important;top:-26px!important;height:220px!important}
+
+/* DBCP hero: the video stops above the headline and fades out, so no words sit on the doorbell */
+html.pp #dbScroll .dbh-vid{height:calc(var(--H) - var(--pf) - 330px)!important;-webkit-mask-image:linear-gradient(180deg,#000 78%,transparent);mask-image:linear-gradient(180deg,#000 78%,transparent)}
+html.pp #dbScroll .dbh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.35) 0,transparent 16%)!important}
+
+/* Hero toggles taller on full-size phones */
+@media (min-height:800px){
+  html.pp #ocHeroHot .fsp.htog{height:66px!important}
+  html.pp #ocHeroHot .fsp.htog:nth-of-type(1){bottom:calc(var(--pf) - var(--H) + 178px)!important}
 }
-@media (max-height:740px){html.pp #ocScroll>.dbm .ocm-cap.dbm-cap{top:calc(var(--mt) - 34px)!important}}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap{display:grid!important;grid-template-columns:1fr 1fr;align-items:start}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap>i{display:none!important}
+html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-cap>em{grid-column:1/-1}
+/* History footage: taller crops fill the screen instead of leaving a third of it empty under the notes */
+html.pp #ocHist .fcol .big{aspect-ratio:4/5;height:auto!important;object-fit:cover}
+html.pp #ocHist .fcol .sm img{aspect-ratio:4/5}

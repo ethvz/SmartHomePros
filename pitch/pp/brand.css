@@ -143,3 +143,12 @@ html.pp #p-history .hy2-h h1{font-size:62px;letter-spacing:-2px}
    centred between the title and the footer */
 html.pp #p-history .hyx{transform:scale(.8)!important;left:calc(300px - 1466px*.8/2)!important;
   top:calc((var(--bt) + 140px + var(--U))/2 - 547px)!important}
+
+/* History on tall phones (390x844, 430x932): a bigger wheel so it fills the space down to the footer */
+@media (max-aspect-ratio:10/19){
+  html.pp #p-history .hyx{transform:scale(.88)!important;left:calc(300px - 1466px*.88/2)!important;
+    top:calc((var(--bt) + 140px + var(--U))/2 - 601px)!important}}
+/* NRG tile on short phones (375x667): a smaller logo, clear of the caption */
+@media (max-height:700px){
+  html.pp #p-about .nrgt .nl{top:14px;width:62px}
+  html.pp #p-about .nrgt h3{font-size:20px}}

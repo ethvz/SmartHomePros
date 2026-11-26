@@ -101,12 +101,12 @@
     [['#ocScroll', '#ocmPhone', '#ocmList', 920, 454], ['#dbScroll', '#dbmPhone', '#dbmList', 372, 748]].forEach(([bq, pq, lq, pw, phh0]) => {
       const box = Q(bq), ph = Q(pq), L = Q(lq); if (!box || !ph || !L) return;
       const sec = L.closest('.otab'), H = window.SH || 1230, st = Q('#stage'), pf = parseFloat(getComputedStyle(st).getPropertyValue('--ppFoot')) || 76;
-      const rows = Math.ceil(L.children.length / 2), listH = rows * 60 + (rows - 1) * 6;
+      const rows = Math.ceil(L.children.length / 2), bh = H >= 1200 ? 66 : 60, listH = rows * bh + (rows - 1) * 6;
       const head = H < 1100 ? 168 : 186, mt = head, mh = Math.max(240, H - pf - 14 - listH - 18 - mt);
       let phs, phh;
       if (pw === 920) { const port = ph.classList.contains('port'); phs = port ? mh / 732 : 560 / 920; phh = port ? mh : 454 * phs; }
       else { phs = Math.min(mh / 748, 330 / 372); phh = 748 * phs; }
-      const v = { '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
+      const v = { '--lbh': bh + 'px', '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
       if (pw === 372) { const pl = 16; v['--cl'] = (pl + 372 * phs + 6).toFixed(1) + 'px';
         if (ph.style.getPropertyValue('left') !== pl + 'px') ph.style.setProperty('left', pl + 'px', 'important');
         const c = Q('#dbmCap'); if (c && c.style.getPropertyValue('transform') !== 'none') c.style.setProperty('transform', 'none', 'important'); }
@@ -119,7 +119,7 @@
       new MutationObserver(() => { if (isPP()) featLayout(); }).observe(el, { attributes: true, attributeFilter: ['style', 'class'] }); });
   }
   function featClear() {
-    D.querySelectorAll('#ocScroll>.dbm,#dbScroll>.dbm').forEach(s => ['--mt', '--mh', '--phs', '--phh', '--cl'].forEach(k => s.style.removeProperty(k)));
+    D.querySelectorAll('#ocScroll>.dbm,#dbScroll>.dbm').forEach(s => ['--lbh', '--mt', '--mh', '--phs', '--phh', '--cl'].forEach(k => s.style.removeProperty(k)));
     const ph = Q('#dbmPhone'); if (ph && ph.style.getPropertyValue('left') === '16px') ph.style.removeProperty('left');
   }
 
@@ -170,10 +170,10 @@
   /* ---------- focal points: every hero gallery photo (and the DBCP hero video) is cropped so the product sits in the
      horizontal centre of the upright screen. FOC = the product x centre as a fraction of each source picture (for close-ups wider
      than the screen, the camera head, so the face is whole and the mount runs off the edge) ---------- */
-  const FOC = { ocp: [.59, .75, .33, .70, .24, .66, .335], dbcp: [.585, .67, .60, .69, .60, .41, .71] };
-  function focusOne(el, f, nw, nh) {
+  const FOC = { ocp: [.59, .75, .33, .70, .29, .66, .335], dbcp: [.585, .67, .60, .69, .60, .41, .71] };
+  function focusOne(el, f, nw, nh, fh) {
     if (!isPP()) { if (el.style.objectPosition) el.style.removeProperty('object-position'); return; }
-    const Fw = 600, Fh = window.SH || 1230; if (!nw || !nh || f == null) return;
+    const Fw = 600, Fh = fh || window.SH || 1230; if (!nw || !nh || f == null) return;
     const k = Math.max(Fw / nw, Fh / nh), Wi = nw * k; if (Wi - Fw < 1) return;
     const v = (Math.max(0, Math.min(1, (f * Wi - Fw / 2) / (Wi - Fw))) * 100).toFixed(1) + '% 50%';
     if (el.style.objectPosition !== v) el.style.objectPosition = v;
@@ -183,7 +183,7 @@
       box.querySelectorAll('.hgl figure img').forEach((im, i) => {
         if (!im.__ppf) { im.__ppf = 1; im.addEventListener('load', () => focusOne(im, FOC[k][i], im.naturalWidth, im.naturalHeight)); }
         focusOne(im, FOC[k][i], im.naturalWidth, im.naturalHeight); }); });
-    const v = Q('#dbHv'); if (v) { if (!v.__ppf) { v.__ppf = 1; v.addEventListener('loadedmetadata', galFocus); } focusOne(v, .6, v.videoWidth || 1376, v.videoHeight || 1032); }
+    const v = Q('#dbHv'); if (v) { if (!v.__ppf) { v.__ppf = 1; v.addEventListener('loadedmetadata', galFocus); } focusOne(v, .6, v.videoWidth || 1376, v.videoHeight || 1032, avail() - 330); }
   }
 
   /* ---------- Compare: rival products drawn at one visual size (equal area) rather than each squeezed to its well ---------- */
@@ -208,13 +208,15 @@
       sec.insertBefore(im, sec.firstChild); });
   }
 
-  function spinFit() { const b = Q('#dbScroll'); if (!b) return; const v = (avail() / 1032).toFixed(4); if (b.style.getPropertyValue('--spk') !== v) b.style.setProperty('--spk', v); }
+  function spinFit() { const v = (avail() / 1032).toFixed(4); ['#ocScroll', '#dbScroll'].forEach(q => { const b = Q(q); if (b && b.style.getPropertyValue('--spk') !== v) b.style.setProperty('--spk', v); }); }
 
   function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); arloTwin(); galFocus(); wellFit(); return; } aiLayout(); cmLayout(); featLayout(); spinFit(); histFit(); arloTwin(); galFocus(); wellFit(); }
+  /* the gallery photos are lazy: once their product page is open, fetch them all so a dot-jump never shows a black slide */
+  function galEager(sec) { sec.querySelectorAll('.hgl img[loading=lazy]').forEach(im => { im.loading = 'eager'; }); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ppo) return; el.__ppo = 1;
     /* the wells only have a size once their page is shown: re-fit then (writes only to the images, never to the observed page) */
-    new MutationObserver(() => { if (isPP() && el.classList.contains('on')) requestAnimationFrame(wellFit); }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
-  function boot() { aiBuild(); cmBuild(); actBleed(); secWatch(); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
+    new MutationObserver(() => { if (isPP() && el.classList.contains('on')) { requestAnimationFrame(wellFit); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
+  function boot() { aiBuild(); cmBuild(); actBleed(); secWatch(); if (isPP()) D.querySelectorAll('#p-ocp.on,#p-dbcp.on').forEach(galEager); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);
