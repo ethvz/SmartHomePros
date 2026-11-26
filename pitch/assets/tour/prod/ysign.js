@@ -149,7 +149,7 @@ export default H => { const { THREE, G, add, rbox } = H;
     art.needsUpdate = true; };
   draw();
   if (document.fonts) document.fonts.load(font(500, 8)).then(draw, () => {});
-  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0xffffff, roughness: .4, envMapIntensity: .6, clearcoat: .15, clearcoatRoughness: .35, bumpMap: peel, bumpScale: .25 });
+  const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0x9a9a9a, roughness: .4, envMapIntensity: .6, clearcoat: .15, clearcoatRoughness: .35, bumpMap: peel, bumpScale: .25 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
   for (const y of [131, -133]) add(S, new THREE.Mesh(new THREE.CircleGeometry(2.3, 24), new THREE.MeshStandardMaterial({ color: 0x2f3a33, roughness: .9 })), 0, yC + y, 9.52);   // shadowed post behind the holes
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
