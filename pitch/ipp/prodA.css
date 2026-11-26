@@ -147,7 +147,7 @@ html.ipp #prScroll .icm .ocm-col{left:var(--ipL)!important;right:var(--ipR)!impo
 html.ipp #prScroll .icm .dbm-h{width:auto!important;min-height:0!important}
 html.ipp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;column-gap:16px;width:auto!important}
 html.ipp #prScroll .icm .ocm-fade{display:none!important}
-html.ipp #prScroll .icm .ocm-card{left:216px!important;top:calc(var(--ipTop) + 390px)!important;height:calc(var(--H) - var(--ipTop) - 390px)!important}
+html.ipp #prScroll .icm .ocm-card{left:216px!important;top:calc(var(--ipTop) + 450px)!important;height:calc(var(--H) - var(--ipTop) - 450px)!important}
 html.ipp #prScroll .icm .ocm-phone{left:56px!important;top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
 html.ipp #prScroll .icm .ocm-cap{left:72px!important;top:auto!important;bottom:calc(var(--ipBot) + 520px)!important}
 
@@ -184,3 +184,10 @@ html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:var(--ipL)!important;right:
 html.ipp #p-hub #hbScroll .hbnew{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 130px)!important;grid-template-columns:1fr!important}
 html.ipp #p-hub #hbScroll .hb3pill{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
 html.ipp #p-hub #hbOut .hbfoot{left:var(--ipL)!important;right:var(--ipR)}
+/* hero: the whole Hub in view (the landscape video at near its landscape size) over a soft copy of its wall; title on top */
+html.ipp #hbScroll [data-t=hero]{background:#3b3026}
+html.ipp #hbScroll [data-t=hero]::before{content:"";position:absolute;inset:-60px;background:url(../assets/hb/hero_v.jpg?v=73) 50% 50%/cover;filter:blur(30px) brightness(.78);z-index:0;pointer-events:none}
+html.ipp #hbScroll .hbh-vid{left:-129px!important;width:1290px!important;height:968px!important;top:calc(var(--H)/2 - 444px)!important;object-fit:cover!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 89%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 89%,transparent 100%)}
+html.ipp #hbScroll .hbh-top{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 50px)!important}
+/* Competitive table: six rivals share the width */
+html.ipp #p-hub #hbScroll #hbCmp .hbt{grid-template-columns:150px repeat(6,1fr)!important}

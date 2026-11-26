@@ -136,13 +136,18 @@ html.pp #stage #drawer .m2-s { height: 50px !important; }
 html.ipp #stage { --ippFoot: 84px; }
 html.ipp #stage #drawer { width: 700px !important; bottom: 80px !important; }
 html.ipp #drawer .shpn-apps { font-size: 20px; }
+/* Home footer: the 1032-wide stage has less room between the logo (ends ~219) and the centred category pill (304 wide) than the
+   Tiles / 3D Home pill needs (156): start the category pill 12px after where that pill ends (219 + 12 + 156 + 12 = 399, centre 551);
+   the page's own place() then keeps Tiles / 3D Home halfway between the logo and it (12px either side). */
+html.ipp #stage #bar.home #barRight { left: 551px !important; }
 html.ipp #drawer .m2-t { height: 92px !important; }
 html.ipp #drawer .m2-s { height: 50px !important; }
 
 /* ======================= Fast Recruit (html.shpn-recruit) ======================= */
 /* the header's own hamburger + logo move to the corner */
 html.shpn-recruit .board [data-x="Menu button"],
-html.shpn-recruit .board img[data-name="Vivint Logo"] { visibility: hidden !important; pointer-events: none !important; }
+html.shpn-recruit .board img[data-name="Vivint Logo"],
+html.shpn-recruit .board img[data-name="Logo (header hidden)"] { visibility: hidden !important; pointer-events: none !important; }
 html.shpn-recruit #phdr .ph-fix { display: none !important; }
 html.shpn-recruit #phdr .ph-scroll { padding-left: 8px; }
 /* status bar / Dynamic Island: the phone header starts below it */

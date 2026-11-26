@@ -13,6 +13,12 @@ html.ipp #homeTrack,html.ipp #p-home .hpane{height:calc(var(--H,1485px) - var(--
 /* All grid: tiles are placed by ipp/shell.js (two-column portrait grid built like the landscape one) */
 html.ipp #allTiles .ht.abs img.cp{height:60%}
 html.ipp #allTiles .ht .cl{font-size:15px!important}
+/* whole-product cut-outs (added by ipp/shell.js) replace the cropped landscape artwork of hub / cameras / keypad / app */
+.ippalt{display:none}
+html.ipp .ht>.ippalt,html.ipp #flipLayer :is(.fa,.fb)>.ippalt{display:block}
+html.ipp #flipLayer :is(.fa,.fb):has(>img.ippalt)>img:not(.ippalt){display:none!important}
+html.ipp .ht:has(>img.ippalt)>img:not(.ippalt){display:none!important}
+html.ipp :is(.ht,.fa,.fb)>img.ippalt{transform:translate(-50%,-50%)!important;object-fit:contain!important}
 
 /* category panes: the rows dissolve into one 12-column grid so tiles keep landscape proportions on the taller screen */
 html.ipp .hcat{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px!important;
@@ -40,5 +46,3 @@ html.ipp .hcat .ht .cl{font-size:16px}
 /* 3D Home: the viewer fills the page above the footer, same as landscape */
 html.ipp #p-home #tour3d{left:0!important;right:0!important;width:auto!important}
 
-/* ================= product switcher sheet: a little taller so the cards breathe on the upright screen ================= */
-html.ipp #psheet .pan{left:16px!important;right:16px!important}

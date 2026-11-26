@@ -9,7 +9,7 @@
   const gvLayout = () => { const box = gv && $('.gvp-ph', gv), im = box && $('.gvp-img', box); if (!im || !ipp()) return;
     const w = box.offsetWidth, h = box.offsetHeight; if (!w || !h) return;
     const RX = 1184, RW = 880, IH = 1446, IW = 2064, s = Math.max(w / RW, h / IH);
-    const ox = Math.max(0, Math.min(RW * s - w, (RW * s - w) * 0.5)), oy = Math.max(0, Math.min(IH * s - h, 640 * s - h * 0.55));
+    const ox = Math.max(0, Math.min(RW * s - w, (RW * s - w) * 0.5)), oy = Math.max(0, Math.min(IH * s - h, 640 * s - h * 0.3));
     const tf = `translate(${-(RX * s + ox)}px,${-oy}px)`;
     if (im.style.transform !== tf) Object.assign(im.style, { width: IW * s + 'px', height: IH * s + 'px', transform: tf }); };
   const count = el => { const n = +el.dataset.n, pre = el.dataset.pre, suf = el.dataset.suf, t0 = performance.now(), T = 1300;

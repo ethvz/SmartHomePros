@@ -26,6 +26,20 @@
     P.ocspot = [x1, y3, cw, h3];
     return P;
   };
+  /* ---- whole products: the landscape artwork of these tiles is cropped (camera heads, keypad/app bottoms, hub frame) and
+     carries a baked-in name. Add the whole cut-out (assets/cat, same kind as every other tile) + a live name;
+     ipp/shell.css shows them only in ipp, sized like the other cut-outs. Built once, never rewritten. ---- */
+  const NAME = { ocp: 'Outdoor Camera Pro III', ocspot: 'Outdoor Camera Pro III with Spotlight', keypad: 'Keypad', app: 'Vivint App', shp2: 'Smart Hub Pro II' };
+  const HUB = { all: 'shp2_home', sensors: 'shp2_sens', smart: 'shp2_home', cams: 'shp2_cam' };
+  const whole = () => {
+    $$('#allTiles .ht[data-k], .hcat .ht[data-k]').forEach(t => {
+      const k = t.dataset.k; if (!NAME[k] || t.querySelector(':scope>.ippalt')) return;
+      const pane = t.closest('.hcat'), src = k === 'shp2' ? HUB[pane ? pane.dataset.c : 'all'] : k;
+      t.insertAdjacentHTML('beforeend', '<img class="cp ippalt ipp-' + k + '" src="assets/cat/' + src + '.webp?v=176" alt="" draggable="false"><div class="cl ippalt">' + NAME[k] + '</div>');
+    });
+  };
+  whole();
+
   const orig = window.homeLayout;
   if (typeof orig === 'function') {
     window.homeLayout = function () {
