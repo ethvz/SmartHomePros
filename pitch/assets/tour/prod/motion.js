@@ -1,3 +1,65 @@
+// Vivint Motion Sensor (VS-PIR300): 70 W x 78.5 H x 50 D mm, wall mounted (back at z=0, face +z).
+// Grey body and white front cover share ONE continuous side wall (flush hairline split at z=35.5), R15 squircle corners,
+// top/bottom bowed 1 mm, R6 front roll into a gently crowned face, Fresnel lens recessed 1.5 mm, tone-on-tone wordmark,
+// recessed TEST pill on the right side. Built in millimetres inside a 0.001-scaled group.
+export default H => {
+  const { THREE, G, add, DEC, decal, printPlane, rslab } = H;
+  const K = kit(THREE);
+  const g = G(), u = add(g, G()); u.scale.setScalar(.001);
+
+  const W = 70, HT = 76.5, RC = 17, P = 2.5, BOW = 1;                     // squircle corners read as R15; bow brings H to 78.5
+  const ring = (d, z) => K.rr(W - 2 * d, HT - 2 * d, RC - d, { p: P, bow: BOW * (1 - d / 20) }).map(([x, y]) => [x, y, z]);
+
+  /* crown of the front face: 0 (with zero slope) at the edge of the flat, 1.5 mm at the centre */
+  const FX = W / 2 - 6, FY = HT / 2 - 6, FZ = 48.5;
+  const crown = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 1.5 * Math.pow(Math.max(0, 1 - r * r), 1.5); };
+
+  /* side profile [inset, z]: R1.5 back edge, straight wall, R6 front roll (4.5 mm tall) */
+  const prof = [];
+  for (let i = 0; i <= 6; i++){ const a = i / 6 * Math.PI / 2; prof.push([1.5 * (1 - Math.sin(a)), 1.5 * (1 - Math.cos(a))]); }
+  for (const z of [2.0, 9, 17, 26, 35.5, 40, 44]) prof.push([0, z]);
+  for (let i = 1; i <= 12; i++){ const a = i / 12 * Math.PI / 2; prof.push([6 * (1 - Math.cos(a)), 44 + 4.5 * Math.sin(a)]); }
+  const rings = prof.map(([d, z]) => ring(d, z));
+
+  /* face: from the edge of the flat to the lens opening (top R4, bottom R6), then the 1.5 mm recess wall */
+  const outer = rings[rings.length - 1];
+  const LX = 55, LY0 = -10.5, LY1 = 27.7, LCY = (LY0 + LY1) / 2;
+  const lensO = K.rr(LX, LY1 - LY0, [4, 4, 6, 6], { cy: LCY });
+  for (let k = 1; k <= 8; k++){ const t = k / 8;
+    rings.push(outer.map(([x, y], i) => { const X = x + (lensO[i][0] - x) * t, Y = y + (lensO[i][1] - y) * t; return [X, Y, FZ + crown(X, Y)]; })); }
+  const lip = rings[rings.length - 1];
+  rings.push(lip.map(([x, y, z]) => [x, y, z - .3]));
+  rings.push(lip.map(([x, y, z]) => [x, y, z - 1.9]));
+
+  const grey = 0xb0b1b4, white = 0xf2f2f0;
+  const PILL = { y: 8, z: 13, len: 21, wid: 7, gap: .4 };
+  const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
+  const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
+  const bodyM = K.bandMat({ color: grey, roughness: .6 }, 'z',
+    [[35.5, white, .45]], [['z', 2.0, .3, 0x55585b, .8], ['z', 35.5, .3, 0x5b5e61, .85]], cut);
+  const body = add(u, new THREE.Mesh(K.skin(rings, { start: true }), bodyM));
+  body.castShadow = body.receiveShadow = true;
+
+  /* Fresnel lens: frosted lavender-grey, faint vertical facet bands, shade under the top lip; follows the crown 1.5 mm down */
+  const lensRings = [];
+  for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27.5) ** 2)]; }));
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9c9aa6, roughness: .66, map: K.bandsTex(true), specularIntensity: .15 });
+  add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
+
+  /* wordmark, tone-on-tone, flush on the crowned face */
+  add(u, decal(DEC.logo, 17.5, 4.4, { color: 0xcfd0d2, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .06);
+
+  /* TEST pill: dark gap ring pocket (1 mm deep), grey cap 0.6 mm below the side surface, printed TEST reading downward */
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.0, 'x', 35, PILL.y, PILL.z, 0x4c4e51);
+  const cap = add(u, rslab(PILL.wid, PILL.len, 1.2, PILL.wid / 2, .45, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55 })), 35 - .6 - .6, PILL.y, PILL.z);
+  cap.rotation.y = Math.PI / 2;
+  const tg = add(u, G(), 35 - .6 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
+  const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.font = '500 27px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
+  tx.scale.setScalar(1000); tx.rotation.z = -Math.PI / 2;
+  return g;
+};
+
 /* ---- sensor kit (shared by the motion / glass / window / water modules; duplicated so each module stands alone) ---- */
 function kit(THREE){
   /* rounded-rectangle outline, CCW from the right edge, fixed point count so rings line up. r = number or [tr, tl, bl, br];
