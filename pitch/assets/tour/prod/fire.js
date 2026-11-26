@@ -30,11 +30,11 @@ export default H => {
   const pm = splitMat(white, white, 'y', Y - 45, .22, 0xdcdddb); pm.alphaMap = mask; pm.alphaTest = .5;
   add(g, ext(outline(-Y, SY, false, true), 17.4, 2.4, pm), 0, 0, 8);
 
-  // pinhole: countersink (dia 2.6) into a dark 1.6 mm bore, 26.5 mm below the top
+  // pinhole: countersink (dia 2.6) into a dark 1.6 mm bore, 26.5 mm below the top (floor just above the inner front solid face)
   { const V2 = (r, z) => new THREE.Vector2(r, z);
     const cs = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1.32, 25.42), V2(1.05, 25.2), V2(.82, 24.85), V2(.8, 24.6)], 40), white), 0, 11.6, 0);
     cs.rotation.x = Math.PI / 2;
-    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(.8, 24.6), V2(.8, 14), V2(0, 14)], 32),
+    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(.8, 24.6), V2(.8, 24.12), V2(0, 24.12)], 32),
       new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: .9, envMapIntensity: .1, side: THREE.DoubleSide })), 0, 11.6, 0);
     bore.rotation.x = Math.PI / 2; }
 
