@@ -10,7 +10,7 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.03, specularIntensity:.42, specularColor:0x9a9a9a, envMapIntensity:.9});   // near-black; F90 held down so it isn't pale at grazing angles
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.03, specularIntensity:.42, specularColor:0x9a9a9a, envMapIntensity:.6});   // near-black; F90 held down so it isn't pale at grazing angles
   const satinK = new THREE.MeshPhysicalMaterial({color:0x0e0e0f, roughness:.5, metalness:0, specularIntensity:.4, envMapIntensity:.15, side:THREE.DoubleSide});   // satin ring: rougher / duller than the glass
   const lensM = new THREE.MeshPhysicalMaterial({color:0x141a26, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:4, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
@@ -34,14 +34,14 @@ export default H => {
       if(p.g === 1) for(let i=0;i<p.nv;i++) pos[3*i] *= SX*.988;   // grille scaled with the shell, sitting ~.5 inside its sides
       if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front, 77 wide
         let x = pos[3*i]*SX, y = pos[3*i+1], z = pos[3*i+2];
-        if(z < .0128){ x = Math.max(-.0385, Math.min(.0385, x)); y = Math.max(-.0495, Math.min(.0456, y)); }   // the CAD's wider back flange pulled in to the front shell's outline
+        if(z < .0128){ x = Math.max(-.0385, Math.min(.0385, x)); y = Math.max(-.0495, Math.min(.0448, y)); }   // the CAD's wider back flange pulled in to the front shell's outline
         if(y > .036 && z > .021 && z < .04){ const dy = y - .036, dz = z - .021, L = Math.hypot(dy, dz); if(L > .010){ y = .036 + dy*.010/L; z = .021 + dz*.010/L; } }   // top-front corner R10
         pos[3*i] = x; pos[3*i+1] = y; pos[3*i+2] = z; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
       let I = p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni);
       const Nr0 = new Int8Array(OCPM.buf, p.n, p.nv*3);
-      if(p.g === 1) I = keepTris(I, pos, (a, b, c, v) => Math.min(a, b, c) >= .016 || Math.abs(Nr0[3*v])/127 < .6);   // grille: side faces start 16 mm off the wall (white border behind); the bottom wrap is kept whole
+      if(p.g === 1) I = keepTris(I, pos, (a, b, c, v) => Math.min(a, b, c) >= .016 || Math.abs(Nr0[3*v+1])/127 > .7);   // grille: side faces start 16 mm off the wall (white border behind); the bottom wrap is kept whole
       else I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
       geo.setIndex(new THREE.BufferAttribute(I,1));
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
@@ -56,8 +56,8 @@ export default H => {
   }
   // wall-plate layer (z 0 -> 7): a 3 mm rim with exactly the shell's outline (77 x 95.1, R10), rounded R1 at the wall, so plate and
   // shell are one flush surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
-  { const s = rrShape(77, 95.1, 10); s.holes.push(rrShape(71, 89.1, 7));
-    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -1.95, 0); g.userData.wallPlate = wp; }
+  { const s = rrShape(77, 94.3, 10); s.holes.push(rrShape(71, 88.3, 7));
+    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -2.35, 0); g.userData.wallPlate = wp; }
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
   { const s = H.rr4(77, 48, [0, 0, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [0, 0, 8.8, 8.8], 0, -25.4));
     add(M, ext(s, 8.95, .3, mountW), 0, 0, 7.05);             // ends exactly at the grille's back edge (z 16)

@@ -20,7 +20,7 @@ export default H => {
   const zF = 93, yT = -85, yB = -152, lean = 13, leanW = 6, S = .12, wing = V2(.93, .37).normalize(), cW = wing.x*61 + wing.y*zF;   // centre face 122 at the top, wings ~68 deg to the wall
   const yc = (yT + yB)/2, ry = (yT - yB)/2;
   const zBack = y => 8 + 28*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));   // near-semicircular back
-  const Wb = 77, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -40;
+  const Wb = 77, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -46.2;   // band starts just inside the mount's rim (no notch)
 
   // sheared group for everything that sits on / is the bar: y' = y - S*(z - 20)
   const SG = new THREE.Group(); M.add(SG); SG.matrixAutoUpdate = false;
@@ -57,7 +57,7 @@ export default H => {
 
   // ---------------------------------------------------------------- light bar housing
   const lines = (d, y) => [ [wing.x, wing.y, cW - d[1]], [0, 1, zF - d[0]], [-wing.x, wing.y, cW - d[1]], [0, -1, -zBack(y)] ];   // d = [centre inset, wing inset]   // CCW by normal angle
-  const RC = [8, 8, 12, 12];                                  // front corners R8, rounded wing/back ends
+  const RC = [8, 8, 9, 9];                                  // front corners R8, rounded wing/back ends
   const nC = 10, nE = 14, B = nC + nE, NP = 4*B;
   const outline = (d, y) => {                                 // rounded convex polygon from half-planes n.p <= c, fixed topology
     const L = lines(d, y), P = [];
@@ -136,7 +136,7 @@ export default H => {
     const sample = (C, u) => { const L = [0]; for(let i=1;i<C.length;i++) L.push(L[i-1] + Math.hypot(C[i][0]-C[i-1][0], C[i][1]-C[i-1][1]));
       const s = u*L[L.length-1]; let k = 1; while(k < L.length-1 && L[k] < s) k++; const fr = (s - L[k-1])/(L[k]-L[k-1] || 1);
       return [C[k-1][0] + (C[k][0]-C[k-1][0])*fr, C[k-1][1] + (C[k][1]-C[k-1][1])*fr, L[L.length-1]]; };
-    const Lall = sample(chainAt(LA(yc), yc), 1)[2], Ltot = Lall - 14, Rw = 10, K = 220;   // window length fixed: its ends are vertical lines 7 mm before the wing ends at mid height
+    const Lall = sample(chainAt(LA(yc), yc), 1)[2], Ltot = Lall - 8, Rw = 10, K = 220;   // window length fixed: its ends are vertical lines 7 mm before the wing ends at mid height
     const yTopAt = s => wY0 + .2 - (s < Rw ? Rw - Math.sqrt(Rw*Rw - (Rw - s)**2) : 0), yMid = (wY0 + wY1)/2;
     const glass = new THREE.MeshPhysicalMaterial({color:0xeef2f5, roughness:.03, metalness:0, transparent:true, opacity:.3, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:2.5, side:THREE.DoubleSide, depthWrite:false});
     const smoke = new THREE.MeshPhysicalMaterial({color:0x55585b, roughness:.15, clearcoat:.8, side:THREE.DoubleSide});

@@ -1051,7 +1051,6 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .vl-c .vl-pic { width: 100%; border-radius: 18px; }
   .vl-c .vl-play { width: 48px; height: 48px; margin: -24px 0 0 -24px; } .vl-c .vl-play svg { width: 17px; height: 17px; margin-left: 3px; }
   .vl-c b { display: block; margin-top: 10px; font-size: 15px; font-weight: 600; line-height: 1.2; letter-spacing: -.01em; }
-  .vl-c small { display: block; margin-top: 3px; font-size: 12px; color: rgba(255,255,255,0.5); }
   /* phones upright: the newest video sits on top of its title */
   @media (max-width: 600px) {
     .fsheet.vl .fs-card { left: 0; right: 0; top: 0; bottom: 0; border-radius: 0; border: 0; }
@@ -3151,7 +3150,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
         + '<div class="vl-body' + (rest.length ? '' : ' solo') + '">' + (first ? '<button type="button" class="vl-hero" data-i="0" aria-label="Play ' + esc(first.title) + '">' + pic(first, true)
           + '<div class="vl-info"><span class="vl-tag">' + esc(first.tag || 'Newest') + '</span><h3>' + esc(first.title) + '</h3>'
           + '<span class="vl-go">' + PLAY + 'Play</span></div></button>' : '')
-        + (rest.length ? '<div class="vl-sub">More videos</div><div class="vl-grid">' + rest.map((v, i) => '<button type="button" class="vl-c" data-i="' + (i + 1) + '" aria-label="Play ' + esc(v.title) + '">' + pic(v) + '<b>' + esc(v.title) + '</b>' + (v.len ? '<small>' + esc(v.len) + '</small>' : '') + '</button>').join('') + '</div>' : '')
+        + (rest.length ? '<div class="vl-sub">More videos</div><div class="vl-grid">' + rest.map((v, i) => '<button type="button" class="vl-c" data-i="' + (i + 1) + '" aria-label="Play ' + esc(v.title) + '">' + pic(v) + '<b>' + esc(v.title) + '</b></button>').join('') + '</div>' : '')
         + '</div>');
       sh.classList.add('vl');
       ['touchmove', 'keyup', 'keypress'].forEach(ev => sh.addEventListener(ev, e => e.stopPropagation(), { passive: true }));
