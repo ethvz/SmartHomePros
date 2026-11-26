@@ -205,6 +205,7 @@
     var band = max(80, gy - top), span = min(band * .82, W * .4, 420);
     f = span / (a - b); cy = (gy - 4) - f * a; cx = W / 2; ground = gy;
     sk = f / 300;
+    var ft = M.round(gy + 6) + 'px'; if (wrap.style.getPropertyValue('--ft') !== ft) wrap.style.setProperty('--ft', ft);
   }
   function resize() {
     var r = hero.getBoundingClientRect(), w = M.round(r.width), h = M.round(r.height);
