@@ -12,6 +12,11 @@ OUT = os.environ.get('SHPC_ART') or os.path.join(os.path.dirname(ROOT), 'shpc-ar
 SERVED = set('htm html css cjs js jsx mjs wasm csv cts geojson json map md mts ts tsx txt webmanifest xml avif gif ico jpeg jpg png svg webp otf ttf woff woff2 mp3 mp4 ogg wav webm pdf'.split())
 LANDING_KEEP = {'pitch/assets/home2.webp', 'pitch/assets/vl/imagine.webp', 'pitch/assets/icon-192.png', 'recruit/a_470ace19f4f41e262a08af30291d0034.webp', 'recruit/icon.png', 'connect/bg.webp'}
 PACK_MAX = 7_000_000
+# images that the iPhone-portrait stylesheets (pitch/pp/*.css) reference with url(): those files are not run through the
+# packer's HTML transform, so their images must stay as plain files in the artifact
+for _c in __import__('glob').glob(os.path.join(ROOT, 'pitch', 'pp', '*.css')):
+    for _u in re.findall(r"url\((?![\"']?data:)[\"']?([^)\"'?]+)", open(_c, encoding='utf-8').read()):
+        LANDING_KEEP.add(os.path.normpath(os.path.join('pitch/pp', _u)))
 
 
 def files_under(d):
