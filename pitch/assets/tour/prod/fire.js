@@ -63,10 +63,15 @@ export default H => {
   const pm = splitMat(white, white, 'y', Y - 38, .22, 0xa8a9a8); pm.alphaMap = mask; pm.alphaTest = .5;
   body();                                                 // plate body: same masked material, so the pinhole stays open through its front
 
-  // front height field: 0.1 x 0.2 mm grid; points outside the outline are pulled onto it, so the edge is exact
-  { const st = .2, nx = Math.ceil(W / .1) + 2, ny = Math.ceil(Ht / st) + 2, pos = [], nor = [], uv = [], idx = [], e = .03;
+  // front height field: 0.1-0.8 mm grid; points outside the outline are pulled onto it, so the edge is exact
+  // adaptive: fine only where the face has detail (side/bottom bands, the top strip and notch), coarse across the flat middle (iPad GPU budget)
+  { const st = .2, pos = [], nor = [], uv = [], idx = [], e = .03;
+    const axis = (lo, hi, step) => { const a = [lo]; while (a[a.length - 1] < hi) a.push(Math.min(hi, a[a.length - 1] + step(a[a.length - 1]))); return a; };
+    const xs = axis(-X - st, X + st, x => { const ax = Math.abs(x); return ax > X - 3.2 ? .1 : Math.abs(ax - NW) < 1.2 ? .1 : ax > X - 9.8 ? .3 : .8; });
+    const ys = axis(-Y - st, Y + st, y => y > Y - 11 || y < -Y + 3.4 ? .15 : .8);
+    const nx = xs.length - 1, ny = ys.length - 1;
     for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
-      let x = -X - st + i * (W + 2 * st) / nx, y = -Y - st + j * (Ht + 2 * st) / ny;
+      let x = xs[i], y = ys[j];
       const n = near(x, y); if (n.d < 0) { x = n.bx; y = n.by; }
       const xi = x - Math.sign(x) * 1e-3 * (n.d < 0), yi = y - Math.sign(y) * 1e-3 * (n.d < 0);
       pos.push(x, y, hf(xi, yi)); uv.push(x, y);

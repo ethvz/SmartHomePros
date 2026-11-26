@@ -65,7 +65,7 @@ export default H => {
   add(g, sweep(P, [[1.9, 30.0], [2.3, 30.0]], hair));                                                         // dark floor (the hairline gap) at the bezel foot
 
   /* ---- fabric grille: inset 2.0, face 0.5 mm below the rim crest, edge wrapped soft */
-  { const N = 2048, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
+  { const N = 1536, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
     const T = 40.8, cols = 48, rows = 51, cw = N/cols, rh = N/rows;                          // 40.8 mm tile: stitches 0.85 x 0.8 mm, half-row stagger
     let seed = 11; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
     const TAU = Math.PI*2, heather = (px, py) => { const u = px/N*TAU, v = py/N*TAU;               // low-frequency mottling that still tiles

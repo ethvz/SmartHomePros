@@ -124,7 +124,7 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   const shellMat = lineMat(white, [{ ax: 'x', at: 41.5, w: .45, col: 0x7d7d7b, k: 1, mask: 'abs(normalize(vON).z) < .95' }, { ax: 'x', at: 41.9, w: .4, col: 0xffffff, k: .5, mask: 'abs(normalize(vON).z) < .95' },
     { ax: 'z', at: 25.5, w: .35, col: 0x8a8a88, k: 1, mask: 'vOP.x > 45.0 && abs(normalize(vON).x) > .7' }, { ax: 'z', at: 25.85, w: .3, col: 0xffffff, k: .5, mask: 'vOP.x > 45.0 && abs(normalize(vON).x) > .7' },   // parting line on the outlet end face
     { ax: 'y', at: -13.4, w: .3, col: 0x8a8a88, k: 1, mask: 'vOP.x > 45.0 && abs(normalize(vON).x) > .7' }]);   // line under the faceplate (sets off the "Max. 330W" strip)   // collar joint, drawn on the walls and the front-to-end round, not on the flat face
-  { const sh = solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat);
+  { const sh = solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 520), prof: shellProf, fan: [0, 0, D + crown] }], shellMat);
     add(P, sh); }
   const zTop = D + crown;
 

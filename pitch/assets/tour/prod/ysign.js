@@ -123,7 +123,7 @@ export default H => { const { THREE, G, add, rbox } = H;
     for (let i = 0; i < N * N; i++) { const v = 128 + (Math.random() - .5) * 90; d.data.set([v, v, v, 255], i * 4); } x.putImageData(d, 0, 0);
     x.filter = 'blur(2px)'; x.drawImage(c, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 5); return t; })();
   /* the artwork, laid out to the measured official art (mm from the centre): orange field, white ring, type, real wordmark */
-  const N = 2048, cv = document.createElement('canvas'); cv.width = cv.height = N; const cx = cv.getContext('2d'), k = N / (2 * Rd);
+  const N = 1536, cv = document.createElement('canvas'); cv.width = cv.height = N; const cx = cv.getContext('2d'), k = N / (2 * Rd);
   const art = new THREE.CanvasTexture(cv); art.colorSpace = THREE.SRGBColorSpace; art.anisotropy = 8;
   const P = (x, y) => [N / 2 + x * k, N / 2 - y * k];
   const font = (w, px) => `${w} ${px * k}px "Vivint Sans", "Avenir Next", "Montserrat", "Helvetica Neue", Arial, sans-serif`;

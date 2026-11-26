@@ -56,9 +56,9 @@ export default H => {
   ];
 
   /* ---------- canvases: printed map + hole mask, planar over the 142 mm disc */
-  const SZ = 142, N = 2048, k = N / SZ, P = (x, y) => [N / 2 + x * k, N / 2 - y * k];
+  const SZ = 142, N = 1536, k = N / SZ, P = (x, y) => [N / 2 + x * k, N / 2 - y * k];
   const cv = document.createElement('canvas'); cv.width = cv.height = N; const x = cv.getContext('2d');
-  const MK = 2048, mk = document.createElement('canvas'); mk.width = mk.height = MK; const m = mk.getContext('2d');   // hole mask (anti-aliased via alphaToCoverage; 2048 keeps iPad memory sane)
+  const MK = 1536, mk = document.createElement('canvas'); mk.width = mk.height = MK; const m = mk.getContext('2d');   // hole mask (anti-aliased via alphaToCoverage; 2048 keeps iPad memory sane)
   x.fillStyle = '#f4f4f2'; x.fillRect(0, 0, N, N); m.fillStyle = '#fff'; m.fillRect(0, 0, MK, MK);
   const pathPts = (c, pts, sc) => { c.beginPath(); pts.forEach(([px, py], i) => { const X = MK / 2 + px * sc, Y = MK / 2 - py * sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.closePath(); };
   m.fillStyle = '#000'; for (const h of holes) { pathPts(m, h.pts, MK / SZ); m.fill(); }
@@ -137,7 +137,7 @@ export default H => {
   const mapT = tex(cv); mapT.colorSpace = THREE.SRGBColorSpace; const maskT = tex(mk);
 
   /* ---------- face grid r = RL..RF, z from surfZ, planar UVs, analytic-ish normals */
-  { const NR = 120, NA = 1440, pos = [], nor = [], uv = [], idx = [], e = .05;
+  { const NR = 72, NA = 540, pos = [], nor = [], uv = [], idx = [], e = .05;
     for (let i = 0; i <= NR; i++) { const r = RL + (RF - RL) * (i / NR) ** 1.6;
       for (let j = 0; j <= NA; j++) { const a = j / NA * Math.PI * 2, X = r * Math.cos(a), Y = r * Math.sin(a), Z = surfZ(X, Y);
         pos.push(X, Y, Z); uv.push(X / SZ + .5, Y / SZ + .5);
@@ -180,7 +180,7 @@ export default H => {
   { const f = faceZ(RL), lp = [V2(30, 33.6 + ZB), V2(43.6, 33.6 + ZB), V2(44.3, 33.9 + ZB), V2(RL, Math.min(f, 34.6 + ZB)), V2(RL, f + .02)].reverse();   // well wall under the lip
     const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), wellM)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
-    const W = 8192, circ = 2 * Math.PI * 40.5, pxmm = W / circ, Hh = Math.round(9 * pxmm), c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
+    const W = 4096, circ = 2 * Math.PI * 40.5, pxmm = W / circ, Hh = Math.round(9 * pxmm), c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
     y.fillStyle = '#2a2b2c'; y.fillRect(0, 0, W, Hh);
     for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 6 * pxmm); }
     y.strokeStyle = 'rgba(95,96,97,.6)'; y.lineWidth = .14 * pxmm; const pitch = .5 * pxmm;   // >= 8 px pitch: no moire with mipmaps

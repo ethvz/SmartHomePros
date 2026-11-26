@@ -225,6 +225,12 @@ body.focus #cFeats.on .feat:nth-child(1){transition-delay:.35s;animation-delay:1
 body.focus #cFeats.on .feat:nth-child(2){transition-delay:.5s;animation-delay:2.6s}
 body.focus #cFeats.on .feat:nth-child(3){transition-delay:.65s;animation-delay:.4s}
 @keyframes fbob{0%,100%{translate:0 0}50%{translate:0 -6px}}
+/* iPad stability: no backdrop blur on the many layers that move with the camera (hotspot dots, labels, rail cards): Safari re-blurs
+   each one every frame over the WebGL canvas and runs out of memory. Only the few static glass panels keep a real blur; no endless bob. */
+.hs .dot,.hs .lbl,#railIn .pi{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+#railIn .pi{background:rgba(40,40,42,.72)}
+#railIn .pi[aria-current="true"]{background:rgba(78,78,80,.86)}
+body.focus #cFeats.on .feat{animation:none!important}
 /* around the product: two on the left, one on the right (landscape) */
 #cFeats .feat:nth-child(1){right:calc(50% + 190px);top:8%}
 #cFeats .feat:nth-child(2){left:calc(50% + 190px);top:30%}
@@ -353,8 +359,14 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ------------------------------------------------------------------ renderer */
 const canvas = document.getElementById('scene');
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, /still/.test(location.search) ? 1 : 1.6));
+/* iPad stability: if the GPU drops the WebGL context (Safari under memory pressure), reload quietly instead of a dead or crashed
+   page; after a second loss this session, come back in a lighter mode (no MSAA, 1x pixels). Touch devices render at <= 1.4x. */
+const SS = (k, v) => { try{ if(v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); }catch(e){ return null; } };
+const LITE = SS('tourLite') === '1', TOUCH = navigator.maxTouchPoints > 1;
+canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); const n = +(SS('tourLost') || 0) + 1; SS('tourLost', String(n)); if(n >= 2) SS('tourLite', '1');
+  document.documentElement.style.background = '#0d1014'; setTimeout(() => location.reload(), 350); }, false);
+const renderer = new THREE.WebGLRenderer({canvas, antialias:!LITE, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, /still/.test(location.search) || LITE ? 1 : TOUCH ? 1.4 : 1.6));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1384,7 +1396,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 24;
+const TOURV = 25;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
