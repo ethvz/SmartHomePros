@@ -167,7 +167,7 @@ export default H => {
   add(head, H.torus(1.2, .14, mat(0x3a3b3d,{r:.3,m:.4})), 0, -30.5, -.3);
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .2, 24), mat(0x2a2a2c,{r:.08,x:{clearcoat:1}}))), 0, -30.5, -.25);
   for(const sx of [-25.5, 25.5]) add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .1, 16), mat(0x1c1c1d,{r:.7}))), sx, -28.5, .02);
-  add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, -1.7-.43, .03);   // wordmark 15 mm above the lens centre (detail_lens)
+  add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, -.6-.43, .03);   // wordmark ~16 mm above the lens centre (between detail_lens and front_1)
 
   // ---------------------------------------------------------------- ball, neck and pose
   const B = V3(0, C.y, 49.5), rBall = 12.2, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
