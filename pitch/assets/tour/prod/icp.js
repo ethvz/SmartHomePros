@@ -129,8 +129,8 @@ export default H => {
   add(hd, new THREE.Mesh(new THREE.ShapeGeometry(ld, 64), discM), 0, 0, ZF - .005);
   add(hd, disc(15.6, 16.6, voidM), 0, 0, ZF - .35);
   add(hd, lathe([[8.5, -.005], [8.45, -.1], [8.2, -.5], [4.8, -.5], [4.5, -.65], [4.5, -1.7]], barrel), 0, 0, ZF);
-  add(hd, disc(0, 4.6, voidM), 0, 0, ZF - 1.7);
-  add(hd, disc(3.1, 4.5, phys(0x3a3a40, { roughness: .35 })), 0, 0, ZF - 1.65);   // graphite inner barrel
+  //DIAG add(hd, disc(0, 4.6, voidM), 0, 0, ZF - 1.7);
+  add(hd, disc(3.1, 4.5, phys(0xff0000, { roughness: .35 })), 0, 0, ZF - 1.65);   // graphite inner barrel
   add(hd, H.dome(3.1, .25, lensM), 0, 0, ZF - 1.66);
   { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.fillStyle = '#fff';           // small crisp glint crescent
     x.beginPath(); x.arc(32, 32, 26, PI * 1.05, PI * 1.6); x.arc(36, 36, 22, PI * 1.6, PI * 1.05, true); x.closePath(); x.fill();

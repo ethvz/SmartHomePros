@@ -129,7 +129,7 @@ export default H => {
       add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .2, 16), die)), cx, cy, zfl + .1); }
   }
 
-  // ---------------------------------------------------------------- clear wraparound window: 0.6 under the lip, R10 corners, ends 7 mm before
+  // ---------------------------------------------------------------- clear wraparound window: 0.6 under the lip, R10 corners, ends 4 mm before
   // each wing's round back end, 2 mm smoky cut edge all round
   { const chainAt = (d, y) => { const P = outline(d, y), ring = P.concat(P), out = [];
       for(let i = 3*B + nC + 1; i <= 6*B - 1; i++) out.push(ring[i]); return out; };   // right wing (from its back tangent) -> front -> left wing
