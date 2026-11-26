@@ -337,3 +337,10 @@ html.pp #p-hub #hbScroll .otab.fb>.fsp{left:50%!important;margin-left:-140px!imp
 html.pp #p-hub #hbSpec .hbspec div b{width:200px!important;padding-right:14px;box-sizing:border-box}
 /* Door & Window Specs: the Surface / Recessed toggle sits above the pill, so the copy starts above the toggle */
 html.pp #prScroll .psec[data-t=specs]:has(.hl .dwseg) .fsp-pane{padding-bottom:276px!important}
+/* shorter phones: tighter Hardware callouts so the product render keeps room above them */
+@media (min-aspect-ratio:10/19){
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane{gap:16px 22px;padding-left:28px;padding-right:28px;padding-bottom:186px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co{font-size:15px!important;line-height:19px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co b{font-size:17px!important;line-height:20px!important;margin-bottom:4px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fst .r{min-height:48px}
+}

@@ -22,7 +22,7 @@
      Parts after the first show a clone of the picture (and of its video, kept in sync). Default: the whole picture. */
   const LAY={
     'lock:lock':{mode:'stack',crops:[[70,200,820,590],[930,190,420,610]],w:[1,.78]},
-    'lock:colors':{mode:'grid',crops:[[60,200,320,450],[360,200,320,450],[650,200,320,450],[960,200,340,450]],labels:['Bronze','Nickel','Brass','Matte Black']},
+    'lock:colors':{mode:'grid',crops:[[66,222,298,428],[362,222,296,428],[662,222,296,428],[958,222,342,428]],labels:['Bronze','Nickel','Brass','Matte Black']},
     'garage:garage':{mode:'stack',crops:[[80,130,500,320],[592,190,696,710]],w:[.85,1]},
     'garage:gphone':{crops:[[224,36,448,900]]},
     'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.8]},
@@ -108,7 +108,7 @@
     'gal/therm_0':.50,'gal/therm_1':.80,'gal/therm_2':.42,'gal/therm_3':.57,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
     'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.80,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
     'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.68,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
-  const ZH={'ph/plug3':.72,'ph/firefighter':.74,'ph/water':.8,'ph/lock3':.72,'ph/chime3':.72,'ph/dws_surf':.76,'ph/dws_rec':.76,'gal/hub_0':.64,'gal/hub_5':.74};
+  const ZH={'ph/plug3':.72,'ph/firefighter':.74,'ph/water':.8,'ph/lock3':.66,'ph/chime3':.72,'ph/dws_surf':.76,'ph/dws_rec':.76,'gal/hub_0':.64,'gal/hub_5':.74};
   const focKey=el=>{ const u=el.getAttribute('src')||''; const m=u.match(/assets\/((?:ph|gal|p)\/[\w]+)\./); return m&&m[1]; };
   function focal(){ const pp=isPP();
     BOX.forEach(q=>{ const b=$(q); if(!b) return;
@@ -143,7 +143,8 @@
         /* a render may not be blown up past ~1.15x its own pixels */
         let cap=9; ims.forEach((im,i)=>{ if(im.naturalWidth) cap=Math.min(cap,im.naturalWidth*1.15/R[i][2]); else if(!im.__ppl){ im.__ppl=1; im.addEventListener('load',later,{once:true}); } });
         const k=Math.min(760/gw,free/gh,cap), w=gw*k, h=gh*k, right=pi%2===0;
-        const L=right?600-w*.74:-w*.26, Y=T+(free-h)/2;
+        /* narrow renders lose less to the edge so they still read as the product */
+        const off=w>320?.26:.14, L=right?600-w*(1-off):-w*off, Y=T+(free-h)/2;
         ims.forEach((im,i)=>{ const r=R[i]; setI(im,'left',(L+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); });
         const want=right?'ppA-br':'ppA-bl'; if(!pn.classList.contains(want)){ pn.classList.remove('ppA-bl','ppA-br'); pn.classList.add(want); } }); }); }
 
