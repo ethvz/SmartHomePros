@@ -84,16 +84,16 @@ export default H => {
   const wY0 = yT - 4.5, wY1 = yB + 4.5;
   const levels = [];                                          // [y, extra inset, recessed band?]
   for(let i=0;i<=8;i++){ const a = i/8*Math.PI/2; levels.push([yT - 4 + 4*Math.cos(a), 4 - 4*Math.sin(a), 0]); }      // top edge R4
-  levels.push([wY0 + .3, 0, 0], [wY0 + .15, .3, 0], [wY0, band, 1]);
+  levels.push([wY0 + .3, 0, 0], [wY0 + .15, .3, 2], [wY0, band, 1]);   // flag 2 = window-edge step: fades out with the recess (no fin at the rear)
   for(let y = wY0 - 4; y > wY1 + 1; y -= 4) levels.push([y, band, 1]);
-  levels.push([wY1, band, 1], [wY1 - .15, .3, 0], [wY1 - .3, 0, 0]);
+  levels.push([wY1, band, 1], [wY1 - .15, .3, 2], [wY1 - .3, 0, 0]);
   for(let i=0;i<=8;i++){ const a = i/8*Math.PI/2; levels.push([yB + 4 - 4*Math.sin(a), 4 - 4*Math.cos(a), 0]); }      // bottom edge R4
   const pos = [], idxA = [], idxB = [];
   for(const [y, d, f] of levels){ const P0 = outline(LA(y), y), P1 = outline(LA(y, d), y);
-    for(let i=0;i<NP;i++){ const w = f ? recessW(i) : 1;
+    for(let i=0;i<NP;i++){ const w = f ? recessW(i) : 1;   // f 1/2 = recess rows
       const q = d ? [P0[i][0] + (P1[i][0]-P0[i][0])*(f ? w : 1), P0[i][1] + (P1[i][1]-P0[i][1])*(f ? w : 1)] : P0[i];
       pos.push(q[0], y, q[1]); } }
-  for(let r=0;r<levels.length-1;r++){ const into = (levels[r][2] && levels[r+1][2]) ? idxB : idxA;
+  for(let r=0;r<levels.length-1;r++){ const into = (levels[r][2] === 1 && levels[r+1][2] === 1) ? idxB : idxA;
     for(let i=0;i<NP;i++){ const a = r*NP+i, b = r*NP+(i+1)%NP, c = a+NP, d = b+NP; into.push(a,b,c, b,d,c); } }
   const cT = pos.length/3; pos.push(0, yT, 55); const cB = pos.length/3; pos.push(0, yB, 50);
   const oB = (levels.length-1)*NP; for(let i=0;i<NP;i++){ idxA.push(cT, (i+1)%NP, i); idxA.push(cB, oB+i, oB+(i+1)%NP); }
@@ -109,10 +109,10 @@ export default H => {
   const domeGeo = new THREE.SphereGeometry(5.1, 40, 16, 0, Math.PI*2, 0, Math.PI/2); domeGeo.scale(1, .56, 1);
   const coneGeo = new THREE.ConeGeometry(2.6, 1.8, 24, 1, true);
   const wallM = new THREE.MeshPhysicalMaterial({vertexColors:true, roughness:.7});          // capsule walls shaded floor -> lip
-  const sW = 48, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
+  const sW = 44, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
     { n: V2(0, 1), p: V2(0, zF), w: 100, cols: [-28, 0, 28], ln: lean },
-    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 50, cols: [-17, 0, 17], ln: leanW },
-    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 50, cols: [-17, 0, 17], ln: leanW } ];
+    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 46, cols: [-16, 0, 16], ln: leanW },
+    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 46, cols: [-16, 0, 16], ln: leanW } ];
   for(const F of faces){
     const slant = Math.hypot(yT - yB, F.ln), dv = V2(F.ln, yT - yB).normalize();
     const hW = (wY0 - wY1)*slant/(yT - yB) + 2, vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;
@@ -174,7 +174,7 @@ export default H => {
 
   // ---------------------------------------------------------------- saddle: the band's foot wraps 2.5 mm thick over the bar's rounded upper
   // back, a little wider than the band; recessed grey screw panel with two flush caps and a small slot below it (detail_backbar)
-  { const Ws = 85, pT = -93.5, pB = -105.5, wP = 62, y0 = yT + 1, y1 = -110;
+  { const Ws = 85, pT = -93.5, pB = -105.5, wP = 62, y0 = yT - 2, y1 = -110;   // saddle starts just below the bar's top edge (no corner poking above it)
     const prof = (ya, yb, off) => { const sd = new THREE.Shape(), n = Math.max(4, Math.round((ya - yb)/1.2));
       for(let i=0;i<=n;i++){ const y = ya + (yb-ya)*i/n; i ? sd.lineTo(zBack(y) - off, y) : sd.moveTo(zBack(y) - off, y); }
       for(let i=n;i>=0;i--){ const y = ya + (yb-ya)*i/n; sd.lineTo(zBack(y) + .4, y); } return sd; };
