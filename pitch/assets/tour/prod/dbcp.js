@@ -55,7 +55,7 @@ export default H => {
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
 
   /* ---------- black front cap: z 28.0 -> 35.0, R2.5 rolled front edge ---------- */
-  const ZF = 35, W = 43, HH = 132, R = 10;
+  const ZF = 35, W = 43, HH = 132, R = 11.5;
   const capS = [[28.0, W, HH, R], [32.5, W, HH, R]];
   for (let i = 1; i <= 9; i++) { const a = i / 9 * PI / 2, s = 2.5 * (1 - Math.cos(a)); capS.push([32.5 + 2.5 * Math.sin(a), W - 2 * s, HH - 2 * s, R - s]); }
   add(g, shell(capS, [glassL, glass], { front: false }));

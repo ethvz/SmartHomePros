@@ -52,8 +52,8 @@ export default H => {
     s.absarc(cx, cy+e, r, 0, Math.PI, false); s.absarc(cx, cy-e, r, Math.PI, 2*Math.PI, false); return s; };
 
   /* ---- materials */
-  const cover = new THREE.MeshPhysicalMaterial({color:0xe9e9e7, roughness:.78, sheen:.45, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.04, clearcoatRoughness:.6});
-  const housing = new THREE.MeshPhysicalMaterial({color:0xe6e6e4, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
+  const cover = new THREE.MeshPhysicalMaterial({color:0xe0e0de, roughness:.78, sheen:.45, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.04, clearcoatRoughness:.6});
+  const housing = new THREE.MeshPhysicalMaterial({color:0xdddddb, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
   const groove = new THREE.MeshStandardMaterial({color:0x7c7c7c, roughness:.65});
   const pocketM = housing.clone(); pocketM.side = THREE.DoubleSide;
   const hidden = new THREE.MeshBasicMaterial({visible:false});
@@ -76,11 +76,11 @@ export default H => {
 
   /* ---- right-side button: pill 12 x 6 in a 0.7 mm shadow ring, cap recessed 0.4 mm with a soft domed face */
   { const b = G(); b.rotation.y = Math.PI/2; add(g, b, W/2*k, 0, 7*k);
-    const patch = new THREE.Shape([[-4,-9],[4,-9],[4,9],[-4,9]].map(([x,y]) => new THREE.Vector2(x,y))); patch.holes.push(pill(7.4, 13.4, 0, 0, true));
+    const patch = new THREE.Shape([[-4,-9],[4,-9],[4,9],[-4,9]].map(([x,y]) => new THREE.Vector2(x,y))); patch.holes.push(pill(7.6, 13.6, 0, 0, true));
     const pg = new THREE.ShapeGeometry(patch, 32); pg.scale(k,k,k); add(b, new THREE.Mesh(pg, housing)).receiveShadow = true;
-    const wg = new THREE.ExtrudeGeometry(pill(7.4, 13.4), {depth:1.6, bevelEnabled:false, curveSegments:32}); wg.translate(0, 0, -1.6); wg.scale(k,k,k);
+    const wg = new THREE.ExtrudeGeometry(pill(7.6, 13.6), {depth:1.6, bevelEnabled:false, curveSegments:32}); wg.translate(0, 0, -1.6); wg.scale(k,k,k);
     add(b, new THREE.Mesh(wg, [hidden, pocketM]));
-    const fg = new THREE.ShapeGeometry(pill(7.4, 13.4), 32); fg.scale(k,k,k); add(b, new THREE.Mesh(fg, new THREE.MeshStandardMaterial({color:0x9a9a98, roughness:.7})), 0, 0, -1.6*k);
+    const fg = new THREE.ShapeGeometry(pill(7.6, 13.6), 32); fg.scale(k,k,k); add(b, new THREE.Mesh(fg, new THREE.MeshStandardMaterial({color:0xa8a8a6, roughness:.7})), 0, 0, -1.6*k);
     const cb = .45, cg = new THREE.ExtrudeGeometry(pill(6, 12), {depth:1.2-2*cb, bevelEnabled:true, bevelThickness:cb, bevelSize:cb, bevelOffset:-cb, bevelSegments:6, curveSegments:32});
     cg.translate(0, 0, cb - 1.2 - .4); cg.scale(k,k,k); const cm = add(b, new THREE.Mesh(cg, housing)); cm.castShadow = cm.receiveShadow = true; }
 
@@ -90,21 +90,21 @@ export default H => {
     const chev = (cy, up) => { const s = up ? 1 : -1; x.beginPath(); x.moveTo(X(-2.85), Y(cy - 1.4*s)); x.lineTo(X(0), Y(cy + 1.4*s)); x.lineTo(X(2.85), Y(cy - 1.4*s)); x.stroke(); };
     const flake = (cx, cy, r) => { for(let i=0;i<6;i++){ const a = Math.PI/2 + i*Math.PI/3, ca = Math.cos(a), sa = Math.sin(a);
         x.beginPath(); x.moveTo(X(cx), Y(cy)); x.lineTo(X(cx + ca*r), Y(cy + sa*r)); x.stroke();
-        for(const f of [.58]) for(const sg of [-1, 1]){ const bx = cx + ca*r*f, by = cy + sa*r*f, b = a + sg*.85, L = r*.36;
+        for(const f of [.62]) for(const sg of [-1, 1]){ const bx = cx + ca*r*f, by = cy + sa*r*f, b = a + sg*.8, L = r*.27;
           x.beginPath(); x.moveTo(X(bx), Y(by)); x.lineTo(X(bx + Math.cos(b)*L), Y(by + Math.sin(b)*L)); x.stroke(); } } };
     const num = (s, cx, cy, capH, wT, wt) => {            // digits sized by cap height and total ink width, tight tracking
       x.font = `${wt} 100px ${F}`; const asc = x.measureText('7').actualBoundingBoxAscent || 70, fs = 100*capH*10/asc; x.font = `${wt} ${fs}px ${F}`;
       x.textAlign = 'left'; x.textBaseline = 'alphabetic'; const ms = [...s].map(c => x.measureText(c)), iw = ms.map(m => m.actualBoundingBoxLeft + m.actualBoundingBoxRight);
       const gap = s.length > 1 ? Math.max(capH*1.6, (wT*10 - iw.reduce((a, b) => a+b, 0))/(s.length-1)) : 0, wI = iw.reduce((a, b) => a+b, 0) + gap*(s.length-1); let px = X(cx) - wI/2;
       [...s].forEach((c, i) => { x.fillText(c, px + ms[i].actualBoundingBoxLeft, Y(cy) + capH*5); px += iw[i] + gap; }); };
-    const glyphs = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
-      x.lineWidth = 10; chev(46.5, true); chev(-46.5, false);
-      x.lineWidth = 2.4; flake(0, 18.3, 3.8);
-      num('73', 0, 2.4, 15.6, 23.7, 300); num('75', 0, -13.2, 6.0, 9.4, 300); };
+    const big = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
+      x.lineWidth = 10; chev(46.5, true); chev(-46.5, false); num('73', 0, 2.4, 15.6, 23.7, 300); };
+    const small = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
+      x.lineWidth = 2.2; flake(0, 18.3, 3.85); num('75', 0, -13.2, 5.8, 9.4, 300); };
     const draw = () => { x.clearRect(0, 0, N, N);
-      const halo = (blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4000; x.shadowColor = col; x.shadowBlur = blur; glyphs(); x.restore(); };   // shadow only, glyphs stay thin
-      halo(34, 'rgba(255,255,255,.75)'); halo(12, 'rgba(255,255,255,.6)');
-      glyphs();
+      const halo = (fn, blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4000; x.shadowColor = col; x.shadowBlur = blur; fn(); x.restore(); };   // shadow only, glyphs stay thin
+      halo(big, 34, 'rgba(255,255,255,.75)'); halo(big, 12, 'rgba(255,255,255,.6)');
+      big(); small();
       x.save(); x.fillStyle = 'rgba(255,255,255,.1)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
       x.font = `500 ${100*120/w0}px ${F}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('vivint', X(0), Y(-36.6)); x.restore(); };
     draw();

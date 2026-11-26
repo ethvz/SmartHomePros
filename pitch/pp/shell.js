@@ -54,8 +54,10 @@
       if (rail.classList.contains('ico') !== ico) rail.classList.toggle('ico', ico);
       if (bar.classList.contains('ppnav') !== flat) bar.classList.toggle('ppnav', flat);
     } finally { busy = false; }
-    logoFit(); setTimeout(logoFit, 120); setTimeout(logoFit, 700);
+    /* debounced: the rail's own class flips (idle, scrub) would otherwise queue two timers each */
+    clearTimeout(lfA); lfA = setTimeout(logoFit, 60); clearTimeout(lfB); lfB = setTimeout(logoFit, 700);
   }
+  let lfA = 0, lfB = 0;
   /* the logo steps aside whenever another footer control (a page's own toggle, a centred pill) would sit on it */
   let logoR = 0;
   function logoFit() {
@@ -97,7 +99,15 @@
   const t3 = $('#tour3d');
   if (t3) new MutationObserver(() => { const f = $('#tour3d iframe'); if (f && !f.__pp) { f.__pp = 1; f.addEventListener('load', tourInset); } tourInset(); }).observe(t3, { childList: true });
 
-  function all() { setGeo(); ppHome(); navMode(); tourInset(); }
+  /* big tiles whose names are baked into the artwork (too small upright): the baked line is clipped off in CSS and a live label added */
+  const BIGK = ['ocp', 'ocspot', 'keypad', 'app'], BIGN = { ocp: 'Outdoor Camera Pro III', ocspot: 'Outdoor Camera Pro III with Spotlight', keypad: 'Keypad', app: 'Vivint App' };
+  function bigLabels() {
+    $$('#allTiles .ht[data-k], .hcat .ht[data-k]').forEach(t => { const k = t.dataset.k; if (!BIGK.includes(k) || t.querySelector(':scope>.ppcl')) return;
+      if (!t.querySelector(':scope>img[src*="assets/tiles/"]')) return;
+      const d = document.createElement('div'); d.className = 'cl ppcl' + (k === 'keypad' || k === 'app' ? ' top' : ''); d.textContent = BIGN[k]; t.appendChild(d); });
+  }
+
+  function all() { setGeo(); ppHome(); navMode(); tourInset(); bigLabels(); }
   addEventListener('resize', () => { all(); setTimeout(all, 320); });
   addEventListener('orientationchange', () => setTimeout(all, 350));
   new MutationObserver(() => { navMode(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });

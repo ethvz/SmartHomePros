@@ -4,7 +4,8 @@
 
 /* ---------- base: full-width, full-height sub-sections (no landscape card scaling) ---------- */
 html.pp :is(#prScroll,#hbScroll,#thScroll){left:calc(50% - 300px)!important;right:auto!important;width:600px!important}
-html.pp :is(#prScroll,#hbScroll,#thScroll)>*{width:600px!important;margin:0!important;height:var(--H)!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important;overflow:hidden!important}
+html.pp :is(#prScroll,#hbScroll,#thScroll)>*{width:600px!important;margin:0!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important;overflow:hidden!important}
+html.pp :is(#prScroll,#hbScroll,#thScroll)>:not(#emuLayer){height:var(--H)!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll)>[hidden]{display:none!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa{left:50%!important;top:auto!important;bottom:84px!important;width:160px;height:84px;margin-left:-80px}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa i{top:24px}
@@ -149,3 +150,48 @@ html.pp #thSaveBg{display:none!important}
 html.pp #thScroll .thc .thm[data-k=save] img.thm-full{left:0!important;top:0!important;width:700px!important;height:700px!important;object-position:50% 40%;-webkit-mask-image:none!important;mask-image:none!important;border-radius:36px!important}
 html.pp #thScroll .thc .thm[data-k=save] .thm-stat.thm-big{left:44px!important;top:440px!important}
 html.pp #thScroll .thc .thm[data-k=save] img.thm-estar{right:30px!important;top:30px!important}
+/* the Modes / Hardware sections (.fb) float over the live 3D Hub (#emuLayer); one upright screen each */
+html.pp #p-hub #hbScroll>.otab.fb{height:var(--H)!important;width:600px!important}
+html.pp #p-hub #emuLayer{width:600px!important}
+html.pp #p-hub #emuLayer .st{height:var(--H)!important}
+/* Modes: a row of round buttons under the Hub */
+html.pp #p-hub #hbScroll .hbmodes.al{left:20px!important;right:20px!important;width:auto!important;top:calc(var(--H)/2 + 190px)!important;height:84px!important;flex-direction:row!important;padding:6px!important;transform:none!important}
+html.pp #p-hub #hbScroll .hbmodes.al .hbm{flex:1 1 0!important;width:auto!important;height:72px!important;border-radius:36px!important;font-size:12.5px!important;gap:6px}
+html.pp #p-hub #hbScroll .hbmodes.al .hbm .mic,html.pp #p-hub #hbScroll .hbmodes.al .hbm .lvi{width:26px!important;height:26px!important}
+html.pp #p-hub #hbScroll .hbmodes.al>.scrubDot,html.pp #p-hub #hbScroll .hbmodes.al .scrubBg{display:none!important}
+/* Hardware | Specs: the Hub sits at the top (prodA.js tells the 3D view where), text in a grid below it */
+html.pp #p-hub #hbScroll .otab.fb>.strip{width:1200px!important;height:var(--H)!important}
+html.pp #p-hub #hbScroll .otab.fb .hbpane{width:600px!important;height:var(--H)!important;transform:none!important}
+html.pp #p-hub #hbCall{display:grid!important;grid-template-columns:1fr 1fr;align-content:start;gap:26px 28px;padding:calc(var(--H)/2 - 60px) 36px 0;box-sizing:border-box}
+html.pp #p-hub #hbCall>.hbln,html.pp #p-hub #hbCall>.hbdot{display:none!important}
+html.pp #p-hub #hbCall>.hbco{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:17px;line-height:1.35}
+html.pp #p-hub #hbCall>.hbco b{font-size:20px;margin-bottom:6px}
+html.pp #p-hub #hbSpec .hbspec{left:20px!important;right:20px!important;width:auto!important;top:calc(var(--H)/2 - 90px)!important;padding:16px 24px!important}
+html.pp #p-hub #hbSpec .hbspec div{padding:12px 0;font-size:16px}
+html.pp #p-hub #hbSpec .hbspec div b{width:180px;font-size:17px}
+/* History / What's New / Outage: each pane is one 600-wide screen; panes sit 1376 apart because the pill slides by 1376 */
+html.pp #p-hub #hbX .hbpane{width:600px!important;height:var(--H)!important;margin-right:776px}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:24px!important;right:24px;top:100px!important;font-size:40px!important;line-height:1.05}
+html.pp #p-hub #hbScroll .hbsub{left:24px!important;top:196px!important;font-size:18px}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:12px!important;right:12px!important;top:200px!important;column-gap:5px!important;row-gap:5px!important}
+html.pp #p-hub #hbOut .hbt{top:236px!important}
+html.pp #p-hub #hbHist .hbt{grid-template-columns:132px repeat(3,1fr)!important}
+html.pp #p-hub #hbOut .hbt{grid-template-columns:170px repeat(2,1fr)!important}
+html.pp #p-hub #hbOut .hbfoot{left:24px!important;right:24px;top:auto!important;bottom:186px!important;font-size:14px}
+html.pp #p-hub #hbCmp .hbt{grid-template-columns:118px repeat(6,1fr)!important;top:170px!important}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:14px!important;line-height:1.2;padding-right:2px}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{font-size:12.5px!important;min-height:34px!important;padding:3px 4px!important;line-height:1.2}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd{font-size:12.5px;line-height:1.15;gap:4px}
+html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:44px!important}
+html.pp #p-hub #hbCmp .hbt .well{height:66px!important}
+html.pp #p-hub #hbCmp .hbt .well img{width:64px!important;height:58px!important}
+html.pp #p-hub #hbScroll .hbnew{left:24px!important;right:24px!important;top:170px!important;grid-template-columns:1fr!important}
+html.pp #p-hub #hbScroll .hbnew>div{padding-top:0!important}
+html.pp #p-hub #hbScroll .hbnew .th{margin-bottom:12px}
+html.pp #p-hub #hbScroll .hbnew .th img{width:170px}
+html.pp #p-hub #hbScroll .hbnew .th span{font-size:20px}
+html.pp #p-hub #hbScroll .hbnew .ft{margin-bottom:16px}
+html.pp #p-hub #hbScroll .hbnew .ft b{font-size:19px}
+html.pp #p-hub #hbScroll .hbnew .ft span{font-size:16px}
+html.pp #p-hub #hbScroll .hb3pill{top:auto!important;bottom:100px!important;width:560px!important;height:68px!important}
+html.pp #p-hub #hbScroll .hb3pill button{font-size:16px}

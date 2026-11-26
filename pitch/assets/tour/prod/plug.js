@@ -103,25 +103,29 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   /* 1-2. housing + collar: one shell, hairline at x = +36 */
   const hx = W / 2 - R, hy = HH / 2 - R;
   const wOf = (x, y) => {                                   // plan width of the front roll-off at an outline point
-    if (Math.abs(x) <= hx + 1e-6 && Math.abs(y) > hy) { const t = (x + hx) / (2 * hx); return 3 + 5 * Math.sin(Math.PI * t) + 2 * sm(.8, 1, t); }
-    if (Math.abs(y) <= hy + 1e-6) { const t = (y + hy) / (2 * hy); return x > 0 ? 5 + 4 * Math.sin(Math.PI * t) : 3 + 1.5 * Math.sin(Math.PI * t); }
-    return x > 0 ? 5 : 3; };
-  const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [];
-    for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
-    for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = w * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
+    if (Math.abs(x) <= hx + 1e-6 && Math.abs(y) > hy) { const t = (x + hx) / (2 * hx); return 3 + 7.5 * Math.sin(Math.PI * t); }
+    if (Math.abs(y) <= hy + 1e-6) { const t = (y + hy) / (2 * hy); return 3 + 4 * Math.sin(Math.PI * t); }
+    return 3; };
+  const VX = []; for (let i = 0; i < 15; i++) VX.push(-37.5 + i * 67 / 14);       // vent grooves across the top wall (they notch the silhouette)
+  const groove = (x, y) => { if (y < hy || Math.abs(x) > hx) return 0; let gmax = 0; for (const v of VX) gmax = Math.max(gmax, 1 - sm(.6, .85, Math.abs(x - v))); return gmax; };
+  const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [], g0 = 2.2 * groove(x, y);
+    for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)) + g0; out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
+    const gv = 2.2 * groove(x, y), zs = D - h, dr = z => .6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
+    for (const [z, d] of [[1.8, gv], [2.3, gv], [16.4, gv], [17, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
+    for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = .6 + (w - .6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 12; j++) { const f = 1 - .94 * j / 12; out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
   const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .3, col: 0x9c9c9a, k: .9, mask: 'vOP.z < 27.5' }]);
-  add(P, solid([{ type: 'outer', pts: pts(rrShape(W, HH, R), 320), prof: shellProf }], shellMat));
+  add(P, solid([{ type: 'outer', pts: pts(rrShape(W, HH, R), 1100), prof: shellProf }], shellMat));
   const zTop = D + crown;
 
   /* 4. flush button: hairline ring only.  5. LED glowing through the shell */
   const ringM = new THREE.MeshStandardMaterial({ color: 0x8e8e8e, roughness: .6, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
-  add(P, new THREE.Mesh(new THREE.RingGeometry(5.0, 5.28, 72), ringM), 0, -1, zTop - .015);
+  add(P, new THREE.Mesh(new THREE.RingGeometry(5.0, 5.28, 72), ringM), 0, -1, zTop + .03);
   add(P, new THREE.Mesh(new THREE.RingGeometry(5.28, 5.7, 72), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .3, transparent: true, opacity: .35,
-    depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })), 0, -1, zTop - .015);   // lit lip outside the gap
-  const led = plane(6, 6, 40, (x, Pp) => { const [cx, cy] = Pp(0, 0), gr = x.createRadialGradient(cx, cy, 0, cx, cy, 110);
+    depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 })), 0, -1, zTop + .03);   // lit lip outside the gap
+  const led = plane(6, 6, 40, (x, Pp) => { const [cx, cy] = Pp(0, 0), gr = x.createRadialGradient(cx, cy, 0, cx, cy, 60);
     gr.addColorStop(0, 'rgba(236,244,255,1)'); gr.addColorStop(.25, 'rgba(221,235,255,.85)'); gr.addColorStop(1, 'rgba(200,222,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 240, 240); },
     { x: { toneMapped: false } });
   add(P, led, 0, 9, zTop - .02);
@@ -131,7 +135,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
       const [ax, ay] = Pp(vx - .75, 7), [bx, by] = Pp(vx + .75, -7), gr = x.createLinearGradient(ax, 0, bx, 0);
       gr.addColorStop(0, 'rgba(95,95,93,.75)'); gr.addColorStop(.55, 'rgba(150,150,148,.55)'); gr.addColorStop(1, 'rgba(255,255,255,.5)');
       x.fillStyle = gr; x.beginPath(); x.roundRect(ax, ay, bx - ax, by - ay, 15); x.fill(); } });
-  vent.rotation.x = -Math.PI / 2; add(P, vent, -3, HH / 2 + .03, 10);
+  
 
   /* 3. receptacle faceplate on the +x end: raised 3 mm, chamfered rim, NEMA 5-15R rotated (slots horizontal, ground toward the wall) */
   { const pp = [[0, 0], [0, 10.05], [.12, 10.25], [.68, 10.81], [.8, 11]];                // embedded 8 mm, proud 3 mm

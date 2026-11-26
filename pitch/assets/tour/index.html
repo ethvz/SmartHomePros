@@ -1253,7 +1253,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 21;
+const TOURV = 22;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1560,6 +1560,7 @@ addEventListener('resize', resize); resize();
 const intro = poseFor({...HOME, r:44, phi:1.12}, HOME.theta+.55);
 camera.position.copy(intro.pos); controls.target.copy(intro.target); camera.lookAt(intro.target);
 let last = performance.now();
+const STUDIO = /[?&]studio=/.test(location.search);
 function frame(now){
   const dt = Math.min(.05,(now-last)/1000); last = now;
   stepFly(now);
@@ -1576,7 +1577,7 @@ function frame(now){
     if(fp){ prodLight.position.copy(camera.position).add(new THREE.Vector3(0,.3,0)); prodLight.target.position.copy(fp.center); prodLight.target.updateMatrixWorld(); } }
   const nn = THREE.MathUtils.clamp(camera.position.distanceTo(controls.target)*.015, .02, .45);
   if(Math.abs(nn-camera.near) > .002){ camera.near = nn; camera.updateProjectionMatrix(); }
-  renderer.render(scene, camera);
+  if(window.__warm || STUDIO) renderer.render(scene, camera);   // first frames wait for the shaders (compiled in the background below)
   if(window.__still){ window.__stillN=(window.__stillN||0)+1; }
   if(window.__paused){ window.__resume=()=>{ window.__paused=false; window.__resume=null; requestAnimationFrame(t=>{ last=t; frame(t); }); }; return; }
   requestAnimationFrame(frame);
@@ -1586,7 +1587,9 @@ addEventListener('message',e=>{ const d=e.data; if(!d||!d.fpTourCtl) return; if(
 requestAnimationFrame(t => { last=t; frame(t); });
 window.__booted = true; clearTimeout(window.__failT);
 if(window.parent!==window) parent.postMessage({fpTour:'ready'},'*');
-Promise.all([assetsReady, ...MODEL_P]).then(() => setTimeout(() => { $('#loading').classList.add('done'); overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }, 120));
+/* compile every shader before the first frame, off the main thread where the browser can (KHR_parallel_shader_compile):
+   drawing the first frame used to compile ~120 programs in one go and freeze the page for many seconds */
+Promise.all([assetsReady, ...MODEL_P]).then(() => Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))])).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => { $('#loading').classList.add('done'); overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }, 120));
 
 /* offline lighting bake: export the static house (no products, no overlays) plus its lights for Blender */
 if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(async () => {

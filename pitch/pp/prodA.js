@@ -42,7 +42,15 @@
   function therm(){ const b=$('#thScroll'); if(!b) return; if(!isPP()){ b.style.removeProperty('--thk'); return; }
     const H=window.SH||1032; b.style.setProperty('--thk',Math.max(.5,Math.min(.82,(H-800)/700)).toFixed(3)); }
 
-  function run(){ strips(); art(); therm(); }
+  /* Smart Hub live 3D view (#emuF): in pp, tell it to draw the Hub centred and full width (Modes), and at the top
+     (Hardware / Specs) with the text in a grid below. Its messages carry a 'pre' geometry; we swap it for ours. */
+  const hubPre=()=>{ const H=window.SH||1032; return { modes:{a0:20,a1:580,top:150,bot:H-60}, hw:{cx:300,cy:Math.round(H/2-250),w:470}, sp:{cx:300,cy:Math.round(H/2-290),w:300} }; };
+  function hub(){ const f=$('#emuF'), w=f&&f.contentWindow; if(!w) return; let fresh=false;
+    try{ if(!w.__ppA){ const o=w.postMessage.bind(w); w.postMessage=function(m,t){ if(isPP()&&m&&m.pre) m=Object.assign({},m,{pre:hubPre()}); return o(m,t); }; w.__ppA=1; fresh=true; } }catch(e){ return; }
+    const k=(isPP()?'pp':'ls')+(window.SH||0); if(fresh||hub.k!==k){ hub.k=k; if(isPP()) try{ w.postMessage({fpEmu:'frame',pre:hubPre()},'*'); }catch(e){} } }
+  { const f=$('#emuF'); if(f) f.addEventListener('load',()=>setTimeout(hub,50)); }
+
+  function run(){ strips(); art(); therm(); hub(); }
   window.__ppA=run;
   let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); }catch(e){ window.__ppAerr=String(e&&e.stack||e); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });

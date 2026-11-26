@@ -13,7 +13,7 @@ export default H => {
   const dark = mat(0x2b2b2b, { r: .7 }), fin = mat(0x333435, { r: .6 }), inner = mat(0x343536, { r: .8 });
 
   /* ---------- face surface: dome + scoop (mm) */
-  const RL = 40, RF = 63;                                  // face annulus: lip ... fillet start
+  const RL = 40, RF = 63, LIFT = 7;                  // LIFT: chamber/cage/cap raised to match the photos' proportions                                  // face annulus: lip ... fillet start
   const faceZ = r => 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - RL) / (RF - RL))) ** 2);
   const SC = { x: -52, y: 0, R: 11, d: 3.4 };          // half-moon scoop at 9 o'clock
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(r);
@@ -143,9 +143,9 @@ export default H => {
     const lm = splitMat(inner, white, 'y', f - 1.6, .001, 0x343536); const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), lm)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 4096, Hh = 208, c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
-    const circ = 2 * Math.PI * 38, pxmm = W / circ; y.fillStyle = '#1c1c1c'; y.fillRect(0, 0, W, Hh);
-    for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#8e8e8e'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 9 * pxmm); }
-    y.strokeStyle = 'rgba(92,92,92,.9)'; y.lineWidth = .14 * pxmm; const pitch = .4 * pxmm;
+    const circ = 2 * Math.PI * 38, pxmm = W / circ; y.fillStyle = '#101010'; y.fillRect(0, 0, W, Hh);
+    for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 9 * pxmm); }
+    y.strokeStyle = 'rgba(70,70,70,.9)'; y.lineWidth = .14 * pxmm; const pitch = .4 * pxmm;
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
@@ -154,19 +154,20 @@ export default H => {
     const mesh = add(g, new THREE.Mesh(mg, new THREE.MeshStandardMaterial({ map: t, roughness: .75, metalness: .1 }))); mesh.rotation.z = -Math.PI / 2; }
   { const cp = [V2(38.2, 45.8), V2(37.6, 46.3), V2(37, 46.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
       V2(35.1, 50.6), V2(35.1, 52.1), V2(34.9, 52.7), V2(34.5, 53), V2(34.1, 52.8), V2(33.9, 52.2), V2(33.85, 51.4)];
-    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp, 180), white)); ch.rotation.x = Math.PI / 2;
+    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + (i > 4 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
     const dk = [V2(33.85, 51.4), V2(33.4, 50.6), V2(0, 50.6)];
-    const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk, 120), mat(0x3a3b3c, { r: .85 }))); di.rotation.x = Math.PI / 2; }
+    const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + LIFT)), 120), mat(0x8a8c8d, { r: .7 }))); di.rotation.x = Math.PI / 2; }
 
   /* ---------- floating cap (TEST/HUSH button) with a shallow centre dimple */
   { const cp = [V2(0, 54.2), V2(25.8, 54.2), V2(26.6, 54.45), V2(26.95, 55), V2(27, 55.6), V2(27, 57.5), V2(26.9, 58.2), V2(26.6, 58.7), V2(26.1, 59.05),
       V2(25.2, 59.25), V2(22, 59.6), V2(17, 60), V2(11, 60.35), V2(6, 60.55), V2(4.7, 60.6), V2(4.5, 60.57), V2(4.1, 60.42), V2(3.3, 60.26), V2(2, 60.15), V2(0, 60.1)];
-    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y)), 160), capM)); cap.rotation.x = Math.PI / 2; }
+    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y + LIFT)), 160), capM)); cap.rotation.x = Math.PI / 2; }
 
   /* ---------- six arched spokes: foot on the face, arc up and in, joining the cap rim */
   { const s = new THREE.Shape(); const f0 = faceZ(44.2) - 1.5, f1 = faceZ(48.4) - 1.5;
-    s.moveTo(24, 55.2); s.lineTo(37.5, 55.2); s.bezierCurveTo(42.2, 55.2, 44.2, 52.5, 44.2, 47); s.lineTo(44.2, f0); s.lineTo(48.4, f1); s.lineTo(48.4, 47.5);
-    s.bezierCurveTo(48.4, 55.6, 44.6, 58.6, 37.5, 58.6); s.lineTo(24, 58.6); s.lineTo(24, 55.2);
+    const zA = 55.2 + LIFT, zB = 58.6 + LIFT;              // arm underside / top
+    s.moveTo(24, zA); s.lineTo(37, zA); s.bezierCurveTo(42.5, zA, 44.2, zA - 4, 44.2, zA - 10); s.lineTo(44.2, f0); s.lineTo(48.4, f1); s.lineTo(48.4, zA - 10);
+    s.bezierCurveTo(48.4, zB - 3, 45, zB, 37, zB); s.lineTo(24, zB); s.lineTo(24, zA);
     const bv = .9, W0 = 9.2;
     const sg = new THREE.ExtrudeGeometry(s, { depth: W0 - 2 * bv, bevelEnabled: true, bevelThickness: bv, bevelSize: bv, bevelOffset: -bv, bevelSegments: 4, curveSegments: 20 });
     sg.translate(0, 0, -(W0 - 2 * bv) / 2);

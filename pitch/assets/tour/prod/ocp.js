@@ -150,17 +150,20 @@ export default H => {
   add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, 1.5-.43, .03);
 
   // ---------------------------------------------------------------- ball, neck and pose
-  const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = 30*Math.PI/180;
+  const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
   const aT = .62, Th = V3(0, cyB - Rbt*Math.sin(aT), czB - Rbt*Math.cos(aT));              // neck target on the slot floor (head-local)
   const nT = V3(0, -Math.sin(aT), -Math.cos(aT)); Th.addScaledVector(nT, -2);
   const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 6 + 2, Tm = B.clone().addScaledVector(u, Dn);
   head.rotation.x = tilt; head.updateMatrix();
   const Gp = Tm.clone().sub(Th.clone().applyEuler(head.rotation));
-  add(M, head, Gp.x, Gp.y, Gp.z);
+  // the head + neck swivel on the ball: a pivot at the ball centre (studio-only ?ocpyaw=deg turns it, to match photos with a turned head)
+  const piv = add(M, G(), B.x, B.y, B.z), qy = +(new URLSearchParams(location.search).get('ocpyaw') || 0);
+  piv.rotation.y = qy*Math.PI/180;
+  add(piv, head, Gp.x - B.x, Gp.y - B.y, Gp.z - B.z);
   const ballM = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.38, clearcoat:.25, clearcoatRoughness:.35, sheen:.3, sheenColor:0xffffff});
   add(M, new THREE.Mesh(new THREE.SphereGeometry(rBall, 48, 32), ballM), B.x, B.y, B.z).castShadow = true;
   { const L = Dn + 2.5, pr = [[.01,5.5],[9.75,5.5],[9.1,7.5],[8.4,8.7],[7.9,9.5],[7.6,10.2],[7.5,11],[7.5,L],[.01,L]];
-    const nk = add(M, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,y]) => new THREE.Vector2(r, y)), 56), ballM), B.x, B.y, B.z);
+    const nk = add(piv, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,y]) => new THREE.Vector2(r, y)), 56), ballM), 0, 0, 0);
     nk.quaternion.setFromUnitVectors(V3(0,1,0), u); nk.castShadow = true; }
   g.userData.headPose = { ball: B.clone().multiplyScalar(.001), glass: Gp.clone().multiplyScalar(.001) };
   return g;
