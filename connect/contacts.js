@@ -31,7 +31,7 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
     return '<a class="mc-a k-' + k + '" href="' + href + '" aria-label="' + esc(aria) + '"><i>' + svg(k === 'c' ? 'phone' : k === 't' ? 'text' : 'mail') + '</i><span><small>' + lab + '</small><b>' + esc(val) + '</b></span></a>';
   }
   function cardHtml(d, i) {
-    var q = [d.n].concat(d.c, d.t, d.e).join(' ').toLowerCase();
+    var q = [d.n].concat(d.c, d.t, d.e, d.c.length ? 'call phone' : '', d.t.length ? 'text sms' : '', d.e.length ? 'email' : '').join(' ').toLowerCase();
     return '<article class="mc-c' + (d.s ? ' star' : '') + '" style="--i:' + Math.min(i, 14) + '" data-q="' + esc(q) + '" data-k="' + (d.c.length ? 'c' : '') + (d.t.length ? 't' : '') + (d.e.length ? 'e' : '') + '">' +
       '<div class="mc-ct"><h3>' + (d.s ? svg('star') : '') + esc(d.n) + '</h3>' +
       '<a class="mc-sv" href="connect/vcf/' + d.f + '.vcf" data-f="' + d.f + '" data-n="' + esc(d.n) + '"' + (standalone ? ' target="_blank"' : '') + ' aria-label="Save ' + esc(d.n) + ' to Contacts">' + svg('add') + '<span>Save</span></a></div>' +

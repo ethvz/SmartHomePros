@@ -19,11 +19,11 @@
      The sub-tab row (NAV) is pinned just above the footer so its buttons never move between sub-slides. */
   const N1 = [[340, 774, 660, 160, 660, , , 'ft']], N3 = [[256, 774, 832, 160, 832, , , 'ft']];
   const SPEC = {
-    mon_hero: [[[70, 215, 585, 215, 585, , , , { x: 52 }]], [[660, 120, 716, 560, W, 0, 964, , { g: 1.25, f: .5 }]]],
-    mon_home: [[[100, 140, 720, 470, W, 100, 762, , { g: 1.3, f: .47 }]], [[806, 214, 394, 466, 394, , , 'fe']], N1],
-    mon_trained: [[[0, 128, 720, 500, W, 100, 762, , { g: 1.3, f: .5 }]], [[730, 290, 600, 370, 600, , , 'fe']], N1],
+    mon_hero: { html: '<div class="ipmon"><h2>The industry’s most trusted emergency support.</h2></div>', rows: [[[640, 60, 736, 520, W, 0, 964, , { g: 1.3, f: .5 }]]] },
+    mon_home: [[[100, 180, 720, 390, W, 100, 762, , { g: 1.3, f: .47 }]], [[806, 214, 394, 466, 394, , , 'fe']], N1],
+    mon_trained: [[[0, 160, 720, 400, W, 100, 762, , { g: 1.3, f: .5 }]], [[730, 290, 600, 370, 600, , , 'fe']], N1],
     mon_911: [[[400, 0, 976, 500, W, 0, 498, , { g: 1.35, f: .72 }]], [[700, 500, 560, 160, 560, , , 'fe']], N1],
-    mon_simple: [[[0, 100, 700, 560, W, 60, 762, , { g: 1.3, f: .36 }]], [[700, 390, 580, 290, 580, , , 'fe']], N1],
+    mon_simple: [[[0, 140, 700, 420, W, 60, 762, , { g: 1.3, f: .36 }]], [[700, 390, 580, 290, 580, , , 'fe']], N1],
     mon_insurance: { bg: 1, rows: [[[40, 0, 1336, 964, W]]] },
     mon_breakin: [[[110, 236, 470, 418, 470]], [[588, 140, 788, 600, 620, , , 'bl', { r: .16, g: 1.7 }]], N3],
     mon_smoke: [[[110, 230, 560, 380, 560]], [[716, 126, 660, 590, 500, , , 'bl', { r: .14, g: 1.8 }]], N3],
@@ -31,7 +31,7 @@
     mon_medical: [[[110, 270, 540, 330, 540]], [[640, 120, 736, 420, W, 0, 762, , { g: 1.4, f: .56 }]], N3],
     mon_duress: [[[110, 260, 540, 400, 540]], [[660, 40, 716, 440, W, 0, 762, , { g: 1.4, f: .57 }]], N3],
     mon_trusted: [[[80, 180, 900, 190, 900]], [[95, 415, 285, 385, 340], [408, 415, 285, 385, 340]], [[722, 415, 285, 385, 340], [1035, 415, 285, 385, 340]]],
-    military_hero: { at: 'bottom', fade: 1, rows: [[[560, 230, 816, 734, W]]],
+    military_hero: { at: 'bottom', fade: 1, rows: [[[420, 200, 956, 764, W]]],
       html: '<div class="ipmil"><h2>We’re proud to protect those who sacrifice to protect us.</h2><ul><li>Special offers for deployed family members</li><li>24/7 monitoring and support</li><li>$4 million in charitable donations to military families</li></ul></div>' }
   };
   const GAP = 24;
@@ -52,6 +52,9 @@
       const sum = () => spec.reduce((a, r) => a + rh(r), 0) + (spec.length - 1) * GAP;
       const navH = nav ? rh(nav) : 0, avail = H - top - BOT - (nav ? navH + GAP : 0);
       let extra = avail - sum();
+      /* short screens: photos give up height first (down to 55%) before everything shrinks together */
+      spec.forEach(r => r.forEach(c => { if (extra >= -1 || c[5] == null || r.length > 1) return;
+        const s = c[4] / c[2], cut = Math.min(c[3] * .45, -extra / s); c[1] += cut / 2; c[3] -= cut; extra += cut * s; }));
       spec.forEach(r => r.forEach(c => { if (extra <= 1 || c[5] == null || r.length > 1) return;
         const s = c[4] / c[2], room = (c[6] - c[5]) - c[3]; if (room <= 0) return;
         const add = Math.min(room, extra / s), up = Math.min(c[1] - c[5], add / 2), dn = Math.min(c[6] - (c[1] + c[3]), add - up), up2 = Math.min(c[1] - c[5], add - dn);
@@ -64,7 +67,7 @@
       const tot = sum(), k = Math.min(1, avail / tot);
       const slot = Math.max(0, avail - tot * k) / (rows.length + 1);
       let y = sp.at === 'bottom' ? H - tot * k : top + slot;
-      [...g.children].forEach(c => { if (!c.classList.contains('ipmil')) c.remove(); });
+      [...g.children].forEach(c => { if (!c.matches('.ipmil,.ipmon')) c.remove(); });
       if (sp.bg && !g.querySelector('.ipbg')) g.insertAdjacentHTML('afterbegin', `<div class="ipbg" style="background-image:url('${g.dataset.src}')"></div>`);
       const place = (r, kk, y0) => {
         let x = (W - r.w * kk) / 2;
@@ -103,7 +106,7 @@
     measureHtml(host); layout(host);
   }
   /* military: the heading block is live HTML; the photo goes under it */
-  const measureHtml = host => qa('.ipg', host).forEach(g => { const m = g.querySelector('.ipmil'); if (m && m.offsetHeight) g._htmlH = m.offsetHeight; });
+  const measureHtml = host => qa('.ipg', host).forEach(g => { const m = g.querySelector('.ipmil,.ipmon'); if (m && m.offsetHeight) g._htmlH = m.offsetHeight; });
 
   const hosts = () => [...qa('#p-monitoring .mtab'), q('#p-military')].filter(Boolean);
   /* Protection: the "more protection" card starts just under the warranty list (CSS reads --iptT) */
@@ -119,6 +122,7 @@
   addEventListener('resize', () => setTimeout(apply, 60));
   addEventListener('orientationchange', () => setTimeout(apply, 400));
   { const pg = q('#p-protection'); if (pg) new MutationObserver(() => { if (pg.classList.contains('on')) requestAnimationFrame(fitProt); }).observe(pg, { attributes: true, attributeFilter: ['class'] });
-    const mil = q('#p-military'); if (mil) new MutationObserver(() => { if (!mil.classList.contains('on') || !isIPP()) return; const g = q('.ipg', mil); if (g && !g._htmlH) { lastSig = ''; requestAnimationFrame(apply); } }).observe(mil, { attributes: true, attributeFilter: ['class'] }); }
+    ['#p-military', '#p-monitoring'].forEach(id => { const pg = q(id); if (pg) new MutationObserver(() => { if (!pg.classList.contains('on') || !isIPP()) return;
+      if (qa('.ipg', pg).some(g => g.querySelector('.ipmil,.ipmon') && !g._htmlH)) { lastSig = ''; requestAnimationFrame(apply); } }).observe(pg, { attributes: true, attributeFilter: ['class'] }); }); }
   new MutationObserver(apply).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 })();
