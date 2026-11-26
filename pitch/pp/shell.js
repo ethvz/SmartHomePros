@@ -15,7 +15,7 @@
     const sc = (st.getBoundingClientRect().width / st.offsetWidth) || 1, sab = probe.offsetHeight / sc;
     const B = Math.round(Math.max(8, 6 + sab * 0.6)), sig = B + '';
     if (sig === geo) return; geo = sig;
-    st.style.setProperty('--ppB', B + 'px'); st.style.setProperty('--ppFoot', (B + 68) + 'px'); st.style.setProperty('--ppHomeFoot', (B + 140) + 'px');
+    st.style.setProperty('--ppB', B + 'px'); st.style.setProperty('--ppFoot', (B + 76) + 'px'); st.style.setProperty('--ppHomeFoot', (B + 152) + 'px');
     tourInset();
   }
 
@@ -34,7 +34,7 @@
   }
   function ppHome() {
     if (!PP()) return;
-    const pane = $('#homeAll'), Ht = (pane && pane.offsetHeight) || (window.SH - 148);
+    const pane = $('#homeAll'), Ht = (pane && pane.offsetHeight) || (window.SH - 160);
     const P = ppGrid(600, Ht);
     $$('#allTiles .ht[data-k]').forEach(el => { const r = P[el.dataset.k]; if (!r) return; const [x, y, w, h] = r;
       Object.assign(el.style, { left: x.toFixed(1) + 'px', top: y.toFixed(1) + 'px', width: w.toFixed(1) + 'px', height: h.toFixed(1) + 'px' }); });
@@ -62,21 +62,48 @@
       const pp = PP(), home = bar.classList.contains('home'), items = [...rail.children].filter(e => e.matches('.bbtn') && e.id !== 'amtBtn');
       const flat = pp && !home && rail.classList.contains('pnav') && !bar.classList.contains('hx-ctr') && items.length > 0;
       if (rail.classList.contains('pph') !== flat) rail.classList.toggle('pph', flat);
-      /* the pill is 372 wide (362 inside): labels only when each tab gets 66+ */
-      const ico = flat && (362 / Math.max(1, items.length)) < 66;
+      /* the pill is 356 wide (346 inside): up to 5 named tabs; more = fixed 58px icon tabs that scroll sideways */
+      const ico = flat && items.length > 5;
       if (rail.classList.contains('ico') !== ico) rail.classList.toggle('ico', ico);
       if (bar.classList.contains('ppnav') !== flat) bar.classList.toggle('ppnav', flat);
       if (bar.classList.contains('ppnologo')) bar.classList.remove('ppnologo');
     } finally { busy = false; }
+    railView();
   }
+
+  /* scrolling nav: keep the current tab in view (smoothly, only when it changes) and fade the edge(s) where tabs hide.
+     Only inline style / scrollLeft are written here (no class or attribute the observers watch). */
+  let lastOn = null;
+  function railFade() {
+    const sc = rail.classList.contains('pph') && rail.classList.contains('ico'), max = rail.scrollWidth - rail.clientWidth;
+    const l = sc && rail.scrollLeft > 2 ? '28px' : '0px', r = sc && rail.scrollLeft < max - 2 ? '28px' : '0px';
+    if (rail.style.getPropertyValue('--ppFL') !== l) rail.style.setProperty('--ppFL', l);
+    if (rail.style.getPropertyValue('--ppFR') !== r) rail.style.setProperty('--ppFR', r);
+  }
+  function railView(force) {
+    const sc = rail.classList.contains('pph') && rail.classList.contains('ico');
+    if (!sc) { if (rail.scrollLeft) rail.scrollLeft = 0; lastOn = null; railFade(); return; }
+    const on = rail.querySelector('.bbtn.on');
+    if (on && (on !== lastOn || force)) {
+      const first = lastOn === null; lastOn = on;
+      const want = Math.max(0, Math.min(rail.scrollWidth - rail.clientWidth, on.offsetLeft + on.offsetWidth / 2 - rail.clientWidth / 2));
+      if (Math.abs(rail.scrollLeft - want) > 1) {
+        const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        rail.scrollTo({ left: want, behavior: first || rm ? 'auto' : 'smooth' });
+      }
+    }
+    railFade();
+  }
+  rail.addEventListener('scroll', railFade, { passive: true });
+  new MutationObserver(() => railView()).observe(rail, { subtree: true, attributes: true, attributeFilter: ['class'] });
   new MutationObserver(navMode).observe(rail, { childList: true, attributes: true, attributeFilter: ['class'] });
   new MutationObserver(navMode).observe(bar, { attributes: true, attributeFilter: ['class'] });
 
-  /* drag along the footer nav to fly through the sections (taps still tap) */
+  /* drag along the footer nav to fly through the sections (taps still tap); a scrolling nav scrolls instead */
   let drag = null;
   const itemAt = x => { const its = [...rail.querySelectorAll('.bbtn')]; let best = null, bd = 1e9;
     its.forEach(b => { const r = b.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - x); if (d < bd) { bd = d; best = b; } }); return best; };
-  rail.addEventListener('touchstart', e => { if (!rail.classList.contains('pph') || e.touches.length !== 1) return; drag = { x0: e.touches[0].clientX, on: false, last: null }; }, { passive: true });
+  rail.addEventListener('touchstart', e => { if (!rail.classList.contains('pph') || rail.classList.contains('ico') || e.touches.length !== 1) return; drag = { x0: e.touches[0].clientX, on: false, last: null }; }, { passive: true });
   rail.addEventListener('touchmove', e => { if (!drag) return; const x = e.touches[0].clientX;
     if (!drag.on && Math.abs(x - drag.x0) > 8) drag.on = true;
     if (!drag.on) return; e.preventDefault();
@@ -89,7 +116,7 @@
   function tourInset() {
     const f = $('#tour3d iframe'); if (!f) return;
     try { const d = f.contentDocument && f.contentDocument.documentElement; if (!d) return;
-      if (PP()) d.style.setProperty('--fb', (parseFloat(getComputedStyle(st).getPropertyValue('--ppHomeFoot')) || 148) + 'px');
+      if (PP()) d.style.setProperty('--fb', (parseFloat(getComputedStyle(st).getPropertyValue('--ppHomeFoot')) || 160) + 'px');
       else d.style.setProperty('--fb', '76px'); } catch (e) {}
   }
   const t3 = $('#tour3d');
