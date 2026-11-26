@@ -21,7 +21,7 @@
   const ROI={'lock:lock':[150,150,1110,520],'lock:colors':[120,170,1150,420],'garage:gphone':[224,36,448,900],'app:phone':[90,60,700,840],'garage:garage':[0,0,1376,964],'app:hero':[0,0,1376,964]};
   const ART='img.full,video.ovid,.hl,.tip,.xf-ghost';
   function artSecs(){ const b=$('#prScroll'); return b?[...b.children].filter(s=>s.classList.contains('psec')&&(s.querySelector(':scope>img.full')||s.querySelector(':scope>.ppart>img.full'))):[]; }
-  function art(){ const pp=isPP(), H=window.SH||1032, id=(window.PR&&PR.id)||'';
+  function art(){ const pp=isPP(), H=window.SH||1032, id=(typeof PR!=='undefined'&&PR&&PR.id)||'';
     artSecs().forEach(sec=>{
       let w=sec.querySelector(':scope>.ppart'), c=sec.querySelector(':scope>.ppctl');
       if(!pp){ if(w){ [...w.children].forEach(x=>sec.insertBefore(x,w)); w.remove(); } if(c){ const hl=sec.querySelector('.hl'); [...c.children].forEach(x=>hl&&hl.appendChild(x)); c.remove(); } return; }
@@ -44,6 +44,7 @@
     const H=window.SH||1032; b.style.setProperty('--thk',Math.max(.5,Math.min(.82,(H-800)/700)).toFixed(3)); }
 
   function run(){ strips(); art(); therm(); }
+  window.__ppA=run;
   let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
   new MutationObserver(later).observe(document.documentElement,{attributes:true,attributeFilter:['class']});

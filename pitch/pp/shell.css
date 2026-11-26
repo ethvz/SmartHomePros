@@ -77,7 +77,8 @@ html.pp #psheet .car{padding:0 22px 24px;scroll-padding:0 22px}
 html.pp .modal .x,html.pp .modal .mx,html.pp .modal [data-close]{min-width:56px;min-height:56px}
 
 /* ---------- video player ---------- */
-html.pp #vlp .x{width:60px;height:60px}
+/* #vlp sits outside the stage (screen pt): the 16:9 video is centred with its native controls attached to it */
+html.pp #vlp video{width:100%;height:auto;max-height:100%}
 
 /* ---------- Home ---------- */
 html.pp #homeTrack{height:calc(var(--H) - var(--ppHomeFoot))!important}

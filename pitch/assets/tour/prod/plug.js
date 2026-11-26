@@ -153,7 +153,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     x.font = '700 120px "Helvetica Neue Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", "Helvetica Neue", Arial, sans-serif';
     x.fillText('Max. 330W', 0, -62); x.fillText('Incandescent', 0, 62); x.restore(); }, { r: .5 });
   txt.rotation.y = Math.PI / 2; txt.scale.x = .92; add(P, txt, W / 2 + .03, -17.6, 19);
-  const fcc = plane(40, 26, 20, (x) => { x.save(); x.translate(400, 260); x.rotate(-Math.PI / 2); x.fillStyle = '#2a2a2a'; x.font = '500 22px "Helvetica Neue", Arial, sans-serif';
+  const fcc = plane(40, 26, 20, (x) => { x.save(); x.translate(400, 260); x.rotate(-Math.PI / 2); x.fillStyle = 'rgba(42,42,42,.55)'; x.font = '400 20px "Helvetica Neue", Arial, sans-serif';
     const L = ['This device complies with Part 15 of the FCC Rules.', 'Operation is subject to the following two', 'conditions: (1) this device may not cause',
       'harmful interference, and (2) this device must', 'accept any interference received, including', 'interference that may cause undesired', 'operation.', 'FCC ID: XQH-LPM1   IC: 9863B-LPM1', 'Made in China'];
     L.forEach((s, i) => x.fillText(s, -230, -200 + i * 46)); x.restore(); }, { r: .5 });
