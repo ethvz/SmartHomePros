@@ -7,19 +7,19 @@ export default H => {
   const K = kit(THREE);
   const g = G(), u = add(g, G()); u.scale.setScalar(.001);
 
-  const W = 66, HT = 99.1, R = 14.5;
-  const ring = (d, z) => K.rr(W - 2 * d, HT - 2 * d, R - d, { nc: 18, ns: 8 }).map(([x, y]) => [x, y, z]);
+  const W = 66, HT = 99.1, R = 16.5;
+  const ring = (d, z) => K.rr(W - 2 * d, HT - 2 * d, R - d, { nc: 18, ns: 8, p: 2.4 }).map(([x, y]) => [x, y, z]);
 
   /* side profile [inset, z]: plate (inset 0.5, R0.8 wall edge) -> dark shadow gap -> shell wall -> R3.5 roll (1.6 tall) */
   const prof = [];
   for (let i = 0; i <= 5; i++){ const a = i / 5 * Math.PI / 2; prof.push([.5 + .8 * (1 - Math.sin(a)), .8 * (1 - Math.cos(a))]); }
   prof.push([.5, 2.1], [.62, 2.25], [1.1, 2.3], [1.1, 2.55], [.25, 2.6], [.04, 2.72], [0, 2.9]);
   for (const z of [6, 10, 14, 17.5, 20, 20.3]) prof.push([0, z]);
-  const RZ = 1.6, Z0 = 20.3;
+  const RZ = 1.3, Z0 = 20.3;
   for (let i = 1; i <= 12; i++){ const a = i / 12 * Math.PI / 2; prof.push([3.5 * (1 - Math.cos(a)), Z0 + RZ * Math.sin(a)]); }
   const rings = prof.map(([d, z]) => ring(d, z));
   const FZ = Z0 + RZ, FX = W / 2 - 3.5, FY = HT / 2 - 3.5;
-  const dome = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 1.0 * Math.max(0, 1 - r * r); };
+  const dome = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 1.3 * Math.pow(Math.max(0, 1 - r * r), 1.4); };
 
   /* face: from the edge of the flat to the dish rim (circle r 13.25), points matched by angle */
   const outer = rings[rings.length - 1], RD = 13.25;
@@ -37,7 +37,7 @@ export default H => {
   body.castShadow = body.receiveShadow = true;
 
   /* concave spherical dish (sag 2.0 at the centre), following the dome, crisp rim; 5 mm bore, felt 1.5 mm below */
-  const SR = (RD * RD + 4) / 4, sag = r => SR - Math.sqrt(SR * SR - r * r), D0 = sag(RD);
+  const DD = 2.6, SR = (RD * RD + DD * DD) / (2 * DD), sag = r => SR - Math.sqrt(SR * SR - r * r), D0 = sag(RD);
   const dz = (x, y) => { const r = Math.hypot(x, y); return FZ + dome(x, y) - (D0 - sag(r)); };
   const dish = [];
   for (const s of [1, .985, .94, .85, .74, .62, .5, .4, .3, 2.5 / RD]) dish.push(rim.map(([x, y]) => [x * s, y * s, dz(x * s, y * s)]));

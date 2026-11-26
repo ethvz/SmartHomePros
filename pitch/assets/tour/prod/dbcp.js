@@ -77,11 +77,11 @@ export default H => {
   const pS = [], D = 6.55;
   for (let i = 0; i <= 14; i++) { const a = i / 14 * PI / 2, s = D * Math.sin(a), z = 8.75 - s;
     const top = br.top - 7.0 * (1 - Math.cos(a)), bot = br.bot + 6.0 * (1 - Math.cos(a));
-    const d = Math.max(0, s - 3.21), side = 4 - Math.sqrt(Math.max(0, 16 - d * d));
+    const side = 5.0 * (1 - Math.cos(a));                                   // sides round in hard toward the wall (bottom view)
     pS.push([z, br.w - 2 * side, top - bot, R, (top + bot) / 2]); }
   add(g, shell(pS, [plateL, plate]));
   // back face: arch cap outline, pads, wire boss
-  const yTopB = br.top - 7, wB = br.w - 3.6;
+  const yTopB = br.top - 7, wB = br.w - 10;
   const bp2 = pp(wB, 34, (x, P) => { x.strokeStyle = '#b4b6b8'; x.lineWidth = 2.5; x.beginPath(); const o = -41;   // plane centre at y 41
     x.moveTo(...P(-wB / 2, 29 + o)); x.lineTo(...P(-13.5, 29 + o)); x.lineTo(...P(-13.5, 41.5 + o));
     const [cx, cy] = P(0, 41.5 + o); x.arc(cx, cy, 135, PI, 0, false); x.lineTo(...P(13.5, 29 + o)); x.lineTo(...P(wB / 2, 29 + o)); x.stroke(); });

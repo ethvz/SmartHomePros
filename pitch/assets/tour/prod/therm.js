@@ -125,9 +125,9 @@ export default H => {
     gr.addColorStop(0, 'rgba(76,125,255,.55)'); gr.addColorStop(.35, 'rgba(76,125,255,.3)'); gr.addColorStop(.7, 'rgba(76,125,255,.08)'); gr.addColorStop(1, 'rgba(76,125,255,0)');
     x.fillStyle = gr; x.fillRect(-256, 0, 512, 460); x.restore();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-    const wash = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false})), 0, (-W/2 + 3 - 20.6)*k, .4*k);
-    wash.renderOrder = 2;
-    wash.geometry.boundingBox = new THREE.Box3(new THREE.Vector3(-.05, -.001, 0), new THREE.Vector3(.05, .001, .0001));   // a wall effect: keep it out of the product's framing box
+    const wash = new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false}));
+    wash.position.set(0, (-W/2 + 3 - 20.6)*k, .4*k); wash.renderOrder = 2;
+    bar.onBeforeRender = () => { if(!wash.parent) g.add(wash); };   // a wall effect: attached on the first frame so it stays out of the product's size/framing box
   }
   return g;
 };

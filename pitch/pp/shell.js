@@ -100,11 +100,27 @@
   if (t3) new MutationObserver(() => { const f = $('#tour3d iframe'); if (f && !f.__pp) { f.__pp = 1; f.addEventListener('load', tourInset); } tourInset(); }).observe(t3, { childList: true });
 
   /* big tiles whose names are baked into the artwork (too small upright): the baked line is clipped off in CSS and a live label added */
-  const BIGK = ['ocp', 'ocspot', 'keypad', 'app'], BIGN = { ocp: 'Outdoor Camera Pro III', ocspot: 'Outdoor Camera Pro III with Spotlight', keypad: 'Keypad', app: 'Vivint App' };
+  /* where the baked name sits in each artwork: cut below (fraction of the picture's height) or above */
+  const BAKED = { 'tiles/ocp.webp': ['b', .855], 'tiles/ocspot.webp': ['b', .905], 'tiles/shp2_cam.webp': ['b', .905], 'tiles/keypad.webp': ['t', .09], 'tiles/app.webp': ['t', .09] };
+  const BIGN = { ocp: 'Outdoor Camera Pro III', ocspot: 'Outdoor Camera Pro III with Spotlight', keypad: 'Keypad', app: 'Vivint App', shp2: 'Smart Hub Pro II' };
+  const bakedOf = im => { const s = im.getAttribute('src') || ''; for (const k in BAKED) if (s.indexOf(k) >= 0) return BAKED[k]; return null; };
+  /* clip the baked line off the picture as drawn (object-fit:contain leaves bands, so work in element px) */
+  function clipBaked(im) {
+    const b = bakedOf(im); if (!b) return;
+    let want = '';
+    if (PP() && im.naturalWidth && im.clientWidth) {
+      const W = im.clientWidth, H = im.clientHeight, k = Math.min(W / im.naturalWidth, H / im.naturalHeight), h = im.naturalHeight * k, top = (H - h) / 2;
+      want = b[0] === 'b' ? `inset(0 0 ${Math.max(0, H - (top + h * b[1])).toFixed(1)}px 0)` : `inset(${(top + h * b[1]).toFixed(1)}px 0 0 0)`;
+    }
+    if (im.style.clipPath !== want) im.style.clipPath = want;
+  }
+  const ro = new ResizeObserver(es => es.forEach(e => clipBaked(e.target)));
   function bigLabels() {
-    $$('#allTiles .ht[data-k], .hcat .ht[data-k]').forEach(t => { const k = t.dataset.k; if (!BIGK.includes(k) || t.querySelector(':scope>.ppcl')) return;
-      if (!t.querySelector(':scope>img[src*="assets/tiles/"]')) return;
-      const d = document.createElement('div'); d.className = 'cl ppcl' + (k === 'keypad' || k === 'app' ? ' top' : ''); d.textContent = BIGN[k]; t.appendChild(d); });
+    $$('#allTiles .ht[data-k], .hcat .ht[data-k]').forEach(t => { const im = t.querySelector(':scope>img'); if (!im) return; const b = bakedOf(im); if (!b) return;
+      if (!im.__ppc) { im.__ppc = 1; ro.observe(im); im.addEventListener('load', () => clipBaked(im)); }
+      clipBaked(im);
+      if (t.querySelector(':scope>.ppcl')) return;
+      const d = document.createElement('div'); d.className = 'cl ppcl' + (b[0] === 't' ? ' top' : ''); d.textContent = BIGN[t.dataset.k] || ''; t.appendChild(d); });
   }
 
   function all() { setGeo(); ppHome(); navMode(); tourInset(); bigLabels(); }

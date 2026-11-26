@@ -4,7 +4,8 @@
 
 /* ---------- base: full-width, full-height sub-sections (no landscape card scaling) ---------- */
 html.pp :is(#prScroll,#hbScroll,#thScroll){left:calc(50% - 300px)!important;right:auto!important;width:600px!important}
-html.pp :is(#prScroll,#hbScroll,#thScroll)>*{width:600px!important;margin:0!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important;overflow:hidden!important}
+html.pp :is(#prScroll,#hbScroll,#thScroll)>*{width:600px!important;margin:0!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important}
+html.pp :is(#prScroll,#hbScroll,#thScroll)>:not(#emuLayer){overflow:hidden!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll)>:not(#emuLayer){height:var(--H)!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll)>[hidden]{display:none!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa{left:50%!important;top:auto!important;bottom:84px!important;width:160px;height:84px;margin-left:-80px}
@@ -147,9 +148,9 @@ html.pp #thScroll .thc #thfL{width:auto!important;display:grid;grid-template-col
 html.pp #thScroll .thc .th-list button{height:60px;font-size:16.5px;padding:0 14px;gap:10px;border-radius:30px;line-height:1.1}
 html.pp #thScroll .thc .th-list button svg{width:22px;height:22px}
 html.pp #thSaveBg{display:none!important}
-html.pp #thScroll .thc .thm[data-k=save] img.thm-full{left:0!important;top:0!important;width:700px!important;height:700px!important;object-position:50% 40%;-webkit-mask-image:none!important;mask-image:none!important;border-radius:36px!important}
-html.pp #thScroll .thc .thm[data-k=save] .thm-stat.thm-big{left:44px!important;top:440px!important}
-html.pp #thScroll .thc .thm[data-k=save] img.thm-estar{right:30px!important;top:30px!important}
+html.pp #thScroll .thc .thm[data-k=save] img.thm-full{display:block!important;max-width:700px!important;left:0!important;top:0!important;width:700px!important;height:700px!important;object-position:50% 40%;-webkit-mask-image:none!important;mask-image:none!important;border-radius:36px!important}
+html.pp #thScroll .thc .thm[data-k=save] .thm-stat.thm-big{display:block!important;left:44px!important;top:440px!important}
+html.pp #thScroll .thc .thm[data-k=save] img.thm-estar{display:block!important;right:30px!important;top:30px!important}
 /* the Modes / Hardware sections (.fb) float over the live 3D Hub (#emuLayer); one upright screen each */
 html.pp #p-hub #hbScroll>.otab.fb{height:var(--H)!important;width:600px!important}
 html.pp #p-hub #emuLayer{width:600px!important}
@@ -195,3 +196,18 @@ html.pp #p-hub #hbScroll .hbnew .ft b{font-size:19px}
 html.pp #p-hub #hbScroll .hbnew .ft span{font-size:16px}
 html.pp #p-hub #hbScroll .hb3pill{top:auto!important;bottom:100px!important;width:560px!important;height:68px!important}
 html.pp #p-hub #hbScroll .hb3pill button{font-size:16px}
+
+/* ---------- Indoor Camera Pro Highlights (.icm): headline, camera render, app phone, feature grid; stacked ---------- */
+html.pp #prScroll .icm .ocm-col{left:20px!important;right:20px!important;width:auto!important;top:96px!important;bottom:20px!important;margin:0!important;justify-content:space-between!important;gap:0!important;pointer-events:none}
+html.pp #prScroll .icm .ocm-col>*{pointer-events:auto}
+html.pp #prScroll .icm .dbm-h{left:16px!important;min-height:0!important;font-size:38px!important;display:block!important}
+html.pp #prScroll .icm .dbm-h small{font-size:18px!important;margin-top:8px}
+html.pp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;gap:4px!important;margin-bottom:var(--ppFoot,86px)}
+html.pp #prScroll .icm .dbm-list button{height:58px!important;font-size:16px!important;padding:0 12px!important;gap:10px!important;line-height:1.1}
+html.pp #prScroll .icm .dbm-list button .lvi{width:22px;height:22px}
+html.pp #prScroll .icm .ocm-fade{display:none!important}
+html.pp #prScroll .icm .ocm-card{left:0!important;width:600px!important;top:250px!important;height:calc(var(--H) - 940px)!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #prScroll .icm .ocm-card img{left:40px!important;top:0!important;width:520px!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important}
+html.pp #prScroll .icm .ocm-phone{left:30px!important;top:calc(var(--H) - 680px)!important;scale:.587;transform-origin:0 0!important}
+html.pp #prScroll .icm .ocm-phone.port{left:136px!important;top:calc(var(--H) - 800px)!important;scale:.44}
+html.pp #prScroll .icm .ocm-cap{display:none!important}

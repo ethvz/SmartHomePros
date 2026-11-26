@@ -44,7 +44,7 @@
 
   /* Smart Hub live 3D view (#emuF): in pp, tell it to draw the Hub centred and full width (Modes), and at the top
      (Hardware / Specs) with the text in a grid below. Its messages carry a 'pre' geometry; we swap it for ours. */
-  const hubPre=()=>{ const H=window.SH||1032; return { modes:{a0:20,a1:580,top:150,bot:H-60}, hw:{cx:300,cy:Math.round(H/2-250),w:470}, sp:{cx:300,cy:Math.round(H/2-290),w:300} }; };
+  const hubPre=()=>{ const H=window.SH||1032; return { modes:{a0:20,a1:580,top:150,bot:H-60}, hw:{cx:300,cy:Math.round(H/2-250),w:470}, sp:{cx:300,cy:Math.round(H/2-330),w:420} }; };
   function hub(){ const f=$('#emuF'), w=f&&f.contentWindow; if(!w) return; let fresh=false;
     try{ if(!w.__ppA){ const o=w.postMessage.bind(w); w.postMessage=function(m,t){ if(isPP()&&m&&m.pre) m=Object.assign({},m,{pre:hubPre()}); return o(m,t); }; w.__ppA=1; fresh=true; } }catch(e){ return; }
     const k=(isPP()?'pp':'ls')+(window.SH||0); if(fresh||hub.k!==k){ hub.k=k; if(isPP()) try{ w.postMessage({fpEmu:'frame',pre:hubPre()},'*'); }catch(e){} } }

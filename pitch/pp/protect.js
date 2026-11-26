@@ -14,38 +14,55 @@
      A spec is a list of rows; a row is a list of crops [x, y, w, h, tw] in slide coordinates, tw = width on the stage.
      Rows are stacked and centred in the space between the title (top) and the footer (bottom); everything shrinks
      together if the screen is short. Tap targets (.hot) that fall inside a crop are cloned onto it. */
+  /* A crop may carry [.., y0, y1]: the rows' leftover height is given to that crop by showing more of the picture above
+     and below it, but never outside y0..y1 (so baked-in text next to it stays out). bg: a blurred, dimmed copy of the
+     slide fills the screen behind the crops. */
   const S1 = [[350, 768, 640, 166, 600]], S3 = [[280, 768, 784, 166, 600]];
   const SPEC = {
-    mon_hero: [[[70, 215, 600, 215, 560]], [[660, 60, 716, 904, 600]]],
-    mon_home: [[[180, 130, 640, 510, 600]], [[830, 225, 370, 445, 370]], S1],
-    mon_trained: [[[0, 0, 700, 640, 600]], [[730, 290, 580, 370, 560]], S1],
-    mon_911: [[[460, 0, 916, 500, 600]], [[700, 500, 560, 160, 560]], S1],
-    mon_simple: [[[0, 0, 700, 700, 600]], [[700, 390, 580, 290, 560]], S1],
-    mon_insurance: [[[60, 0, 780, 964, 600]]],
-    mon_breakin: [[[110, 240, 440, 410, 440]], [[580, 150, 796, 580, 600]], S3],
-    mon_smoke: [[[110, 230, 560, 380, 600]], [[740, 130, 540, 580, 480]], S3],
-    mon_water: [[[110, 270, 540, 320, 600]], [[640, 190, 680, 480, 560]], S3],
-    mon_medical: [[[110, 270, 540, 330, 600]], [[640, 0, 736, 720, 600]], S3],
-    mon_duress: [[[110, 260, 540, 400, 600]], [[660, 0, 716, 740, 600]], S3],
+    mon_hero: [[[70, 215, 585, 215, 560]], [[660, 60, 716, 904, 600, 0, 964]]],
+    mon_home: [[[180, 130, 640, 510, 600, 122, 762]], [[860, 225, 340, 445, 340]], S1],
+    mon_trained: [[[0, 0, 700, 640, 600, 0, 762]], [[730, 290, 580, 370, 560]], S1],
+    mon_911: [[[460, 0, 916, 500, 600, 0, 498]], [[700, 500, 560, 160, 560]], S1],
+    mon_simple: [[[0, 0, 700, 700, 600, 0, 762]], [[700, 390, 580, 290, 560]], S1],
+    mon_insurance: { bg: 1, rows: [[[60, 0, 780, 964, 600]]] },
+    mon_breakin: [[[110, 240, 440, 410, 440]], [[570, 150, 760, 580, 560, 120, 760, 'fr']], S3],
+    mon_smoke: [[[110, 230, 560, 380, 600]], [[740, 130, 540, 580, 480, 100, 762]], S3],
+    mon_water: [[[110, 270, 540, 320, 600]], [[640, 190, 680, 480, 560, 130, 762]], S3],
+    mon_medical: [[[110, 270, 540, 330, 600]], [[640, 0, 736, 720, 600, 0, 762]], S3],
+    mon_duress: [[[110, 260, 540, 400, 600]], [[660, 0, 716, 740, 600, 0, 762]], S3],
     mon_trusted: [[[80, 180, 900, 190, 600]], [[95, 415, 285, 385, 290], [408, 415, 285, 385, 290]], [[722, 415, 285, 385, 290], [1035, 415, 285, 385, 290]]],
     military_hero: { at: 'bottom', fade: 1, rows: [[[700, 275, 676, 689, 720]]],
       html: '<div class="ppmil"><h2>We\u2019re proud to protect those who sacrifice to protect us.</h2><ul><li>Special offers for deployed family members</li><li>24/7 monitoring and support</li><li>$4 million in charitable donations to military families</li></ul></div>' }
   };
-  const GAP = 18, TOP = 96, BOT = 84;
+  const GAP = 18;
+  /* top: clear the section title and the status bar (brand.js publishes --brsat, the top safe area in stage px); bottom: the footer */
+  const insets = () => { const cs = getComputedStyle(q('#stage') || document.documentElement);
+    const sat = parseFloat(cs.getPropertyValue('--brsat')) || 0, foot = parseFloat(cs.getPropertyValue('--ppFoot')) || 76;
+    return { TOP: Math.max(96, sat + 30), BOT: foot + 10 }; };
   const key = img => (img.getAttribute('src') || '').split('/').pop().split('.')[0];
 
   function layout(host) {
     const H = window.SH || 1032, ppx = host.querySelector(':scope>.ppx'); if (!ppx) return;
+    const { TOP, BOT } = insets();
     qa(':scope>.ppg', ppx).forEach(g => {
-      const sp = SPEC[g.dataset.k], spec = sp.rows || sp, hots = g._hots || [];
-      const rows = spec.map(r => ({ cs: r, h: Math.max(...r.map(c => c[3] * c[4] / c[2])), w: r.reduce((a, c) => a + c[4], 0) + (r.length - 1) * GAP }));
-      const tot = rows.reduce((a, r) => a + r.h, 0) + (rows.length - 1) * GAP, avail = H - TOP - BOT, k = Math.min(1, avail / tot);
+      const sp = SPEC[g.dataset.k], spec = (sp.rows || sp).map(r => r.map(c => c.slice())), hots = g._hots || [];
+      const rh = r => Math.max(...r.map(c => c[3] * c[4] / c[2]));
+      const sum = () => spec.reduce((a, r) => a + rh(r), 0) + (spec.length - 1) * GAP;
+      const avail = H - TOP - BOT;
+      /* grow the crops that allow it (more picture above/below) into the leftover height */
+      let extra = avail - sum();
+      spec.forEach(r => r.forEach(c => { if (extra <= 1 || c.length < 7 || r.length > 1) return;
+        const s = c[4] / c[2], room = (c[6] - c[5]) - c[3]; if (room <= 0) return;
+        const add = Math.min(room, extra / s), up = Math.min(c[1] - c[5], add / 2), dn = Math.min(c[6] - (c[1] + c[3]), add - up), up2 = Math.min(c[1] - c[5], add - dn);
+        c[1] -= up2; c[3] += up2 + dn; extra -= (up2 + dn) * s; }));
+      const rows = spec.map(r => ({ cs: r, h: rh(r), w: r.reduce((a, c) => a + c[4], 0) + (r.length - 1) * GAP }));
+      const tot = sum(), k = Math.min(1, avail / tot);
       let y = sp.at === 'bottom' ? H - tot * k : TOP + Math.max(0, (avail - tot * k) / 2);
-      g.innerHTML = sp.html || '';
+      g.innerHTML = (sp.bg ? `<div class="ppbg" style="background-image:url('${g.dataset.src}')"></div>` : '') + (sp.html || '');
       rows.forEach(r => {
         let x = (600 - r.w * k) / 2;
-        r.cs.forEach(([cx, cy, cw, ch, tw]) => {
-          const s = tw * k / cw, d = document.createElement('div'); d.className = 'ppc' + (sp.fade ? ' fade' : '');
+        r.cs.forEach(([cx, cy, cw, ch, tw, , , fx]) => {
+          const s = tw * k / cw, d = document.createElement('div'); d.className = 'ppc' + (sp.fade ? ' fade' : '') + (fx ? ' ' + fx : '');
           Object.assign(d.style, { left: x + 'px', top: y + (r.h * k - ch * s) / 2 + 'px', width: cw * s + 'px', height: ch * s + 'px' });
           const im = document.createElement('img'); im.src = g.dataset.src; im.alt = ''; im.decoding = 'async'; im.draggable = false;
           Object.assign(im.style, { left: -cx * s + 'px', top: -cy * s + 'px', width: 1376 * s + 'px', height: 964 * s + 'px' });
@@ -70,20 +87,25 @@
       const g = document.createElement('div'); g.className = 'ppg'; g.dataset.k = key(img); g.dataset.src = img.getAttribute('src'); g.hidden = img.hidden; g._hots = hots;
       ppx.appendChild(g);
       /* follow the slide's own sub-tab switching (it toggles [hidden] on the original images) */
-      new MutationObserver(() => { const was = g.hidden; g.hidden = img.hidden; if (was && !g.hidden) { g.classList.remove('in'); void g.offsetWidth; g.classList.add('in'); } }).observe(img, { attributes: true, attributeFilter: ['hidden'] });
+      new MutationObserver(() => { const was = g.hidden; if (was === img.hidden) return; g.hidden = img.hidden; if (was && !g.hidden) { g.classList.remove('in'); void g.offsetWidth; g.classList.add('in'); } }).observe(img, { attributes: true, attributeFilter: ['hidden'] });
     });
     const sc = host.querySelector(':scope>.scroll'); sc ? host.insertBefore(ppx, sc) : host.appendChild(ppx);
     layout(host);
   }
 
   const hosts = () => [...qa('#p-monitoring .mtab'), q('#p-military')].filter(Boolean);
-  let lastH = 0;
+  /* Protection: the "more protection" card starts just under the warranty list (CSS reads --ptT) */
+  const fitProt = () => { const pg = q('#p-protection'), l = pg && q('.wlist', pg); if (!l || !isPP()) return;
+    const v = Math.round(l.offsetTop + l.offsetHeight + 28) + 'px'; if (l.offsetHeight && pg.style.getPropertyValue('--ptT') !== v) pg.style.setProperty('--ptT', v); };
+  let lastSig = '';
   function apply() {
     if (!isPP()) return;
-    const H = window.SH || 0; hosts().forEach(h => { if (!h.querySelector(':scope>.ppx')) build(h); else if (H !== lastH) layout(h); }); lastH = H;
+    const i = insets(), sig = [window.SH || 0, i.TOP, i.BOT].join(); /* re-lay out only when the height or the insets change */
+    hosts().forEach(h => { if (!h.querySelector(':scope>.ppx')) build(h); else if (sig !== lastSig) layout(h); }); lastSig = sig; fitProt();
   }
-  apply();
+  apply(); setTimeout(apply, 500); /* again once brand.js has published --brsat */
   addEventListener('resize', () => setTimeout(apply, 60));
   addEventListener('orientationchange', () => setTimeout(apply, 400));
+  { const pg = q('#p-protection'); if (pg) new MutationObserver(() => { if (pg.classList.contains('on')) requestAnimationFrame(fitProt); }).observe(pg, { attributes: true, attributeFilter: ['class'] }); }
   new MutationObserver(apply).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 })();

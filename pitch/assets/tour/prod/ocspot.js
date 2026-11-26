@@ -15,27 +15,28 @@ export default H => {
   const greyP = mat(0xbec0c2, {r:.55});
 
   // ---------------------------------------------------------------- bracket: vertical band + J bend (side profile extruded across 77 mm)
-  const Wb = 77, yTop = -40, yBend = -67, yTg = -87, tT = 7;
-  { const s = new THREE.Shape();                              // profile in (u = z, v = y)
-    s.moveTo(0, yTop); s.lineTo(0, yBend);
-    s.absarc(20, yBend, 20, Math.PI, 1.5*Math.PI, false);    // outer R20: (0,-67) -> (20,-87)
-    s.lineTo(26, yTg); s.lineTo(26, yTg+tT);                  // overlaps the tongue plate
-    s.lineTo(20, yTg+tT);
-    s.absarc(20, yBend-3, 10, 1.5*Math.PI, Math.PI, true);   // inner R10: (20,-80) -> (10,-70)
-    s.lineTo(10, yTop); s.lineTo(0, yTop);
+  const Wb = 77, yTop = -40, yTg = -84, tT = 7, Tb = 12, Ro = 27, Ri = Ro - Tb, zTg = 74;
+  { const s = new THREE.Shape();                              // profile in (u = z, v = y): band 12 thick, outer bend R20, tongue 7 thick
+    s.moveTo(0, yTop); s.lineTo(0, yTg + Ro);
+    s.absarc(Ro, yTg + Ro, Ro, Math.PI, 1.5*Math.PI, false); // outer bend -> tongue underside
+    s.lineTo(Ro + 8, yTg); s.lineTo(Ro + 8, yTg + tT);       // overlaps the tongue plate
+    s.lineTo(Ro, yTg + tT);
+    s.absarc(Ro, yTg + tT + Ri, Ri, 1.5*Math.PI, Math.PI, true);   // inner bend
+    s.lineTo(Tb, yTop); s.lineTo(0, yTop);
     const j = ext(s, Wb, 3, white); j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
-    // tongue: plan rounded rectangle (R8 front corners) 77 wide, lying on the bar top: underside y = -87, top y = -80, forward to z = 62
-    const t = ext(rr4(Wb, 62-22, [8, 8, 0, 0], 0, (62+22)/2), tT, 1.5, white);   // shape (x, z), extruded along +y after rotation
-    t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yTg + tT, 0);   // shape y -> z, extrusion -> down from y = -80 to -87 M.add(t); t.castShadow = t.receiveShadow = true;
+    // tongue: plan rounded rectangle (R8 front corners) 77 wide lying on the bar top (a real 7 mm step), running forward to z = 74
+    const t = ext(rr4(Wb, zTg - Ro, [8, 8, 0, 0], 0, (zTg + Ro)/2), tT, 1.5, white);   // shape (x, z)
+    t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yTg + tT, 0);   // shape y -> z; thickness runs down to the bar top
+    M.add(t); t.castShadow = t.receiveShadow = true;
   }
 
   // ---------------------------------------------------------------- light bar housing
   // plan (x, z): centre face z = 84 (122 wide), wings to (+-87, 18), rounded back; section: top y = -87, bottom y = -147,
   // the back a half-ellipse (rearmost z = 8 at mid height), all three LED faces leaning back 12 mm toward the bottom.
-  const yT = -87, yB = -147, lean = 12, wing = V2(66, 26).normalize(), cW = wing.x*61 + wing.y*84;
-  const zBack = y => 22 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/30)**2));
+  const yT = -84, yB = -150, lean = 14, wing = V2(66, 26).normalize(), cW = wing.x*61 + wing.y*84;
+  const zBack = y => 20 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/33)**2));   // half-ellipse back, rearmost z = 6
   const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, 84 - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
-  const RC = [4, 4, 10, 10];                                  // corner radii after each line: right-front R4, front-left R4, left-back R10, back-right R10
+  const RC = [4, 4, 4, 4];                                    // corner radii: front corners R4; the wings run right back to the rounded (half-ellipse) back
   const nC = 10, nE = 14;
   const outline = (d, y) => {                                 // rounded convex polygon from half-planes n.p <= c, fixed topology
     const L = lines(d, y), P = [];
@@ -48,7 +49,7 @@ export default H => {
     return P; };
   const NP = 4*(nC+1+nE-1);
   const leanAt = y => lean*(yT - y)/(yT - yB);
-  const wY0 = -91, wY1 = -143, band = 5;                      // window band: housing sits 5 mm back (reflector plates fill it)
+  const wY0 = yT - 4, wY1 = yB + 4, band = 5;                      // window band: housing sits 5 mm back (reflector plates fill it)
   const levels = [];
   for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yT - 3 + 3*Math.cos(a), 3 - 3*Math.sin(a), 0]); }    // top edge R3
   levels.push([wY0+.6, 0, 0], [wY0+.3, .3, 0], [wY0, band, 1]);
@@ -70,10 +71,10 @@ export default H => {
   const ledIn = mat(0x55585b, {r:.3});
   const slant = Math.hypot(yT - yB, lean), dv = V2(lean, yT - yB).normalize();     // down-the-face direction: (inward lean, down)
   // faces: horizontal outward normal, top-edge centre point (x, z), usable width, column offsets
-  const sW = 29, faces = [                                    // wings: plate centred 29 mm back along the wing from the front corner
+  const sW = 33, faces = [                                    // wings: plate centred 29 mm back along the wing from the front corner
     { n: V2(0, 1), p: V2(0, 84), w: 118, cols: [-25, 0, 25] },
-    { n: V2(wing.x, wing.y), p: V2(61 + wing.y*sW, 84 - wing.x*sW), w: 52, cols: [-18, 0, 18] },
-    { n: V2(-wing.x, wing.y), p: V2(-61 - wing.y*sW, 84 - wing.x*sW), w: 52, cols: [-18, 0, 18] } ];
+    { n: V2(wing.x, wing.y), p: V2(61 + wing.y*sW, 84 - wing.x*sW), w: 58, cols: [-18, 0, 18] },
+    { n: V2(-wing.x, wing.y), p: V2(-61 - wing.y*sW, 84 - wing.x*sW), w: 58, cols: [-18, 0, 18] } ];
   const hW = (wY0 - wY1), vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;               // window height, slanted distance to its middle
   for(const F of faces){
     const f = new THREE.Group(); M.add(f);
@@ -110,7 +111,7 @@ export default H => {
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below)
-  { const yP = -99, th = .33, zP = zBack(yP);
+  { const yP = -96, th = .33, zP = zBack(yP);
     const p = add(M, H.rslab(70, 22, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
     for(const sx of [-30, 30]){ const c = add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, .3, 32), mat(0xd9dadb,{r:.45}))), sx, 0, .65); } }
   return g;

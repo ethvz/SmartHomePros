@@ -42,8 +42,8 @@ export default H => {
   const faceM = white.clone();
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f3, roughness: .5, sheen: .5, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
   const hair = new THREE.MeshStandardMaterial({ color: 0xa9a9a9, roughness: .7 });
-  const ringM = new THREE.MeshPhysicalMaterial({ color: 0x47484a, roughness: .62, side: THREE.DoubleSide });
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa9abab, roughness: .75, sheen: .3, sheenColor: 0xffffff });
+  const ringM = new THREE.MeshStandardMaterial({ color: 0x2f3031, roughness: .8, side: THREE.DoubleSide });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x96989a, roughness: .75, sheen: .3, sheenColor: 0xffffff });
   const lightM = new THREE.MeshPhysicalMaterial({ color: 0xdcdedb, roughness: .4, emissive: 0x83f4b8, emissiveIntensity: .0 });
   const holeM = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .9 });
 

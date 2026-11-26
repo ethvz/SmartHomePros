@@ -114,6 +114,7 @@ export default H => {
     const boot = new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(mm(r), mm(y))), 48), cordM); boot.rotation.z = -Math.PI / 2; boot.castShadow = true;
     add(g, boot, mm(48.0), mm(-1.5), mm(8));
     const curve = new THREE.CatmullRomCurve3([[57.5, -1.5, 8], [62, -3, 7.2], [65.5, -10, 5.2], [67, -24, 3.2], [67.2, -50, 1.8], [67, -80, 1.6]].map(([x, y, z]) => new THREE.Vector3(mm(x), mm(y), mm(z))));
-    const cord = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, mm(1.5), 16, false), cordM); cord.castShadow = true; add(g, cord); }
+    const cord = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, mm(1.5), 16, false), cordM); cord.castShadow = true; add(g, cord);
+    if (new URLSearchParams(location.search).get('part') === 'nocord') { g.remove(cord); g.remove(boot); } }   // DEBUG
   return g;
 };

@@ -117,8 +117,6 @@ html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:c
 .ppcl{display:none}
 html.pp .ht>.ppcl{display:block;position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:15px!important;line-height:1.15;color:rgba(255,255,255,.62);pointer-events:none;z-index:3;padding:0 6px}
 html.pp .ht>.ppcl.top{top:10px;bottom:auto}
-html.pp img[src*="tiles/ocp.webp"],html.pp img[src*="tiles/ocspot.webp"]{clip-path:inset(0 0 13% 0)}
-html.pp img[src*="tiles/keypad.webp"],html.pp img[src*="tiles/app.webp"]{clip-path:inset(8% 0 0 0)}
 html.pp #allTiles .ht[data-k=shp2]::after{font-size:15px!important;color:rgba(255,255,255,.62)!important}
 /* 3D Home: the frame fills the upright screen; the footer floats over it */
 html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}
