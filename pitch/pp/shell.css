@@ -129,7 +129,7 @@ html.pp #vlp video{width:100%;height:auto;max-height:100%}
 /* ---------- Home ---------- */
 html.pp #homeTrack{height:calc(var(--H) - var(--ppHomeFoot))!important}
 html.pp #p-home .hpane{height:calc(var(--H) - var(--ppHomeFoot))!important}
-html.pp #homeAll .hall-h{left:244px;right:20px;top:16px;height:auto}
+html.pp #homeAll .hall-h{left:244px!important;right:20px!important;top:33px!important;height:auto!important;text-align:left}   /* the eyebrow, right of the top corner */
 html.pp #homeAll .hall-h h1{display:none}
 html.pp #allTiles .ht .cl{font-size:16px!important;line-height:1.12;bottom:6%!important;padding:0 4px}
 html.pp #allTiles .ht .cl[data-pps]{font-size:0!important}

@@ -203,3 +203,8 @@ html.ipp #prScroll .sns-c{padding-top:24px!important;grid-template-columns:280px
 html.ipp #prScroll .sns-c ul{gap:8px!important}
 html.ipp #prScroll .sns-c li{font-size:15px!important;line-height:1.3!important}
 html.ipp #prScroll .sns-c .bv{font-size:18px!important}
+/* Energy Savings: the photo stays inside the picture box (no full-bleed backdrop behind the feature list) */
+html.ipp #thSaveBg{display:none!important}
+html.ipp #thScroll .thc .thm[data-k=save] img.thm-full{left:0!important;top:0!important;width:700px!important;height:700px!important;object-position:50% 40%;-webkit-mask-image:none!important;mask-image:none!important;border-radius:36px!important}
+html.ipp #thScroll .thc .thm[data-k=save] .thm-stat.thm-big{left:44px!important;top:470px!important}
+html.ipp #thScroll .thc .thm[data-k=save] img.thm-estar{right:30px!important;top:30px!important}
