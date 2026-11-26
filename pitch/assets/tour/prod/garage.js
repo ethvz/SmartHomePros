@@ -37,7 +37,7 @@ export default H => {
   const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xdfe3e3, roughness: .15, transmission: .9, thickness: mm(2.5), ior: 1.45, clearcoat: .6, clearcoatRoughness: .1 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xb4b8b8, roughness: .15, transmission: .9, thickness: mm(2.5), ior: 1.45, clearcoat: .6, clearcoatRoughness: .1 });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x6a6a64, roughness: .7 });
   const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe6c65a, roughness: .35, emissive: 0xffe08a, emissiveIntensity: .25, clearcoat: .6 });
   const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xe8e6dc, roughness: .5 });
@@ -113,11 +113,12 @@ export default H => {
     (c, x, y) => { c.beginPath(); c.arc(x, y, 4, 0, Math.PI * 2); c.stroke(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; c.beginPath(); c.moveTo(x + 6 * Math.cos(a), y + 6 * Math.sin(a)); c.lineTo(x + 8.5 * Math.cos(a), y + 8.5 * Math.sin(a)); c.stroke(); } },
     (c, x, y) => { c.beginPath(); c.roundRect(x - 5, y - 11, 10, 9, 2.5); c.roundRect(x - 5, y + 2, 10, 9, 2.5); c.stroke(); }];
   [-18.6, 0, 18.6].forEach((bx, i) => { const by = -32.6, bz = dome(bx, by);
+    const bg = add(g, G(), mm(bx), mm(by), mm(bz));                      // follows the domed face: tilted to its local slope
+    bg.rotation.x = -Math.atan((dome(bx, by + .5) - dome(bx, by - .5)) / 1); bg.rotation.y = Math.atan((dome(bx + .5, by) - dome(bx - .5, by)) / 1);
     { const sh = new THREE.Shape(rrPts(mm(6.6), mm(10.6), mm(3.3)).map(([a, b]) => new THREE.Vector2(a, b))), hp = new THREE.Path(rrPts(mm(6.0), mm(10.0), mm(3.0)).map(([a, b]) => new THREE.Vector2(a, b)));
-      sh.holes.push(hp); add(g, new THREE.Mesh(new THREE.ShapeGeometry(sh), outlineM), mm(bx), mm(by), mm(bz + .03)); }   // single crisp groove line
-    const b = add(g, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM), mm(bx), mm(by), mm(bz - .02));
-    add(g, conform(printPlane(mm(5), mm(8), (c, P) => { c.strokeStyle = '#777'; c.lineWidth = 2.4; const [x, y] = P(0, mm(-1.2)); icon[i](c, x, y); }),
-      () => mm(.32)), mm(bx), mm(by), mm(bz - .02)); void b; });
+      sh.holes.push(hp); add(bg, new THREE.Mesh(new THREE.ShapeGeometry(sh), outlineM), 0, 0, mm(.03)); }   // single crisp groove line
+    add(bg, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM), 0, 0, mm(-.02));
+    add(bg, conform(printPlane(mm(5), mm(8), (c, P) => { c.strokeStyle = '#777'; c.lineWidth = 2.4; const [x, y] = P(0, mm(-1.2)); icon[i](c, x, y); }), () => mm(.32)), 0, 0, mm(-.02)); });
 
   /* ---------- power cord: ribbed boot out of the right side, white cord down the wall ---------- */
   { const prof = [[3.05, -1.0], [3.05, 1.0]]; for (let k = 0; k < 5; k++) { const y0 = 1.8 + k * 2.6; prof.push([2.95 - k * .1, y0], [3.3 - k * .1, y0 + .6], [3.3 - k * .1, y0 + 1.3], [2.95 - k * .1, y0 + 1.9]); }

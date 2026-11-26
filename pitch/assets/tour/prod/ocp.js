@@ -10,71 +10,80 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.08, specularIntensity:.3, envMapIntensity:.3});
-  const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.3, metalness:0, clearcoat:.3, clearcoatRoughness:.25, specularIntensity:.3, envMapIntensity:.2});
-  const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:2.2, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.05, specularIntensity:1, envMapIntensity:1.2, clearcoat:1, clearcoatRoughness:.02});
+  const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.18, metalness:0, clearcoat:.3, clearcoatRoughness:.2, specularIntensity:.6, envMapIntensity:.7});
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:3, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
 
   // ---------------------------------------------------------------- mount (engineering CAD), decoded exactly like the inline model
-  const C = { x:0, y:21, zf:46, r:18.6 };                   // collar: CAD front face z = 46; radius/axis matched to the side photo (CAD nut r16.4 reads small)
+  const C = { x:0, y:21, zf:46, r:19.3 };                   // collar: CAD front face z = 46; Ø38.6 / axis from the side photos (CAD nut r16.4 reads small)
+  const keepTris = (I, pos, keep) => { const out = []; for(let t=0;t<I.length;t+=3){ const a = I[t], b = I[t+1], c = I[t+2];
+    if(keep(pos[3*a+2], pos[3*b+2], pos[3*c+2])) out.push(a, b, c); } return new Uint32Array(out); };
   if(OCPM){
     const mountMat = mountW.clone(); mountMat.side = THREE.DoubleSide;
-    // hairline parting groove at z = 7 mm (wall-plate layer / front shell): same white both sides, fine dark line
-    const mountSplit = H.splitMat(mountMat, mountMat, 'z', .007, .0003, 0x8a8c8f); mountSplit.side = THREE.DoubleSide;
     const grl = grilleMat(0xc4c6c8, [6.5,4.5]); grl.side = THREE.DoubleSide;
-    const Mt = [mountSplit, grl, mountMat];
+    const Mt = [mountMat, grl, mountMat];
     const cad = add(g, G());
     for(const p of OCPM.parts){
+      const k = OCPM.parts.indexOf(p);
+      if(k === 0 || p.g === 2) continue;                     // inner chassis (its tab pokes out below) and the CAD collar (replaced below)
       const geo = new THREE.BufferGeometry();
       const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
       let I = p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni);
+      if(p.g === 1) I = keepTris(I, pos, (a, b, c) => Math.min(a, b, c) >= .016);   // grille: side wrap starts 16 mm off the wall (white border behind it)
+      else I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
       geo.setIndex(new THREE.BufferAttribute(I,1));
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
         for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
           uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0354)/.0708; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
         geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, Mt[p.g]); m.castShadow = m.receiveShadow = true; cad.add(m);
-      if(p.g === 1) m.scale.x = 1.072;                       // grille wrap sits 0.5 mm inside the shell sides (CAD grille reads 3 mm in)
-      const k = OCPM.parts.indexOf(p);
-      if(k === 0) m.visible = false;                         // the CAD's inner chassis: a tab of it pokes out below the shell
-      if(p.g === 2) m.visible = false;                       // CAD collar: replaced by the dimpled locking collar below
     }
   } else {                                                    // offline fallback: plain mount block of the CAD size
     add(M, H.rslab(77, 99, 29, 10, 4, mountW), 0, 0, 14.5);
     add(M, H.rslab(71, 42, 1, 7, .4, grilleMat(0xc4c6c8,[60,36])), 0, -28, 29.1);
   }
-  // inner wall behind the speaker grille (the CAD's hidden chassis used to fill it): white, so the side opening is not see-through
-  add(M, H.rslab(70.6, 46, 7, 4, 1, mountW), 0, -26, 10);
-  // back of the mount (the CAD shell is open toward the wall): cavity floor 6 mm in, raised keyhole plate with the brass
-  // insert, 4 screw bosses with keyhole slots, side ribs, cable slot (ocp_back_1)
-  { const inner = new THREE.MeshPhysicalMaterial({color:0xd9dadb, roughness:.6, side:THREE.DoubleSide});
-    const dark = mat(0x3c3e40, {r:.8});
-    add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 9.5);                       // cavity floor, ~9 mm in from the wall
-    const plateM = new THREE.MeshPhysicalMaterial({color:0xe6e7e8, roughness:.55, side:THREE.DoubleSide});
-    add(M, H.rslab(44, 60, 6.5, 3, .6, plateM), 0, 11, 6.25);                          // raised centre plate (face 3 mm off the wall)
-    for(const [bx, by] of [[-27, 30], [27, 26], [-27, -5], [27, -9]]){                 // screw towers with round holes
-      add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.9, 7.5, 32), inner)), bx, by, 5.25);
-      add(M, H.rslab(8.5, 10.5, 7.5, 2, .6, inner), bx + Math.sign(bx)*4.5, by, 5.25);    // U-shaped tower: walls back to the rim
-      add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, .2, 24), dark)), bx, by, 1.45); }
-    for(const rx of [-21, -15.5, 15.5, 21]) add(M, H.rslab(2.2, 58, 6.5, 1, .4, inner), rx, 10, 5.75);   // channel walls beside the centre plate
-    const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.3, metalness:.9});
-    const tube = new THREE.LatheGeometry([[2.4,0],[2.4,2.2],[2.8,2.7],[3.9,2.7],[4.2,2.4],[4.2,0]].map(([r,y]) => new THREE.Vector2(r, y)), 40);
-    { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 3); t.rotation.x = -Math.PI/2; }   // brass insert tube standing 2.6 mm off the plate toward the wall
-    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, .1, 24), dark)), 0, 6, 1.5);
-    { const sl = add(M, H.rslab(3.5, 9, .2, 1.75, .05, dark), -6, -6, 2.95); sl.rotation.z = Math.PI/2; } }
+  // wall-plate layer (z 0 -> 7): a rim with exactly the shell's outline at z = 7 (76.2 x 96.3, R10), so plate and shell are flush
+  // with only the hairline parting line; open toward the wall (the back cavity below)
+  { const s = rrShape(76.2, 96.3, 10); s.holes.push(rrShape(70.2, 90.3, 7));
+    const wp = add(M, ext(s, 6.85, .35, mountW), 0, -1.55, 0); g.userData.wallPlate = wp; }
+  // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
+  { const s = H.rr4(76.2, 48, [0, 0, 10, 10], 0, -25.7); s.holes.push(H.rr4(73.8, 46.6, [0, 0, 8.8, 8.8], 0, -25.6));
+    add(M, ext(s, 9.3, .3, mountW), 0, 0, 7.05); }
+  // back of the mount (open toward the wall, ocp_back_1 / detail_back): floor 15 mm in, thin centre plate (face 6 mm off the wall),
+  // four tall U-shaped screw towers with real keyholes, channel walls, the brass insert tube standing 4 mm proud, cable slot
+  { const inner = new THREE.MeshPhysicalMaterial({color:0xd6d7d8, roughness:.6, side:THREE.DoubleSide});
+    const dark = mat(0x2e3032, {r:.85});
+    add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 15.5);                      // cavity floor
+    const plateM = new THREE.MeshPhysicalMaterial({color:0xe7e8e9, roughness:.55, side:THREE.DoubleSide});
+    add(M, H.rslab(42, 58, 2, 3, .5, plateM), 0, 11, 7);                               // centre plate, face at z = 6
+    add(M, H.rslab(38, 54, 9, 3, .5, inner), 0, 11, 11.5);                             // its supports down to the floor
+    const keyhole = (cx, cy) => { const p = new THREE.Path(), a0 = Math.atan2(-1.561, 1.25);
+      p.moveTo(cx + 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - .061); p.absarc(cx, cy + 1.5, 2, a0, Math.PI - a0, false); p.lineTo(cx - 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - 3.6); return p; };
+    for(const [bx, by] of [[-27, 30], [27, 26], [-27, -5], [27, -9]]){
+      const sg = Math.sign(bx), sh = H.rr4(13, 11.5, sg < 0 ? [5.75, 0, 0, 5.75] : [0, 5.75, 5.75, 0], bx + sg*2.5, by);
+      sh.holes.push(keyhole(bx, by));
+      add(M, ext(sh, 13.2, .5, inner), 0, 0, 2);                                      // tower: z 2 -> 15.2, walls run out to the rim
+      add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2, 2, .2, 20), dark)), bx, by + 1.5, 9); }
+    for(const rx of [-21.5, -16.5, 16.5, 21.5]) add(M, H.rslab(1.8, 58, 12, .8, .4, inner), rx, 10, 9.3);   // channel walls
+    const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.28, metalness:.9});
+    const tube = new THREE.LatheGeometry([[2,0],[2,3.5],[2.4,4],[3.6,4],[4,3.6],[4,0]].map(([r,y]) => new THREE.Vector2(r, y)), 48);
+    { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 6); t.rotation.x = -Math.PI/2; }   // brass tube OD 8 / ID 4, 4 mm proud of the plate
+    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2, 2, .1, 24), dark)), 0, 6, 4.5);
+    { const sl = add(M, H.rslab(3.5, 9, .2, 1.75, .05, dark), -6, -6, 5.9); sl.rotation.z = Math.PI/2; } }
   // microphone pinhole on the +x side, just above the grille, near the 7 mm seam
-  { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.45, -3, 15); ph.rotation.z = Math.PI/2; }
+  { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.12, -3, 13); ph.rotation.z = Math.PI/2; }
 
   // ---------------------------------------------------------------- dimpled locking collar (white, golf-ball dimples, real step at the root)
   {
-    const zRoot = 27, zA = 31.6, zB = 44.3, zF = C.zf, R = C.r, bore = 12.1;
+    const zRoot = 27, zA = 29, zB = 43.4, zF = C.zf, R = C.r, bore = 12.8;
     // lathe: plain root band, dark shadow groove, (textured band added separately), plain front band, R1.5 front edge, front face, bore
-    const prof = [[R-.2, zRoot], [R, zRoot+.2], [R, 31], [R-.35, 31.15], [R-.35, 31.45], [R, zA]];
+    const prof = [[R-.2, zRoot], [R, zRoot+.2], [R, 28.4], [R-.35, 28.55], [R-.35, 28.85], [R, zA]];
     const L1 = new THREE.LatheGeometry(prof.map(([r,z]) => new THREE.Vector2(r, z)), 96);
-    const front = [[R, zB], [R, zF-1.5]]; for(let i=1;i<=6;i++){ const a = i/6*Math.PI/2; front.push([R-1.5+1.5*Math.cos(a), zF-1.5+1.5*Math.sin(a)]); }
+    const front = [[R, zB], [R, zF-2.5]]; for(let i=1;i<=8;i++){ const a = i/8*Math.PI/2; front.push([R-2.5+2.5*Math.cos(a), zF-2.5+2.5*Math.sin(a)]); }
     front.push([bore+.8, zF], [bore+.1, zF-.4], [bore, zF-1.2], [bore, zF-6]);
     const L2 = new THREE.LatheGeometry(front.map(([r,z]) => new THREE.Vector2(r, z)), 96);
     const colM = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
@@ -82,16 +91,16 @@ export default H => {
     // the bore floor in shadow
     add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(bore, bore, .2, 48), mat(0x6c6e70,{r:.8}))), C.x, C.y, zF-6);
     // dimpled band: 54 dimples round x 8 staggered rows at 1.8 pitch, as a bump + shade texture
-    const N = 54, rows = 7, pxP = 20, Wc = N*pxP, Hc = Math.round(rows*1.8/(2*Math.PI*R/N)*pxP);
+    const N = 54, rows = 9, pxP = 20, Wc = N*pxP, Hc = Math.round(rows*1.6/(2*Math.PI*R/N)*pxP);
     const cv = document.createElement('canvas'); cv.width = Wc; cv.height = Hc; const x = cv.getContext('2d');
     const cv2 = document.createElement('canvas'); cv2.width = Wc; cv2.height = Hc; const x2 = cv2.getContext('2d');
     x.fillStyle = '#fff'; x.fillRect(0,0,Wc,Hc); x2.fillStyle = '#fff'; x2.fillRect(0,0,Wc,Hc);
-    const rowH = Hc/rows, rD = pxP*1.0/(2*Math.PI*R/N)/2;
+    const rowH = Hc/rows, rD = pxP*1.2/(2*Math.PI*R/N)/2;
     for(let r=0;r<rows;r++) for(let i=-1;i<=N;i++){
       const cx = (i + (r%2)*.5 + .25)*pxP, cy = (r+.5)*rowH;
       const gr = x.createRadialGradient(cx, cy, 0, cx, cy, rD); gr.addColorStop(0,'#000'); gr.addColorStop(.55,'#555'); gr.addColorStop(1,'#fff');
       x.fillStyle = gr; x.beginPath(); x.arc(cx, cy, rD, 0, Math.PI*2); x.fill();
-      const g2 = x2.createRadialGradient(cx, cy-rD*.25, 0, cx, cy, rD); g2.addColorStop(0,'#d4d5d6'); g2.addColorStop(.7,'#e4e5e6'); g2.addColorStop(1,'#fff');
+      const g2 = x2.createRadialGradient(cx, cy-rD*.25, 0, cx, cy, rD); g2.addColorStop(0,'#b9bbbd'); g2.addColorStop(.6,'#cfd1d3'); g2.addColorStop(1,'#fff');
       x2.fillStyle = g2; x2.beginPath(); x2.arc(cx, cy, rD, 0, Math.PI*2); x2.fill();
     }
     const bt = new THREE.CanvasTexture(cv); bt.wrapS = THREE.RepeatWrapping; bt.anisotropy = 8;
@@ -137,17 +146,7 @@ export default H => {
   const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   hg.setIndex([...idxK, ...idxW]); hg.addGroup(0, idxK.length, 0); hg.addGroup(idxK.length, idxW.length, 1);
   hg.computeVertexNormals();
-  // neck slot: a 16 mm stadium recessed 2 mm, running down the lower back and round the bottom-back curve
-  const cyB = yBs(Zb+Rbt) + Rbt, czB = Zb + Rbt, slot = [];
-  for(let y=-10; y>cyB; y-=.5) slot.push([y, Zb]);
-  for(let i=0;i<=40;i++){ const a = i/40*1.15; slot.push([cyB - Rbt*Math.sin(a), czB - Rbt*Math.cos(a)]); }
-  { const P = hg.attributes.position, Nn = hg.attributes.normal;
-    for(let i=0;i<P.count;i++){ const x = P.getX(i), y = P.getY(i), z = P.getZ(i); if(Math.abs(x) > 9 || y > -8 || z > -14) continue;
-      let dm = 1e9; for(let k=0;k<slot.length-1;k++){ const [ay, az] = slot[k], [by, bz] = slot[k+1], vy = by-ay, vz = bz-az;
-        const t = Math.max(0, Math.min(1, ((y-ay)*vy + (z-az)*vz)/(vy*vy+vz*vz))); dm = Math.min(dm, Math.hypot(y-ay-vy*t, z-az-vz*t)); }
-      const d = Math.hypot(x, dm); const w = d >= 8.4 ? 0 : d <= 7.4 ? 1 : (t => t*t*(3-2*t))((8.4-d)/1);
-      if(w > 0){ P.setXYZ(i, x - Nn.getX(i)*2*w, y - Nn.getY(i)*2*w, z - Nn.getZ(i)*2*w); } }
-    hg.computeVertexNormals(); }
+  const cyB = yBs(Zb+Rbt) + Rbt, czB = Zb + Rbt;
   const head = G();
   const shell = add(head, new THREE.Mesh(hg, [bezelK, shellW])); shell.castShadow = shell.receiveShadow = true;
 
@@ -155,22 +154,20 @@ export default H => {
   // light ring (flush, 75 -> 70, R10/R7, hairline gaps) and the front glass (70 x 70 R7, holes for the lens and the light sensor)
   { const s = rrShape(74.7, 74.7, 13.85); s.holes.push(rrShape(70.3, 70.3, 11.15));
     add(head, ext(s, 1.2, .12, PM.ring), 0, 0, -1.3);
-    const gs = rrShape(70, 70, 11), lh = new THREE.Path(); lh.absarc(0, -17, 10.42, 0, Math.PI*2, true); gs.holes.push(lh);
+    const gs = rrShape(70, 70, 11), lh = new THREE.Path(); lh.absarc(0, -17, 9.84, 0, Math.PI*2, true); gs.holes.push(lh);
     const sh = new THREE.Path(); sh.absarc(0, -30.5, 1.7, 0, Math.PI*2, true); gs.holes.push(sh);
     add(head, ext(gs, 1.2, .15, glassK), 0, 0, -1.2); }
   // lens: satin barrel flush to +0.3 with a soft chamfer inward, blue-black glass recessed ~2 mm with a concentric inner ring
-  { const pr = [[6.7,-2.7],[6.95,-2.3],[8.8,-.3],[9.5,.24],[10.05,.3],[10.35,.12],[10.4,-1.3]];   // lens bezel Ø20.8, opening Ø14 (detail_lens)
+  { const pr = [[6.2,-2.6],[6.4,-2],[9.3,.25],[9.55,.3],[9.75,.15],[9.82,-1.3]];   // lens bezel Ø19.6 with a straight conical chamfer down to the lens (detail_lens)
     const b = add(head, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,z]) => new THREE.Vector2(r, z)), 72), satinK), 0, -17, 0); b.rotation.x = Math.PI/2;
-    add(head, dome(6.9, 1.9, lensM), 0, -17, -2.5);   // one big glossy dark lens dome
-    add(head, H.torus(4.6, .1, mat(0x1c1f26,{r:.2,m:.5})), 0, -17, -1.15);
-    add(head, H.torus(2.6, .14, mat(0x8d9299,{r:.15,m:.9})), 0, -17, -.75);   // inner element rim catching light
-    add(head, dome(1.9, .5, new THREE.MeshPhysicalMaterial({color:0x101522, roughness:.02, metalness:.4, clearcoat:1, envMapIntensity:2})), 0, -17, -.72); }
+    add(head, dome(6.2, 2.6, lensM), 0, -17, -2.9);   // one big glossy blue-black lens dome
+  }
   // light / IR sensor (recessed 0.3), mic pinholes, wordmark
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.65, .4, 32), mat(0x1e1e1f,{r:.4}))), 0, -30.5, -.5);
   add(head, H.torus(1.2, .14, mat(0x3a3b3d,{r:.3,m:.4})), 0, -30.5, -.3);
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .2, 24), mat(0x2a2a2c,{r:.08,x:{clearcoat:1}}))), 0, -30.5, -.25);
   for(const sx of [-25.5, 25.5]) add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .1, 16), mat(0x1c1c1d,{r:.7}))), sx, -28.5, .02);
-  add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, -.6-.43, .03);   // wordmark ~16 mm above the lens centre (between detail_lens and front_1)
+  add(head, decal(DEC.logo, 27, 6.75, {color:0xe6e6e6, r:.45}), 0, -.6-.45, .03);   // wordmark ~16 mm above the lens centre (between detail_lens and front_1)
 
   // ---------------------------------------------------------------- ball, neck and pose
   const B = V3(0, C.y, 49.5), rBall = 12.2, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
@@ -188,12 +185,17 @@ export default H => {
   const hInv = new THREE.Quaternion().setFromEuler(head.rotation).invert(), toHead = P => P.clone().sub(Gp).applyQuaternion(hInv);
   let tHit = 30; for(let t = 0; t < 60; t += .1){ const h = toHead(B.clone().add(V3(0, 0, t))); if(h.z <= 0 && h.z >= Zb && h.y >= sec(h.z).yB){ tHit = t; break; } }
   const Ln = tHit + 2, hitH = toHead(B.clone().add(V3(0, 0, tHit)));
-  { // flat exit pad round the neck where it leaves the slot (ocp_bottom_1): 20 x 14, tangent to the shell there
-    const nrm = hitH.z < czB ? V3(0, hitH.y - cyB, hitH.z - czB).normalize() : V3(0, 0, -1), a = Math.atan2(-nrm.y, -nrm.z);
-    const pad = add(head, H.rslab(19, 13, 1.2, 4, .5, shellW), ...hitH.clone().addScaledVector(nrm, -.5).toArray()); pad.rotation.x = Math.PI - a; }
+  { // funnel: the head's lower back flows into the neck with a concave blend (no slot edge, no pad): shell vertices near the
+    // neck axis are pulled back along it, 8 mm at the neck, easing to nothing 24 mm out
+    const Ah = toHead(B), dh = V3(0, 0, 1).applyQuaternion(hInv), Pp = hg.attributes.position, w = V3(0, 0, 0);
+    for(let i=0;i<Pp.count;i++){ w.set(Pp.getX(i), Pp.getY(i), Pp.getZ(i)).sub(Ah); const t = w.dot(dh);
+      if(t <= 0 || t > tHit + 14) continue; const r = w.clone().addScaledVector(dh, -t).length(); if(r >= 24) continue;
+      const u = Math.max(0, (r - 8)/16), k = 8*(1 - u)*(1 - u);
+      Pp.setXYZ(i, Pp.getX(i) - dh.x*k, Pp.getY(i) - dh.y*k, Pp.getZ(i) - dh.z*k); }
+    hg.computeVertexNormals(); }
   const ballM = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.38, clearcoat:.25, clearcoatRoughness:.35, sheen:.3, sheenColor:0xffffff});
   add(M, new THREE.Mesh(new THREE.SphereGeometry(rBall, 48, 32), ballM), B.x, B.y, B.z).castShadow = true;
-  { const L = Ln + .5, pr = [[.01,5.5],[10.4,5.5],[9.6,7.8],[8.7,9.2],[8.1,10.1],[7.7,10.9],[7.5,11.8],[7.5,Ln-5],[7.9,Ln-3.5],[9.4,Ln-1.4],[9.8,Ln-.8],[9.8,L],[.01,L]];   // flared trapezoid foot into the slot
+  { const L = Ln + .5, pr = [[.01,7],[8,7],[8,L],[.01,L]];   // straight Ø16 neck, no flares
     const nk = add(piv, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,y]) => new THREE.Vector2(r, y)), 56), ballM), 0, 0, 0);
     nk.quaternion.setFromUnitVectors(V3(0,1,0), V3(0,0,1)); nk.castShadow = true; }
   g.userData.headPose = { ball: B.clone().multiplyScalar(.001), glass: Gp.clone().multiplyScalar(.001) };
