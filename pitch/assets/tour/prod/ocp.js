@@ -32,10 +32,11 @@ export default H => {
       const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
       if(p.g === 1){ const Ng = new Int8Array(OCPM.buf, p.n, p.nv*3); for(let i=0;i<p.nv;i++){ pos[3*i] *= SX*.988;   // grille scaled with the shell, ~.5 inside its sides
-        if(Math.abs(Ng[3*i])/127 > .6 && pos[3*i+2] < .016) pos[3*i+2] = .016; } }   // side faces start 16 mm off the wall: clamp (no sawtooth)
+        if(pos[3*i+2] < .016) pos[3*i+2] = .016; } }   // the grille starts 16 mm off the wall: clamp (no sawtooth); the white strip covers z 7-16
       if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front, 77 wide
         let x = pos[3*i]*SX, y = pos[3*i+1], z = pos[3*i+2];
         if(z < .0128) x = Math.max(-.0385, Math.min(.0385, x));   // the CAD's wider back flange pulled in to the shell's 77 mm outline
+        if(z < .020) y = Math.min(.0466, y);                        // one flat top end from the wall to the R10 front corner (no step at the seam)
         if(y > .036 && z > .021 && z < .04){ const dy = y - .036, dz = z - .021, L = Math.hypot(dy, dz); if(L > .010){ y = .036 + dy*.010/L; z = .021 + dz*.010/L; } }   // top-front corner R10
         pos[3*i] = x; pos[3*i+1] = y; pos[3*i+2] = z; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
@@ -56,8 +57,8 @@ export default H => {
   }
   // wall-plate layer (z 0 -> 7): a 3 mm rim with exactly the shell's outline (77 x 95.1, R10), rounded R1 at the wall, so plate and
   // shell are one flush surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
-  { const s = rrShape(77, 98.5, 10); s.holes.push(rrShape(71, 92.5, 7));
-    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -.5, 0); g.userData.wallPlate = wp; }   // top y 48.75 = the shell's own top
+  { const s = rrShape(77, 96.1, 10); s.holes.push(rrShape(71, 90.1, 7));
+    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -1.45, 0); g.userData.wallPlate = wp; }   // top y 46.6 = the shell's top end
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
   { const s = H.rr4(77, 48, [3, 3, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [1.8, 1.8, 8.8, 8.8], 0, -25.4));
     add(M, ext(s, 8.95, .3, mountW), 0, 0, 7.05);             // ends exactly at the grille's back edge (z 16)

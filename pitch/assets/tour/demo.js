@@ -98,7 +98,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmDone svg{width:22px;height:22px}
 #dmDone[hidden]{display:none}
 /* code dots for the lock / keypad close-up */
-#dmPad{position:fixed;z-index:8;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 34px + var(--fb,0px));transform:translateX(-50%);padding:14px 22px;border-radius:26px;display:flex;align-items:center;gap:18px;transition:opacity .3s,transform .4s var(--ease)}
+#dmPad{position:fixed;z-index:8;left:50%;top:calc(env(safe-area-inset-top,0px) + 18px);transform:translateX(-50%);padding:14px 22px;border-radius:26px;display:flex;align-items:center;gap:18px;transition:opacity .3s,transform .4s var(--ease)}
 #dmPad[hidden]{display:none}
 #dmPad .dots{display:flex;gap:12px}
 #dmPad .dots i{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55);transition:background .15s,box-shadow .15s,transform .2s var(--ease)}
@@ -132,14 +132,13 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #card #dmAct .tv{min-width:58px;font-size:20px;line-height:1.05}
 #card #dmAct svg{width:19px;height:19px}
 @media (max-width:560px){
-  #card.dmHas .c-name{max-width:24vw!important;font-size:14px!important}
+  #card.dmHas .c-name{display:none!important}
   #card #dmAct{gap:4px;margin:0}
   #card #dmAct .t{display:none}
   #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
   #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock]{width:40px;padding:0;justify-content:center}
   #card #dmAct button.rnd{width:36px;height:36px}
   #card #dmAct .tv{min-width:42px;font-size:16px}
-  #card.dmHas[data-dm=therm] .c-name{max-width:17vw!important}
   #card #dmAct .tv small{font-size:8.5px;letter-spacing:.1em}
 }
 /* live caption while an automation plays */
@@ -153,6 +152,8 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmCap .st i svg{width:16px;height:16px}
 #dmCap .st i.cur{color:#fff;box-shadow:inset 0 0 0 2px var(--vg);transform:scale(1.08)}
 #dmCap .st i.done{background:var(--vg);color:#04110d}
+#dmCap button.nudge{animation:dmNudge .5s}
+@keyframes dmNudge{30%{transform:scale(1.12);background:rgba(255,255,255,.28)}}
 #dmCap button{height:40px;padding:0 16px;border-radius:20px;background:rgba(255,255,255,.1);font-weight:600;font-size:14px;flex:none}
 #dmCap.alarm .st i.cur{box-shadow:inset 0 0 0 2px #ff3b30}
 #dmShieldRun{position:fixed;inset:0;z-index:9}
@@ -175,6 +176,8 @@ body.dmMode #dmHud{opacity:0;pointer-events:none;transform:translateY(-10px)}
   #dmCap .st i{width:24px;height:24px} #dmCap .st i svg{width:13px;height:13px}
   #dmCap button{height:36px;padding:0 12px}
   #dmPad{gap:12px;padding:12px 16px}
+  #dmPad{top:calc(env(safe-area-inset-top,0px) + 76px)}
+  .emb #dmPad{top:78px}
 }
 @media (max-width:560px){ body:not(.focus) #dmHud{top:calc(env(safe-area-inset-top,0px) + 64px)} .emb body:not(.focus) #dmHud{top:66px} body:not(.focus) #dmScenes{top:calc(env(safe-area-inset-top,0px) + 116px)} .emb body:not(.focus) #dmScenes{top:118px} }
 @media (max-width:430px){ #dmCap .st{display:none} #dmPad .cd{display:none} }
@@ -310,7 +313,12 @@ const TH = {
     this.glow = 1; },
 };
 /* Keypad: status ring + downcast slot follow the arm state */
-const KP = { paint(){ const p = parts('keypad'); if(p.slot) meshMats(p.slot).forEach(m => { m.emissive && m.emissive.setHex(M.alarm ? RED : M.arm === 'dis' ? 0x83f4b8 : AMBER); m.emissiveIntensity = 1.1; });
+const KP = {
+  flashBad(){ const p = parts('keypad'), g = P('keypad') && P('keypad').model; if(!g) return;
+    const mats = [...(p.statusIcons || []).flatMap(meshMats), ...(p.slot ? meshMats(p.slot) : [])], x0 = g.position.clone(), side = V(0, 0, 1).applyQuaternion(g.quaternion).cross(V(0, 1, 0)).normalize();
+    tween(.6, (e, k) => { const on = Math.sin(k*3*Math.PI) ** 2; mats.forEach(m => glowMat(m, RED, 2.2*on)); g.position.copy(x0).addScaledVector(side, Math.sin(k*Math.PI*6)*(1 - k)*.004); }, t => t)
+      .then(() => { g.position.copy(x0); mats.forEach(m => glowMat(m, RED, 0)); KP.paint(); }); },
+  paint(){ const p = parts('keypad'); if(p.slot) meshMats(p.slot).forEach(m => { m.emissive && m.emissive.setHex(M.alarm ? RED : M.arm === 'dis' ? 0x83f4b8 : AMBER); m.emissiveIntensity = 1.1; });
   (p.statusIcons || []).forEach((r, i) => meshMats(r).forEach(m => glowMat(m, RED, M.alarm && i === 2 ? 2 : 0))); } };
 /* Smart Hub downcast LED: an additive wash on the wall under the hub (green disarmed / orange armed / red alarm) */
 const HUBLED = (() => { const p = P('hub'); if(!p) return { set(){} };
@@ -327,6 +335,27 @@ const HUBLED = (() => { const p = P('hub'); if(!p) return { set(){} };
   return { set(hex, alarm){ m.color.setHex(hex); strip.material.color.setHex(hex);
     if(alarm && !pulse){ pulse = now => { m.opacity = .45 + .45*Math.abs(Math.sin(now/260)); }; perFrame.add(pulse); kick(); }
     if(!alarm && pulse){ perFrame.delete(pulse); pulse = null; m.opacity = .75; } } }; })();
+/* the 3D hub's own glass: an always-on status screen drawn to match the live hub (demo time 6:30 pm, arm state), so the
+   panel never shows a stale screenshot next to the live UI */
+const DEMO_TIME = { h:18, m:30 };
+const HUBSCR = (() => { let mesh = null; const p = P('hub'); if(!p) return { draw(){} };
+  p.model.traverse(o => { if(o.isMesh && o.geometry.type === 'PlaneGeometry' && Math.abs((o.geometry.parameters || {}).width - .1513) < 1e-4) mesh = o; });
+  if(!mesh || !mesh.material.map) return { draw(){} };
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 620; const x = c.getContext('2d');
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  const draw = () => { const W = 1024, Hh = 620, F = '"Vivint Sans",-apple-system,Helvetica,Arial,sans-serif';
+    const col = M.alarm ? '#ff3b30' : M.arm !== 'dis' ? '#ff8a1f' : '#05E5AF', lab = M.alarm ? 'Alarm' : M.arm === 'away' ? 'Armed Away' : M.arm === 'stay' ? 'Armed Stay' : 'Disarmed';
+    const g = x.createRadialGradient(0, 0, 0, 0, 0, 900); g.addColorStop(0, M.alarm ? '#3a0c08' : M.arm !== 'dis' ? '#3a1c08' : '#0b2a20'); g.addColorStop(.6, '#050807'); g.addColorStop(1, '#000');
+    x.fillStyle = g; x.fillRect(0, 0, W, Hh);
+    x.fillStyle = '#fff'; x.textBaseline = 'alphabetic'; x.font = '300 210px ' + F; const hh = ((DEMO_TIME.h + 11) % 12) + 1, tm = hh + ':' + String(DEMO_TIME.m).padStart(2, '0');
+    x.fillText(tm, 80, 330); const tw = x.measureText(tm).width; x.font = '400 54px ' + F; x.fillStyle = 'rgba(255,255,255,.7)'; x.fillText(DEMO_TIME.h < 12 ? 'AM' : 'PM', 96 + tw, 330);
+    x.font = '400 40px ' + F; x.fillText(new Date().toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' }), 84, 140);
+    x.beginPath(); x.roundRect(80, 400, 380, 92, 46); x.fillStyle = col + '33'; x.fill(); x.strokeStyle = col; x.lineWidth = 3; x.stroke();
+    x.beginPath(); const sx = 128, sy = 446; x.moveTo(sx, sy - 22); x.lineTo(sx + 19, sy - 14); x.lineTo(sx + 19, sy + 2); x.quadraticCurveTo(sx + 17, sy + 18, sx, sy + 25); x.quadraticCurveTo(sx - 17, sy + 18, sx - 19, sy + 2); x.lineTo(sx - 19, sy - 14); x.closePath(); x.fillStyle = col; x.fill();
+    x.fillStyle = '#fff'; x.font = '500 44px ' + F; x.fillText(lab, 168, 461);
+    t.needsUpdate = true; };
+  const m = mesh.material; m.map = t; m.emissiveMap = t; draw(); document.fonts && document.fonts.ready.then(draw);
+  return { draw }; })();
 /* house lights (interior point lights + exposure) for Goodnight / Welcome / Smoke */
 const LIT = { base:null, exp0:renderer.toneMappingExposure,
   list(){ const L = HOUSE.lights || {}; return (L.interior || []).filter(Boolean); },
@@ -346,6 +375,10 @@ const EMU = { frame:null, w:null, doc:null, UI:null, S:null, ready:null, driving
 function emu(){ if(EMU.ready) return EMU.ready;
   EMU.ready = new Promise(res => { const f = document.createElement('iframe'); f.title = 'Smart Hub Pro 2'; f.setAttribute('allow', 'autoplay');
     f.src = '../emu/index.html?flat&v=' + (T.TOURV || 1); hubEl.insertBefore(f, hubEl.firstChild); EMU.frame = f;
+    const pin = () => { try { const w = f.contentWindow, d = f.contentDocument; if(!w || !d || !/emu/.test(d.URL)){ setTimeout(pin, 4); return; } if(w.__demoTime) return;
+      const RD = w.Date, fixed = () => { const n = new RD(); n.setHours(DEMO_TIME.h, DEMO_TIME.m, 0, 0); return n.getTime(); };
+      w.Date = class extends RD { constructor(...a){ if(a.length) super(...a); else super(fixed()); } static now(){ return fixed(); } }; w.__demoTime = true; } catch(e){ setTimeout(pin, 8); } };
+    pin();
     f.addEventListener('load', () => { const poll = () => { try { const d = f.contentDocument, u = f.contentWindow.eval('UI');
         if(!d || !u || !d.getElementById('gB')) return setTimeout(poll, 80);
         EMU.w = f.contentWindow; EMU.doc = d; EMU.UI = u; EMU.S = u.S; hookEmu(); res(EMU); } catch(e){ setTimeout(poll, 120); } }; poll(); }); });
@@ -354,7 +387,7 @@ const q = s => EMU.doc && EMU.doc.querySelector(s);
 function emuClick(sel){ const b = q(sel); if(!b) return false; EMU.driving = true; try { b.click(); } finally { EMU.driving = false; } return true; }
 /* 3D -> hub: press the emulator's own buttons, so its UI animates itself */
 const HUBDO = {
-  lock(locked){ if(!EMU.S || EMU.S.locks.front === locked) return; emuClick('[data-act="lock"][data-lk="front"]'); },
+  lock(locked){ if(!EMU.S || EMU.S.locks.front === locked || lockBusy()) return; emuClick('[data-act="lock"][data-lk="front"]'); },
   garage(open){ if(!EMU.S) return; const busy = q('#gB') && q('#gB').classList.contains('busy'); if(busy || (EMU.S.garage === 'open') === open) return; emuClick('#gB'); },
   arm(k){ if(!EMU.S || EMU.S.arm === k) return; emuClick(`[data-act="setarm"][data-arm="${k}"]`); },
   therm(){ const S = EMU.S; if(!S) return; const t = M.th;
@@ -365,25 +398,36 @@ const HUBDO = {
   clearAlarm(){ if(!EMU.S || !EMU.S.alarm) return; for(const d of CODE) emuClick(`[data-pin="${d}"]`); },
   home(){ if(EMU.UI){ emuClick('[data-act="close"]'); } },
 };
-function syncEmu(){ if(!EMU.S) return; const S = EMU.S; S.th.cur = M.th.cur; HUBDO.therm(); HUBDO.lock(M.locked); HUBDO.garage(M.garageOpen); HUBDO.arm(M.arm); }
+const lockBusy = () => !!q('[data-act="lock"][data-lk="front"].busy');
+/* push the house's state to the hub. Order matters: disarm before unlocking (or the hub raises "front door opened"),
+   lock before arming. The hub's lock and garage buttons flip after a delay, so this runs again shortly after. */
+function syncEmu(){ if(!EMU.S || MODE.run) return; const S = EMU.S; S.th.cur = M.th.cur; HUBDO.therm();
+  if(M.arm === 'dis') HUBDO.arm('dis'); HUBDO.lock(M.locked); HUBDO.garage(M.garageOpen); if(M.arm !== 'dis' && !M.garageOpen) HUBDO.arm(M.arm); }
+function reconcile(){ syncEmu(); clearTimeout(reconcile.t); reconcile.t = setTimeout(() => { syncEmu(); reconcile.t = setTimeout(syncEmu, 1900); }, 900); }
+/* what the presenter last touched on the hub: only a real tap there may change the house (stale reads never do) */
+const USER = { lock:0, arm:0 };
+const recent = (t, ms) => performance.now() - t < ms;
 /* hub -> 3D: watch what the emulator does */
 let pend = null;
 function hookEmu(){ const d = EMU.doc;
   EMU.w.addEventListener('hubled', e => { const c = e.detail || {}; HUBLED.set(c.alarm || EMU.S.alarm ? RED : EMU.S.arm !== 'dis' ? AMBER : GREEN, !!EMU.S.alarm); });
-  d.addEventListener('click', e => { if(EMU.driving) return; const a = e.target.closest && e.target.closest('[data-act]'); if(!a) return;
+  d.addEventListener('click', e => { if(EMU.driving) return; if(e.target.closest && e.target.closest('[data-pin]')) USER.arm = performance.now();
+    const a = e.target.closest && e.target.closest('[data-act]'); if(!a) return;
     const act = a.dataset.act;
+    if(act === 'lock' || act === 'pdlock' || (act === 'rail' && a.dataset.r === 'lock')) USER.lock = performance.now();
+    if(act === 'setarm' || act === 'arm') USER.arm = performance.now();
     if(act === 'garage' && !a.classList.contains('busy')) setTimeout(() => fromHub('garage', !M.garageOpen), 0);
     if(act === 'tup' || act === 'tdn' || act === 'tmode') setTimeout(() => fromHub('therm'), 0); }, true);
   new MutationObserver(() => { if(!pend) pend = Promise.resolve().then(() => { pend = null; diffEmu(); }); })
     .observe(d.getElementById('scr'), { subtree:true, attributes:true, attributeFilter:['class'], childList:true });
   syncEmu(); }
-function diffEmu(){ if(EMU.driving || !EMU.S || MODE.run) return; const S = EMU.S;   // during a sequence the 3D side leads; settle() syncs the hub after
-  if(S.arm !== M.arm && !S.alarm){ const k = S.arm; M.arm = k; paintArm(); fromHub('arm', k); return; }
-  if(S.locks.front !== M.locked) fromHub('lock', S.locks.front);
+function diffEmu(){ if(EMU.driving || !EMU.S || MODE.run) return; const S = EMU.S;   // during a sequence the 3D side leads; it syncs the hub after
+  if(S.arm !== M.arm && !S.alarm){ if(recent(USER.arm, 6000)){ USER.arm = 0; const k = S.arm; M.arm = k; paintArm(); fromHub('arm', k); return; } reconcile(); }
+  if(S.locks.front !== M.locked && !lockBusy()){ if(recent(USER.lock, 2500)){ USER.lock = 0; fromHub('lock', S.locks.front); } else reconcile(); }
   if(!S.alarm && M.alarm){ M.alarm = false; paintArm(); } }
 function paintArm(){ const a = $('#dmArm'); a.classList.toggle('armed', M.arm !== 'dis'); a.classList.toggle('alarm', M.alarm);
   a.querySelector('span').textContent = M.alarm ? 'Alarm' : M.arm === 'away' ? 'Armed Away' : M.arm === 'stay' ? 'Armed Stay' : 'Disarmed';
-  HUBLED.set(M.alarm ? RED : M.arm !== 'dis' ? AMBER : GREEN, M.alarm); KP.paint(); }
+  HUBLED.set(M.alarm ? RED : M.arm !== 'dis' ? AMBER : GREEN, M.alarm); KP.paint(); HUBSCR.draw && HUBSCR.draw(); }
 
 /* dock: the iframe drawn onto the 3D hub glass with a CSS homography of the four projected screen corners */
 const SCR = { c:V(-.0032, .01555, .0227), w:.1513, h:.1513*750/1280 };
@@ -406,7 +450,7 @@ function pipMatrix(){ const W = innerWidth, s = Math.min(380, W*.46)/1280, top =
 function dockStep(){ if(!EMU.docked) return; const m = dockMatrix(); if(!m){ hubEl.classList.remove('vis'); return; }
   if(m !== EMU.mx){ EMU.mx = m; hubEl.style.transform = m; }
   if(!hubEl.classList.contains('vis')) hubEl.classList.add('vis');
-  if(MODE.kind !== 'panel' && !MODE.run){ const r = hubEl.getBoundingClientRect(); tryEl.style.transform = `translate3d(${(r.left + r.right)/2 - tryEl.offsetWidth/2}px,${r.bottom + 4}px,0)`; } }
+  if(MODE.kind !== 'panel' && !MODE.run){ const r = hubEl.getBoundingClientRect(), b = P('hub').model.localToWorld(V(0, -.085, .02)).project(camera), by = (1 - b.y)/2*innerHeight; tryEl.style.transform = `translate3d(${(r.left + r.right)/2 - tryEl.offsetWidth/2}px,${by + 10}px,0)`; } }
 function showDock(on){ if(on){ emu(); EMU.docked = true; hubEl.classList.remove('pip'); hubEl.style.transition = ''; perFrame.add(dockStep); kick(); }
   else { perFrame.delete(dockStep); hubEl.classList.remove('vis', 'live'); tryEl.classList.remove('vis'); } }
 async function toPip(){ if(!hubEl.classList.contains('vis')) { hubEl.style.transition = 'none'; hubEl.style.transform = pipMatrix(); hubEl.classList.add('pip'); void hubEl.offsetWidth; hubEl.style.transition = ''; hubEl.classList.add('vis'); EMU.docked = false; perFrame.delete(dockStep); return; }
@@ -448,7 +492,7 @@ async function enterPad(k){ if(MODE.run) return; emu(); quietTour(); MODE.kind =
   padEl.classList.remove('bad', 'ok'); padEl.hidden = false; doneB.hidden = false;
   padEl.querySelector('.ks').innerHTML = k === 'keypad' ? '<button data-k="away">Away</button><button data-k="stay">Stay</button>' : '';
   await fly(padPose(k)); controls.enabled = false; }
-function leaveMode(){ const k = MODE.kind, pk = PAD.k; MODE.kind = null; MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hubEl.classList.remove('live');
+function leaveMode(){ const k = MODE.kind, pk = PAD.k; MODE.kind = null; setTimeout(hudOn, 0); MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hubEl.classList.remove('live');
   controls.enabled = true; document.body.classList.remove('dmMode');
   if(k === 'panel'){ state.focus = null; T.focus('hub'); } else if(pk){ state.focus = null; T.focus(pk); } else T.overview(); }
 doneB.addEventListener('click', () => { if(MODE.run) return; leaveMode(); });
@@ -467,7 +511,7 @@ const digitOf = m => (m.name || '').replace(/^key/, '');
 function padKey(m){ const d = digitOf(m); if(!/^\d$/.test(d) || PAD.code.length >= 4) return; pressKey(m, GREEN); PAD.code += d; padDots();
   if(PAD.code.length === 4) setTimeout(padCheck, 260); }
 async function padCheck(){ const ok = PAD.code === CODE, k = PAD.k;
-  if(!ok){ padEl.classList.remove('bad'); void padEl.offsetWidth; padEl.classList.add('bad'); if(k === 'lock'){ LOCK.flash(RED, 2); LOCK.shake(); } else KP.flashBad && KP.flashBad();
+  if(!ok){ padEl.classList.remove('bad'); void padEl.offsetWidth; padEl.classList.add('bad'); if(k === 'lock'){ LOCK.flash(RED, 2); LOCK.shake(); } else KP.flashBad();
     await wait(.7); PAD.code = ''; padDots(); padEl.classList.remove('bad'); return; }
   padEl.classList.add('ok');
   if(k === 'lock') automation('welcome', { typed:true });
@@ -476,7 +520,7 @@ async function padCheck(){ const ok = PAD.code === CODE, k = PAD.k;
 /* taps on the 3D scene (called by index.html before its own product hit test) */
 const hits = (o, ray) => o && ray.intersectObject(o, true).length > 0;
 window.__tapHook = (ray, e) => {
-  if(MODE.run){ skip(); return true; }
+  if(MODE.run){ nudgeSkip(); return true; }
   if(MODE.kind === 'lockpad'){ const n = nearestKey(parts('lock').keys || [], e); if(n) padKey(n.m); return true; }
   if(MODE.kind === 'keypad'){ const kp = parts('keypad'); const n = nearestKey([...(kp.keys || []), kp.stay, kp.away, kp.clear].filter(Boolean), e);
     if(n){ if(n.m === kp.stay || n.m === kp.away){ pressKey(n.m); setTimeout(() => automation(n.m === kp.away ? 'away' : 'stay', { from:'keypad' }), 300); }
@@ -531,17 +575,20 @@ function caption(kicker, title, steps, alarm){ capEl.querySelector('small').text
   capEl.querySelector('.st').innerHTML = (steps || []).map(s => `<i>${STEPI[s] || IC.check}</i>`).join(''); capEl.classList.toggle('alarm', !!alarm); capEl.classList.remove('off'); }
 function capStep(i, title){ const st = [...capEl.querySelectorAll('.st i')]; st.forEach((s, j) => { s.classList.toggle('done', j < i); s.classList.toggle('cur', j === i); }); if(title) capEl.querySelector('b').textContent = title; }
 function capDone(title){ capEl.querySelectorAll('.st i').forEach(s => { s.classList.add('done'); s.classList.remove('cur'); }); if(title) capEl.querySelector('b').textContent = title; }
-function skip(){ if(!MODE.run || SKIP.on) return; SKIP.on = true; flushAll(); }
-$('#dmSkip').addEventListener('click', skip); runShield.addEventListener('click', skip);
+function skip(){ if(!MODE.run || SKIP.on || performance.now() - MODE.runT0 < 800) return; SKIP.on = true;
+  hubEl.style.transition = 'none'; if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix();   // no half-way hub UI left floating
+  flushAll(); }
+function nudgeSkip(){ const b = $('#dmSkip'); b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge'); }
+$('#dmSkip').addEventListener('click', skip); runShield.addEventListener('click', nudgeSkip);
 let queue = Promise.resolve();
 /* run one sequence at a time; `body(ctx)` does the moves; `withHub` floats the hub UI as picture-in-picture */
 function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async () => {
   const back = MODE.run ? null : context(), wasPanel = back && back.kind === 'panel'; MODE.back = back;
-  MODE.run = name; MODE.lockCam = true; PAD.k = null; padEl.hidden = true; doneB.hidden = true; quietTour(); actEl.classList.add('off'); runShield.hidden = false; setFill(1.6);
+  MODE.run = name; MODE.runT0 = performance.now(); MODE.lockCam = true; PAD.k = null; padEl.hidden = true; doneB.hidden = true; quietTour(); actEl.classList.add('off'); runShield.hidden = false; setFill(1.6);
   if(withHub){ await emu(); if(wasPanel && EMU.docked) await toPip(); else if(!hubEl.classList.contains('pip') || !hubEl.classList.contains('vis')) await toPip(); }
   try { await body(); } catch(e){ console.warn('demo', name, e); }
   const wasSkip = SKIP.on; SKIP.on = false; flushAll(); settle();
-  await wait(wasSkip ? .2 : 1.1); capEl.classList.add('off'); runShield.hidden = true; MODE.run = null; MODE.lockCam = false; MODE.kind = null;
+  await wait(wasSkip ? .2 : 1.1); capEl.classList.add('off'); runShield.hidden = true; MODE.run = null; MODE.lockCam = false; MODE.kind = null; hudOn(); reconcile();
   if(wasPanel){ await restore({ kind:'panel' }); }
   else { hubEl.classList.remove('vis'); setTimeout(() => { if(!MODE.kind && !MODE.run && !(state.focus && state.focus.k === 'hub')){ hubEl.classList.remove('pip'); showDock(false); } }, 500); await restore(back); }
   syncAct(); }); return queue; }
@@ -549,7 +596,7 @@ function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async
 function settle(){ GAR.place(M.garage = M.garageOpen ? 1 : 0); GAR.leds(0); const t = parts('lock').turn; if(t) t.rotation.z = M.locked ? 0 : -Math.PI/2;
   if(DOOR.pivot) DOOR.pivot.rotation.y = DOOR.sign*1.35*M.door; TH.glow = 1; TH.paint(); paintArm();
   const ls = LIT.list(); if(LIT.base) ls.forEach((l, i) => l.intensity = LIT.base[i]*(.12 + .88*M.lights)); renderer.toneMappingExposure = LIT.exp0*(.45 + .55*M.lights);
-  syncEmu(); }
+  }
 
 /* a single device, driven from the hub, the action bar or a 3D tap */
 function device(k, v){
@@ -598,11 +645,11 @@ function automation(name, o = {}){
     capStep(3, 'Door opens'); await fly(SH.door()); await DOOR.swing(true);
     capStep(4, 'Lights on'); if(M.lights < .9){ await fly(SH.great()); await LIT.to(1, 1.4); }
     capStep(5, 'Comfort 72°'); await fly(SH.therm()); M.th.cur = Math.max(M.th.cur, 74); await TH.to(72, 'cool'); HUBDO.therm(); await wait(.6);
-    capDone('Welcome home'); await fly(SH.door()); await DOOR.swing(false, 1.8); });
+    capDone('Welcome home'); await fly(SH.door()); await DOOR.swing(false, 1.8); M.th.cur = 72; TH.paint(); });   // by now the room has reached 72°
   if(name === 'disarm' || name === 'kpok') return sequence('disarm', async () => {
     caption('Security', name === 'kpok' ? 'Code accepted' : 'Disarmed', ['shield']);
     M.arm = 'dis'; paintArm(); HUBDO.arm('dis'); if(o.from === 'keypad'){ await wait(.6); } else { await fly(SH.home()); }
-    await LOCK.flash(GREEN, 1); capDone('System disarmed'); await wait(.4); }, { withHub:o.from !== 'keypad' || true });
+    await Promise.all([LOCK.flash(GREEN, 1), M.lights < .9 ? LIT.to(1, 1.2) : null]); capDone('System disarmed'); await wait(.4); });
   if(name === 'night') return sequence('night', async () => {
     caption('Automation', 'Goodnight', ['lock', 'garage', 'bulb', 'temp', 'shield']);
     capStep(0, 'Doors locked'); HUBDO.lock(true); await fly(SH.lock()); if(M.door) await DOOR.swing(false, 1.4); await LOCK.set(true);
@@ -620,7 +667,7 @@ function automation(name, o = {}){
     capStep(4, 'Doors unlock'); HUBDO.lock(false); await fly(SH.door()); await LOCK.set(false); await DOOR.swing(true, 1.8); await wait(.8);
     capDone('Clear path out'); await wait(1.2);
     /* reset: the alarm is silenced, the door closes, heating/cooling resumes */
-    SMOKE.off(); setFill(1.6); M.alarm = false; HUBDO.clearAlarm(); M.arm = 'dis'; paintArm(); await DOOR.swing(false, 1.6); M.th.mode = 'cool'; TH.paint(); HUBDO.therm(); }, {});
+    SMOKE.off(); setFill(1.6); M.alarm = false; HUBDO.clearAlarm(); M.arm = 'dis'; paintArm(); await DOOR.swing(false, 1.6); await LOCK.set(true); M.th.mode = 'cool'; TH.paint(); }, {});   // reset: door shut and relocked, comfort back on (the hub follows when the run ends)
 }
 /* scenes menu */
 $('#dmScB').addEventListener('click', e => { e.stopPropagation(); if(MODE.run) return; scenesEl.classList.toggle('off'); $('#dmScB').classList.toggle('on', !scenesEl.classList.contains('off')); });
@@ -628,12 +675,11 @@ scenesEl.addEventListener('click', e => { const b = e.target.closest('[data-sc]'
   if(MODE.kind && MODE.kind !== 'panel') leaveModeQuiet(); automation(b.dataset.sc); });
 addEventListener('pointerdown', e => { if(!scenesEl.classList.contains('off') && !e.target.closest('#dmScenes,#dmScB')){ scenesEl.classList.add('off'); $('#dmScB').classList.remove('on'); } }, true);
 $('#dmHubB').addEventListener('click', () => { if(MODE.run) return; if(MODE.kind === 'panel') return leaveMode(); if(MODE.kind) leaveModeQuiet(); enterPanel(); });
-function leaveModeQuiet(){ MODE.kind = null; MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; }
+function leaveModeQuiet(){ MODE.kind = null; MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hudOn(); }
 function hudOn(){ $('#dmHubB').classList.toggle('on', MODE.kind === 'panel'); }
 addEventListener('keydown', e => { if(e.key === 'Escape'){ if(MODE.run) skip(); else if(MODE.kind) leaveMode(); } });
 addEventListener('resize', () => { if(MODE.kind === 'panel' && !MODE.run){ const p = panelPose(); camera.position.copy(p.pos); controls.target.copy(p.target); camera.lookAt(p.target); kick(); }
   if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix(); });
-/* Fast Pitch pauses the tour while it is off screen: let the emulator rest too */
 
 /* ------------------------------------------------------------------ boot */
 DOOR.init(); GAR.init(); TH.paint(); paintArm(); syncAct();

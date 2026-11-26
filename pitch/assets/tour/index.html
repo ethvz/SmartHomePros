@@ -696,6 +696,15 @@ pl(0,3.0,-1.9,15,10);                           // dining
 pl(.05,6.2,-3.0,16,13);                         // vault fill
 pl(4.1,4.6,1.4,11,10);                          // right bay under the flat ceiling
 LIGHTS.lantern = pl(-4.78,FL+1.85,4.4,2.2,4); LIGHTS.interior.pop();   // wall lantern pool by the door
+/* entry hall behind the front door (carved into the entry block in shell.py: x -4.5..-3.25, z 1.5..3.8, ceiling FL+2.7):
+   warm ceiling light, oak floor, a runner and a framed print, so the open door shows a lit home inside */
+LIGHTS.hall = pl(-3.875,FL+2.45,2.55,7,5);
+{ const hallFloor = phys(0xffffff,{r:.6,x:{map:TX.floor,color:0xdcc4a2,clearcoat:.15,clearcoatRoughness:.4}});
+  slab(-4.5,-3.25,FL-.02,FL,1.5,3.81,hallFloor,null,false);
+  slab(-4.2,-3.55,FL,FL+.008,1.75,3.6,phys(0x8c7a68,{r:1,x:{bumpMap:TX.plaster,bumpScale:2,clearcoat:.02}}),null,false);   // runner (live-lit, inside the sealed block)
+  slab(-4.2,-3.55,FL+1.2,FL+1.85,1.5,1.53,mat(0x1d1e20,{r:.5}),null,false);                              // print frame on the hall's end wall
+  slab(-4.15,-3.6,FL+1.25,FL+1.8,1.53,1.535,mat(0xcdb89c,{r:.9}),null,false);
+  const d = cyl(.12,.03,M.bulb,24); d.position.set(-3.875,FL+2.68,2.55); scene.add(d); }
 { const key = new THREE.SpotLight(0xffcf9c, 60, 14, 1.05, .9, 2);
   key.position.set(.6,7.4,-1.0); key.target.position.set(.8,0,-.2);
   scene.add(key, key.target); LIGHTS.interior.push(key); }
@@ -1375,7 +1384,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 22;
+const TOURV = 23;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };

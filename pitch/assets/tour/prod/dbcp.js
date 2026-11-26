@@ -56,7 +56,7 @@ export default H => {
   rgg.addColorStop(0, '#ffa060'); rgg.addColorStop(.17, '#ffa060'); rgg.addColorStop(.45, '#ff6a2a'); rgg.addColorStop(.8, '#e8401a'); rgg.addColorStop(1, '#e8401a');
   rgx.fillStyle = rgg; rgx.fillRect(0, 0, 4, 128); const rgt = new THREE.CanvasTexture(rgc); rgt.colorSpace = THREE.SRGBColorSpace;
   const ringM = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: 0xffffff, emissiveMap: rgt, emissiveIntensity: 1, envMapIntensity: .1, toneMapped: false, side: DS });
-  const ringWall = ringMat(0xff4a1c, .4), btnRim = phys(0x050505, { roughness: .6, envMapIntensity: .2 });
+  const ringWall = ringMat(0xff6a2a, .8), btnRim = phys(0x050505, { roughness: .3, envMapIntensity: .2 });
   const lensM = phys(0x05040a, { roughness: .02, metalness: .2, clearcoat: 1, clearcoatRoughness: 0, iridescence: .6, iridescenceIOR: 1.6, iridescenceThicknessRange: [250, 400], envMapIntensity: .8 });
   const glint = phys(0x2e2e34, { roughness: .05, clearcoat: 1, metalness: .3 });
 
@@ -158,11 +158,11 @@ export default H => {
 
   /* ---------- light ring (flush) + recessed doorbell button ---------- */
   const B = add(g, G(), 0, BY, ZF);
-  { const rp = [[13.4, -.12], [13.45, -.03]]; for (let i = 0; i <= 7; i++) rp.push([13.55 + (15.3 - 13.55) * i / 7, -.01]); rp.push([15.42, -.04], [15.45, -.15], [15.45, -1.6]);
+  { const rp = [[13.3, -.12], [13.4, -.03]]; for (let i = 0; i <= 7; i++) rp.push([13.55 + (15.3 - 13.55) * i / 7, -.01]); rp.push([15.42, -.04], [15.45, -.15], [15.45, -1.6]);
     add(B, lathe(rp, ringM)); }                                                          // one band: bright inner edge grading to deep red-orange
   add(B, tube(13.3, -1.15, -.12, ringWall));                                             // diffuser inner wall, lit
   add(B, lathe([[0, -2.1], [1.5, -2.08], [4, -1.97], [8, -1.65], [11, -1.3], [12.6, -1.13]], btn));   // dished button, flat at the pole
-  add(B, lathe([[12.6, -1.13], [13.05, -1.12], [13.25, -1.2], [13.3, -1.4], [13.3, -2.8]], ringWall));   // lit lip, runs straight into the ring wall (review r4)
+  add(B, lathe([[12.6, -1.13], [13.05, -1.12], [13.25, -1.2], [13.3, -1.4], [13.3, -2.8]], btnRim));   // button-black rim; only the vertical wall above is lit (review r5)
   add(B, disc(13.25, 15.5, voidM), 0, 0, -1.6);
   g.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = false; } });
   return out;
