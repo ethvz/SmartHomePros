@@ -121,7 +121,9 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
-  const shellMat = lineMat(white, [{ ax: 'x', at: 39.5, w: .45, col: 0x7d7d7b, k: 1, mask: 'abs(normalize(vON).z) < .985' }, { ax: 'x', at: 39.9, w: .4, col: 0xffffff, k: .5, mask: 'abs(normalize(vON).z) < .985' }]);   // collar joint, drawn on the walls and the front-to-end round, not on the flat face
+  const shellMat = lineMat(white, [{ ax: 'x', at: 41.5, w: .45, col: 0x7d7d7b, k: 1, mask: 'abs(normalize(vON).z) < .95' }, { ax: 'x', at: 41.9, w: .4, col: 0xffffff, k: .5, mask: 'abs(normalize(vON).z) < .95' },
+    { ax: 'z', at: 25.5, w: .35, col: 0x8a8a88, k: 1, mask: 'vOP.x > 45.0 && abs(normalize(vON).x) > .7' }, { ax: 'z', at: 25.85, w: .3, col: 0xffffff, k: .5, mask: 'vOP.x > 45.0 && abs(normalize(vON).x) > .7' },   // parting line on the outlet end face
+    { ax: 'y', at: -13.4, w: .3, col: 0x8a8a88, k: 1, mask: 'vOP.x > 45.0 && abs(normalize(vON).x) > .7' }]);   // line under the faceplate (sets off the "Max. 330W" strip)   // collar joint, drawn on the walls and the front-to-end round, not on the flat face
   { const sh = solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat);
     add(P, sh); }
   const zTop = D + crown;
@@ -150,14 +152,15 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   /* 3. receptacle faceplate on the +x end: raised 3 mm, chamfered rim, NEMA 5-15R rotated (slots horizontal, ground toward the wall) */
   { const pp = [[0, 0], [0, 9.7], [.1, 9.85], [1.1, 10.85], [1.2, 11]];   // 1.2 mm 45-degree chamfer                // embedded 8 mm, proud 3 mm
     const slotProf = [[0, 8.6], [0, 10.6], [.15, 10.85], [.3, 11]];   // floor just outside the body's end wall (deeper would be hidden by it)
-    const U = []; { const r = 2.5, u0 = 2.1, u1 = 5.4; U.push(new THREE.Vector2(u0, -r));
+    const U = []; { const r = 3.25, u0 = 1.4, u1 = 4.65;   // ground hole 6.5 x 6.5 mm
+    U.push(new THREE.Vector2(u0, -r));
       for (let i = 0; i <= 24; i++) { const t = -Math.PI / 2 + i / 24 * Math.PI; U.push(new THREE.Vector2(u1 + r * Math.cos(t), r * Math.sin(t))); }
       U.push(new THREE.Vector2(u0, r)); }
     const dense = a => { const s = new THREE.Shape(a); return pts(s, 90); };
     const deep = (k, K, v) => v[2] > 10.95 ? 1 : .22 + .4 * sm(8.7, 10.6, v[2]);   // dark slot walls; the rim ring stays white so the plate face is not tinted
     const loops = [{ type: 'outer', pts: pts(rrShape(28, 27, .8), 160), prof: uni(pp) },
-      { type: 'pocket', pts: offs(pts(rrShape(8.7, 2.7, .4), 80), -2.85, 6.35), prof: uni(slotProf), col: deep },
-      { type: 'pocket', pts: offs(pts(rrShape(8.7, 2.7, .4), 80), -2.85, -6.35), prof: uni(slotProf), col: deep },
+      { type: 'pocket', pts: offs(pts(rrShape(10, 3.0, .45), 80), -3.4, 6.35), prof: uni(slotProf), col: deep },
+      { type: 'pocket', pts: offs(pts(rrShape(10, 3.0, .45), 80), -3.4, -6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: dense(U), prof: uni(slotProf), col: deep }];
     const bm = white.clone(); bm.vertexColors = true; bm.envMapIntensity = .5; const boss = solid(loops, bm, true);
     boss.rotation.y = Math.PI / 2; add(P, boss, 39.5, .5, 17.5); }   // plate spans z 3.5-31.5
