@@ -20,8 +20,8 @@ export default H => {
   const gapM = new THREE.MeshStandardMaterial({ color: 0x070707, roughness: .9 });
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xeeeeec, roughness: .5, sheen: .6, sheenRoughness: .5, sheenColor: 0xffffff, clearcoat: .15, clearcoatRoughness: .5,
     emissive: 0xf4f8f2, emissiveIntensity: .05 });
-  const rimM = new THREE.MeshPhysicalMaterial({ color: 0x8a8c8c, roughness: .55 });
-  const keyS = splitMat(rimM, keyM, 'z', mm(1.33), 1e-6, 0x8a8c8c), btnS = splitMat(rimM, keyM, 'z', mm(.88), 1e-6, 0x8a8c8c);
+  const rimM = new THREE.MeshPhysicalMaterial({ color: 0x707272, roughness: .7 });
+  const keyS = splitMat(rimM, keyM, 'z', mm(1.33), 1e-6, 0x707272), btnS = splitMat(rimM, keyM, 'z', mm(.88), 1e-6, 0x707272);
   const plugM = new THREE.MeshPhysicalMaterial({ color: 0x18181a, roughness: .45, metalness: .2, envMapIntensity: .5 });
   const softA = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 2, 32, 32, 31);
     gr.addColorStop(0, '#fff'); gr.addColorStop(.45, '#aaa'); gr.addColorStop(1, '#000'); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
@@ -146,20 +146,24 @@ export default H => {
   // piano-gloss cover, cylindrically convex across its width (1.2 mm crown) so it always carries a reflection band
   const CW = mm(58.2), CH = covTop - covBot, CZ = mm(20.5), HZ = mm(2.3), ER = mm(.8), CR = mm(1.2);
   const crownX = x => CR * (1 - Math.min(1, (2 * x / CW) ** 2));
-  { const rrS = (w, h, r, nc = 6, ns = 16) => { const P = rrPts(w, h, r, nc), out = [];   // rounded rect with extra points along the straight edges
-      for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length]; out.push(a);
-        if ((i + 1) % (nc + 1) === 0) for (let k = 1; k < ns; k++) out.push([a[0] + (b[0] - a[0]) * k / ns, a[1] + (b[1] - a[1]) * k / ns]); }
-      return out; };
-    const ring = (d, z, crown = true) => rrS(CW - 2 * d, CH - 2 * d, mm(1.4) - d).map(([x, y]) => [x, y, z + (crown ? crownX(x) : 0)]);
-    const rings = [ring(0, 0, false), ring(0, HZ - ER)];
-    for (let i = 1; i <= 6; i++) { const a = i / 6 * Math.PI / 2; rings.push(ring(ER * (1 - Math.cos(a)), HZ - ER + ER * Math.sin(a))); }
-    for (let i = 1; i <= 12; i++) rings.push(ring(ER + (CW / 2 - ER) * (i / 12) * .99, HZ));
-    add(inn, ringMesh(rings, glossM), 0, (covTop + covBot) / 2, CZ); }
+  { // cross-section across the width (flat back, eased side edges, cylindrical crown), extruded along the height with soft ends:
+    // a single smooth surface along y, so the reflection band has no triangulation creases
+    const sh = new THREE.Shape(), n = 64, hw = CW / 2;
+    sh.moveTo(-hw, 0); sh.lineTo(hw, 0); sh.lineTo(hw, HZ - ER);
+    for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2; sh.lineTo(hw - ER + ER * Math.cos(a), HZ - ER + ER * Math.sin(a) + crownX(hw - ER + ER * Math.cos(a))); }
+    for (let i = 1; i < n; i++) { const x = hw - ER - (CW - 2 * ER) * i / n; sh.lineTo(x, HZ + crownX(x)); }
+    for (let i = 0; i < 8; i++) { const a = Math.PI / 2 + i / 8 * Math.PI / 2; sh.lineTo(-hw + ER + ER * Math.cos(a), HZ - ER + ER * Math.sin(a) + crownX(-hw + ER + ER * Math.cos(a))); }
+    sh.lineTo(-hw, HZ - ER); sh.lineTo(-hw, 0);
+    const b = mm(.6), geo = new THREE.ExtrudeGeometry(sh, { depth: CH - 2 * b, bevelEnabled: true, bevelThickness: b, bevelSize: b * .6, bevelOffset: -b * .6, bevelSegments: 6, curveSegments: 4 });
+    geo.rotateX(Math.PI / 2); geo.translate(0, CH / 2 - b, 0); geo.computeVertexNormals();
+    const cov = new THREE.Mesh(geo, glossM); cov.castShadow = cov.receiveShadow = true; add(inn, cov, 0, (covTop + covBot) / 2, CZ); }
   { const logo = printPlane(mm(30), mm(7), (x, P) => { x.fillStyle = '#f4f4f4'; x.textAlign = 'center'; x.textBaseline = 'middle';
       x.font = 'italic 800 64px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, 0)); x.scale(1.05, 1); x.fillText('Kwikset', 0, 0); x.restore(); });
     logo.material.emissive = new THREE.Color(0xffffff); logo.material.emissiveIntensity = .35;   // printed white reads even on the dark door at night
     add(inn, conform(logo, px => crownX(px)), 0, mm(46.0), CZ + HZ); }
   for (const sx of [-1, 1]) add(inn, rslab(mm(5.0), mm(145.5), mm(.9), mm(.6), mm(.44), glossM), sx * mm(31.6), CY, mm(21.6));   // side rails with bright eased edges
+  { const hl = new THREE.MeshStandardMaterial({ color: 0x3a3a3c, emissive: 0x6a6a6e, roughness: .3 });   // thin bright highlight lines on the rail edges
+    for (const sx of [-1, 1]) for (const ex of [-2.25, 2.25]) add(inn, rbox(mm(.3), mm(144.5), mm(.3), mm(.12), hl), sx * mm(31.6) + mm(ex), CY, mm(21.98)); }
   // matte lower panel (a touch prouder than the cover), hairline seam under the cover
   const panTop = mm(39.2), panBot = mm(-27.0), PZ = mm(24.2);
   add(inn, rslab(mm(57.8), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));

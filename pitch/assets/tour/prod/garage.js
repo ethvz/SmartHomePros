@@ -37,9 +37,9 @@ export default H => {
   const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xf4f6f6, roughness: .02, transmission: .97, thickness: mm(2.5), ior: 1.49, clearcoat: .6, clearcoatRoughness: .1 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .05, clearcoat: 1, clearcoatRoughness: .05, transparent: true, opacity: .12, depthWrite: false });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x6a6a64, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe6c65a, roughness: .35, emissive: 0xffe08a, emissiveIntensity: .45, clearcoat: .6 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe0b840, roughness: .35, emissive: 0xffc94a, emissiveIntensity: .35, clearcoat: .6 });
   const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xe8e6dc, roughness: .5 });
   const btnM = white.clone(), outlineM = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
@@ -76,7 +76,7 @@ export default H => {
   { // hole walls and floor: same white plastic, darkened toward the floor (baked ambient occlusion) like the shadowed well in the photos
     const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .45, vertexColors: true }), true, false);
     const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
-    for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), f = .2 + .8 * t ** 2.2; col.push(f, f, f * .99); }
+    for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), f = .76 + .24 * t ** 1.5; col.push(f, f, f * .99); }
     wm.geometry.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); add(g, wm); }
 
   /* ---------- LED board, 12 separate SMD packages, clear lens ---------- */
@@ -85,7 +85,10 @@ export default H => {
   for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = mm((c - 1.5) * 3.9), y = lc[1] + mm((1 - r) * 4.6);
     add(g, H.rslab(mm(3.0), mm(3.4), mm(.5), mm(.25), mm(.1), ledFrameM), x, y, mm(ZF + .85));
     add(g, H.rslab(mm(2.2), mm(2.6), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
-  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.3), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25)); }
+  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.4), lensM); lens.castShadow = false; lens.renderOrder = 2; add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25));
+    const bev = new THREE.Mesh(new THREE.ShapeGeometry((() => { const o = new THREE.Shape(rrPts(mm(24), mm(24), mm(5.5)).map(([a, b]) => new THREE.Vector2(a, b))); o.holes.push(new THREE.Path(rrPts(mm(23.2), mm(23.2), mm(5.1)).map(([a, b]) => new THREE.Vector2(a, b)))); return o; })()),
+      new THREE.MeshStandardMaterial({ color: 0xf4f4f4, roughness: .2, transparent: true, opacity: .75 }));
+    add(g, bev, lc[0], lc[1], mm(faceC - 4 + .01)); }   // the lens's bright 0.4 mm bevel edge
 
   /* ---------- printing (conformed to the dome) ---------- */
   const printAt = (cx, cy, w, h, draw) => add(g, conform(printPlane(mm(w), mm(h), draw), (px, py) => mm(dome(cx + px * 1000, cy + py * 1000))), mm(cx), mm(cy), 0);
