@@ -86,9 +86,9 @@
   /* ---------- AI wheel: the landscape artwork + its hotspots, scaled so the wheel spans the width, centred in the free height ---------- */
   function aiFit() {
     const sec = Q('#p-ai'); if (!sec) return;
-    const H = window.SH || 1485, T = top0(), F = foot(), k = 1.05;           /* wheel + labels span ~x 205..1185 of the 1376 artwork */
+    const H = window.SH || 1485, T = top0(), F = foot(), k = .98;           /* wheel + labels span x 208..1220 of the 1376-wide artwork (centre 714) */
     const cx = 516, cy = T + (H - T - F) / 2 - 10;
-    setP(sec, '--aik', String(k)); setP(sec, '--aix', (cx - 695 * k).toFixed(1) + 'px'); setP(sec, '--aiy', (cy - 488 * k).toFixed(1) + 'px');
+    setP(sec, '--aik', String(k)); setP(sec, '--aix', (cx - 714 * k).toFixed(1) + 'px'); setP(sec, '--aiy', (cy - 488 * k).toFixed(1) + 'px');
   }
 
   /* ---------- Compatibility: the landscape grid image cut into brand cards and stacked (artwork px, 2064x1446) ---------- */
