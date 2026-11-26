@@ -33,9 +33,9 @@ export default H => {
   // ---------------------------------------------------------------- light bar housing
   // plan (x, z): centre face z = 84 (122 wide), wings to (+-87, 18), rounded back; section: top y = -87, bottom y = -147,
   // the back a half-ellipse (rearmost z = 8 at mid height), all three LED faces leaning back 12 mm toward the bottom.
-  const yT = -84, yB = -150, lean = 14, wing = V2(66, 26).normalize(), cW = wing.x*61 + wing.y*84;
+  const zF = 88, yT = -84, yB = -150, lean = 15, wing = V2(66, 26).normalize(), cW = wing.x*61 + wing.y*84;
   const zBack = y => 20 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/33)**2));   // half-ellipse back, rearmost z = 6
-  const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, 84 - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
+  const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, zF - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
   const RC = [4, 4, 4, 4];                                    // corner radii: front corners R4; the wings run right back to the rounded (half-ellipse) back
   const nC = 10, nE = 14;
   const outline = (d, y) => {                                 // rounded convex polygon from half-planes n.p <= c, fixed topology
@@ -72,7 +72,7 @@ export default H => {
   const slant = Math.hypot(yT - yB, lean), dv = V2(lean, yT - yB).normalize();     // down-the-face direction: (inward lean, down)
   // faces: horizontal outward normal, top-edge centre point (x, z), usable width, column offsets
   const sW = 33, faces = [                                    // wings: plate centred 29 mm back along the wing from the front corner
-    { n: V2(0, 1), p: V2(0, 84), w: 118, cols: [-25, 0, 25] },
+    { n: V2(0, 1), p: V2(0, zF), w: 114, cols: [-25, 0, 25] },
     { n: V2(wing.x, wing.y), p: V2(61 + wing.y*sW, 84 - wing.x*sW), w: 58, cols: [-18, 0, 18] },
     { n: V2(-wing.x, wing.y), p: V2(-61 - wing.y*sW, 84 - wing.x*sW), w: 58, cols: [-18, 0, 18] } ];
   const hW = (wY0 - wY1), vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;               // window height, slanted distance to its middle
