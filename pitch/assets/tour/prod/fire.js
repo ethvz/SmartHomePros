@@ -1,64 +1,80 @@
 // fire: Vivint Smoke & CO Monitor (EC-FF345 alarm listener), 43.4 W x 76.2 H x 25.4 D mm (width from the photo, 0.57 of the height; spec sheet says 38.1). Back on the wall at z = 0, face toward +z.
 // Built in millimetres inside a 0.001-scaled group. Outline = rectangle with crisp 45 deg corner chamfers (3 mm legs) through the full
-// depth and a shallow 9 x 0.5 mm notch centred in the top edge (photo). A rear solid (small back edge round), the face plate (3.8 mm side
-// roll-offs with a visible crease) and, above the plate's rounded top nose (the bright "rib" 7.6 mm below the top), a top strip set back
-// and sloping away with an R1.5 top edge. One countersunk pinhole.
+// depth and a shallow 9 x 0.5 mm notch centred in the top edge (photo). Rear solid + plate body share the outline; the front is ONE
+// height-field surface over that outline (so every change is flush): 2 mm side/edge roll-offs running unbroken round the chamfers, the
+// face at z 24.6, a top strip (top 7.4 mm) set back 0.8 mm with a soft crease 3.6 mm below the top (the photo's highlight line), and an
+// inset half-round rib 7.4-10.1 mm below the top, ending 4.4 mm in from each side (the photo's bright band). One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
   const W = 43.4, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3.0, NW = 4.5, ND = .5;
-  const white = new THREE.MeshPhysicalMaterial({ color: 0xececee, roughness: .38, clearcoat: .35, clearcoatRoughness: .28 });
+  const white = new THREE.MeshPhysicalMaterial({ color: 0xa6a6ad, roughness: .3, clearcoat: .45, clearcoatRoughness: .25 });
 
-  // chamfered outline from y0 to y1; chTop/chBot: corner chamfers; notch: the 9 x 0.5 mm top-edge notch
-  const outline = (y0, y1, chTop, chBot, notch) => { const s = new THREE.Shape();
-    s.moveTo(-X + (chBot ? C : 0), y0); s.lineTo(X - (chBot ? C : 0), y0); if (chBot) s.lineTo(X, y0 + C);
-    s.lineTo(X, y1 - (chTop ? C : 0)); if (chTop) s.lineTo(X - C, y1);
-    if (notch) { s.lineTo(NW, y1); s.lineTo(NW, y1 - ND); s.lineTo(-NW, y1 - ND); s.lineTo(-NW, y1); }
-    s.lineTo(-X + (chTop ? C : 0), y1); if (chTop) s.lineTo(-X, y1 - C);
-    s.lineTo(-X, y0 + (chBot ? C : 0)); s.closePath(); return s; };
+  // outline polygon (CCW), with the top notch
+  const OP = [[-X + C, -Y], [X - C, -Y], [X, -Y + C], [X, Y - C], [X - C, Y], [NW, Y], [NW, Y - ND], [-NW, Y - ND], [-NW, Y], [-X + C, Y], [-X, Y - C], [-X, -Y + C]];
+  const shape = () => new THREE.Shape(OP.map(p => new THREE.Vector2(p[0], p[1])));
+  // nearest point on the outline and signed distance (+ inside)
+  const near = (x, y) => { let best = 1e9, bx = 0, by = 0, inside = false;
+    for (let i = 0, j = OP.length - 1; i < OP.length; j = i++) { const [x1, y1] = OP[j], [x2, y2] = OP[i];
+      if ((y2 > y) !== (y1 > y) && x < (x1 - x2) * (y - y2) / (y1 - y2) + x2) inside = !inside;
+      const dx = x2 - x1, dy = y2 - y1, t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy))), px = x1 + t * dx, py = y1 + t * dy, d = Math.hypot(x - px, y - py);
+      if (d < best) { best = d; bx = px; by = py; } }
+    return { d: inside ? best : -best, bx, by }; };
 
-  const PH = Y - 27.8, RIB = Y - 7.3;                    // pinhole 27.8 mm below the top; face plate stops 7.6 mm below the top
-  // rear solid: z 0 .. 20, back perimeter R 0.5
-  add(g, ext(outline(-Y, Y, true, true, true), 20, .5, white));
+  const PH = Y - 27.8, ZF = 24.6;                         // pinhole 27.8 mm below the top; face plane
+  const BS = 2, BT = .9;                                  // edge roll-off: 2 mm wide, 0.9 mm deep (elliptical)
+  const ss = (a, b, t) => { t = Math.max(0, Math.min(1, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const RY = Y - 8.75, RH = 1.35, RL = X - 4.4 - RH;     // rib: capsule centre line y, half height, half length
+  const hf = (x, y) => {                                  // height of the front surface (inside the outline)
+    let z = ZF;
+    // top strip: set back 0.8; between 7.4 and 3.6 mm below the top it also tips back 0.4 toward the bottom; R0.4-ish crease at Y-3.6
+    const u = Y - 3.6 - y, slope = .25 / 3.8, sp = .4 * Math.log1p(Math.exp(u / .4));          // softplus: a rounded crease
+    const strip = ZF - .8 - slope * Math.min(sp, 3.8 + .4);
+    z += (strip - ZF) * ss(Y - 7.4 - .35, Y - 7.4 + .35, y);
+    // rib: half-round, 0.6 proud
+    // rib: round-topped, 0.6 proud; its upper side is a half-round, its lower side runs out gently (no dark line under it, photo)
+    const dx = Math.max(0, Math.abs(x) - RL), dr = Math.hypot(dx, y > RY ? y - RY : (y - RY) / 2);
+    if (dr < RH) z = Math.max(z, ZF + .6 * (y > RY ? Math.sqrt(1 - (dr / RH) ** 2) : Math.cos(dr / RH * Math.PI / 2) ** 2 * .5 + .5 * Math.sqrt(1 - (dr / RH) ** 2)));
+    // edge roll-off
+    // a ~24 deg flat (faces the light like the photo's bright side strips), soft inner crease
+    const { d } = near(x, y); if (d < BS) { const q = (BS - Math.max(0, d)) / BS; z -= BT * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1); }
+    return z; };
 
-  // face plate: z 8 .. 24.6; side roll-offs 3.8 wide x 1.4 deep (3 segments so the inner crease reads); its top edge is squeezed to
-  // a 2.3 mm nose: that rounded nose is the bright band ("rib") across the top. Faint parting line 38 mm below the top (photo).
+  // rear solid (z 0..20) and the plate body (z 8 .. ZF-BT) behind the front surface
+  add(g, ext(shape(), 20, .5, white));
+  const body = () => add(g, ext(shape(), ZF - BT - 8 + .02, .3, pm), 0, 0, 8);
+
+  // pinhole mask (4 mm square round the hole), front surface material with the faint parting line 38 mm below the top
   const mask = (() => { const N = 128, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
     x.fillStyle = '#fff'; x.fillRect(0, 0, N, N); x.fillStyle = '#000'; x.beginPath(); x.arc(N / 2, N / 2, 1.3 / 4 * N, 0, Math.PI * 2); x.fill();
-    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;   // maps a 4 mm square round the pinhole
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
     t.repeat.set(1 / 4, 1 / 4); t.offset.set(2 / 4, (2 - PH) / 4); return t; })();
-  const pm = splitMat(white, white, 'y', Y - 38, .22, 0xdcdddb); pm.alphaMap = mask; pm.alphaTest = .5;
-  { const bs = 3.8, bt = 1.4, d = 16.6, nose = 2.3;
-    const ps = new THREE.Shape(), Rc = 4.2;               // plate outline: bottom chamfers, top corners rounded so the nose band has round ends
-    ps.moveTo(-X + C, -Y); ps.lineTo(X - C, -Y); ps.lineTo(X, -Y + C); ps.lineTo(X, RIB - Rc); ps.absarc(X - Rc, RIB - Rc, Rc, 0, Math.PI / 2, false);
-    ps.lineTo(-X + Rc, RIB); ps.absarc(-X + Rc, RIB - Rc, Rc, Math.PI / 2, Math.PI, false); ps.lineTo(-X, -Y + C); ps.closePath();
-    const ge = new THREE.ExtrudeGeometry(ps, { depth: d - 2 * bt, bevelEnabled: true, bevelThickness: bt,
-      bevelSize: bs, bevelOffset: -bs, bevelSegments: 3, curveSegments: 16 });
-    ge.translate(0, 0, bt);
-    const p = ge.attributes.position;                    // squeeze the top-edge roll from 3.8 mm to the 1 mm nose
-    for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y > RIB - bs - 1e-4) p.setY(i, RIB - (RIB - y) * nose / bs); }
-    ge.computeVertexNormals();
-    add(g, new THREE.Mesh(ge, pm), 0, 0, 8); }
+  const pm = splitMat(white, white, 'y', Y - 38, .22, 0xa8a9a8); pm.alphaMap = mask; pm.alphaTest = .5;
+  body();                                                 // plate body: same masked material, so the pinhole stays open through its front
 
-  // top strip: from the plate's nose to the top, set back to the end of the nose roll (z 23.2) and sloping back a further 1 mm
-  // toward the top; R1.5 rounds (the highlight line just under the top edge). Its lower part is buried behind the plate.
-  { const y0 = RIB - 2, d = 23.2, b = 1.5;
-    const ge = new THREE.ExtrudeGeometry(outline(y0, Y, true, false, true), { depth: d - 2 * b, bevelEnabled: true, bevelThickness: b,
-      bevelSize: b, bevelOffset: -b, bevelSegments: 5, curveSegments: 12 });
-    ge.translate(0, 0, b);
-    const p = ge.attributes.position;
-    for (let i = 0; i < p.count; i++) { const y = p.getY(i), z = p.getZ(i), t = Math.max(0, (y - RIB) / (Y - RIB)); p.setZ(i, z - t * 1.0 * (z / d)); }
-    ge.computeVertexNormals();
-    add(g, new THREE.Mesh(ge, white)); }
+  // front height field: 0.2 mm grid; points outside the outline are pulled onto it, so the edge is exact
+  { const st = .2, nx = Math.ceil(W / st) + 2, ny = Math.ceil(Ht / st) + 2, pos = [], nor = [], uv = [], idx = [], e = .03;
+    for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
+      let x = -X - st + i * (W + 2 * st) / nx, y = -Y - st + j * (Ht + 2 * st) / ny;
+      const n = near(x, y); if (n.d < 0) { x = n.bx; y = n.by; }
+      const xi = x - Math.sign(x) * 1e-3 * (n.d < 0), yi = y - Math.sign(y) * 1e-3 * (n.d < 0);
+      pos.push(x, y, hf(xi, yi)); uv.push(x, y);
+      const gx = (hf(xi + e, yi) - hf(xi - e, yi)) / (2 * e), gy = (hf(xi, yi + e) - hf(xi, yi - e)) / (2 * e), l = Math.hypot(gx, gy, 1);
+      nor.push(-gx / l, -gy / l, 1 / l); }
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const a = j * (nx + 1) + i, b = a + 1, c = a + nx + 1, d = c + 1; idx.push(a, b, d, a, d, c); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx);
+    const face = add(g, new THREE.Mesh(geo, pm)); face.userData.noSelfShadow = true; }
 
   // pinhole: shallow countersink (dia 2.6, 0.15 deep) into a dark brown 2.0 mm bore (photo), 27.8 mm below the top
   { const V2 = (r, z) => new THREE.Vector2(r, z);
-    const cs = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1.32, 24.62), V2(1.15, 24.54), V2(1.03, 24.49), V2(1, 24.45)], 40), white), 0, PH, 0);
+    const cs = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1.32, ZF + .02), V2(1.15, ZF - .06), V2(1.03, ZF - .11), V2(1, ZF - .15)], 40), white), 0, PH, 0);
     cs.rotation.x = Math.PI / 2;
-    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1, 24.45), V2(1, 21.6), V2(0, 21.6)], 32),
+    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1, ZF - .15), V2(1, 21.6), V2(0, 21.6)], 32),
       new THREE.MeshStandardMaterial({ color: 0x2a1e16, roughness: .9, envMapIntensity: .1, side: THREE.DoubleSide })), 0, PH, 0);
     bore.rotation.x = Math.PI / 2; }
 
-  outer.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  // the big, nearly flat front is lit by direct light only (no self-shadow): a shadow map on it gives acne seams in the house
+  outer.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = !o.userData.noSelfShadow; } });
   return outer;
 };
