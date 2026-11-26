@@ -95,36 +95,36 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
     x.drawImage(T, 0, 0);
   }
   /* ---- end helpers ---- */
-  const g = G(), W = 29, L = 64, D = 11, lift = 4.0;                        // ring end lifted 4 mm by the ring wire under it
+  const g = G(), W = 32, L = 64, D = 11, lift = 4.0;                        // ring end lifted 4 mm by the ring wire under it
   const F = G(); F.scale.setScalar(.001); g.add(F);
   const bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search));                          // bare: the fob alone, upright (face +z) for photo matching
   if (!bare) { F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001; }
 
   /* 1-3. shell */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0xbdbdbb, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
-  const shell = lineMat(grey, [{ ax: 'y', at: -10.3, B: 0x505153, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0x868684, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
+  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x333436, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
     { ax: 'z', at: 3, w: .25, col: 0x303132, k: .6 }]);
   const pocketP = []; pocketP.push([0, 9.6], [0, 10.5]); for (let i = 1; i <= 6; i++) { const t = i / 6 * Math.PI / 2; pocketP.push([.5 * (1 - Math.cos(t)), 10.5 + .5 * Math.sin(t)]); }
   const keysY = [20.1, 10.2, .2];
-  const loops = [{ type: 'outer', pts: pts(rr4(W, L, [8, 8, 7, 7]), 300), prof: uni(rrP(D, 2.5, 2.5, 8)) },
+  const loops = [{ type: 'outer', pts: pts(rr4(W, L, [9, 9, 8, 8]), 300), prof: uni(rrP(D, 2.5, 2.5, 8)) },
     ...keysY.map(y => ({ type: 'pocket', pts: offs(pts(H.rrShape(21.8, 7.1, 3.5), 110), 0, y), prof: uni(pocketP) })),
-    { type: 'hole', pts: offs(pts(H.rrShape(18.8, 6.3, 3.149), 120), 0, -23), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
+    { type: 'hole', pts: offs(pts(H.rrShape(19, 6, 2.999), 120), 0, -24), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
   add(F, solid(loops, shell));
 
   /* 4-6. keys (recessed 0.3 mm), legends, red dots */
-  const keyM = new THREE.MeshPhysicalMaterial({ color: 0x4c4d4f, roughness: .5 });
+  const keyM = new THREE.MeshPhysicalMaterial({ color: 0x2f3032, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
-  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#b5b6b7';
+  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#a4a5a6';
     x.font = '400 146px "Helvetica Neue", Helvetica, Arial, sans-serif';
     const fit = (s, x0, x1, y) => { const m = x.measureText(s).width, [a, b] = Pp(x0, y), [c] = Pp(x1, y); x.save(); x.translate(a, b); x.scale((c - a) / m, 1); x.fillText(s, 0, 4); x.restore(); };
-    fit('DISARM', -3.3, 7.8, 20.1 - 10.2); fit('STAY', -1.3, 5.5, 0); fit('AWAY', -2.0, 6.1, .2 - 10.2);
-    x.fillStyle = '#b0282a'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-4.6, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
+    fit('DISARM', -5.6, 6.0, 20.1 - 10.2); fit('STAY', -3.6, 3.6, 0); fit('AWAY', -4.1, 4.3, .2 - 10.2);
+    x.fillStyle = '#b0282a'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.1, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
   add(F, leg, 0, 10.2, D - .3 + .02);
 
   /* 7. debossed logo on the grey end */
-  const logo = plane(16, 6, 80, () => {}); add(F, logo, 0, -15.3, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 640, 240, 12.8 * 80, 5.5,
-    'rgba(40,40,40,.45)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
+  const logo = plane(40, 12, 40, () => {}); add(F, logo, 0, -16.2, D + .02);
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 800, 240, 33 * 40, 4,
+    'rgba(30,30,30,.6)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
 
   if (bare) return g;
   /* 9. split ring (two coils of flat steel wire) through the slot and under the ring end, leaning over; two house keys on it */

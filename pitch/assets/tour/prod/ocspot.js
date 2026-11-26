@@ -11,7 +11,7 @@ export default H => {
   const white = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.6, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const barW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.5, clearcoat:.15, clearcoatRoughness:.45, sheen:.3, sheenRoughness:.7, sheenColor:0xffffff});
   const refl = new THREE.MeshPhysicalMaterial({color:0xf4f4f4, roughness:.75, sheen:.2, sheenColor:0xffffff});
-  const reflDeep = new THREE.MeshPhysicalMaterial({color:0xe6e7e8, roughness:.8});
+  const reflDeep = new THREE.MeshPhysicalMaterial({color:0xeeeeef, roughness:.7});
   const greyP = mat(0xbec0c2, {r:.55});
 
   // ---------------------------------------------------------------- bracket: vertical band + J bend (side profile extruded across 77 mm)
@@ -67,7 +67,7 @@ export default H => {
   const bar = new THREE.Mesh(bg, [barW, reflDeep]); bar.castShadow = bar.receiveShadow = true; M.add(bar);
 
   // ---------------------------------------------------------------- LED faces: reflector plate with 3 capsule recesses x 2 LED domes, per face
-  const ledM = new THREE.MeshPhysicalMaterial({color:0x8a8c8e, roughness:.08, metalness:.1, clearcoat:1, clearcoatRoughness:.03, transmission:.0, sheen:.2});
+  const ledM = new THREE.MeshPhysicalMaterial({color:0xa4a7aa, roughness:.06, metalness:.1, clearcoat:1, clearcoatRoughness:.03, transmission:.0, sheen:.2});
   const ledIn = mat(0x55585b, {r:.3});
   const slant = Math.hypot(yT - yB, lean), dv = V2(lean, yT - yB).normalize();     // down-the-face direction: (inward lean, down)
   // faces: horizontal outward normal, top-edge centre point (x, z), usable width, column offsets
@@ -100,14 +100,14 @@ export default H => {
       for(let i=start;i<=end;i++) out.push(ring[i]);
       return out; };
     const glass = new THREE.MeshPhysicalMaterial({color:0xe9eef2, roughness:.04, metalness:0, transparent:true, opacity:.32, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:1.6, side:THREE.DoubleSide, depthWrite:false});
-    const smoke = new THREE.MeshPhysicalMaterial({color:0x7a7d80, roughness:.18, transparent:true, opacity:.9, clearcoat:.6, side:THREE.DoubleSide});
+    const smoke = new THREE.MeshPhysicalMaterial({color:0x606366, roughness:.18, transparent:true, opacity:.85, clearcoat:.6, side:THREE.DoubleSide});
     const strip = (yA, yB2, m, dE = 0) => { const lv = [yA, (yA+yB2)/2, yB2], pos = [], idx = []; let n = 0;
       for(const y of lv){ const C = chainAt(leanAt(y) + .12 - dE, y); n = C.length; for(const [x, z] of C) pos.push(x, y, z); }
       for(let r=0;r<lv.length-1;r++) for(let i=0;i<n-1;i++){ const a = r*n+i, b = a+1, c = a+n, d = c+1; idx.push(a,b,c, b,d,c); }
       const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
       return add(M, new THREE.Mesh(ge, m)); };
     strip(wY0 + .2, wY1 - .2, glass).renderOrder = 2;                 // flush outer window over the whole band
-    strip(wY0 + .2, wY0 - 1.8, smoke, .06); strip(wY1 + 1.8, wY1 - .2, smoke, .06);
+    strip(wY0 + .2, wY0 - 2.4, smoke, .06); strip(wY1 + 2.4, wY1 - .2, smoke, .06);
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below)

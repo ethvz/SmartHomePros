@@ -39,7 +39,7 @@ export default H => {
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.5), 0x4a4a4a);
   const lensM = new THREE.MeshPhysicalMaterial({ color: 0xe6eaea, roughness: .06, transmission: .97, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x34342f, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xebe5c4, roughness: .35, emissive: 0xfff3c8, emissiveIntensity: .35, clearcoat: .6 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xf0de92, roughness: .35, emissive: 0xffeaa0, emissiveIntensity: .3, clearcoat: .6 });
   const btnM = white.clone();
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 
@@ -69,7 +69,7 @@ export default H => {
   const lc = [0, mm(PC[1])];
   add(g, H.rslab(mm(17), mm(14), mm(.8), mm(1.5), mm(.2), boardM), lc[0], lc[1], mm(ZF + .5));
   for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) add(g, H.rslab(mm(3.2), mm(3.6), mm(.6), mm(.3), mm(.12), ledM), mm((c - 1.5) * 3.8), lc[1] + mm((1 - r) * 3.95), mm(ZF + 1.1));
-  { const lens = H.rslab(mm(24), mm(24), mm(3.2), mm(5), mm(.9), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(ZF + 1.5)); }
+  { const lens = H.rslab(mm(26), mm(26), mm(3.2), mm(5.5), mm(.9), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(ZF + 1.5)); }
 
   /* ---------- printing (conformed to the dome) ---------- */
   const printAt = (cx, cy, w, h, draw) => add(g, conform(printPlane(mm(w), mm(h), draw), (px, py) => mm(dome(cx + px * 1000, cy + py * 1000))), mm(cx), mm(cy), 0);
