@@ -42,6 +42,18 @@
   const _hl = window.homeLayout;
   if (_hl) window.homeLayout = function () { _hl.apply(this, arguments); setGeo(); ppHome(); };
 
+  /* ---- Home button: every page but Home gets the Vivint house mark beside the burger (data-home = the logo's own action) ---- */
+  if (!$('#ppHome')) {
+    const burger = $('#burger');
+    const hb = document.createElement('button');
+    hb.id = 'ppHome'; hb.type = 'button'; hb.dataset.home = '1'; hb.setAttribute('aria-label', 'Home');
+    hb.innerHTML = '<svg viewBox="1296 38 350 350" fill="currentColor" aria-hidden="true"><circle cx="1343.07" cy="342.6" r="39.6"/>' +
+      '<path d="M1462.07 45l-155.72 141.25v52.92c57.67-20.1 120.93 9.9 141.22 67 4.19 11.7 6.32 24.03 6.32 36.43 0 12.74-2.26 24.93-6.32 36.34h134.03c20.02 0 36.25-16.04 36.25-35.84v-156.85L1462.07 45z"/></svg><span>Home</span>';
+    (burger && burger.parentNode === bar) ? burger.after(hb) : bar.prepend(hb);
+    /* instant press feedback (the tap itself is handled by the page's own [data-home] delegation) */
+    hb.addEventListener('pointerdown', () => { hb.classList.add('pressed'); setTimeout(() => hb.classList.remove('pressed'), 180); }, { passive: true });
+  }
+
   /* ---- section nav: along the footer instead of a side rail ---- */
   let busy = false;
   function navMode() {
@@ -50,28 +62,12 @@
       const pp = PP(), home = bar.classList.contains('home'), items = [...rail.children].filter(e => e.matches('.bbtn') && e.id !== 'amtBtn');
       const flat = pp && !home && rail.classList.contains('pnav') && !bar.classList.contains('hx-ctr') && items.length > 0;
       if (rail.classList.contains('pph') !== flat) rail.classList.toggle('pph', flat);
-      const ico = flat && (432 / Math.max(1, items.length)) < 66;
+      /* the pill is 372 wide (362 inside): labels only when each tab gets 66+ */
+      const ico = flat && (362 / Math.max(1, items.length)) < 66;
       if (rail.classList.contains('ico') !== ico) rail.classList.toggle('ico', ico);
       if (bar.classList.contains('ppnav') !== flat) bar.classList.toggle('ppnav', flat);
+      if (bar.classList.contains('ppnologo')) bar.classList.remove('ppnologo');
     } finally { busy = false; }
-    /* debounced: the rail's own class flips (idle, scrub) would otherwise queue two timers each */
-    clearTimeout(lfA); lfA = setTimeout(logoFit, 60); clearTimeout(lfB); lfB = setTimeout(logoFit, 700);
-  }
-  let lfA = 0, lfB = 0;
-  /* the logo steps aside whenever another footer control (a page's own toggle, a centred pill) would sit on it */
-  let logoR = 0;
-  function logoFit() {
-    const lg = $('#barlogo'); if (!lg) return;
-    if (!PP()) { if (bar.classList.contains('ppnologo')) bar.classList.remove('ppnologo'); return; }
-    const sc = (st.getBoundingClientRect().width / st.offsetWidth) || 1, b0 = bar.getBoundingClientRect().left;
-    if (!bar.classList.contains('ppnologo')) { const r = lg.getBoundingClientRect(); if (r.width) logoR = (r.right - b0) / sc; }
-    if (!logoR) return;
-    let hit = false;
-    $$('#bar > *:not(#burger):not(#barlogo):not(#back):not(#barRight), #barRight > *').forEach(e => { if (hit) return;
-      const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) return;
-      const r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
-      if ((r.left - b0) / sc < logoR + 8 && (r.right - b0) / sc > 70 && r.bottom > bar.getBoundingClientRect().top - 4) hit = true; });
-    if (bar.classList.contains('ppnologo') !== hit) bar.classList.toggle('ppnologo', hit);
   }
   new MutationObserver(navMode).observe(rail, { childList: true, attributes: true, attributeFilter: ['class'] });
   new MutationObserver(navMode).observe(bar, { attributes: true, attributeFilter: ['class'] });
@@ -123,7 +119,17 @@
       const d = document.createElement('div'); d.className = 'cl ppcl' + (b[0] === 't' ? ' top' : ''); d.textContent = BIGN[t.dataset.k] || ''; t.appendChild(d); });
   }
 
-  function all() { setGeo(); ppHome(); navMode(); tourInset(); bigLabels(); }
+  /* Keypad and Vivint App: their landscape tiles run off the bottom edge (cut off in a small upright tile).
+     Add the whole product (the same kind of cut-out the other tiles use) + a live name; CSS shows them only in pp */
+  function wholeTiles() {
+    $$('#allTiles .ht[data-k=keypad], #allTiles .ht[data-k=app], .hcat .ht[data-k=keypad], .hcat .ht[data-k=app]').forEach(t => {
+      if (t.querySelector(':scope>.ppalt')) return;
+      const k = t.dataset.k;
+      t.insertAdjacentHTML('beforeend', '<img class="cp ppalt" src="assets/cat/' + k + '.webp?v=176" alt="" draggable="false"><div class="cl ppalt">' + BIGN[k] + '</div>');
+    });
+  }
+
+  function all() { setGeo(); ppHome(); navMode(); tourInset(); bigLabels(); wholeTiles(); }
   addEventListener('resize', () => { all(); setTimeout(all, 320); });
   addEventListener('orientationchange', () => setTimeout(all, 350));
   new MutationObserver(() => { navMode(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
