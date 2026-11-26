@@ -109,11 +109,50 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 /* hint + loading */
 #hint{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 222px);transform:translateX(-50%);z-index:4;padding:9px 16px;border-radius:18px;font-size:13px;font-weight:500;color:var(--fg);white-space:nowrap;transition:opacity .5s}
 #hint.gone{opacity:0}
-#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:9;background:var(--bg);transition:opacity .6s}
+#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:9;background:radial-gradient(120% 80% at 50% 42%,#0b1312 0,var(--bg) 70%);transition:opacity .6s}
 #loading.done{opacity:0;pointer-events:none}
-#loading{place-content:center;gap:16px}
+#loading{place-content:center;gap:14px;justify-items:center}
 #loading div{font-size:15px;color:var(--muted);letter-spacing:.02em}
-#loadBar{display:block;width:180px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--mint) var(--p,0%),rgba(255,255,255,.12) 0);transition:--p .3s}
+/* the house being assembled (built by #ldJs); pieces animate on transform/opacity only */
+#loading .ld-wrap{width:min(84vw,460px,74vh);transition:transform .7s var(--ease),opacity .6s}
+#loading.done .ld-wrap{transform:scale(1.12);opacity:0}
+#ldHouse{display:block;width:100%;height:auto;overflow:visible;animation:ldBob 3.6s ease-in-out infinite}
+@keyframes ldBob{50%{transform:translateY(-4px)}}
+#ldHouse polygon{stroke-linejoin:round}
+.ld-ghost polygon{fill:none;stroke:rgba(5,229,175,.2);stroke-width:.7;stroke-dasharray:3 3;transition:opacity .6s}
+.ld-ghost .ld-lot{fill:rgba(5,229,175,.035);stroke:rgba(5,229,175,.16);stroke-dasharray:none}
+.fin .ld-ghost polygon:not(.ld-lot){opacity:0}
+.ld-p{opacity:0;transform:translateY(-34px);transition:opacity .3s ease,transform .62s cubic-bezier(.3,1.45,.5,1)}
+.ld-p.on{opacity:1;transform:none}
+.ld-slab{transform:translateY(12px)}
+.ld-win,.ld-door,.ld-prod{transform-box:fill-box;transform-origin:50% 50%;transform:scale(.3)}
+.ld-roof{transform:translateY(-46px)}
+.ld-t{fill:#eef2f3}.ld-f{fill:#d3d9dc}.ld-s{fill:#a7b1b5}
+#ldHouse .ld-t,#ldHouse .ld-f,#ldHouse .ld-s{stroke:rgba(255,255,255,.7);stroke-width:.6}
+.ld-slab .ld-t{fill:#88928f}.ld-slab .ld-f{fill:#5e6765}.ld-slab .ld-s{fill:#4a5250}
+#ldHouse .ld-slab polygon{stroke:rgba(255,255,255,.18)}
+#ldHouse .ld-rf{fill:#3d474a;stroke:rgba(255,255,255,.35);stroke-width:.6}
+#ldHouse .ld-rb{fill:#2c3437;stroke:rgba(255,255,255,.3);stroke-width:.6}
+#ldHouse .ld-g{fill:#13201e;stroke:rgba(255,255,255,.85);stroke-width:.9;transition:fill .5s}
+.fin #ldHouse .ld-g{fill:#0c6b55}
+#ldHouse .ld-d{fill:#27302f;stroke:rgba(255,255,255,.8);stroke-width:.8}
+#ldHouse .ld-gd{fill:#e6ebed;stroke:rgba(0,0,0,.18);stroke-width:.6}
+#ldHouse .ld-ln{fill:none;stroke:rgba(0,0,0,.18);stroke-width:.6}
+.ld-prod{transition:opacity .2s,transform .5s cubic-bezier(.3,1.8,.5,1)}
+.ld-dev{fill:#1a2120;stroke:#fff;stroke-width:.8}
+.ld-led{fill:var(--vg)}
+.ld-ring{fill:none;stroke:var(--vg);stroke-width:1.2;opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+.ld-prod.on .ld-ring{animation:ldRing .9s ease-out .15s}
+.fin .ld-prod .ld-ring{animation:ldRing 1s ease-out}
+@keyframes ldRing{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(2.2)}}
+.ld-glint{fill:none;stroke:var(--vg);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22 100;stroke-dashoffset:22;opacity:0}
+.fin .ld-glint{animation:ldGlint .8s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes ldGlint{0%{opacity:1;stroke-dashoffset:22}85%{opacity:1}100%{opacity:0;stroke-dashoffset:-100}}
+#loadMsg{min-height:1.3em;transition:opacity .4s}
+.fin #loadMsg,.fin #loadBar{opacity:0}
+#loadBar{display:block;width:120px;height:2px;border-radius:2px;overflow:hidden;background:rgba(255,255,255,.1);transition:opacity .4s}
+#loadBar b{display:block;height:100%;background:var(--vg);transform-origin:0 50%;transform:scaleX(0);transition:transform .12s linear}
+@media (prefers-reduced-motion:reduce){ #ldHouse{animation:none} .ld-p,.ld-slab,.ld-roof,.ld-win,.ld-door,.ld-prod{transform:none;transition:opacity .4s} .ld-ring,.ld-glint{animation:none!important} }
 
 /* narrow / portrait phone: card becomes a bottom sheet */
 /* soft shade behind the title so it stays readable over a bright sky */
@@ -288,7 +327,88 @@ body.focus #cFeats.on .feat{animation:none!important}
 
 <div id="hint" class="glass">Drag to look around · Pinch to zoom · Tap a ring</div>
 <nav id="rail" aria-label="Products"><div id="railIn"></div></nav>
-<div id="loading"><div id="loadMsg">Building the house…</div><i id="loadBar"></i></div>
+<div id="loading"><div class="ld-wrap"><svg id="ldHouse" aria-hidden="true"></svg></div><div id="loadMsg">Building the house…</div><i id="loadBar"><b></b></i></div>
+<script id="ldJs">/* loading screen: an isometric house assembled piece by piece, driven by the real load progress.
+   __ld.p(stage, frac): stage 0 = pack download, 1 = textures/models, 2 = shader compile. __ld.finish(cb) plays the last pieces, then cb().
+   Cheap: one SVG built once, pieces animate with CSS transitions, a 20 Hz timer only eases a number; everything is removed once hidden.
+   window.__ldHold = 0..1 pins the build at that point (for scripted frame captures). */
+(function(){
+  var L = document.getElementById('loading'), svg = document.getElementById('ldHouse'); if(!L || !svg) return;
+  var NS = 'http://www.w3.org/2000/svg', S = 22, C = .866;
+  function P(x,y,z){ return [((x-y)*C*S).toFixed(1), ((x+y)*.5*S - z*S).toFixed(1)]; }
+  function poly(pts){ return pts.map(function(p){ return P(p[0],p[1],p[2]).join(','); }).join(' '); }
+  function box(x0,x1,y0,y1,z0,z1){ return [
+    ['t', [[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]]],
+    ['f', [[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]]],
+    ['s', [[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1]]] ]; }
+  function fy(y,x0,x1,z0,z1){ return [[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1]]; }
+  function fx(x,y0,y1,z0,z1){ return [[x,y0,z0],[x,y1,z0],[x,y1,z1],[x,y0,z1]]; }
+  /* [threshold, kind, faces]; drawn in this order (back to front) */
+  var R = [
+    [.02,'slab', box(0,6,0,4.5,-.35,0)],
+    [.09,'slab', box(6,9.4,1.2,4.5,-.35,0)],
+    [.17,'wall', box(0,6,0,4.5,0,3.2)],
+    [.29,'wall', box(6,9.4,1.2,4.5,0,2.6)],
+    [.38,'win',  [['g', fy(4.5,.7,1.9,1.3,2.4)]]],
+    [.43,'win',  [['g', fy(4.5,3.9,5.1,1.3,2.4)]]],
+    [.48,'door', [['d', fy(4.5,2.5,3.4,0,2.2)]]],
+    [.54,'door', [['gd', fy(4.5,6.5,8.9,0,2.0)], ['ln', fy(4.5,6.5,8.9,.66,.67)], ['ln', fy(4.5,6.5,8.9,1.33,1.34)]]],
+    [.59,'win',  [['g', fx(9.4,2.3,3.5,1.1,1.9)]]],
+    [.63,'win',  [['g', fx(6,.35,1.0,1.3,2.4)]]],
+    [.67,'wall', [['s', [[6,0,3.2],[6,4.5,3.2],[6,2.25,4.9]]]]],
+    [.71,'roof', [['rb', [[-.25,-.3,3.2],[6.25,-.3,3.2],[6.25,2.25,4.9],[-.25,2.25,4.9]]]]],
+    [.76,'roof', [['rf', [[-.25,2.25,4.9],[6.25,2.25,4.9],[6.25,4.8,3.2],[-.25,4.8,3.2]]]]],
+    [.80,'roof', [['rb', [[6,1.0,2.6],[9.65,1.0,2.6],[9.65,2.85,3.7],[6,2.85,3.7]]], ['s', [[9.4,1.2,2.6],[9.4,4.5,2.6],[9.4,2.85,3.7]]]]],
+    [.84,'roof', [['rf', [[6,2.85,3.7],[9.65,2.85,3.7],[9.65,4.7,2.6],[6,4.7,2.6]]]]],
+    [.89,'prod', [3.75,4.5,1.15]],   /* doorbell camera */
+    [.93,'prod', [9.25,4.5,2.25]],   /* outdoor camera on the garage corner */
+    [.965,'prod',[.15,4.5,2.85]]     /* floodlight camera on the house corner */
+  ];
+  function el(n,a,p){ var e = document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); if(p) p.appendChild(e); return e; }
+  var ghost = el('g',{'class':'ld-ghost'},svg), build = el('g',{},svg), parts = [];
+  el('polygon',{points:poly([[-1.6,-1.4,-.36],[11,-1.4,-.36],[11,6.6,-.36],[-1.6,6.6,-.36]]),'class':'ld-lot'},ghost);
+  R.forEach(function(r){
+    var g = el('g',{'class':'ld-p ld-'+r[1]},build);
+    if(r[1]==='prod'){ var q = P(r[2][0],r[2][1],r[2][2]);
+      el('circle',{cx:q[0],cy:q[1],r:9,'class':'ld-ring'},g); el('rect',{x:q[0]-3.2,y:q[1]-4.5,width:6.4,height:9,rx:3,'class':'ld-dev'},g);
+      el('circle',{cx:q[0],cy:+q[1]-1,r:1.5,'class':'ld-led'},g);
+    } else r[2].forEach(function(f){ var pts = poly(f[1]); el('polygon',{points:pts,'class':'ld-'+f[0]},g); if(f[0]!=='ln') el('polygon',{points:pts},ghost); });
+    parts.push([r[0],g]);
+  });
+  /* the green glint that runs along the rooflines when everything is in */
+  el('polyline',{points:poly([[-.25,4.8,3.2],[-.25,2.25,4.9],[6.25,2.25,4.9],[6.25,4.8,3.2]]),'class':'ld-glint',pathLength:100},svg);
+  el('polyline',{points:poly([[6.25,2.85,3.7],[9.65,2.85,3.7],[9.65,4.7,2.6]]),'class':'ld-glint',pathLength:100,style:'animation-delay:.18s'},svg);
+  /* viewBox from the lot and the ridge, fixed so it never jumps */
+  var a = P(-1.6,6.6,-.36), b = P(11,-1.4,-.36), top = P(-.25,2.25,4.9), bot = P(11,6.6,-.36);
+  svg.setAttribute('viewBox', (+a[0]-6)+' '+(+top[1]-14)+' '+(b[0]-a[0]+12)+' '+(bot[1]-top[1]+22));
+  var msg = document.getElementById('loadMsg'), bar = document.getElementById('loadBar'), barI = bar && bar.firstElementChild;
+  var WORDS = ['Building the house…','Pouring the foundation','Raising the walls','Setting the roof','Installing Vivint'], said = WORDS[0];
+  var BASE = [.03,.55,.82], CAP = [.55,.82,.975], TAU = [14,10,2.6];
+  var stage = 0, real = 0, creep = 0, shown = 0, fin = null, finT = 0, timer = 0, gone = false;
+  function word(w){ if(!msg || w===said || WORDS.indexOf(msg.textContent)<0) return; msg.textContent = said = w; }
+  function tick(){
+    if(gone) return;
+    var dt = .05;
+    if(fin){ real = 1; creep = 1; } else creep += (CAP[stage] - creep) * (1 - Math.exp(-dt / TAU[stage]));
+    var eff = window.__ldHold != null ? window.__ldHold : Math.max(real, creep);
+    var k = fin ? .22 : .1, d = (eff - shown) * k; shown += Math.max(-.02, Math.min(fin ? .08 : .025, d));
+    if(window.__ldHold != null) shown = eff;
+    for(var i=0;i<parts.length;i++){ var on = shown >= parts[i][0]; if(on !== !!parts[i][2]){ parts[i][2] = on; parts[i][1].classList.toggle('on', on); } }
+    if(barI) barI.style.transform = 'scaleX(' + shown.toFixed(3) + ')';
+    word(shown < .17 ? WORDS[1] : shown < .67 ? WORDS[2] : shown < .87 ? WORDS[3] : WORDS[4]);
+    if(fin && shown > .995 && !finT){ L.classList.add('fin'); finT = setTimeout(function(){ var f = fin; fin = function(){}; f(); setTimeout(stop, 900); }, 700); }
+  }
+  function stop(){ if(gone) return; gone = true; clearInterval(timer); svg.textContent = ''; svg.remove(); if(bar) bar.remove(); }
+  timer = setInterval(tick, 50);
+  window.__ld = {
+    p: function(s, f){ if(fin) return; if(s > stage){ stage = s; creep = Math.max(creep, BASE[s]); }
+      if(s === stage) real = Math.max(real, BASE[s] + (CAP[s] - BASE[s]) * Math.max(0, Math.min(1, f || 0))); },
+    finish: function(cb){ if(gone){ cb(); return; } if(!fin) fin = cb; },
+    get shown(){ return shown; }
+  };
+  /* safety: if the overlay is hidden some other way, stop anyway */
+  new MutationObserver(function(){ if(L.classList.contains('done') && !gone) setTimeout(stop, 900); }).observe(L, {attributes:true, attributeFilter:['class']});
+})();</script>
 
 <script type="importmap">
 {"imports":{"three":"./three.bundle.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}
@@ -303,7 +423,7 @@ import * as THREE from 'three';
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
 const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=22'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
-  for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const b=document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.min(92,Math.round(92*got/tot))+'%'); }
+  for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; window.__ld&&__ld.p(0,got/tot); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
   for(const k in idx){ const [o2,l,t]=idx[k]; m[k]=URL.createObjectURL(new Blob([new Uint8Array(buf,base+o2,l)],{type:t})); } return m; }catch(e){ return {}; } })();
@@ -382,7 +502,7 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.16;
 const loadMgr = new THREE.LoadingManager();
 let loadN = 0, loadDone = 0;
-const bump = () => { const b = document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.round(100*loadDone/Math.max(1,loadN))+'%'); };
+const bump = () => { window.__ld && __ld.p(1, loadDone/Math.max(1,loadN)); };   /* drives the house-assembly loader */
 loadMgr.onStart = (u,a,t) => { loadN = t; bump(); };
 loadMgr.onProgress = (u,a,t) => { loadDone = a; loadN = t; bump(); };
 const assetsReady = new Promise(res => { loadMgr.onLoad = res; loadMgr.onError = () => {}; setTimeout(res, 20000); });
@@ -1789,7 +1909,7 @@ function capTextures(max0, maxLight = max0){ const seen = new Set();
             get(){ if(ver !== t.source.version){ ver = t.source.version; cache = small(); } return cache; } });
         } else { const c = small(); if(im.close) im.close(); t.image = c; }   // loaded images never change: swap once, free the big one
         t.needsUpdate = true; } catch(e){} } }); }
-Promise.all([assetsReady, ...MODEL_P]).then(() => { if(PHONE) capTextures(512, 1024); else if(LITE) capTextures(1024); }).then(() => Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))])).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }, 120));
+Promise.all([assetsReady, ...MODEL_P]).then(() => { if(PHONE) capTextures(512, 1024); else if(LITE) capTextures(1024); }).then(() => { window.__ld && __ld.p(2, 0); return Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))]); }).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => (window.__ld ? __ld.finish : f => f())(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }), 120));
 
 /* offline lighting bake: export the static house (no products, no overlays) plus its lights for Blender */
 if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(async () => {
