@@ -39,13 +39,13 @@ export default H => {
   const satin = phys(0x1d1e20, { roughness: .55, envMapIntensity: .4, specularIntensity: .5 });
   const foot = phys(0x0e0f10, { roughness: .75 });
   const pivot = phys(0x2a2b2d, { roughness: .4, clearcoat: .2 });
-  const grey = phys(0x3a3b3e, { roughness: .42 });
-  const glass = phys(0x050506, { roughness: .06, clearcoat: 1, clearcoatRoughness: .03, specularIntensity: .5, envMapIntensity: .2 });
+  const grey = phys(0x3a3b3e, { roughness: .42, specularIntensity: .4 });
+  const glass = phys(0x050506, { roughness: .06, clearcoat: .5, clearcoatRoughness: .1, specularIntensity: .5, specularColor: 0x222222, envMapIntensity: .2 });
   const discM = phys(0x2c2d31, { roughness: .08, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: 1 });
   const barrel = phys(0x0b0b0c, { roughness: .3 });
   const voidM = new THREE.MeshBasicMaterial({ color: 0x000000, side: DS });
   const btnM = phys(0x45464a, { roughness: .55, sheen: .3, sheenColor: 0x8a8c90 });
-  const lensM = phys(0x150c22, { roughness: .02, metalness: .3, clearcoat: 1, clearcoatRoughness: 0, iridescence: .45, iridescenceIOR: 1.6, iridescenceThicknessRange: [300, 420], envMapIntensity: .6 });
+  const lensM = phys(0x150c22, { roughness: .02, metalness: .3, clearcoat: 1, clearcoatRoughness: 0, iridescence: .45, iridescenceIOR: 1.6, iridescenceThicknessRange: [300, 420], envMapIntensity: 1.5 });
   const ledM = new THREE.MeshStandardMaterial({ color: 0x22ff44, emissive: 0x22ff44, emissiveIntensity: .9, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
 
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
@@ -117,7 +117,7 @@ export default H => {
     [8, 9, 10, 11, 10, 9, 8].forEach((n, r) => { for (let i = 0; i < n; i++) S.holes.push(circ((i - (n - 1) / 2) * 2.75, 15.2 + (r - 3) * 2.15, .6)); });
     const toB = (geo, y) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i), y, p.getY(i)); geo.computeVertexNormals(); return geo; };
     add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(S, 12), -30), grey));
-    add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(rrS(36, 16.2, 5, 0, 15.2), 24), -29.3), voidM)); }
+    add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(rrS(36, 18, 5, 0, 15.2), 24), -29.6), voidM)); }
   const cS = [[22.6, 60, 60, 12]];                                        // gloss-black front wraps only 1.2 mm (the R1.2 roll)
   for (let i = 1; i <= 8; i++) { const a = i / 8 * PI / 2, s = 1.2 * (1 - Math.cos(a)); cS.push([22.6 + 1.2 * Math.sin(a), 60 - 2 * s, 60 - 2 * s, 12 - s]); }
   add(hd, shell(cS, glass, { front: false }));
@@ -130,8 +130,11 @@ export default H => {
   add(hd, disc(15.6, 16.6, voidM), 0, 0, ZF - .35);
   add(hd, lathe([[8.5, -.005], [8.45, -.1], [8.2, -.5], [4.8, -.5], [4.5, -.65], [4.5, -1.7]], barrel), 0, 0, ZF);
   add(hd, disc(0, 4.6, voidM), 0, 0, ZF - 1.7);
-  add(hd, disc(3.1, 4.5, phys(0x2a2a2e, { roughness: .1, clearcoat: 1, envMapIntensity: 1 })), 0, 0, ZF - 1.65);   // graphite inner barrel
+  add(hd, disc(3.1, 4.5, phys(0x3a3a40, { roughness: .35 })), 0, 0, ZF - 1.65);   // graphite inner barrel
   add(hd, H.dome(3.1, .25, lensM), 0, 0, ZF - 1.66);
+  { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'); x.fillStyle = '#fff';           // small crisp glint crescent
+    x.beginPath(); x.arc(32, 32, 26, PI * 1.05, PI * 1.6); x.arc(36, 36, 22, PI * 1.6, PI * 1.05, true); x.closePath(); x.fill();
+    const t = new THREE.CanvasTexture(c); add(hd, new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: .6, depthWrite: false })), 0, 0, ZF - 1.39); }
   for (const r of [1.4, 2.3]) add(hd, H.torus(r, .05, phys(0x2a2a30, { roughness: .05, clearcoat: 1 })), 0, 0, ZF - 1.62);
   add(hd, tube(.6, ZF - .8, ZF, voidM), 0, -12.4, 0); add(hd, disc(0, .6, voidM), 0, -12.4, ZF - .8);
   for (const x of [-21.6, 21.6]) { add(hd, tube(.5, ZF - .8, ZF, voidM), x, 0, 0); add(hd, disc(0, .5, voidM), x, 0, ZF - .8); }

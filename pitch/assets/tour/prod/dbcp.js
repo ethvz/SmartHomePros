@@ -52,7 +52,11 @@ export default H => {
   const btn = phys(0x0a0a0a, { roughness: .12, clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: 1 });
   const lip = phys(0x0a0a0a, { roughness: .3 });
   const ringMat = (c, k) => new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: c, emissiveIntensity: k, envMapIntensity: .1, toneMapped: false, side: DS });
-  const ringIn = ringMat(0xff5c14, 1), ringOut = ringMat(0xff3c0a, 1), ringWall = ringMat(0xff4a1c, .4);
+  const rgc = document.createElement('canvas'); rgc.width = 4; rgc.height = 128; const rgx = rgc.getContext('2d'), rgg = rgx.createLinearGradient(0, 128, 0, 0);
+  rgg.addColorStop(0, '#ffa060'); rgg.addColorStop(.17, '#ffa060'); rgg.addColorStop(.45, '#ff6a2a'); rgg.addColorStop(.8, '#e8401a'); rgg.addColorStop(1, '#e8401a');
+  rgx.fillStyle = rgg; rgx.fillRect(0, 0, 4, 128); const rgt = new THREE.CanvasTexture(rgc); rgt.colorSpace = THREE.SRGBColorSpace;
+  const ringM = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: 0xffffff, emissiveMap: rgt, emissiveIntensity: 1, envMapIntensity: .1, toneMapped: false, side: DS });
+  const ringWall = ringMat(0xff4a1c, .4), btnRim = phys(0x0a0a0a, { roughness: .5 });
   const lensM = phys(0x05040a, { roughness: .02, metalness: .2, clearcoat: 1, clearcoatRoughness: 0, iridescence: .6, iridescenceIOR: 1.6, iridescenceThicknessRange: [250, 400], envMapIntensity: .8 });
   const glint = phys(0x2e2e34, { roughness: .05, clearcoat: 1, metalness: .3 });
 
@@ -90,51 +94,60 @@ export default H => {
   // dark cores fill the hairline seams so they read as fine dark lines
   add(g, shell([[27.7, W - .6, HH - .6, sub(R, .3)], [28.1, W - .6, HH - .6, sub(R, .3)]], voidM));
   const br = bodyAt(zb0);
-  add(g, shell([[8.6, br.w - .6, br.top - br.bot - .6, sub(R, .3), (br.top + br.bot) / 2], [9.2, br.w - .6, br.top - br.bot - .6, sub(R, .3), (br.top + br.bot) / 2]], voidM));
+  add(g, shell([[8.5, br.w - .6, br.top - br.bot - .6, sub(R, .3), (br.top + br.bot) / 2], [9.2, br.w - .6, br.top - br.bot - .6, sub(R, .3), (br.top + br.bot) / 2]], phys(0x8e9092, { roughness: .6 })));
 
   /* ---------- back plate / bracket: z 2.2 -> 8.75, rounding into the wall ---------- */
-  const pS = [], D = 7.75, ZB = 8.75 - D, SX = 7.0;                    // plate back face at z 1.0; pads reach the wall
-  for (let i = 0; i <= 16; i++) { const a = i / 16 * PI / 2, k = 1 - Math.cos(a), z = 8.75 - D * Math.sin(a);
+  const pS = [], ZP = 8.65, D = 7.65, ZB = ZP - D, SX = 7.0;                    // plate back face at z 1.0; pads reach the wall
+  for (let i = 0; i <= 16; i++) { const a = i / 16 * PI / 2, k = 1 - Math.cos(a), z = ZP - D * Math.sin(a);
     const top = br.top - 9.0 * k, bot = br.bot + 9.5 * k;
     pS.push([z, br.w - 2 * SX * k, top - bot, R, (top + bot) / 2]); }
   add(g, shell(pS, [plateL, plate]));
   // back face: arch cap outline, pads, wire boss
   const wB = br.w - 2 * SX - 1;
-  const bp2 = pp(wB, 40, (x, P) => { x.strokeStyle = '#b4b6b8'; x.lineWidth = 2.5; x.beginPath(); const o = -42;   // plane centre at y 42
-    x.moveTo(...P(-wB / 2, 29 + o)); x.lineTo(...P(-13.5, 29 + o)); x.lineTo(...P(-13.5, 40 + o));
-    const [cx, cy] = P(0, 40 + o); x.arc(cx, cy, 135, PI, 0, false); x.lineTo(...P(13.5, 29 + o)); x.lineTo(...P(wB / 2, 29 + o)); x.stroke(); });
-  bp2.rotation.y = PI; add(g, bp2, 0, 42, ZB - .01);
+  // arch cap outline: a fine groove line laid on the real plate surface (back face and over the top roll), meeting the y 29 split
+  { const inside = (x, y, w, h, r, cy) => { const dx = Math.max(0, Math.abs(x) - (w / 2 - r)), dy = Math.max(0, Math.abs(y - cy) - (h / 2 - r)); return Math.hypot(dx, dy) <= r; };
+    const zOn = (x, y) => { let lo = 0, hi = PI / 2; if (inside(x, y, br.w - 2 * SX, br.top - br.bot - 18.5, 10, (br.top - 9 + br.bot + 9.5) / 2)) return ZB;
+      for (let it = 0; it < 30; it++) { const a = (lo + hi) / 2, k = 1 - Math.cos(a), top = br.top - 9 * k, bot = br.bot + 9.5 * k;
+        inside(x, y, br.w - 2 * SX * k, top - bot, 10, (top + bot) / 2) ? lo = a : hi = a; } return ZP - D * Math.sin(lo); };
+    const pts = [], push = (x, y) => pts.push(new THREE.Vector3(x, y, zOn(x, y) - .02));
+    const xe = (br.w - 2 * SX) / 2;
+    for (let i = 0; i <= 4; i++) push(-xe + (xe - 13.5) * i / 4, 29);
+    for (let i = 1; i <= 10; i++) push(-13.5, 29 + 16.5 * i / 10);
+    for (let i = 1; i <= 40; i++) { const t = PI - PI * i / 40; push(13.5 * Math.cos(t), 45.5 + 13.5 * Math.sin(t)); }
+    for (let i = 1; i <= 10; i++) push(13.5, 45.5 - 16.5 * i / 10);
+    for (let i = 1; i <= 4; i++) push(13.5 + (xe - 13.5) * i / 4, 29);
+    add(g, new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'catmullrom', .1), 240, .1, 6, false), phys(0x9fa1a3, { roughness: .7 }))); }
   // wall pads stand 1 mm proud of the back face: small boss round the wire hole, slotted lower pad
-  const upPad = rrS(14, 11, 5, 0, 36); upPad.holes.push(new THREE.Path(rrS(7, 4, 2, 0, 36).getPoints().reverse()));
+  const upPad = rrS(14, 11, 5, 0, 34); upPad.holes.push(new THREE.Path(rrS(7, 4, 2, 0, 34).getPoints().reverse()));
   add(g, H.ext(upPad, ZB + .05, .3, plate));
-  add(g, H.rslab(7, 4, .3, 1.9, .05, voidM), 0, 36, ZB - .4);
+  add(g, H.rslab(7, 4, .3, 1.9, .05, voidM), 0, 34, ZB - .4);
   const loPad = rrS(13, 23, 6.5, 0, -38); loPad.holes.push(new THREE.Path(rrS(4, 13, 2, 0, -38).getPoints().reverse()));
   add(g, H.ext(loPad, ZB + .05, .3, plate));
   add(g, H.rslab(4.2, 13.2, .3, 2, .05, phys(0xcfd0d0, { roughness: .7 })), 0, -38, ZB - .2);
   // terminal boss: raised rounded square, raised pill on it, two grey ringed terminals
-  add(g, H.ext(rrS(18, 18, 4.5, 0, -3.5), .45, .15, plate), 0, 0, ZB - .4);
-  add(g, H.ext(rrS(11, 5.5, 2.75, 0, -3.5), .45, .15, plate), 0, 0, ZB - .8);
-  for (const x of [-2.8, 2.8]) { add(g, disc(.5, .9, phys(0x9a9a9a, { roughness: .4, metalness: .5 })), x, -3.5, ZB - .81).rotation.y = PI; add(g, disc(0, .5, voidM), x, -3.5, ZB - .81).rotation.y = PI; }
+  add(g, H.ext(rrS(18, 18, 4.5, 0, -3.5), .75, .25, plate), 0, 0, ZB - .7);            // boss .7 proud, pill on it reaches the wall plane
+  add(g, H.ext(rrS(11, 5.5, 2.75, 0, -3.5), .4, .15, plate), 0, 0, ZB - 1.0);
+  for (const x of [-2.8, 2.8]) { add(g, disc(.55, 1.05, phys(0xb5b5b5, { roughness: .35, metalness: .5 })), x, -3.5, ZB - 1.01).rotation.y = PI; add(g, disc(0, .55, voidM), x, -3.5, ZB - 1.01).rotation.y = PI; }
 
   /* ---------- bottom face: notch, speaker slots, security-screw tab ---------- */
   const slope = 1.3 / (zb1 - zb0), ybAt = z => bodyAt(z).bot;
   const bot = add(g, G(), 0, ybAt(18), 18); bot.rotation.x = Math.atan(slope);          // frame lying on the sloped bottom, +z toward the front
   // security-screw tab: level underside at y -66, hanging just below the sloped bottom (z 7..16)
-  const tab = H.ext(rrS(10.7, 9, 2), 4, .3, tabM); tab.rotation.x = -PI / 2; add(g, tab, 0, -66, 11.5);
-  const tp = pp(12, 10.5, (x, P) => { x.strokeStyle = '#cfd0d1'; x.lineWidth = 1.5; x.beginPath(); const [a, b] = P(-5.35, 4.5), [c, d] = P(5.35, -4.5); x.roundRect(a, b, c - a, d - b, 20); x.stroke();
+  const tab = H.ext(rrS(10.7, 10, 2), 4.3, .3, tabM); tab.rotation.x = -PI / 2; add(g, tab, 0, -66.3, 10.5);
+  const tp = pp(12, 11, (x, P) => { x.strokeStyle = '#cfd0d1'; x.lineWidth = 1.5; x.beginPath(); const [a, b] = P(-5.35, 5), [c, d] = P(5.35, -5); x.roundRect(a, b, c - a, d - b, 20); x.stroke();
       const [cx, cy] = P(0, 0); x.fillStyle = '#000'; x.beginPath(); x.arc(cx, cy, 19.5, 0, 2 * PI); x.fill(); });
-  tp.rotation.x = PI / 2; add(g, tp, 0, -66.02, 11.5);
+  tp.rotation.x = PI / 2; add(g, tp, 0, -66.32, 10.5);
 
   /* ---------- lens: proud bezel, smoky window, recessed barrel and element ---------- */
   const L = add(g, G(), 0, LY, ZF);
   add(L, lathe([[8.25, .7], [8.25, 1.0], [9.45, 1.0], [9.85, .6], [9.85, -.6]], bezel));
   add(L, disc(4.15, 8.25, smoke), 0, 0, .7);
   add(L, tube(4.15, -.3, .7, bezel));
-  add(L, disc(2.75, 4.15, voidM), 0, 0, -.3);
+  add(L, disc(2.75, 4.15, phys(0x111111, { roughness: .1, clearcoat: 1 })), 0, 0, -.3);
   add(L, tube(2.75, -.95, -.3, voidM));
   add(L, H.dome(2.75, .2, lensM), 0, 0, -.95);
   for (const r of [1.6, 2.3]) add(L, H.torus(r, .05, glint), 0, 0, -.9);
-  add(L, disc(0, 9.0, voidM), 0, 0, -.65);
+  add(L, disc(4.15, 9.0, voidM), 0, 0, -.65);
 
   /* ---------- mic / light-sensor holes (recessed) ---------- */
   for (const x of [-6.2, 6.2]) { add(g, tube(.8, ZF - 1.5, ZF, voidM), x, 20.6, 0); add(g, disc(0, .8, voidM), x, 20.6, ZF - 1.5); }
@@ -144,10 +157,11 @@ export default H => {
 
   /* ---------- light ring (flush) + recessed doorbell button ---------- */
   const B = add(g, G(), 0, BY, ZF);
-  add(B, lathe([[13.4, -.12], [13.45, -.02], [13.55, -.01], [14.3, -.01]], ringIn));
-  add(B, lathe([[14.3, -.01], [15.3, -.01], [15.42, -.04], [15.45, -.15], [15.45, -1.6]], ringOut));
+  { const rp = [[13.4, -.12], [13.45, -.03]]; for (let i = 0; i <= 7; i++) rp.push([13.55 + (15.3 - 13.55) * i / 7, -.01]); rp.push([15.42, -.04], [15.45, -.15], [15.45, -1.6]);
+    add(B, lathe(rp, ringM)); }                                                          // one band: bright inner edge grading to deep red-orange
   add(B, tube(13.3, -1.15, -.12, ringWall));                                             // diffuser inner wall, lit
-  add(B, lathe([[0, -2.1], [4, -1.97], [8, -1.65], [11, -1.3], [12.6, -1.13], [13.0, -1.12], [13.2, -1.2], [13.25, -1.4], [13.25, -2.8]], btn));   // dished button
+  add(B, lathe([[0, -2.1], [1.5, -2.08], [4, -1.97], [8, -1.65], [11, -1.3], [12.6, -1.13]], btn));   // dished button, flat at the pole
+  add(B, lathe([[12.6, -1.13], [13.0, -1.12], [13.2, -1.2], [13.25, -1.4], [13.25, -2.8]], btnRim));
   add(B, disc(13.25, 15.5, voidM), 0, 0, -1.6);
   g.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = false; } });
   return out;

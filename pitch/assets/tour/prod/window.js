@@ -32,7 +32,7 @@ export default H => {
   const cut = `vOP.y < -${(SW / 2 - 1).toFixed(3)} && ((abs(vOP.x) < ${NW} && vOP.z < ${ZC.toFixed(3)}) || length(vec2(vOP.x, vOP.z - ${ZC.toFixed(3)})) < ${NW})`;
   add(u, part(68.6, SW, 8.3, 12.7, .8, ZS, 2.6, cut, [2.5, 6]));
   const U = new THREE.Shape(); U.moveTo(-NW, -.5); U.lineTo(-NW, ZC); U.absarc(0, ZC, NW, Math.PI, 0, true); U.lineTo(NW, -.5); U.lineTo(-NW, -.5);
-  K.pocket(u, U, 1.3, '-y', -SW / 2, 0, 0, 0x6f7174);
+  K.pocket(u, U, 1.3, '-y', -SW / 2, 0, 0, 0x808285);
 
   /* magnet right below (centred on the sensor, 2.8 mm gap), its long side facing the notch */
   add(u, part(47.5, 14.2, 4.7, 12.7, .6, ZS, 2.6, null, [2.5, 6]), 0, -(SW / 2 + 2.8 + 7.1), 0);
