@@ -516,7 +516,7 @@ button { font: inherit; color: inherit; }
 
 /* ---- rearrange mode: every tile and section gets a frosted glass cover with a grip ---- */
 .rov { position: absolute; z-index: 6; inset: 0; border-radius: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: grab; touch-action: pan-y;
-  background: rgba(8,10,12,.5); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.12);
+  background: rgba(8,10,12,.42); -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.12);
   opacity: 0; transition: opacity .3s; pointer-events: none; }
 body.rearr .rov { opacity: 1; pointer-events: auto; }
 .rov .gr { width: 52px; height: 52px; flex: none; border-radius: 26px; display: grid; place-items: center; touch-action: none; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); transition: background .2s, transform .25s var(--ease); }
