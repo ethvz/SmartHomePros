@@ -87,7 +87,9 @@ export default H => {
 
   // Kwikset logo button (raised 1.0 mm, frosted white, in a 0.4 mm dark gap)
   add(ex, rslab(mm(19.3), mm(10.5), mm(.2), mm(2.7), mm(.05), gapM), 0, mm(41.8), PF + mm(.02));
-  const kb = add(ex, chamKey(mm(18.3), mm(9.5), mm(2.2), mm(.45), mm(1.0), mm(.45), mm(.1), btnS), 0, mm(41.8), PF);
+  const parts = { keys: [], led: [] };                                   // interactive hooks for the 3D Home demo (group.userData.parts)
+  const kb = add(ex, chamKey(mm(18.3), mm(9.5), mm(2.2), mm(.45), mm(1.0), mm(.45), mm(.1), splitMat(rimM, keyM, 'z', mm(.88), 1e-6, 0x707272)), 0, mm(41.8), PF);
+  parts.button = kb;
   add(ex, conform(printPlane(mm(16), mm(7), (x, P) => { x.fillStyle = '#121212'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = 'italic 900 35px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, mm(.1))); x.scale(1.0, 1); x.fillText('Kwikset', 0, 0);
     x.strokeStyle = '#121212'; x.lineWidth = 1.6; x.lineJoin = 'round'; x.strokeText('Kwikset', 0, 0); x.restore(); }),
@@ -98,7 +100,8 @@ export default H => {
   for (let r = 0; r < 2; r++) for (let c = 0; c < 5; c++) {
     const x = mm((c - 2) * 10.45), y = mm(r ? 11.9 : 27.2), digit = String((r * 5 + c + 1) % 10);
     add(ex, rslab(KW + mm(1.0), KH + mm(1.0), mm(.2), KR + mm(.5), mm(.05), gapM), x, y, PF + mm(.02));
-    const k = add(ex, chamKey(KW, KH, KR, mm(.85), mm(.9), mm(.5), mm(.15), keyS), x, y, PF);
+    const k = add(ex, chamKey(KW, KH, KR, mm(.85), mm(.9), mm(.5), mm(.15), splitMat(rimM, keyM, 'z', mm(1.33), 1e-6, 0x707272)), x, y, PF);   // own material per key so each can light up
+    k.name = 'key' + digit; parts.keys.push(k);
     add(ex, conform(printPlane(mm(6), mm(7), (cx, P) => { cx.fillStyle = '#141414'; cx.textAlign = 'center'; cx.textBaseline = 'alphabetic';
       cx.font = '700 66px ' + FONT; cx.fillText(digit, ...P(0, mm(-2.3))); }), (px, py) => k.userData.zf(inset(px, py, KW, KH, KR))), x, y, PF);
   }
@@ -118,7 +121,7 @@ export default H => {
   for (const deg of [-20, 0, 20]) {
     const pts = []; for (let i = 0; i <= 6; i++) { const [r, z] = bell((.78 + i / 6 * .2) * Math.PI / 2); pts.push([r + .03, z + .03]); }
     const w = 4 / 19.5;
-    add(ex, lathe(pts, ledOff, 8, Math.PI + deg * Math.PI / 180 - w / 2, w), 0, ROSE_Y, 0);
+    parts.led.push(add(ex, lathe(pts, ledOff.clone(), 8, Math.PI + deg * Math.PI / 180 - w / 2, w), 0, ROSE_Y, 0));
   }
   // SmartKey keyway printed into the plug face
   const kw = add(ex, printPlane(mm(16), mm(16), (x, P) => { x.fillStyle = '#000'; x.strokeStyle = '#000'; x.lineWidth = 3;
@@ -168,7 +171,7 @@ export default H => {
   const panTop = mm(39.2), panBot = mm(-27.0), PZ = mm(24.2);
   add(inn, rslab(mm(57.8), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));
   // status LED (lit green, as in the 2025 render)
-  add(inn, rslab(mm(8), mm(2.6), mm(.6), mm(1.3), mm(.2), ledOn), 0, mm(25.0), PZ - mm(.12));
+  parts.interiorLed = add(inn, rslab(mm(8), mm(2.6), mm(.6), mm(1.3), mm(.2), ledOn), 0, mm(25.0), PZ - mm(.12));
   add(inn, rslab(mm(8.8), mm(3.4), mm(.2), mm(1.7), mm(.05), gapM), 0, mm(25.0), PZ + mm(.02));
   // thumb-turn rose: raised ring with a groove
   add(inn, lathe([[11.2, 23.9], [11.0, 24.6], [10.8, 25.1], [10.3, 25.45], [9.0, 25.5], [8.7, 25.45], [8.6, 25.0], [8.2, 24.95], [8.1, 25.3], [7.8, 25.5], [0, 25.5]], powderL), 0, 0, 0);
@@ -180,7 +183,8 @@ export default H => {
     const geo = new THREE.ExtrudeGeometry(s, { depth: mm(10) - mm(2.0), bevelEnabled: true, bevelThickness: mm(1.0), bevelSize: mm(1.0), bevelOffset: -mm(1.0), bevelSegments: 5, curveSegments: 12 });
     geo.translate(0, 0, mm(1.0));
     geo.applyMatrix4(new THREE.Matrix4().set(0, 0, -1, mm(5), 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1)); geo.computeVertexNormals();
-    const bar = new THREE.Mesh(geo, powder); bar.castShadow = bar.receiveShadow = true; add(inn, bar, 0, 0, mm(24.6)); void pts; }
+    const bar = new THREE.Mesh(geo, powder); bar.castShadow = bar.receiveShadow = true;
+    const turn = add(inn, G(), 0, 0, 0); add(turn, bar, 0, 0, mm(24.6)); parts.turn = parts.bolt = turn; void pts; }   // rotate turn.rotation.z (about the deadbolt axis) to lock/unlock
 
   /* ================= LEVERS (one per side, square rose, slim rectangular lever toward the hinge side) ================= */
   const lever = dir => { const l = G();
@@ -193,5 +197,6 @@ export default H => {
   const li = add(g, lever(1), 0, LY, ZI); li.rotation.y = Math.PI;        // turned to face into the house; arm still points to the hinge side
   if (PART === 'ext') { inn.visible = false; g.children.filter(c => c !== ex).forEach(c => g.remove(c)); }   // DEBUG
   if (PART === 'int') { g.remove(ex); g.children.filter(c => c !== inn).forEach(c => g.remove(c)); }   // DEBUG
+  g.userData.parts = parts;
   return g;
 };

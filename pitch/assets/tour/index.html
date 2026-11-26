@@ -604,8 +604,16 @@ const TVG = new THREE.Group(); TVG.position.set(-1.45,FL,1.7); TVG.rotation.y = 
   const pole=cyl(.012,1.55,M.blackM,8); pole.position.y=.78; lamp.add(pole); const base=cyl(.14,.025,M.blackM,24); base.position.y=.012; lamp.add(base);
   const shade=new THREE.Mesh(new THREE.CylinderGeometry(.17,.21,.28,32,1,true), phys(0xf2e8d8,{r:.8,x:{side:THREE.DoubleSide,emissive:0xffcf98,emissiveIntensity:.9,transmission:0}})); shade.position.y=1.55; lamp.add(shade); }
 // outlets (Chime Extender and Smart Plug are plugged in here) and the home's existing smoke alarm
-const plate = (x,y,z,ry) => { const p = new THREE.Mesh(new RoundedBoxGeometry(.075,.118,.008,2,.004), M.cab); p.position.set(x,y,z); p.rotation.y = ry; scene.add(p); return p; };
-plate(GR.x1-.004,FL+.32,.2,-Math.PI/2); plate(4.6,FL+.32,GR.cz+.004,0);
+/* a full duplex outlet: 70 x 115 mm plate; the product plugs into the UPPER receptacle (centred on the product, y = py),
+   the lower receptacle (face, two slots, ground hole) stays visible below it */
+const OUTLET_M = {plate:mat(0xf1efea,{r:.45}), rec:mat(0xe7e5df,{r:.4}), slot:mat(0x1b1b1b,{r:.8})};
+const plate = (x,py,z,ry) => { const g = new THREE.Group(); g.position.set(x,py-.019,z); g.rotation.y = ry; scene.add(g);
+  const p = new THREE.Mesh(new RoundedBoxGeometry(.07,.115,.008,2,.003), OUTLET_M.plate); p.position.z = .004; g.add(p);
+  for(const ry2 of [.019,-.019]){ const r = new THREE.Mesh(new RoundedBoxGeometry(.034,.029,.006,2,.004), OUTLET_M.rec); r.position.set(0,ry2,.009); g.add(r);
+    if(ry2 < 0){ for(const sx of [-.0065,.0065]){ const s = new THREE.Mesh(new THREE.BoxGeometry(.0022,.0075,.002), OUTLET_M.slot); s.position.set(sx,ry2+.004,.0115); g.add(s); }
+      const h = new THREE.Mesh(new THREE.CylinderGeometry(.0025,.0025,.002,12), OUTLET_M.slot); h.rotation.x = Math.PI/2; h.position.set(0,ry2-.007,.0115); g.add(h); } }
+  return g; };
+plate(GR.x1,FL+.32,.2,-Math.PI/2); plate(4.6,FL+.32,GR.cz,0);   // chime (right wall) and Smart Plug (shelf wall): same y as their PLACE entries
 { const sa = new THREE.Group(); sa.position.set(1.15,5.55,KZ+.01); sa.rotation.y = 0; scene.add(sa);
   const b = cyl(.075,.035,M.cab,40); b.rotation.x = Math.PI/2; b.position.z = .018; sa.add(b);
   const d = new THREE.Mesh(new THREE.SphereGeometry(.05,32,12,0,Math.PI*2,0,Math.PI/2), M.cab); d.rotation.x = Math.PI/2; d.position.z = .035; d.scale.y = .35; sa.add(d); }
@@ -614,7 +622,7 @@ slab(-.85,2.75,FL,FL+.012,.75,3.45,M.rug,null,false);
 
 /* ------------------------------------------------------------------ lights */
 /* dusk: a dim, cool sky and a weak low key from the west; the house's own warm (2700-3000 K) lights carry the picture */
-scene.add(new THREE.HemisphereLight(0x8496b8, 0x0b0c0e, .5));
+scene.add(new THREE.HemisphereLight(0x8193b8, 0x0b0c0e, 1.7));
 const moon = new THREE.DirectionalLight(0xa3b6d8, .55);
 moon.position.set(-9, 20, 16); moon.target.position.set(1, 0, -1);
 moon.castShadow = true; moon.shadow.mapSize.set(2048, 2048);
@@ -669,7 +677,7 @@ function model(name, {pos, rotY=0, scale=1, fit=null, shadow=true, tweak=null}){
 model('velvetsofa', {pos:V(.95,FL,2.7), rotY:Math.PI, fit:{w:2.5}, tweak:o=>o.traverse(m=>{ if(m.isMesh && m.material && m.material.color && /fabric|velvet/i.test(m.material.name)){ m.material.color.set(0x1d6a63); } })});
 model('modern_coffee_table_01', {pos:V(.95,FL,1.4), fit:{w:1.1}});
 model('mid_century_lounge_chair', {pos:V(-1.05,FL,3.25), rotY:Math.PI*.92, tweak:o=>o.traverse(m=>{ if(m.isMesh && m.material && m.material.color){
-  if((m.material.metalness||0) > .3) return; m.material = m.material.clone(); m.material.color.set(0x55806a); m.material.map = null; } })});   // sage-green upholstery
+  m.material = m.material.clone(); m.material.color.set(0x8fcfa4); } })});   // tinted toward the reference's green armchair (one atlas material)
 model('potted_plant_04', {pos:V(.75,FL+.94,-4.45), fit:{h:.42}});
 model('potted_plant_01', {pos:V(2.6,FL,-.5), fit:{h:1.35}});
 // dining: round wood table with light Scandinavian chairs, mid-room in front of the island

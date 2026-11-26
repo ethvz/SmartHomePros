@@ -78,7 +78,7 @@ export default H => {
     const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
     const n = hole.length;
     for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), top = Math.max(0, (pa.getY(i) - mm(PC[1])) / mm(HW / 2));
-      let f = (.8 + .2 * t ** 1.5) * (1 - .24 * top * (1 - t * .3));   // top wall reaches ~0x8e8c82                                     // darker toward the floor, and more on the top wall (shadowed from above)
+      let f = (.8 + .2 * t ** 1.5) * (1 - .15 * top * (1 - t * .3));   // top wall reaches ~0x8e8c82                                     // darker toward the floor, and more on the top wall (shadowed from above)
       const ri = Math.floor(i / n), lt = pa.getX(i) < mm(-HW * .25) || pa.getY(i) > mm(PC[1] + HW * .25);
       if ((ri === 1 || ri === 2) && lt) f = .5;                                                                // 0.5 mm dark lip line on the left and top walls                                                                // 0.3 mm dark line right under the hole edge (0x6a6a66 on 0xd4d1c4)
       col.push(f, f, f); }

@@ -99,16 +99,16 @@ export default H => {
 
   // ---------------------------------------------------------------- LED faces: white reflector plate 1 mm behind the window with 3 real
   // capsule recesses (2.5 deep, darker walls, grey floor) x 2 clear TIR domes with a faceted core
-  const lensM = new THREE.MeshPhysicalMaterial({color:0x9aa0a6, roughness:.03, metalness:.05, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.45, specularIntensity:1, envMapIntensity:2.5, depthWrite:false});   // clear grey glass
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x9aa0a6, roughness:.03, metalness:.05, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.35, specularIntensity:1, envMapIntensity:2.5, depthWrite:false});   // clear grey glass
   const coreM = new THREE.MeshPhysicalMaterial({color:0x24272a, roughness:.08, metalness:.3, flatShading:true, clearcoat:1});
   const die = mat(0xefe9da, {r:.4, x:{emissive:0x2a2822}});
   const domeGeo = new THREE.SphereGeometry(5.1, 40, 16, 0, Math.PI*2, 0, Math.PI/2); domeGeo.scale(1, .56, 1);
   const coneGeo = new THREE.ConeGeometry(3.8, 2.4, 8, 1, true);
   const wallM = new THREE.MeshPhysicalMaterial({vertexColors:true, roughness:.7});          // capsule walls shaded floor -> lip
-  const sW = 27, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
+  const sW = 35, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
     { n: V2(0, 1), p: V2(0, zF), w: 108, cols: [-28, 0, 28], ln: lean },
-    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 46, cols: [-16, 0, 16], ln: leanW },
-    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 46, cols: [-16, 0, 16], ln: leanW } ];
+    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 52, cols: [-19, 0, 19], ln: leanW },
+    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 52, cols: [-19, 0, 19], ln: leanW } ];
   for(const F of faces){
     const slant = Math.hypot(yT - yB, F.ln), dv = V2(F.ln, yT - yB).normalize();
     const hW = (wY0 - wY1)*slant/(yT - yB) + 2, vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;

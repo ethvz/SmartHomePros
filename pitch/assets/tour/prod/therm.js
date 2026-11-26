@@ -52,15 +52,16 @@ export default H => {
     s.absarc(cx, cy+e, r, 0, Math.PI, false); s.absarc(cx, cy-e, r, Math.PI, 2*Math.PI, false); return s; };
 
   /* ---- materials */
-  const cover = new THREE.MeshPhysicalMaterial({color:0xe0e0de, roughness:.78, sheen:.45, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.04, clearcoatRoughness:.6});
+  const cover = new THREE.MeshPhysicalMaterial({color:0xd6d6d4, roughness:.7, sheen:.15, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.08, clearcoatRoughness:.35});
+  const coverSide = cover.clone(); coverSide.color.set(0xffffff); coverSide.vertexColors = true;          // side band greyer than the face, blending over the roll
   const housing = new THREE.MeshPhysicalMaterial({color:0xdddddb, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
-  const groove = new THREE.MeshStandardMaterial({color:0x7c7c7c, roughness:.65});
+  const groove = new THREE.MeshStandardMaterial({color:0x666666, roughness:.8});
   const pocketM = housing.clone(); pocketM.side = THREE.DoubleSide;
   const hidden = new THREE.MeshBasicMaterial({visible:false});
 
   const g = G();
   const BX = [-48, -40, -32, -24, -16, -8, 0, 8, 16, 24, 32, 40, 48];          // extra points along the bottom for the light bar falloff
-  const P = outline(W, W, 25, 2.9, [-9, 9], BX);
+  const P = outline(W, W, 25, 3.1, [-9, 9], BX);
 
   /* ---- rear housing z 0 -> 14.2 (1.5 mm back roll), right-side window left open for the button pocket */
   const win = (mx, my, mz) => mx > W/2 - .01 && Math.abs(my) < 9 && mz > 3 && mz < 11;
@@ -71,63 +72,92 @@ export default H => {
   add(g, sweep(P, [[1, 14.2], [1, 15.9]], groove));
   add(g, sweep(P, [[1, 15.9], [.22, 15.9]], groove));
   /* ---- front cover z 15.9 -> 22.9, flush side wall, 3.5 mm soft front roll, flat face */
-  add(g, sweep(P, [[.22, 15.9], [.07, 15.97], [0, 16.15], ...arc(0, 19.4, 3.5, D, 12)], cover));
+  { const cS = new THREE.Color(0xcacac8), cF = new THREE.Color(0xd6d6d4), tmp = new THREE.Color();
+    add(g, sweep(P, [[.22, 15.9], [.07, 15.97], [0, 16.15], ...arc(0, 19.4, 3.5, D, 12)], coverSide, null, (xx, yy, z) => { const f = Math.min(1, Math.max(0, (z - 19.4)/3.5)); tmp.copy(cS).lerp(cF, f*f); return [tmp.r, tmp.g, tmp.b]; })); }
   add(g, cap(P, 3.5, D, cover, true));
 
-  /* ---- right-side button: pill 12 x 6 in a 0.7 mm shadow ring, cap recessed 0.4 mm with a soft domed face */
+  /* ---- right-side button: pill 6 x 12 cap in a 7 x 13 hole with a 0.35 mm 45-degree chamfered lip, cap 0.3 mm below the wall, 0.25 mm dome */
   { const b = G(); b.rotation.y = Math.PI/2; add(g, b, W/2*k, 0, 7*k);
-    const patch = new THREE.Shape([[-4,-9],[4,-9],[4,9],[-4,9]].map(([x,y]) => new THREE.Vector2(x,y))); patch.holes.push(pill(7.6, 13.6, 0, 0, true));
+    const patch = new THREE.Shape([[-4,-9],[4,-9],[4,9],[-4,9]].map(([x,y]) => new THREE.Vector2(x,y))); patch.holes.push(pill(7.7, 13.7, 0, 0, true));
     const pg = new THREE.ShapeGeometry(patch, 32); pg.scale(k,k,k); add(b, new THREE.Mesh(pg, housing)).receiveShadow = true;
-    const wg = new THREE.ExtrudeGeometry(pill(7.6, 13.6), {depth:1.6, bevelEnabled:false, curveSegments:32}); wg.translate(0, 0, -1.6); wg.scale(k,k,k);
-    add(b, new THREE.Mesh(wg, [hidden, pocketM]));
-    const fg = new THREE.ShapeGeometry(pill(7.6, 13.6), 32); fg.scale(k,k,k); add(b, new THREE.Mesh(fg, new THREE.MeshStandardMaterial({color:0xa8a8a6, roughness:.7})), 0, 0, -1.6*k);
-    const cb = .45, cg = new THREE.ExtrudeGeometry(pill(6, 12), {depth:1.2-2*cb, bevelEnabled:true, bevelThickness:cb, bevelSize:cb, bevelOffset:-cb, bevelSegments:6, curveSegments:32});
-    cg.translate(0, 0, cb - 1.2 - .4); cg.scale(k,k,k); const cm = add(b, new THREE.Mesh(cg, housing)); cm.castShadow = cm.receiveShadow = true; }
+    const band = (A, zA, B, zB, m) => { const a = A.getSpacedPoints(120), c = B.getSpacedPoints(120), pos = [], idx = [], n = a.length;
+      for(const q of a) pos.push(q.x*k, q.y*k, zA*k); for(const q of c) pos.push(q.x*k, q.y*k, zB*k);
+      for(let i=0;i<n;i++){ const j = (i+1)%n; idx.push(i, j, n+i, j, n+j, n+i); }
+      const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); gg.setIndex(idx); gg.computeVertexNormals();
+      return new THREE.Mesh(gg, m); };
+    const chamM = new THREE.MeshStandardMaterial({color:0xc4c4c2, roughness:.6, side:THREE.DoubleSide});
+    add(b, band(pill(7.7, 13.7), 0, pill(7.0, 13.0), -.35, chamM));                                   // chamfered lip
+    add(b, band(pill(7.0, 13.0), -.35, pill(7.0, 13.0), -1.25, pocketM));                            // pocket wall, 0.9 deep
+    const fg = new THREE.ShapeGeometry(pill(7.0, 13.0), 32); fg.scale(k,k,k); add(b, new THREE.Mesh(fg, new THREE.MeshStandardMaterial({color:0x9a9a98, roughness:.7})), 0, 0, -1.25*k);
+    const cb = .25, cg = new THREE.ExtrudeGeometry(pill(6, 12), {depth:.9-2*cb, bevelEnabled:true, bevelThickness:cb, bevelSize:cb, bevelOffset:-cb, bevelSegments:6, curveSegments:32});
+    cg.translate(0, 0, cb - .9 - .3); cg.scale(k,k,k); const cm = add(b, new THREE.Mesh(cg, housing)); cm.castShadow = cm.receiveShadow = true; }
 
   /* ---- lit display: glyphs glowing white through the dead-front face (10 px per mm, 100 mm square) */
-  { const N = 1000, cv = document.createElement('canvas'); cv.width = cv.height = N; const x = cv.getContext('2d');
+  { const N = 1000, cv = document.createElement('canvas'); cv.width = cv.height = 1024; const x = cv.getContext('2d'); x.setTransform(1.024, 0, 0, 1.024, 0, 0);   // 10 logical px per mm on a power-of-two canvas (mipmaps)
     const F = '"Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif', X = mm => N/2 + mm*10, Y = mm => N/2 - mm*10;
     const chev = (cy, up) => { const s = up ? 1 : -1; x.beginPath(); x.moveTo(X(-2.85), Y(cy - 1.4*s)); x.lineTo(X(0), Y(cy + 1.4*s)); x.lineTo(X(2.85), Y(cy - 1.4*s)); x.stroke(); };
     const flake = (cx, cy, r) => { for(let i=0;i<6;i++){ const a = Math.PI/2 + i*Math.PI/3, ca = Math.cos(a), sa = Math.sin(a);
         x.beginPath(); x.moveTo(X(cx), Y(cy)); x.lineTo(X(cx + ca*r), Y(cy + sa*r)); x.stroke();
-        for(const f of [.62]) for(const sg of [-1, 1]){ const bx = cx + ca*r*f, by = cy + sa*r*f, b = a + sg*.8, L = r*.27;
+        for(const f of [.55, .8]) for(const sg of [-1, 1]){ const bx = cx + ca*r*f, by = cy + sa*r*f, b = a + sg*.8, L = r*(f < .7 ? .27 : .18);
           x.beginPath(); x.moveTo(X(bx), Y(by)); x.lineTo(X(bx + Math.cos(b)*L), Y(by + Math.sin(b)*L)); x.stroke(); } } };
     const num = (s, cx, cy, capH, wT, wt) => {            // digits sized by cap height and total ink width, tight tracking
       x.font = `${wt} 100px ${F}`; const asc = x.measureText('7').actualBoundingBoxAscent || 70, fs = 100*capH*10/asc; x.font = `${wt} ${fs}px ${F}`;
       x.textAlign = 'left'; x.textBaseline = 'alphabetic'; const ms = [...s].map(c => x.measureText(c)), iw = ms.map(m => m.actualBoundingBoxLeft + m.actualBoundingBoxRight);
       const gap = s.length > 1 ? Math.max(capH*1.6, (wT*10 - iw.reduce((a, b) => a+b, 0))/(s.length-1)) : 0, wI = iw.reduce((a, b) => a+b, 0) + gap*(s.length-1); let px = X(cx) - wI/2;
       [...s].forEach((c, i) => { x.fillText(c, px + ms[i].actualBoundingBoxLeft, Y(cy) + capH*5); px += iw[i] + gap; }); };
+    const flame = (cx, cy, h) => { const s2 = h/7.7; x.beginPath(); x.moveTo(X(cx), Y(cy - 3.85*s2));
+      x.bezierCurveTo(X(cx - 3.2*s2), Y(cy - 3.6*s2), X(cx - 3*s2), Y(cy + .4*s2), X(cx - .6*s2), Y(cy + 3.85*s2));
+      x.bezierCurveTo(X(cx - .5*s2), Y(cy + 1.6*s2), X(cx + .9*s2), Y(cy + 1.4*s2), X(cx + 1.2*s2), Y(cy + 2.2*s2));
+      x.bezierCurveTo(X(cx + 3.4*s2), Y(cy - .2*s2), X(cx + 3*s2), Y(cy - 3.6*s2), X(cx), Y(cy - 3.85*s2)); x.stroke(); };
+    const ST = {mode:'cool', current:73, setpoint:75, display:true};
     const big = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
-      x.lineWidth = 10; chev(46.5, true); chev(-46.5, false); num('73', 0, 2.4, 15.6, 23.7, 300); };
+      x.lineWidth = 13; chev(46.5, true); chev(-46.5, false); num(String(Math.round(ST.current)), 0, 2.4, 15.6, String(Math.round(ST.current)).length > 1 ? 23.7 : 11, 300); };
     const small = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
-      x.lineWidth = 2.2; flake(0, 18.3, 3.85); num('75', 0, -13.2, 5.8, 9.4, 300); };
-    const draw = () => { x.clearRect(0, 0, N, N);
-      const halo = (fn, blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4000; x.shadowColor = col; x.shadowBlur = blur; fn(); x.restore(); };   // shadow only, glyphs stay thin
+      x.lineWidth = 3; if(ST.mode === 'cool') flake(0, 18.3, 3.85); else if(ST.mode === 'heat') flame(0, 18.3, 7.7);
+      if(ST.mode !== 'off') num(String(Math.round(ST.setpoint)), 0, -13.2, 6.0, 9.4, 400); };
+    const draw = () => { x.clearRect(0, 0, N, N); if(!ST.display){ t && (t.needsUpdate = true); return; }
+      const halo = (fn, blur, col) => { x.save(); x.translate(-4000, 0); x.shadowOffsetX = 4096; x.shadowColor = col; x.shadowBlur = blur; fn(); x.restore(); };   // shadow only, glyphs stay thin
       halo(big, 34, 'rgba(255,255,255,.75)'); halo(big, 12, 'rgba(255,255,255,.6)');
-      big(); small();
-      x.save(); x.fillStyle = 'rgba(255,255,255,.1)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
-      x.font = `500 ${100*120/w0}px ${F}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('vivint', X(0), Y(-36.6)); x.restore(); };
-    draw();
-    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.premultiplyAlpha = true;
+      x.save(); x.filter = 'blur(2px)'; x.globalAlpha = .6; big(); small(); x.restore();            // light diffused through the dead-front
+      big(); small(); };
+    let t = null; draw();
+    t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16; t.premultiplyAlpha = true; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter;
     if(document.fonts) Promise.all(['300', '400', '500'].map(w => document.fonts.load(`${w} 60px "Vivint Sans"`))).then(() => { draw(); t.needsUpdate = true; }).catch(() => {});
     const m = new THREE.MeshBasicMaterial({map:t, transparent:true, blending:THREE.CustomBlending, blendSrc:THREE.OneFactor, blendDst:THREE.OneMinusSrcAlphaFactor, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
-    add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), m), 0, 0, (D + .03)*k); }
+    const dispMesh = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), m), 0, 0, (D + .03)*k);
+    var display = { mesh:dispMesh, texture:t, canvas:cv, state:ST, redraw:() => { draw(); t.needsUpdate = true; } }; }
+
+  /* ---- "vivint" printed grey on the cover (not lit), 12 x 3.4 mm at (0, -36.6) */
+  { const c = document.createElement('canvas'); c.width = 256; c.height = 64; const x = c.getContext('2d'), t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
+    const F = '"Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif';
+    const draw = () => { x.clearRect(0, 0, 256, 64); x.fillStyle = 'rgba(120,120,120,1)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;
+      x.font = `500 ${100*232/w0}px ${F}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('vivint', 128, 34); t.needsUpdate = true; };
+    draw(); if(document.fonts) document.fonts.load('500 60px "Vivint Sans"').then(draw).catch(() => {});
+    add(g, new THREE.Mesh(new THREE.PlaneGeometry(.0132, .0033), new THREE.MeshStandardMaterial({map:t, transparent:true, opacity:.45, roughness:.7, depthWrite:false,
+      polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})), 0, -36.6*k, (D + .02)*k); }
 
   /* ---- status light: blue glow out of the BOTTOM of the groove only, strongest over the central ~70 mm */
   { const blue = new THREE.Color(0x4c7dff), fall = x => { const a = Math.abs(x); return a < 30 ? 1 : a > 50 ? 0 : (t => 1 - t*t*(3-2*t))((a-30)/20); };
-    const colFn = (xx, y) => { const f = y < -W/2 + 3 ? fall(xx) : 0; return [blue.r*f*1.6, blue.g*f*1.6, blue.b*f*1.6]; };
-    const gm = new THREE.MeshBasicMaterial({vertexColors:true, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-1});
+    const colFn = (xx, y) => { const f = y < -W/2 + 3 ? fall(xx) : 0; return [f, f, f]; };          // falloff only; the colour lives on the material
+    const gm = new THREE.MeshBasicMaterial({color:blue, vertexColors:true, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-1});
     const bar = add(g, sweep(P, [[.98, 14.25], [.98, 15.85]], gm, (mx, my) => my > -W/2 + 3, colFn)); bar.castShadow = bar.receiveShadow = false;
-    const lip = add(g, sweep(P, [[.3, 14.2], [.95, 14.2]], gm, (mx, my) => my > -W/2 + 3, (xx, y, z) => colFn(xx, y).map(v => v*.45))); lip.castShadow = lip.receiveShadow = false;
+    const lip = add(g, sweep(P, [[.3, 14.2], [.95, 14.2]], gm, (mx, my) => my > -W/2 + 3, (xx, y, z) => colFn(xx, y).map(v => v*.3))); lip.castShadow = lip.receiveShadow = false;
     // soft fan on the wall below
     const c = document.createElement('canvas'); c.width = 512; c.height = 192; const x = c.getContext('2d');
     x.save(); x.translate(256, 0); x.scale(1, .42); const gr = x.createRadialGradient(0, 0, 0, 0, 0, 250);
-    gr.addColorStop(0, 'rgba(76,125,255,.55)'); gr.addColorStop(.35, 'rgba(76,125,255,.3)'); gr.addColorStop(.7, 'rgba(76,125,255,.08)'); gr.addColorStop(1, 'rgba(76,125,255,0)');
+    gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(.35, 'rgba(255,255,255,.3)'); gr.addColorStop(.7, 'rgba(255,255,255,.08)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
     x.fillStyle = gr; x.fillRect(-256, 0, 512, 460); x.restore();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
-    const wash = new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false}));
+    const wash = new THREE.Mesh(new THREE.PlaneGeometry(.11, .0413), new THREE.MeshBasicMaterial({color:blue, map:t, transparent:true, depthWrite:false, toneMapped:false}));
     wash.position.set(0, (-W/2 + 3 - 20.6)*k, .4*k); wash.renderOrder = 2;
     bar.onBeforeRender = () => { if(!wash.parent) g.add(wash); };   // a wall effect: attached on the first frame so it stays out of the product's size/framing box
+    var led = { meshes:[bar, lip, wash], material:gm, washMaterial:wash.material, colors:{cool:0x4c7dff, heat:0xffa040},
+      setColor(hex){ gm.color.set(hex); wash.material.color.set(hex); },
+      setIntensity(v){ gm.opacity = v; wash.material.opacity = v; [bar, lip, wash].forEach(o => o.visible = v > 0); } };
   }
+  /* ---- live state for the interactive demo: g.userData.parts.setState({mode:'cool'|'heat'|'off', setpoint, current, display}) */
+  const setState = (o = {}) => { Object.assign(display.state, o); display.redraw();
+    const mode = display.state.mode; if(mode === 'cool' || mode === 'heat'){ led.setColor(led.colors[mode]); led.setIntensity(1); } else led.setIntensity(0); };
+  g.userData.parts = { display, led, setState, getState:() => ({...display.state}) };
   return g;
 };

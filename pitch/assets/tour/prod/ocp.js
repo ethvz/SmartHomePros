@@ -10,7 +10,7 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.03, specularIntensity:.12, specularColor:0x9a9a9a, envMapIntensity:.8});   // near-black; F90 held down so it isn't pale at grazing angles
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.03, specularIntensity:.32, specularColor:0x9a9a9a, envMapIntensity:1});   // near-black; F90 held down so it isn't pale at grazing angles
   const satinK = new THREE.MeshPhysicalMaterial({color:0x0e0e0f, roughness:.5, metalness:0, specularIntensity:.4, envMapIntensity:.15, side:THREE.DoubleSide});   // satin ring: rougher / duller than the glass
   const lensM = new THREE.MeshPhysicalMaterial({color:0x141a26, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:4, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
@@ -31,18 +31,18 @@ export default H => {
       const geo = new THREE.BufferGeometry();
       const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
-      if(p.g === 1) for(let i=0;i<p.nv;i++) pos[3*i] *= SX*.988;   // grille scaled with the shell, sitting ~.5 inside its sides
+      if(p.g === 1){ const Ng = new Int8Array(OCPM.buf, p.n, p.nv*3); for(let i=0;i<p.nv;i++){ pos[3*i] *= SX*.988;   // grille scaled with the shell, ~.5 inside its sides
+        if(Math.abs(Ng[3*i])/127 > .6 && pos[3*i+2] < .016) pos[3*i+2] = .016; } }   // side faces start 16 mm off the wall: clamp (no sawtooth)
       if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front, 77 wide
         let x = pos[3*i]*SX, y = pos[3*i+1], z = pos[3*i+2];
-        if(z < .0128){ x = Math.max(-.0385, Math.min(.0385, x)); y = Math.max(-.0495, Math.min(.0438, y)); }   // the CAD's wider back flange pulled in to the front shell's outline
+        if(z < .0128) x = Math.max(-.0385, Math.min(.0385, x));   // the CAD's wider back flange pulled in to the shell's 77 mm outline
         if(y > .036 && z > .021 && z < .04){ const dy = y - .036, dz = z - .021, L = Math.hypot(dy, dz); if(L > .010){ y = .036 + dy*.010/L; z = .021 + dz*.010/L; } }   // top-front corner R10
         pos[3*i] = x; pos[3*i+1] = y; pos[3*i+2] = z; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
       let I = p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni);
       const Nr0 = new Int8Array(OCPM.buf, p.n, p.nv*3);
-      if(p.g === 1) I = keepTris(I, pos, (a, b, c, v) => Math.min(a, b, c) >= .016 || Math.abs(Nr0[3*v+1])/127 > .7);   // grille: side faces start 16 mm off the wall (white border behind); the bottom wrap is kept whole
-      else I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
+      if(p.g !== 1) I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
       geo.setIndex(new THREE.BufferAttribute(I,1));
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
         for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
@@ -56,12 +56,13 @@ export default H => {
   }
   // wall-plate layer (z 0 -> 7): a 3 mm rim with exactly the shell's outline (77 x 95.1, R10), rounded R1 at the wall, so plate and
   // shell are one flush surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
-  { const s = rrShape(77, 93.3, 10); s.holes.push(rrShape(71, 87.3, 7));
-    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -2.85, 0); g.userData.wallPlate = wp; }
+  { const s = rrShape(77, 98.5, 10); s.holes.push(rrShape(71, 92.5, 7));
+    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -.5, 0);   // top y 48.75 = the shell's own top g.userData.wallPlate = wp; }
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
-  { const s = H.rr4(77, 48, [0, 0, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [0, 0, 8.8, 8.8], 0, -25.4));
+  { const s = H.rr4(77, 48, [3, 3, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [1.8, 1.8, 8.8, 8.8], 0, -25.4));
     add(M, ext(s, 8.95, .3, mountW), 0, 0, 7.05);             // ends exactly at the grille's back edge (z 16)
-    add(M, H.rslab(74, 1.6, 14, .6, .3, mountW), 0, -47.4, 15); }   // liner inside the bottom rim (hides the grille's back faces)
+    add(M, H.rslab(70, 1.6, 14, .6, .3, mountW), 0, -47.4, 15);       // liner inside the bottom rim (hides the grille's back faces)
+    add(M, H.rslab(74, 2, 9, .8, .4, mountW), 0, -48.5, 11.5); }        // closes the mount's bottom end between z 7 and 16
   // back of the mount (open toward the wall, ocp_back_1 / detail_back): floor 15 mm in, thin centre plate (face 6 mm off the wall),
   // four tall U-shaped screw towers with real keyholes, channel walls, the brass insert tube standing 4 mm proud, cable slot
   { const inner = new THREE.MeshPhysicalMaterial({color:0xd6d7d8, roughness:.6, side:THREE.DoubleSide});
@@ -73,10 +74,10 @@ export default H => {
     const keyhole = (cx, cy) => { const p = new THREE.Path(), a0 = Math.atan2(-1.561, 1.25);
       p.moveTo(cx + 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - .061); p.absarc(cx, cy + 1.5, 2, a0, Math.PI - a0, false); p.lineTo(cx - 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - 3.6); return p; };
     for(const [bx, by] of [[-28, 30], [28, 26], [-28, -5], [28, -9]]){                // big U clips, 12 x 14, open to the rim
-      const sg = Math.sign(bx), sh = H.rr4(12, 14, sg < 0 ? [6, 0, 0, 6] : [0, 6, 6, 0], bx + sg*1.5, by);
+      const sg = Math.sign(bx), sh = H.rr4(12, 14, sg < 0 ? [6, 3, 3, 6] : [3, 6, 6, 3], bx + sg*1.5, by);
       sh.holes.push(keyhole(bx, by));
       add(M, ext(sh, 13.2, .6, inner), 0, 0, 2);                                      // tower: z 2 -> 15.2
-      add(M, H.rslab(5, 8.5, .4, 1, .1, dark), bx, by, 3.2); }                        // dark backing 1 mm behind the keyhole
+      add(M, H.rslab(5, 8.5, .4, 1, .1, mat(0x6a6c6e, {r:.8})), bx, by, 4.2); }      // keyhole backing ~2 mm deep
     for(const rx of [-21.5, 21.5]) add(M, H.rslab(1.8, 58, 12, .8, .4, inner), rx, 10, 9.3);   // channel walls
     const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.28, metalness:.9});
     const tube = new THREE.LatheGeometry([[2.2,0],[2.2,4],[2.6,4.5],[4.1,4.5],[4.5,4.1],[4.5,0]].map(([r,y]) => new THREE.Vector2(r, y)), 48);
@@ -170,7 +171,6 @@ export default H => {
   { const pr = [[6.2,-2.6],[6.4,-2],[9.3,.25],[9.55,.3],[9.75,.15],[9.82,-1.3]];   // lens bezel Ø19.6 with a straight conical chamfer down to the lens (detail_lens)
     const b = add(head, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,z]) => new THREE.Vector2(r, z)), 72), satinK), 0, -17, 0); b.rotation.x = Math.PI/2;
     add(head, dome(6.2, 2.6, lensM), 0, -17, -2.9);   // one big glossy blue-black lens dome
-    add(head, H.torus(3.2, .14, mat(0x3a3f48, {r:.2})), 0, -17, -.66);   // dark inner element ring
   }
   // light / IR sensor (recessed 0.3), mic pinholes, wordmark
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.65, .4, 32), mat(0x1e1e1f,{r:.4}))), 0, -30.5, -.5);
