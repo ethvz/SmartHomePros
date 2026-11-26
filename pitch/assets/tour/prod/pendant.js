@@ -26,6 +26,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
     const cap = (C, k0, holes, up) => { const pts = [ring(C, k0)], map = []; for (let i = 0; i < C.n; i++) map.push(C.base + k0 * C.n + i);
       for (const [I, k] of holes) { pts.push(ring(I, k)); for (let i = 0; i < I.n; i++) map.push(I.base + k * I.n + i); }
       const all = pts.flat();
+      for (let i = 0; i < map.length; i++) { const e = map[i], o = pos.length / 3; pos.push(pos[e * 3], pos[e * 3 + 1], pos[e * 3 + 2]); col.push(col[e * 3], col[e * 3 + 1], col[e * 3 + 2]); map[i] = o; }   // flat caps get their own vertices (crisp normals, no streaks)
       for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(pts[0], pts.slice(1))) {
         const A = all[a], B = all[b], D = all[c], cr = (B.x - A.x) * (D.y - A.y) - (B.y - A.y) * (D.x - A.x);
         if ((cr > 0) === up) idx.push(map[a], map[b], map[c]); else idx.push(map[a], map[c], map[b]); } };
@@ -109,17 +110,17 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
     for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
-  const dishP = [[-2.75, 9.6], [-2.75, 10.5], [-1.8, 11.19], [-.95, 11.8], [-.45, 12.14], [-.08, 12.36], [.3, 12.46], [.65, 12.495], [1.0, 12.5]].map(([d, z]) => [d, D - (12.5 - z) * 1.15]);   // 2.3 mm deep cone
+  const dishP = [[-2.82, 9.6], [-2.82, 10.5], [-1.8, 11.19], [-.95, 11.8], [-.45, 12.14], [-.08, 12.36], [.3, 12.46], [.65, 12.495], [1.0, 12.5]].map(([d, z]) => [d, D - (12.5 - z) * 1.15]);   // 2.3 mm deep cone
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
-    { type: 'pocket', pts: circ(0, -6.5, 9, 120), prof: uni(dishP) },
+    { type: 'pocket', pts: circ(0, -6.5, 9, 120), prof: uni(dishP), col: (k, K, v) => (.7 + .3 * sm(D - 2.4, D - .2, v[2])) * (1 - .3 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
     { type: 'hole', pts: circ(0, 18.5, 3.2, 72), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
-  add(B, solid(loops, shell));
+  shell.vertexColors = true; add(B, solid(loops, shell, true));
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
-  const btnM = new THREE.MeshPhysicalMaterial({ color: 0x9c9b98, roughness: .6, clearcoat: .05 });
+  const btnM = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .6, clearcoat: .05 });
   const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 3.0);
-  add(B, new THREE.Mesh(new THREE.RingGeometry(5.95, 6.3, 96), new THREE.MeshStandardMaterial({ color: 0x2e2e2e, roughness: .9 })), 0, -6.5, D - 3.15);
+  add(B, new THREE.Mesh(new THREE.RingGeometry(5.97, 6.2, 96), new THREE.MeshStandardMaterial({ color: 0x2e2e2e, roughness: .9 })), 0, -6.5, D - 3.15);
 
   /* 3. pry notch on the back-cover seam, bottom centre */
   const notch = plane(7, 1.6, 60, (x, Pp) => { const [a, b] = Pp(-3, .5), [c, d] = Pp(3, -.5), gr = x.createLinearGradient(0, b, 0, d);
@@ -129,8 +130,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* 7. debossed "vivint" on the cap (tone on tone) */
   const logo = plane(30, 10, 40, () => {});
   logo.material.roughness = .55; add(B, logo, 0, 12.6, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 22 * 40, 3,
-    'rgba(40,40,40,.42)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 22 * 40, 4,
+    'rgba(30,30,30,.6)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
 
   if ((/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search))) return g;   // product-photo studio views: the pendant alone
   /* hook on the wall */

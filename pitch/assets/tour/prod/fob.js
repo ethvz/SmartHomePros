@@ -27,6 +27,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
     const cap = (C, k0, holes, up) => { const pts = [ring(C, k0)], map = []; for (let i = 0; i < C.n; i++) map.push(C.base + k0 * C.n + i);
       for (const [I, k] of holes) { pts.push(ring(I, k)); for (let i = 0; i < I.n; i++) map.push(I.base + k * I.n + i); }
       const all = pts.flat();
+      for (let i = 0; i < map.length; i++) { const e = map[i], o = pos.length / 3; pos.push(pos[e * 3], pos[e * 3 + 1], pos[e * 3 + 2]); col.push(col[e * 3], col[e * 3 + 1], col[e * 3 + 2]); map[i] = o; }   // flat caps get their own vertices (crisp normals, no streaks)
       for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(pts[0], pts.slice(1))) {
         const A = all[a], B = all[b], D = all[c], cr = (B.x - A.x) * (D.y - A.y) - (B.y - A.y) * (D.x - A.x);
         if ((cr > 0) === up) idx.push(map[a], map[b], map[c]); else idx.push(map[a], map[c], map[b]); } };
@@ -105,7 +106,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
 
   /* 1-3. shell */
   const grey = new THREE.MeshPhysicalMaterial({ color: 0x7a7a78, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
-  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x333436, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
+  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x28292b, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
     { ax: 'z', at: 3, w: .25, col: 0x303132, k: .6 }]);
   const pocketP = []; pocketP.push([0, 9.6], [0, 10.5]); for (let i = 1; i <= 6; i++) { const t = i / 6 * Math.PI / 2; pocketP.push([.5 * (1 - Math.cos(t)), 10.5 + .5 * Math.sin(t)]); }
   const keysY = [20.1, 10.2, .2];
@@ -115,19 +116,19 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   add(F, solid(loops, shell));
 
   /* 4-6. keys (recessed 0.3 mm), legends, red dots */
-  const keyM = new THREE.MeshPhysicalMaterial({ color: 0x2f3032, roughness: .5 });
+  const keyM = new THREE.MeshPhysicalMaterial({ color: 0x252628, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
   const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#9c9d9e';
     x.font = '300 194px "Helvetica Neue", Helvetica, Arial, sans-serif';
     const fit = (s, x0, x1, y) => { const m = x.measureText(s).width, [a, b] = Pp(x0, y), [c] = Pp(x1, y); x.save(); x.translate(a, b); x.scale((c - a) / m, 1); x.fillText(s, 0, 4); x.restore(); };
     fit('DISARM', -5.6, 5.5, 20.1 - 10.2); fit('STAY', -3.9, 3.0, 0); fit('AWAY', -4.6, 3.6, .2 - 10.2);
-    x.fillStyle = '#b0282a'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
+    x.fillStyle = '#6e1416'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
   add(F, leg, 0, 10.2, D - .3 + .02);
 
   /* 7. debossed logo on the grey end */
   const logo = plane(40, 12, 40, () => {}); add(F, logo, 0, -16.2, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 800, 240, 33 * 40, 4,
-    'rgba(30,30,30,.6)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 800, 240, 33 * 40, 6,
+    'rgba(20,20,20,.75)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
 
   if (bare) return g;
   /* 9. split ring (two coils of flat steel wire) through the slot and under the ring end, leaning over; two house keys on it */

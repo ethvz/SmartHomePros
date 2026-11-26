@@ -13,7 +13,6 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa i{top:24px}
 
 /* ---------- hero (photo / video) ---------- */
 html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.lh-media,.lh-scrim,.hgl,.ochx,.ich-vid,.hbh-vid,.ich-scrim,.ich-sc,.hbh-scrim,.hbh-sc){left:0!important;right:auto!important;width:600px!important;height:var(--H)!important}
-html.pp :is(#prScroll,#hbScroll,#thScroll) .hg-dots{bottom:176px!important}
 html.pp :is(#prScroll,#thScroll) .lh-ph{width:100%!important;height:100%!important;object-fit:cover}
 html.pp :is(#prScroll,#thScroll) .lh-media .smk-ghost{object-fit:cover}
 html.pp :is(#prScroll,#thScroll) .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.45) 0,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 46%,rgba(0,0,0,.86) 100%)!important}
@@ -125,16 +124,12 @@ html.pp #prScroll .ppart{position:absolute;left:0;top:0;width:1376px;height:964p
 html.pp #prScroll .ppart>*{pointer-events:auto}
 html.pp #prScroll .ppart .hot{overflow:visible}
 html.pp #prScroll .ppart .hot::before{content:"";position:absolute;inset:-36px}   /* the scaled-down hotspot keeps a finger-sized target */
-html.pp #prScroll .ppctl{position:absolute;left:20px;right:20px;display:flex;flex-wrap:wrap;gap:12px;z-index:6}
-html.pp #prScroll .ppctl .lvt{position:relative!important;left:auto!important;top:auto!important;flex:1 1 0;min-width:calc(50% - 6px);height:112px!important;width:auto!important;font-size:18px;gap:8px;background:#141414}
-html.pp #prScroll .ppctl[data-n="3"] .lvt,html.pp #prScroll .ppctl[data-n="5"] .lvt,html.pp #prScroll .ppctl[data-n="6"] .lvt{min-width:calc(33.3% - 8px)}
 html.pp #prScroll .ppctl .lvt.on{background:#262628}
 html.pp #prScroll .ppctl .lvt:active{transform:scale(.96)}
 html.pp #prScroll .ppctl .lvl{position:relative!important;left:auto!important;top:auto!important;width:100%!important}
 html.pp #prScroll .ppctl .lvl button{height:60px;font-size:20px}
 
 /* ---------- Smart Hub ---------- */
-html.pp #hbScroll .hbh-vid{object-fit:cover;object-position:50% 50%}
 html.pp #hbScroll .hbh-top{left:36px!important;right:36px!important;top:110px!important}
 html.pp #hbScroll .hbh-top h1{font-size:54px!important}
 html.pp #hbScroll .hbh-top p{font-size:22px!important;line-height:1.35}
@@ -173,20 +168,6 @@ html.pp #p-hub #hbSpec .hbspec div{padding:12px 0;font-size:16px}
 html.pp #p-hub #hbSpec .hbspec div b{width:180px;font-size:17px}
 /* History / What's New / Outage: each pane is one 600-wide screen; panes sit 1376 apart because the pill slides by 1376 */
 html.pp #p-hub #hbX .hbpane{width:600px!important;height:var(--H)!important;margin-right:776px}
-html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:24px!important;right:24px;top:100px!important;font-size:40px!important;line-height:1.05}
-html.pp #p-hub #hbScroll .hbsub{left:24px!important;top:196px!important;font-size:18px}
-html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:12px!important;right:12px!important;top:200px!important;column-gap:5px!important;row-gap:5px!important}
-html.pp #p-hub #hbOut .hbt{top:236px!important}
-html.pp #p-hub #hbHist .hbt{grid-template-columns:132px repeat(3,1fr)!important}
-html.pp #p-hub #hbOut .hbt{grid-template-columns:170px repeat(2,1fr)!important}
-html.pp #p-hub #hbOut .hbfoot{left:24px!important;right:24px;top:auto!important;bottom:186px!important;font-size:14px}
-html.pp #p-hub #hbCmp .hbt{grid-template-columns:118px repeat(6,1fr)!important;top:170px!important}
-html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:14px!important;line-height:1.2;padding-right:2px}
-html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{font-size:12.5px!important;min-height:34px!important;padding:3px 4px!important;line-height:1.2}
-html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd{font-size:12.5px;line-height:1.15;gap:4px}
-html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:44px!important}
-html.pp #p-hub #hbCmp .hbt .well{height:66px!important}
-html.pp #p-hub #hbCmp .hbt .well img{width:64px!important;height:58px!important}
 html.pp #p-hub #hbScroll .hbnew{left:24px!important;right:24px!important;top:170px!important;grid-template-columns:1fr!important}
 html.pp #p-hub #hbScroll .hbnew>div{padding-top:0!important}
 html.pp #p-hub #hbScroll .hbnew .th{margin-bottom:12px}
@@ -203,14 +184,9 @@ html.pp #prScroll .icm .ocm-col{left:20px!important;right:20px!important;width:a
 html.pp #prScroll .icm .ocm-col>*{pointer-events:auto}
 html.pp #prScroll .icm .dbm-h{left:16px!important;min-height:0!important;font-size:38px!important;display:block!important}
 html.pp #prScroll .icm .dbm-h small{font-size:18px!important;margin-top:8px}
-html.pp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;gap:4px!important;margin-bottom:var(--ppFoot,86px)}
 html.pp #prScroll .icm .dbm-list button{height:58px!important;font-size:16px!important;padding:0 12px!important;gap:10px!important;line-height:1.1}
 html.pp #prScroll .icm .dbm-list button .lvi{width:22px;height:22px}
 html.pp #prScroll .icm .ocm-fade{display:none!important}
-html.pp #prScroll .icm .ocm-card{left:0!important;width:600px!important;top:250px!important;height:calc(var(--H) - 940px)!important;-webkit-mask-image:none!important;mask-image:none!important}
-html.pp #prScroll .icm .ocm-card img{left:40px!important;top:0!important;width:520px!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important}
-html.pp #prScroll .icm .ocm-phone{left:30px!important;top:calc(var(--H) - 680px)!important;scale:.587;transform-origin:0 0!important}
-html.pp #prScroll .icm .ocm-phone.port{left:136px!important;top:calc(var(--H) - 800px)!important;scale:.44}
 html.pp #prScroll .icm .ocm-cap{display:none!important}
 
 /* ---------- shorter phones (e.g. 375x667: stage about 600x1067): tighten the tallest sections ---------- */
@@ -232,14 +208,7 @@ html.pp #prScroll .icm .ocm-cap{display:none!important}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-foot{display:none!important}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .xa{padding:16px 22px!important;row-gap:8px}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-list{top:270px!important}
-  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{top:84px!important;font-size:34px!important}
-  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{top:150px!important;row-gap:3px!important}
-  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{min-height:28px!important;font-size:11.5px!important;padding:2px 3px!important}
-  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:12.5px!important}
-  html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:34px!important}
   html.pp #p-hub #hbScroll .hb3pill{bottom:88px!important}
-  html.pp #p-hub #hbScroll .hbsub{top:136px!important}
-  html.pp #p-hub #hbOut .hbt{top:180px!important}
   html.pp #p-hub #hbScroll .hbnew{top:140px!important}
   html.pp #p-hub #hbScroll .hbnew .th img{width:120px}
   html.pp #p-hub #hbScroll .hbnew .ft{margin-bottom:10px}
@@ -247,4 +216,73 @@ html.pp #prScroll .icm .ocm-cap{display:none!important}
   html.pp #prScroll .smk-c>.best{display:none!important}
   html.pp #thScroll .thc .th-list button{height:52px}
   html.pp #prScroll .icm .dbm-list button{height:50px!important}
+}
+
+/* ---------- review round 2 ---------- */
+/* hero galleries: dots between the copy and the scroll cue */
+html.pp :is(#prScroll,#hbScroll,#thScroll) .hg-dots{bottom:178px!important}
+html.pp :is(#prScroll,#thScroll) .lhero.hgw .lh-txt{bottom:238px!important}
+/* picture sections: tiles in even columns (--cols, --th from prodA.js); live finish labels; the scroll cue is dropped where tiles sit low */
+html.pp #prScroll .ppctl{position:absolute;left:20px;right:20px;display:flex;flex-wrap:wrap;gap:10px;z-index:6}
+html.pp #prScroll .ppctl .lvt{position:relative!important;left:auto!important;top:auto!important;flex:0 0 calc((100% - (var(--cols,2) - 1)*10px)/var(--cols,2));min-width:0;height:var(--th,112px)!important;width:auto!important;font-size:17px;line-height:1.2;gap:8px;padding:0 6px;box-sizing:border-box;background:#141414}
+html.pp #prScroll .ppart.ppx{pointer-events:none}
+html.pp #prScroll .ppart.ppx video{pointer-events:none}
+html.pp #prScroll .pplab{position:absolute;z-index:6;text-align:center;font-size:20px;font-weight:500;color:#fff;letter-spacing:-.2px}
+html.pp #prScroll .psec.ppA-tiles>.nxa{display:none!important}
+/* Smart Hub hero: the whole Hub in view over a soft copy of its wall */
+html.pp #hbScroll [data-t=hero]{background:#3b3026}
+html.pp #hbScroll [data-t=hero]::before{content:"";position:absolute;inset:-40px;background:url(../assets/hb/hero_v.jpg?v=73) 50% 50%/cover;filter:blur(28px) brightness(.8);z-index:0}
+html.pp #hbScroll .hbh-vid{left:-322px!important;width:1238px!important;height:929px!important;top:calc(var(--H)*.55 - 470px)!important;object-fit:cover;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%)}
+/* Hub tables: use the height; readable type */
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:24px!important;right:24px;top:96px!important;font-size:40px!important;line-height:1.05}
+html.pp #p-hub #hbScroll .hbsub{left:24px!important;right:24px;top:150px!important;font-size:18px}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:12px!important;right:12px!important;top:168px!important;column-gap:6px!important;row-gap:6px!important}
+html.pp #p-hub #hbOut .hbt{top:200px!important}
+html.pp #p-hub #hbHist .hbt{grid-template-columns:150px repeat(3,1fr)!important}
+html.pp #p-hub #hbOut .hbt{grid-template-columns:170px repeat(2,1fr)!important}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:16px!important;line-height:1.2;padding-right:4px}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{font-size:15px!important;min-height:44px!important;padding:4px 6px!important;line-height:1.2}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c small{font-size:13px!important}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd{font-size:15px;line-height:1.15;gap:6px}
+html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd small{font-size:13px}
+html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:52px!important}
+html.pp #p-hub #hbOut .hbfoot{left:24px!important;right:24px;top:auto!important;bottom:186px!important;font-size:15px}
+/* Competitive: six rivals do not fit 600 wide, so the table slides sideways with the feature names pinned */
+html.pp #p-hub #hbCmp .hbt{grid-template-columns:150px repeat(6,124px)!important;right:0!important;padding-right:12px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none;touch-action:pan-x pan-y;top:168px!important}
+html.pp #p-hub #hbCmp .hbt::-webkit-scrollbar{display:none}
+html.pp #p-hub #hbCmp .hbt>:nth-child(7n+1){position:sticky;left:0;z-index:2;background:#000;box-shadow:8px 0 12px -6px #000}
+html.pp #p-hub #hbCmp .hbt .c{min-height:56px!important}
+html.pp #p-hub #hbCmp .hbt .well{height:90px!important}
+html.pp #p-hub #hbCmp .hbt .well img{width:96px!important;height:84px!important}
+/* Vivint App "App" section: copy on top, the live phone centred and scaled below it (--aek from prodA.js) */
+html.pp #prScroll .appemu .ae-copy{left:36px!important;right:36px!important;width:auto!important;top:100px!important;transform:none!important}
+html.pp #prScroll .appemu .ae-copy h2{font-size:46px!important;margin-bottom:12px}
+html.pp #prScroll .appemu .ae-copy h2 br{display:none}
+html.pp #prScroll .appemu .ae-copy p{font-size:20px!important}
+html.pp #prScroll .appemu .ae-phone{left:50%!important;top:var(--aey,330px)!important;margin:0!important;transform-origin:50% 0!important;translate:-50% 0;scale:var(--aek,.8)}
+/* Indoor Camera Highlights: full-width feature grid, camera above a smaller phone */
+html.pp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;gap:4px!important;width:auto!important;margin-bottom:var(--ppFoot,86px)}
+html.pp #prScroll .icm .ocm-card{left:0!important;width:600px!important;top:240px!important;height:calc(var(--H) - 870px)!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #prScroll .icm .ocm-card img{left:40px!important;top:0!important;width:520px!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important}
+html.pp #prScroll .icm .ocm-phone{left:50%!important;top:calc(var(--H) - 610px)!important;translate:-50% 0;scale:.55;transform-origin:50% 0!important}
+html.pp #prScroll .icm .ocm-phone.port{top:calc(var(--H) - 660px)!important;scale:.36}
+/* the page title hides when the section's own heading already says it (prodA.js sets html.ppA-ngt) */
+html.pp.ppA-ngt #gTitle{opacity:0!important;pointer-events:none}
+@media (min-aspect-ratio:10/19){
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{top:80px!important;font-size:32px!important}
+  html.pp #p-hub #hbScroll .hbsub{top:122px!important;font-size:16px}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{top:126px!important;row-gap:3px!important}
+  html.pp #p-hub #hbOut .hbt{top:156px!important}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{min-height:30px!important;font-size:13.5px!important;padding:2px 4px!important}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:14px!important}
+  html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:34px!important}
+  html.pp #p-hub #hbCmp .hbt .c{min-height:44px!important}
+  html.pp #p-hub #hbCmp .hbt .well{height:64px!important}
+  html.pp #p-hub #hbCmp .hbt .well img{width:72px!important;height:60px!important}
+  html.pp #prScroll .appemu .ae-copy h2{font-size:38px!important}
+  html.pp #prScroll .appemu .ae-copy p{font-size:18px!important}
+  html.pp #prScroll .icm .dbm-h{font-size:32px!important}
+  html.pp #prScroll .icm .dbm-h small{font-size:16px!important}
+  html.pp #prScroll .icm .ocm-card{top:210px!important;height:calc(var(--H) - 790px)!important}
+  html.pp #prScroll .icm .ocm-phone{top:calc(var(--H) - 560px)!important;scale:.5}
 }

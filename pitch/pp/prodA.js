@@ -84,7 +84,21 @@
     const k=(isPP()?'pp':'ls')+(window.SH||0); if(fresh||hub.k!==k){ hub.k=k; if(isPP()) try{ w.postMessage({fpEmu:'frame',pre:hubPre()},'*'); }catch(e){} } }
   { const f=$('#emuF'); if(f) f.addEventListener('load',()=>setTimeout(hub,50)); }
 
-  function run(){ strips(); art(); therm(); hub(); }
+  /* Vivint App live phone: below its copy, as large as the room above the footer allows */
+  function appEmu(){ const sec=document.querySelector('#prScroll .appemu'); if(!sec) return; if(!isPP()){ sec.style.removeProperty('--aek'); sec.style.removeProperty('--aey'); return; }
+    const cp=sec.querySelector('.ae-copy'), H=window.SH||1032, y=(cp?cp.offsetTop+cp.offsetHeight:300)+28, k=Math.max(.4,Math.min(1,(H-y-footH()-28)/884));
+    sec.style.setProperty('--aey',Math.round(y)+'px'); sec.style.setProperty('--aek',k.toFixed(3)); }
+
+  /* hide the page title (#gTitle) while the section on screen already names the product in its own heading */
+  function title(){ const html=document.documentElement; let on=false;
+    if(isPP()){ const pg=document.querySelector('.page.on'), box=pg&&pg.querySelector('#prScroll,#hbScroll,#thScroll'), g=$('#gTitle');
+      if(box&&g){ const name=(g.textContent||'').replace(/^\s*vivint\s+/i,'').trim().toLowerCase(), br=box.getBoundingClientRect(), mid=br.top+br.height*.4;
+        const sec=[...box.children].find(x=>{ const r=x.getBoundingClientRect(); return r.height&&r.top<=mid&&r.bottom>mid; });
+        if(sec&&name){ const hd=sec.querySelector('.eb,.xeb,.lh-txt .eb,.ae-copy .eb,h1,h2'); on=!!(hd&&hd.textContent.toLowerCase().includes(name)); } } }
+    html.classList.toggle('ppA-ngt',on); }
+  BOX.forEach(q=>{ const b=$(q); if(b) b.addEventListener('scroll',()=>{ cancelAnimationFrame(title.r); title.r=requestAnimationFrame(title); },{passive:true}); });
+
+  function run(){ strips(); art(); therm(); hub(); appEmu(); title(); }
   window.__ppA=run;
   let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); }catch(e){ window.__ppAerr=String(e&&e.stack||e); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
