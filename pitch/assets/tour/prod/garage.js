@@ -37,9 +37,9 @@ export default H => {
   const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .05, clearcoat: 1, clearcoatRoughness: .05, transparent: true, opacity: .12, depthWrite: false });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xdedbd0, roughness: .05, clearcoat: 1, clearcoatRoughness: .05, transparent: true, opacity: .12, depthWrite: false });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x3e443c, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe2bb48, roughness: .35, emissive: 0xffc540, emissiveIntensity: .3, clearcoat: .6 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xd8ab30, roughness: .35, emissive: 0xffb820, emissiveIntensity: .12, clearcoat: .6 });
   const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xf2f0e8, roughness: .5 });
   const btnM = white.clone(), outlineM = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
@@ -74,12 +74,13 @@ export default H => {
   for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
   add(g, ringMesh(rings.slice(0, nBody), bodyM, false, true));
   { // hole walls and floor: same white plastic, darkened toward the floor (baked ambient occlusion) like the shadowed well in the photos
-    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xd4d1c4, roughness: .45, vertexColors: true }), true, false);
+    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xcfcbbd, roughness: .45, vertexColors: true }), true, false);
     const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
     const n = hole.length;
     for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), top = Math.max(0, (pa.getY(i) - mm(PC[1])) / mm(HW / 2));
-      let f = (.8 + .2 * t ** 1.5) * (1 - .12 * top * (1 - t * .5));                                     // darker toward the floor, and more on the top wall (shadowed from above)
-      if (Math.floor(i / n) === 1) f = .5;                                                                // 0.3 mm dark line right under the hole edge (0x6a6a66 on 0xd4d1c4)
+      let f = (.85 + .15 * t ** 1.5) * (1 - .31 * top * (1 - t * .3));   // top wall reaches ~0x8e8c82                                     // darker toward the floor, and more on the top wall (shadowed from above)
+      const ri = Math.floor(i / n), lt = pa.getX(i) < mm(-HW * .25) || pa.getY(i) > mm(PC[1] + HW * .25);
+      if ((ri === 1 || ri === 2) && lt) f = .5;                                                                // 0.5 mm dark lip line on the left and top walls                                                                // 0.3 mm dark line right under the hole edge (0x6a6a66 on 0xd4d1c4)
       col.push(f, f, f); }
     wm.geometry.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); add(g, wm); }
 

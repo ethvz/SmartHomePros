@@ -161,7 +161,7 @@ export default H => {
   /* ---------- floating cap (TEST/HUSH button) with a shallow centre dimple */
   { const cp = [V2(0, 54.2), V2(25.8, 54.2), V2(26.6, 54.45), V2(26.95, 55), V2(27, 55.6), V2(27, 57.5), V2(26.9, 58.2), V2(26.6, 58.7), V2(26.1, 59.05),
       V2(25.2, 59.25), V2(22, 59.6), V2(17, 60), V2(11, 60.35), V2(6, 60.55), V2(4.7, 60.6), V2(4.5, 60.57), V2(4.1, 60.42), V2(3.3, 60.26), V2(2, 60.15), V2(0, 60.1)];
-    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y + ZB + LIFT)), 160), capM)); cap.rotation.x = Math.PI / 2; }
+    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * 1.07, p.y + ZB + LIFT)), 160), capM)); cap.rotation.x = Math.PI / 2; }
 
   /* ---------- six arched spokes: foot on the face, arc up and in, joining the cap rim */
   { const s = new THREE.Shape(); const f0 = faceZ(45.2) - 1.5, f1 = faceZ(49.4) - 1.5;

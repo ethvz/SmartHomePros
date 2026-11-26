@@ -53,8 +53,8 @@ export default H => {
   for (let i = 0; i <= 5; i++) { const a = i / 5 * Math.PI / 2; const d = 1.5 * (1 - Math.sin(a)); rings.push(ring(d, 14.3 - d, 1.5 * (1 - Math.cos(a)))); }
   for (let i = 1; i <= 6; i++) { const t = i / 6, d = .6 * t; rings.push(ring(d, 14.3 - d, 1.5 + 8.0 * t)); }          // grey sides, a gentle linear flare
   for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = .6 + 1.5 * (1 - Math.cos(a)); rings.push(ring(d, 14.3 - d, 9.5 + 1.0 * Math.sin(a))); }   // 1 mm forward-facing grey shoulder just behind the split
-  rings.push(ring(2.1, 12.2, 11.8), ring(2.1, 12.2, 13.0));
-  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 2.1 + 3 * (1 - Math.cos(a)); rings.push(ring(d, 12.2 - 3 * (1 - Math.cos(a)), 13.0 + 3 * Math.sin(a))); }
+  rings.push(ring(2.3, 12.0, 11.8), ring(2.6, 11.7, 13.5));                                   // white side wall with ~6 deg draft inward
+  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 2.6 + 2.5 * (1 - Math.cos(a)); rings.push(ring(d, 11.7 - 2.5 * (1 - Math.cos(a)), 13.5 + 2.5 * Math.sin(a))); }   // R2.5 roll into the face
   add(g, ringMesh(rings, body, false, true));
   // flat face with the three emergency openings
   const ER = 7.65, EY = -52.4, EX = [-21.1, 0, 21.1];

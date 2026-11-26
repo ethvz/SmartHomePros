@@ -35,7 +35,8 @@ export default H => {
     s.absarc(Ro, yTg + tT + Ri, Ri, 1.5*Math.PI, Math.PI, true);
     s.lineTo(Tb, yTop); s.lineTo(0, yTop);
     const j = ext(s, Wb, 3, white);
-    add(M, H.rslab(Wb, 14, 7, 3, 1, white), 0, -49.5 - 4, 3.5);   // transition block under the mount: R1 wall-side edges like the plate, so no notch where band and mount meet j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
+    j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
+    add(M, H.rslab(Wb, 14, 7, 3, 1, white), 0, -49.5 - 4, 3.5);   // transition block under the mount: R1 wall-side edges like the plate, so no notch where band and mount meet
     // thin tongue lying on the sloped bar top: plan rounded rectangle, R10 front corners, 4 mm thick (a real step), to z = 74
     const t = ext(rr4(Wb, zTg - Ro + 2, [10, 10, 0, 0], 0, (zTg + Ro - 2)/2), tT, 1.2, white);
     t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yT + tT, 0);
