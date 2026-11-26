@@ -52,9 +52,9 @@ export default H => {
     s.absarc(cx, cy+e, r, 0, Math.PI, false); s.absarc(cx, cy-e, r, Math.PI, 2*Math.PI, false); return s; };
 
   /* ---- materials */
-  const cover = new THREE.MeshPhysicalMaterial({color:0xf2f2f0, roughness:.74, sheen:.45, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.04, clearcoatRoughness:.6});
-  const housing = new THREE.MeshPhysicalMaterial({color:0xeeeeec, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
-  const groove = new THREE.MeshStandardMaterial({color:0x8e8e8e, roughness:.6});
+  const cover = new THREE.MeshPhysicalMaterial({color:0xe9e9e7, roughness:.78, sheen:.45, sheenRoughness:.85, sheenColor:0xffffff, clearcoat:.04, clearcoatRoughness:.6});
+  const housing = new THREE.MeshPhysicalMaterial({color:0xe6e6e4, roughness:.56, clearcoat:.1, clearcoatRoughness:.5});
+  const groove = new THREE.MeshStandardMaterial({color:0x7c7c7c, roughness:.65});
   const pocketM = housing.clone(); pocketM.side = THREE.DoubleSide;
   const hidden = new THREE.MeshBasicMaterial({visible:false});
 
@@ -95,7 +95,7 @@ export default H => {
     const num = (s, cx, cy, capH, wT, wt) => {            // digits sized by cap height and total ink width, tight tracking
       x.font = `${wt} 100px ${F}`; const asc = x.measureText('7').actualBoundingBoxAscent || 70, fs = 100*capH*10/asc; x.font = `${wt} ${fs}px ${F}`;
       x.textAlign = 'left'; x.textBaseline = 'alphabetic'; const ms = [...s].map(c => x.measureText(c)), iw = ms.map(m => m.actualBoundingBoxLeft + m.actualBoundingBoxRight);
-      const gap = s.length > 1 ? (wT*10 - iw.reduce((a, b) => a+b, 0))/(s.length-1) : 0; let px = X(cx) - wT*5;
+      const gap = s.length > 1 ? Math.max(capH*.9, (wT*10 - iw.reduce((a, b) => a+b, 0))/(s.length-1)) : 0, wI = iw.reduce((a, b) => a+b, 0) + gap*(s.length-1); let px = X(cx) - wI/2;
       [...s].forEach((c, i) => { x.fillText(c, px + ms[i].actualBoundingBoxLeft, Y(cy) + capH*5); px += iw[i] + gap; }); };
     const glyphs = () => { x.strokeStyle = x.fillStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
       x.lineWidth = 10; chev(46.5, true); chev(-46.5, false);
@@ -107,9 +107,9 @@ export default H => {
       x.save(); x.fillStyle = 'rgba(255,255,255,.3)'; x.font = `500 100px ${F}`; const w0 = x.measureText('vivint').width;  // faint wordmark
       x.font = `500 ${100*120/w0}px ${F}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('vivint', X(0), Y(-36.6)); x.restore(); };
     draw();
-    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.premultiplyAlpha = true;
     if(document.fonts) Promise.all(['300', '400', '500'].map(w => document.fonts.load(`${w} 60px "Vivint Sans"`))).then(() => { draw(); t.needsUpdate = true; }).catch(() => {});
-    const m = new THREE.MeshBasicMaterial({map:t, transparent:true, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
+    const m = new THREE.MeshBasicMaterial({map:t, transparent:true, premultipliedAlpha:true, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
     add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), m), 0, 0, (D + .03)*k); }
 
   /* ---- status light: blue glow out of the BOTTOM of the groove only, strongest over the central ~70 mm */

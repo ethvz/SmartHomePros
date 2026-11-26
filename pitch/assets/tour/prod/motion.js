@@ -12,7 +12,7 @@ export default H => {
 
   /* crown of the front face: 0 at the edge of the flat, 1.5 mm at the centre */
   const FX = W / 2 - 6, FY = HT / 2 - 6, FZ = 48.5;
-  const crown = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 1.5 * Math.max(0, 1 - r * r); };
+  const crown = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 1.5 * Math.pow(Math.max(0, 1 - r * r), 1.5); };
 
   /* side profile [inset, z]: R1.5 back edge, straight wall, R6 front roll (4.5 mm tall) */
   const prof = [];
@@ -31,7 +31,7 @@ export default H => {
   rings.push(lip.map(([x, y, z]) => [x, y, z - .3]));
   rings.push(lip.map(([x, y, z]) => [x, y, z - 1.9]));
 
-  const grey = 0xb8b9bc, white = 0xf2f2f0;
+  const grey = 0xb0b1b4, white = 0xf2f2f0;
   const PILL = { y: 8, z: 13, len: 21, wid: 7, gap: .4 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
@@ -43,12 +43,11 @@ export default H => {
   /* Fresnel lens: frosted lavender-grey, faint vertical facet bands, follows the crown 1.5 mm below the cover */
   const lensRings = [];
   for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27.5) ** 2)]; }));
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xaeadb8, roughness: .62, map: K.bandsTex(), specularIntensity: .2, sheen: .35, sheenRoughness: .9,
-    sheenColor: 0xe8e6ee, emissive: 0x1c1b22, emissiveIntensity: .2 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9c9aa6, roughness: .66, map: K.bandsTex(true), specularIntensity: .15 });
   add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
 
   /* wordmark, tone-on-tone, flush on the crowned face */
-  add(u, decal(DEC.logo, 15, 3.8, { color: 0xbdbec0, r: .5 }), 0, -25.2, FZ + crown(0, -25.2) + .06);
+  add(u, decal(DEC.logo, 17.5, 4.4, { color: 0xc4c5c7, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .06);
 
   /* TEST pill: dark gap ring pocket (1 mm deep), grey cap 0.6 mm below the side surface, printed TEST reading downward */
   K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.0, 'x', 35, PILL.y, PILL.z, 0x4c4e51);
@@ -79,7 +78,7 @@ function kit(THREE){
       const n = (q + 1) % 4, [sx, sy] = map(n, 1, 0), e = pts[pts.length - 1], s = [C[n][0] + sx * R[n], C[n][1] + sy * R[n]];
       for (let i = 1; i <= ns; i++){ const t = i / (ns + 1); pts.push([e[0] + (s[0] - e[0]) * t, e[1] + (s[1] - e[1]) * t]); }
     }
-    if (bow){ const xc = w / 2 - Math.max(...R); for (const q of pts) if (Math.abs(q[0]) < xc) q[1] += Math.sign(q[1]) * bow * (1 - (q[0] / xc) ** 2) ** 2; }
+    if (bow) for (const q of pts) q[1] += bow * (1 - (q[0] / (w / 2)) ** 2) * q[1] / (h / 2);
     return pts.map(([x, y]) => [x + cx, y + cy]);
   }
   /* skin a list of equal-length rings [[x,y,z],...] into a smooth surface; start/end: true = flat fan cap at the centroid,
@@ -134,11 +133,21 @@ function kit(THREE){
     parent.add(m); return m;
   }
   /* soft vertical Fresnel facet bands (shading only) */
-  function bandsTex(){
-    const c = document.createElement('canvas'); c.width = 512; c.height = 64; const x = c.getContext('2d');
-    for (let i = 0; i < 512; i++){ const t = i / 512, v = Math.sin(t * Math.PI * 2 * 6.5) * .5 + Math.sin(t * Math.PI * 2 * 13) * .12;
-      const l = Math.round(244 + v * 6); x.fillStyle = `rgb(${l},${l},${l})`; x.fillRect(i, 0, 1, 64); }
+  function bandsTex(ao){
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
+    for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
+      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 6.5) * .5 + Math.sin(t * Math.PI * 2 * 13) * .12;
+      let l = 240 + v * 3.5;
+      if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
+        l *= (1 - .3 * Math.exp(-top / .035) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
+      const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }
+    x.putImageData(im, 0, 0);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  return { rr, skin, bandMat, pill, pocket, bandsTex };
+  function noiseTex(){
+    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), im = x.createImageData(64, 64);
+    for (let k = 0; k < im.data.length; k += 4){ const v = 90 + Math.random() * 120; im.data[k] = im.data[k + 1] = im.data[k + 2] = v; im.data[k + 3] = 255; }
+    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+  }
+  return { rr, skin, bandMat, pill, pocket, bandsTex, noiseTex };
 }

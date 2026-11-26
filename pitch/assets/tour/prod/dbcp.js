@@ -45,11 +45,11 @@ export default H => {
   const plate = phys(0xe6e6e6, { roughness: .6, clearcoat: .05 });
   const plateL = H.splitMat(plate, plate, 'y', 29, .25, 0xa4a6a8);              // arch cap piece / bracket split on the sides
   const tabM = phys(0xe8e8e8, { roughness: .55 });
-  const bezel = phys(0x0a0a0a, { roughness: .12, clearcoat: 1, clearcoatRoughness: .03 });
-  const smoke = phys(0x1b1b1d, { roughness: .05, clearcoat: 1, clearcoatRoughness: .02 });
+  const bezel = phys(0x0a0a0a, { roughness: .12, clearcoat: 1, clearcoatRoughness: .03, envMapIntensity: .7 });
+  const smoke = phys(0x161618, { roughness: .18, clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: .45 });
   const voidM = new THREE.MeshStandardMaterial({ color: 0x030303, roughness: .9, side: DS });
   const btn = phys(0x0a0a0a, { roughness: .06, clearcoat: 1, clearcoatRoughness: .03 });
-  const ringM = new THREE.MeshStandardMaterial({ color: 0xff6a3a, roughness: .35, emissive: 0xff4a1c, emissiveIntensity: 1.6, envMapIntensity: .2, side: DS });
+  const ringM = new THREE.MeshStandardMaterial({ color: 0xff3a14, roughness: .35, emissive: 0xff3412, emissiveIntensity: 1.25, envMapIntensity: .1, side: DS });
   const lensM = H.PM.lens.clone(); lensM.side = DS;
 
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
@@ -141,8 +141,8 @@ export default H => {
   // soft additive glow just outside and inside the ring
   const gc = document.createElement('canvas'); gc.width = gc.height = 256; const gx = gc.getContext('2d');
   const gr = gx.createRadialGradient(128, 128, 0, 128, 128, 128), r0 = 15.375 / 19;
-  gr.addColorStop(0, 'rgba(255,80,30,0)'); gr.addColorStop(r0 - .14, 'rgba(255,80,30,0)'); gr.addColorStop(r0, 'rgba(255,90,40,.55)');
-  gr.addColorStop(r0 + .09, 'rgba(255,80,30,.12)'); gr.addColorStop(1, 'rgba(255,80,30,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 256, 256);
+  gr.addColorStop(0, 'rgba(255,50,15,0)'); gr.addColorStop(r0 - .14, 'rgba(255,50,15,0)'); gr.addColorStop(r0, 'rgba(255,60,20,.45)');
+  gr.addColorStop(r0 + .09, 'rgba(255,50,15,.12)'); gr.addColorStop(1, 'rgba(255,50,15,0)'); gx.fillStyle = gr; gx.fillRect(0, 0, 256, 256);
   const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace;
   add(B, new THREE.Mesh(new THREE.PlaneGeometry(38, 38), new THREE.MeshBasicMaterial({ map: gt, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })), 0, 0, .04);
 

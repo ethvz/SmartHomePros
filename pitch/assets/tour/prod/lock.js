@@ -1,6 +1,6 @@
 // Smart Lock: Kwikset Home Connect 620 Contemporary, matte black (finish 514).
 // Exterior: 70.6 x 109.5 mm flat escutcheon on a rubber gasket, Kwikset logo button, ten raised frosted keys, bell-shaped
-// deadbolt rose with a SmartKey plug and three hidden status LEDs. Interior (other side of the door, facing -z): 69 x 147 mm
+// deadbolt rose with a SmartKey plug and three hidden status LEDs. Interior (other side of the door, facing -z): 66.5 x 147 mm
 // housing with a gloss battery cover, matte lower panel, status LED and a sloped thumb-turn on a ringed rose.
 // Plus one matte-black lever on each face of the door below the deadbolt (these replace the door group's plain levers).
 // Scene: group origin sits 15 mm (world) in front of the door; the model is scaled x1.45, so in these local units the exterior
@@ -15,13 +15,13 @@ export default H => {
     for (let i = 0; i < N * N; i++) { const v = 118 + Math.random() * 30 + (Math.random() < .08 ? 30 : 0); d.data[i*4] = d.data[i*4+1] = d.data[i*4+2] = v; d.data[i*4+3] = 255; }
     x.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(220, 220); return t; })();
   const powder = new THREE.MeshPhysicalMaterial({ color: 0x1d1d1e, roughness: .74, metalness: .28, bumpMap: noiseTex, bumpScale: .35, clearcoat: .05 });
-  const powderL = powder.clone(); powderL.bumpMap = null;                      // lathe parts (their UVs would stretch the grain)
+  const powderL = powder.clone(); powderL.bumpMap = null; powderL.roughness = .82; powderL.metalness = .18;                      // lathe parts (their UVs would stretch the grain)
   const rubber = new THREE.MeshStandardMaterial({ color: 0x0e0e0e, roughness: .9 });
   const gapM = new THREE.MeshStandardMaterial({ color: 0x070707, roughness: .9 });
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xeeeeec, roughness: .5, sheen: .6, sheenRoughness: .5, sheenColor: 0xffffff, clearcoat: .15, clearcoatRoughness: .5,
     emissive: 0xf4f8f2, emissiveIntensity: .05 });
-  const plugM = new THREE.MeshPhysicalMaterial({ color: 0x171717, roughness: .45, metalness: .35 });
-  const ledOff = new THREE.MeshPhysicalMaterial({ color: 0x2b2c2c, roughness: .35, clearcoat: .4 });
+  const plugM = new THREE.MeshPhysicalMaterial({ color: 0x2a2a2b, roughness: .5, metalness: .3 });
+  const ledOff = new THREE.MeshStandardMaterial({ color: 0x272828, roughness: .85, metalness: .1 });
   const glossM = new THREE.MeshPhysicalMaterial({ color: 0x050506, roughness: .06, metalness: .1, clearcoat: 1, clearcoatRoughness: .03, specularIntensity: 1 });
   const ledOn = new THREE.MeshStandardMaterial({ color: 0x9cf5a2, emissive: 0x6dff8a, emissiveIntensity: 1.1, roughness: .3 });
 
@@ -110,24 +110,24 @@ export default H => {
   // built facing +z with the turn rose at the origin, then turned 180 deg about y onto the interior door face
   const inn = add(g, G(), 0, ROSE_Y, ZI); inn.rotation.y = Math.PI;
   const CY = mm(36);                                                                                 // housing centre, 36 mm above the rose
-  add(inn, rslab(mm(69), mm(147), mm(21.7), mm(2.5), mm(.9), powder), 0, CY, mm(10.85));            // housing (its side rails show beside the cover)
-  add(inn, rslab(mm(67.6), mm(145.6), mm(1.2), mm(2), mm(.3), rubber), 0, CY, mm(.4));              // dark back edge on the door
+  add(inn, rslab(mm(66.5), mm(147), mm(21.7), mm(2.5), mm(.9), powder), 0, CY, mm(10.85));            // housing (its side rails show beside the cover)
+  add(inn, rslab(mm(65.1), mm(145.6), mm(1.2), mm(2), mm(.3), rubber), 0, CY, mm(.4));              // dark back edge on the door
   // gloss battery cover, top part between the rails
   const covTop = mm(109.0), covBot = mm(36.6);
-  add(inn, rslab(mm(58.4), covTop - covBot, mm(3.0), mm(1.4), mm(1.0), glossM), 0, (covTop + covBot) / 2, mm(22.0));
+  add(inn, rslab(mm(56), covTop - covBot, mm(3.0), mm(1.4), mm(1.0), glossM), 0, (covTop + covBot) / 2, mm(22.0));
   add(inn, printPlane(mm(30), mm(7), (x, P) => { x.fillStyle = '#f4f4f4'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = 'italic 800 64px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, 0)); x.scale(1.05, 1); x.fillText('Kwikset', 0, 0); x.restore(); }),
     0, mm(42.6), mm(23.53));
   // matte lower panel (a touch prouder than the cover), hairline seam under the cover
   const panTop = mm(36.2), panBot = mm(-34.0), PZ = mm(24.2);
-  add(inn, rslab(mm(59.2), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));
+  add(inn, rslab(mm(57.6), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));
   // status LED (lit green, as in the 2025 render)
   add(inn, rslab(mm(8), mm(3.2), mm(.6), mm(1.6), mm(.2), ledOn), 0, mm(21.9), PZ - mm(.12));
   add(inn, rslab(mm(8.8), mm(4.0), mm(.2), mm(2), mm(.05), gapM), 0, mm(21.9), PZ + mm(.02));
   // thumb-turn rose: raised ring with a groove
   add(inn, lathe([[11.2, 23.9], [11.0, 24.6], [10.8, 25.1], [10.3, 25.45], [9.0, 25.5], [8.7, 25.45], [8.6, 25.0], [8.2, 24.95], [8.1, 25.3], [7.8, 25.5], [0, 25.5]], powderL), 0, 0, 0);
   // thumb-turn: 10 mm wide, 41 mm long, its face sloping out toward the bottom (9 mm proud at the top, 13 mm at the bottom)
-  { const s = new THREE.Shape(), T = mm(14.8), B = mm(-26.2), r = mm(1.6);
+  { const s = new THREE.Shape(), T = mm(14.8), B = mm(-21.5), r = mm(1.6);
     const pts = [[0, T], [mm(8.6), T], [mm(12.8), B], [0, B]];
     s.moveTo(0, T); s.lineTo(mm(8.6) - r, T); s.quadraticCurveTo(mm(8.6), T, mm(8.6) + r * .1, T - r);
     s.lineTo(mm(12.8) - r * .05, B + r); s.quadraticCurveTo(mm(12.8), B, mm(12.8) - r, B); s.lineTo(0, B); s.lineTo(0, T);

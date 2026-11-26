@@ -64,16 +64,17 @@ export default H => {
   { const N = 512, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
     const cols = 16, rows = 24, cw = N/cols, rh = N/rows;                                   // tile = 12.8 x 14.4 mm (0.8 x 0.6 mm stitches)
     let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
-    x.fillStyle = '#6e6e6e'; x.fillRect(0, 0, N, N);
+    x.fillStyle = '#5a5a5a'; x.fillRect(0, 0, N, N);                                        // dark gaps between the stitch columns
     for(let r=0;r<rows;r++) for(let q=0;q<cols;q++) for(const side of [-1, 1]){                 // each stitch: two loops leaning into a V
-      const roll = rnd(); let v = 178 + rnd()*28; if(roll < .14) v = 132 + rnd()*20; else if(roll > .93) v = 228 + rnd()*18;
-      const cx = q*cw + cw/2 + side*cw*.22, cy = r*rh + rh/2;
-      x.save(); x.translate(cx, cy); x.rotate(side*.62);
-      const gr = x.createLinearGradient(-cw*.2, 0, cw*.2, 0); gr.addColorStop(0, `rgb(${v*.82|0},${v*.82|0},${v*.82|0})`); gr.addColorStop(.5, `rgb(${v|0},${v|0},${v|0})`); gr.addColorStop(1, `rgb(${v*.82|0},${v*.82|0},${v*.82|0})`);
-      x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.2, rh*.66, 0, 0, Math.PI*2); x.fill(); x.restore(); }
+      const roll = rnd(); let v = 182 + rnd()*14; if(roll < .12) v = 140 + rnd()*14; else if(roll > .92) v = 226 + rnd()*20;
+      const cx = q*cw + cw/2 + side*cw*.21, cy = r*rh + rh/2;
+      x.save(); x.translate(cx, cy); x.rotate(side*.6);
+      const gr = x.createLinearGradient(-cw*.19, 0, cw*.19, 0), e = `rgb(${v*.6|0},${v*.6|0},${v*.6|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
+      gr.addColorStop(0, e); gr.addColorStop(.45, m); gr.addColorStop(1, e);
+      x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.19, rh*.62, 0, 0, Math.PI*2); x.fill(); x.restore(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/12.8, 1/14.4); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
-    const fab = new THREE.MeshPhysicalMaterial({color:0xd2d2d2, map:t, bumpMap:bt, bumpScale:1.2, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
+    const fab = new THREE.MeshPhysicalMaterial({color:0xb6b6b6, map:t, bumpMap:bt, bumpScale:2, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
     const b = .3, fg = new THREE.ExtrudeGeometry(offsetShape(P, 2.0), {depth:1.1-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:4, curveSegments:24});
     fg.translate(0, 0, 29.7 + b); fg.scale(k, k, k); const fm = add(g, new THREE.Mesh(fg, fab)); fm.receiveShadow = true; }
 
@@ -90,9 +91,9 @@ export default H => {
   /* ---- right-side wordmark, reading bottom to top, light grey print */
   { const cc = document.createElement('canvas'); cc.width = 80; cc.height = 160;                  // 10 px/mm: 8 x 16 mm plane
     const t = new THREE.CanvasTexture(cc); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; const y = cc.getContext('2d');
-    const draw2 = () => { y.clearRect(0, 0, 80, 160); y.save(); y.translate(40, 80); y.rotate(-Math.PI/2); y.fillStyle = '#c4c4c2';
-      const F = '"Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; y.font = `600 100px ${F}`; const w0 = y.measureText('vivint').width;
-      y.font = `600 ${100*145/w0}px ${F}`; y.textAlign = 'center'; y.textBaseline = 'middle'; y.fillText('vivint', 0, 3); y.restore(); t.needsUpdate = true; };
+    const draw2 = () => { y.clearRect(0, 0, 80, 160); y.save(); y.translate(40, 80); y.rotate(-Math.PI/2); y.fillStyle = '#cfcfcd';
+      const F = '"Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; y.font = `500 100px ${F}`; const w0 = y.measureText('vivint').width;
+      y.font = `500 ${100*145/w0}px ${F}`; y.textAlign = 'center'; y.textBaseline = 'middle'; y.fillText('vivint', 0, 3); y.restore(); t.needsUpdate = true; };
     draw2(); if(document.fonts) document.fonts.load('600 60px "Vivint Sans"').then(draw2).catch(() => {});
     const m = new THREE.MeshStandardMaterial({map:t, transparent:true, roughness:.5, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
     const pl = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.008, .016), m), (W/2 + .03)*k, 0, 16*k); pl.rotation.y = Math.PI/2; }
