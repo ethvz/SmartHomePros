@@ -69,7 +69,7 @@ export default H => {
   for (let k = 1; k <= 8; k++) { const t = k / 8, dep = DD * (1 - Math.cos(t * Math.PI / 2)) ** .9;   // dish: tangent to the face, steepening toward the hole
     rings.push(inner.map(([x, y], i) => [mm(x + (hole[i][0] - x) * t), mm(y + (hole[i][1] - y) * t), mm(top[i] - dep)])); }
   const nBody = rings.length;                                                                // rings so far: shell, face and dish (up to the hole edge)
-  for (const [s2, dz] of [[.996, .12], [.992, .3], [.99, 3], [.99, 6.6], [.985, 7.0], [.97, 7.4]])   // crisp edge, vertical wall, small floor round
+  for (const [s2, dz] of [[.999, .05], [.996, .22], [.99, 3], [.99, 6.6], [.985, 7.0], [.97, 7.4]])   // crisp edge, vertical wall, small floor round
     rings.push(hole.map(([x, y], i) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(Math.max(ZF, top[i] - DD - dz))]));
   for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
   add(g, ringMesh(rings.slice(0, nBody), bodyM, false, true));
@@ -85,7 +85,8 @@ export default H => {
   for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = mm((c - 1.5) * 3.9), y = lc[1] + mm((1 - r) * 4.6);
     add(g, H.rslab(mm(3.0), mm(3.4), mm(.5), mm(.25), mm(.1), ledFrameM), x, y, mm(ZF + .85));
     add(g, H.rslab(mm(2.2), mm(2.6), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
-  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.4), lensM); lens.castShadow = false; lens.renderOrder = 2; add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25));
+  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.4), lensM); lens.castShadow = false; lens.renderOrder = 2; lens.material = [lensM, new THREE.MeshPhysicalMaterial({ color: 0x8c9090, roughness: .2, clearcoat: .5 })];   // caps clear, sides show the block's thickness
+    add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25));
     const bev = new THREE.Mesh(new THREE.ShapeGeometry((() => { const o = new THREE.Shape(rrPts(mm(24), mm(24), mm(5.5)).map(([a, b]) => new THREE.Vector2(a, b))); o.holes.push(new THREE.Path(rrPts(mm(23.2), mm(23.2), mm(5.1)).map(([a, b]) => new THREE.Vector2(a, b)))); return o; })()),
       new THREE.MeshStandardMaterial({ color: 0xf4f4f4, roughness: .2, transparent: true, opacity: .75 }));
     add(g, bev, lc[0], lc[1], mm(faceC - 4 + .01)); }   // the lens's bright 0.4 mm bevel edge
