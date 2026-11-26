@@ -1,4 +1,4 @@
-// smokeco: Vivint Smoke & CO Detector (VS-SMKCO2-345), 142 mm dia x 61 mm. Wall/ceiling side at z = 0, room side toward +z.
+// smokeco: Vivint Smoke & CO Detector (VS-SMKCO2-345), 142 mm dia x ~71 mm (spec sheet says 61; the reference photos show a deeper body and taller cage). Wall/ceiling side at z = 0, room side toward +z.
 // Built in millimetres inside a 0.001-scaled group. Body = lathe (base seam hairline, fillet), face annulus = a polar grid whose
 // height follows a gentle dome plus the half-moon scoop; holes (sounder openings) are cut by an alpha mask, and the flush pads,
 // LED window, icon and printing are one planar canvas map, so every colour change is flush with the surface.
@@ -13,17 +13,17 @@ export default H => {
   const dark = mat(0x111111, { r: .8 }), fin = mat(0x1e1f20, { r: .7 }), inner = mat(0x343536, { r: .8 });
 
   /* ---------- face surface: dome + scoop (mm) */
-  const RL = 43.5, RF = 63, LIFT = 7;                  // LIFT: chamber/cage/cap raised to match the photos' proportions                                  // face annulus: lip ... fillet start
-  const faceZ = r => 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - RL) / (RF - RL))) ** 2);
+  const RL = 43.5, RF = 63, LIFT = 7, ZB = 3;         // ZB: body side made 3 mm taller (photos show a deeper body than the spec sheet)                  // LIFT: chamber/cage/cap raised to match the photos' proportions                                  // face annulus: lip ... fillet start
+  const faceZ = r => ZB + 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - RL) / (RF - RL))) ** 2);
   const SC = { x: -54, y: 0, R: 9, d: 4.5 };          // half-moon scoop at 9 o'clock
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(r);
     const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** .4; return z; };
 
   /* ---------- body lathe: back, base seam, straight side, fillet into the face */
   const prof = [V2(0, 0), V2(69.6, 0), V2(70.7, .25), V2(71, 1), V2(71, 2.85), V2(70.7, 2.9), V2(70.7, 3.1), V2(71, 3.15)];
-  { const P0 = V2(71, 3.15), P1 = V2(71, 28);              // straight cylinder, then a cubic fillet meeting the face slope
+  { const P0 = V2(71, 3.15), P1 = V2(71, 28 + ZB);              // straight cylinder, then a cubic fillet meeting the face slope
     prof.push(P1); const s = -2.4 * 2 / (RF - RL), L = 3.6, n = Math.hypot(1, s);
-    const A = P1, B = V2(71, 32.2), D = V2(RF, faceZ(RF)), C = V2(RF + L / n, D.y + L * s / n);   // C: outward along the face tangent
+    const A = P1, B = V2(71, 32.2 + ZB), D = V2(RF, faceZ(RF)), C = V2(RF + L / n, D.y + L * s / n);   // C: outward along the face tangent
     for (let i = 1; i <= 18; i++) { const t = i / 18, u = 1 - t;
       prof.push(V2(u*u*u*A.x + 3*u*u*t*B.x + 3*u*t*t*C.x + t*t*t*D.x, u*u*u*A.y + 3*u*u*t*B.y + 3*u*t*t*C.y + t*t*t*D.y)); } }
   const bodyM = splitMat(white, white, 'y', 3, .3, 0xb0b0b0);
@@ -139,7 +139,7 @@ export default H => {
       const b = add(g, new THREE.Mesh(new THREE.BoxGeometry(ul, 1.6, 3.6), fin), X, Y, top - 1.8); b.rotation.z = h.phi * D2R; } }
 
   /* ---------- well lip, well wall + floor (dark below), insect mesh band, chamber rings, dark interior */
-  { const f = faceZ(RL), lp = [V2(30, 33.6), V2(41.7, 33.6), V2(42.7, 33.8), V2(42.7, f - 1.3), V2(42.85, f - .65), V2(43.2, f - .2), V2(RL, f)].reverse();
+  { const f = faceZ(RL), lp = [V2(30, 33.6 + ZB), V2(41.7, 33.6 + ZB), V2(42.7, 33.8 + ZB), V2(42.7, f - 1.3), V2(42.85, f - .65), V2(43.2, f - .2), V2(RL, f)].reverse();
     const lm = splitMat(inner, white, 'y', f - 1.6, .001, 0x343536); const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), lm)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
     const W = 4096, Hh = 208, c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
@@ -149,23 +149,23 @@ export default H => {
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
-    const mg = new THREE.CylinderGeometry(41.5, 41.5, 12.4, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, 33.6 + 6.2);
+    const mg = new THREE.CylinderGeometry(41.5, 41.5, 12.4, 180, 1, true); mg.rotateX(Math.PI / 2); mg.translate(0, 0, ZB + 33.6 + 6.2);
     // cylinder UV u starts at +z (pre-rotation) i.e. -y here; rotate so the tabs sit at 0, 60, 120 ... degrees
     const mesh = add(g, new THREE.Mesh(mg, new THREE.MeshStandardMaterial({ map: t, roughness: .75, metalness: .1 }))); mesh.rotation.z = -Math.PI / 2; }
   { const cp = [V2(41.7, 45.8), V2(41.1, 46.3), V2(37, 46.3), V2(36.6, 46.6), V2(36.4, 47), V2(36.4, 49.2), V2(36.2, 49.6), V2(35.7, 49.7), V2(35.3, 50.1),
       V2(35.1, 50.6), V2(35.1, 52.1), V2(34.9, 52.7), V2(34.5, 53), V2(34.1, 52.8), V2(33.9, 52.2), V2(33.85, 51.4)];
-    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + (i > 4 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
+    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 4 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
     const dk = [V2(33.85, 51.4), V2(33.4, 50.6), V2(0, 50.6)];
-    const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + LIFT)), 120), mat(0x55575a, { r: .75 }))); di.rotation.x = Math.PI / 2; }
+    const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + ZB + LIFT)), 120), mat(0x55575a, { r: .75 }))); di.rotation.x = Math.PI / 2; }
 
   /* ---------- floating cap (TEST/HUSH button) with a shallow centre dimple */
   { const cp = [V2(0, 54.2), V2(25.8, 54.2), V2(26.6, 54.45), V2(26.95, 55), V2(27, 55.6), V2(27, 57.5), V2(26.9, 58.2), V2(26.6, 58.7), V2(26.1, 59.05),
       V2(25.2, 59.25), V2(22, 59.6), V2(17, 60), V2(11, 60.35), V2(6, 60.55), V2(4.7, 60.6), V2(4.5, 60.57), V2(4.1, 60.42), V2(3.3, 60.26), V2(2, 60.15), V2(0, 60.1)];
-    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y + LIFT)), 160), capM)); cap.rotation.x = Math.PI / 2; }
+    const cap = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map(p => V2(p.x * .944, p.y + ZB + LIFT)), 160), capM)); cap.rotation.x = Math.PI / 2; }
 
   /* ---------- six arched spokes: foot on the face, arc up and in, joining the cap rim */
   { const s = new THREE.Shape(); const f0 = faceZ(45.2) - 1.5, f1 = faceZ(49.4) - 1.5;
-    const zA = 55.2 + LIFT, zB = 58.6 + LIFT;              // arm underside / top
+    const zA = 55.2 + ZB + LIFT, zB = 58.6 + ZB + LIFT;              // arm underside / top
     s.moveTo(24, zA); s.lineTo(37, zA); s.bezierCurveTo(43.5, zA, 45.2, zA - 4, 45.2, zA - 10); s.lineTo(45.2, f0); s.lineTo(49.4, f1); s.lineTo(49.4, zA - 10);
     s.bezierCurveTo(49.4, zB - 3, 46, zB, 37, zB); s.lineTo(24, zB); s.lineTo(24, zA);
     const bv = .9, W0 = 9.2;

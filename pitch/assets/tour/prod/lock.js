@@ -15,15 +15,15 @@ export default H => {
     for (let i = 0; i < N * N; i++) { const v = 118 + Math.random() * 30 + (Math.random() < .08 ? 30 : 0); d.data[i*4] = d.data[i*4+1] = d.data[i*4+2] = v; d.data[i*4+3] = 255; }
     x.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(220, 220); return t; })();
   const powder = new THREE.MeshPhysicalMaterial({ color: 0x1d1d1e, roughness: .74, metalness: .28, bumpMap: noiseTex, bumpScale: .35, clearcoat: .05 });
-  const powderL = powder.clone(); powderL.bumpMap = null; powderL.roughness = .82; powderL.metalness = .18;                      // lathe parts (their UVs would stretch the grain)
+  const powderL = powder.clone(); powderL.bumpMap = null; powderL.roughness = .9; powderL.metalness = .12;                      // lathe parts (their UVs would stretch the grain)
   const rubber = new THREE.MeshStandardMaterial({ color: 0x0e0e0e, roughness: .9 });
   const gapM = new THREE.MeshStandardMaterial({ color: 0x070707, roughness: .9 });
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xeeeeec, roughness: .5, sheen: .6, sheenRoughness: .5, sheenColor: 0xffffff, clearcoat: .15, clearcoatRoughness: .5,
     emissive: 0xf4f8f2, emissiveIntensity: .05 });
   const rimM = new THREE.MeshPhysicalMaterial({ color: 0xc4c6c6, roughness: .5, sheen: .4, sheenColor: 0xffffff });
   const keyS = splitMat(rimM, keyM, 'z', mm(1.08), 1e-6, 0xc4c6c6), btnS = splitMat(rimM, keyM, 'z', mm(.78), 1e-6, 0xc4c6c6);
-  const plugM = new THREE.MeshPhysicalMaterial({ color: 0x2a2a2b, roughness: .5, metalness: .3 });
-  const ledOff = new THREE.MeshStandardMaterial({ color: 0x242424, roughness: .9, metalness: .1 });
+  const plugM = new THREE.MeshPhysicalMaterial({ color: 0x242425, roughness: .5, metalness: .3 });
+  const ledOff = new THREE.MeshStandardMaterial({ color: 0x2b2b2c, roughness: .85, metalness: .1 });
   const glossM = new THREE.MeshPhysicalMaterial({ color: 0x050506, roughness: .06, metalness: .1, clearcoat: 1, clearcoatRoughness: .03, specularIntensity: 1 });
   const ledOn = new THREE.MeshStandardMaterial({ color: 0x9cf5a2, emissive: 0x6dff8a, emissiveIntensity: 1.1, roughness: .3 });
 
@@ -92,23 +92,23 @@ export default H => {
   for (let i = 1; i <= 6; i++) { const q = i / 6 * Math.PI / 2; rose.push([16.4 + 1.5 * Math.cos(q), 30.25 + 1.5 * Math.sin(q)]); }
   rose.push([14, 31.75], [9.7, 31.75], [9.62, 31.55], [9.55, 30.9], [9.0, 30.6], [0, 30.6]);
   add(ex, lathe(rose, powderL), 0, ROSE_Y, 0);
-  add(ex, lathe([[9.25, 30.4], [9.25, 31.5], [9.05, 31.72], [8.7, 31.75], [0, 31.75]], plugM, 96), 0, ROSE_Y, 0);
-  { const ring = new THREE.Mesh(new THREE.RingGeometry(mm(9.2), mm(9.62), 96), gapM); add(ex, ring, 0, ROSE_Y, mm(30.95)); }
+  add(ex, lathe([[9.0, 30.4], [9.0, 31.5], [8.8, 31.72], [8.45, 31.75], [0, 31.75]], plugM, 96), 0, ROSE_Y, 0);
+  { const ring = new THREE.Mesh(new THREE.RingGeometry(mm(8.95), mm(9.62), 96), gapM); add(ex, ring, 0, ROSE_Y, mm(30.95)); }
   // three hidden status LEDs on the top of the shoulder (11, 12, 1 o'clock)
   for (const deg of [-20, 0, 20]) {
-    const pts = []; for (let i = 0; i <= 6; i++) { const t = .55 + i / 6 * .25; pts.push([25.2 + (17.9 - 25.2) * t + .04, 15.6 + (30.2 - 15.6) * t + .02]); }
+    const pts = []; for (let i = 0; i <= 6; i++) { const t = .74 + i / 6 * .2; pts.push([25.2 + (17.9 - 25.2) * t + .04, 15.6 + (30.2 - 15.6) * t + .02]); }
     const w = 2 / 23.5;
     add(ex, lathe(pts, ledOff, 6, Math.PI + deg * Math.PI / 180 - w / 2, w), 0, ROSE_Y, 0);
   }
   // SmartKey keyway printed into the plug face
   add(ex, printPlane(mm(16), mm(16), (x, P) => { x.fillStyle = '#020202'; x.strokeStyle = '#020202'; x.lineWidth = 3;
     const R = (cx, cy, w, h, r) => { const [px, py] = P(mm(cx), mm(cy)); x.beginPath(); x.roundRect(px - w * 5, py - h * 5, w * 10, h * 10, r * 10); };
-    R(0, -.5, 1.2, 11, .3); x.fill();                                   // vertical slot
-    R(0, 5.6, 1.9, 1.9, .2); x.stroke();                                // little square at the top
-    { const [px, py] = P(0, mm(-1)); x.beginPath(); x.arc(px, py, 22.5, 0, Math.PI * 2); x.fill(); }   // round hole
-    R(.9, -5.2, 1.6, 1.0, .2); x.fill();                                // jog at the bottom of the slot
-    R(-4.5, -1.5, .8, 2.0, .4); x.fill();                               // SmartKey re-key tool hole
-    x.strokeStyle = 'rgba(60,60,60,.6)'; x.lineWidth = 1.5; { const [px, py] = P(0, mm(-1)); x.beginPath(); x.arc(px, py, 24, 0, Math.PI * 2); x.stroke(); } }),
+    R(0, -2.8, 1.3, 11.6, .3); x.fill();                                   // vertical slot
+    R(0, 4.2, 2.4, 2.4, .25); x.stroke();                                // little square at the top
+    { const [px, py] = P(0, mm(-2.6)); x.beginPath(); x.arc(px, py, 27, 0, Math.PI * 2); x.fill(); }   // round hole
+    R(.9, -6.6, 1.5, 1.4, .2); x.fill();                                // jog at the bottom of the slot
+    R(-4.5, -3.0, .9, 2.4, .45); x.fill();                               // SmartKey re-key tool hole
+    x.strokeStyle = 'rgba(60,60,60,.6)'; x.lineWidth = 1.5; { const [px, py] = P(0, mm(-2.6)); x.beginPath(); x.arc(px, py, 28.5, 0, Math.PI * 2); x.stroke(); } }),
     0, ROSE_Y, mm(31.78));
 
   /* ================= INTERIOR (other side of the door) ================= */

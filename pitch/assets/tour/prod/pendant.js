@@ -30,7 +30,10 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
         const A = all[a], B = all[b], D = all[c], cr = (B.x - A.x) * (D.y - A.y) - (B.y - A.y) * (D.x - A.x);
         if ((cr > 0) === up) idx.push(map[a], map[b], map[c]); else idx.push(map[a], map[c], map[b]); } };
     const outer = info.find(I => I.L.type === 'outer'), thru = info.filter(I => I.L.type === 'hole'), pk = info.filter(I => I.L.type === 'pocket');
-    if (outer) { cap(outer, 0, thru.map(I => [I, 0]), false); cap(outer, outer.K - 1, [...thru, ...pk].map(I => [I, I.K - 1]), true); }
+    if (outer) { cap(outer, 0, thru.map(I => [I, 0]), false);
+      if (outer.L.fan) { const c = pos.length / 3, b0 = outer.base + (outer.K - 1) * outer.n; pos.push(...outer.L.fan); col.push(1, 1, 1);   // tiny last ring: fan to a centre vertex
+        for (let i = 0; i < outer.n; i++) idx.push(b0 + i, b0 + (i + 1) % outer.n, c); }
+      else cap(outer, outer.K - 1, [...thru, ...pk].map(I => [I, I.K - 1]), true); }
     for (const I of pk) cap(I, 0, [], true);
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     if (useCol) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
@@ -99,8 +102,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   const B = G(); B.scale.setScalar(.001); B.position.set(0, -drop - HT / 2 * .001, .004); g.add(B);   // body: back centre origin, mm
 
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
-  const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6, sheen: .25, sheenRoughness: .8, sheenColor: 0xffffff });
-  const shell = lineMat(body, [{ ax: 'y', at: 10, B: 0x8c8c8a, rB: .55, w: .3, col: 0x6c6c6a, k: .9 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
+  const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6 });
+  const shell = lineMat(body, [{ ax: 'y', at: 10, B: 0x6e6e6c, rB: .55, w: .3, col: 0x6c6c6a, k: .9 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
   const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5 + 1.7 * u, st = 8, out = [];
     for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
     for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
@@ -114,7 +117,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   add(B, solid(loops, shell));
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
-  const btnM = new THREE.MeshPhysicalMaterial({ color: 0xcccbc8, roughness: .6, sheen: .4, sheenRoughness: .7, sheenColor: 0xffffff, clearcoat: .05 });
+  const btnM = new THREE.MeshPhysicalMaterial({ color: 0x9c9b98, roughness: .6, clearcoat: .05 });
   const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 3.0);
   add(B, new THREE.Mesh(new THREE.RingGeometry(5.95, 6.3, 96), new THREE.MeshStandardMaterial({ color: 0x2e2e2e, roughness: .9 })), 0, -6.5, D - 3.15);
 

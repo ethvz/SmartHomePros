@@ -460,22 +460,23 @@ function wall({axis, at, from, to, h, y0=FL, t=0.2, open=[], m=M.siding, faces=n
 const meshesOf = g => { const a=[]; g.traverse(o=>o.isMesh&&a.push(o)); return a; };
 const setMat = (g, m) => g.traverse(o=>{ if(o.isMesh && o.material===M.siding) o.material = m; });
 
-/* House plan (matches the owner's reference video): narrow and deep. Garage x -10.3..-6.9 (z -2.6..4), two-storey entry
-   block x -6.9..-2.5, great room x -2.3..5.3 / z -6.8..4 with its FRONT cut away (vaulted cross gable over x -2.3..2.7),
-   solid core x 2.7..5.5 / z -7..-2.6 whose front face holds the shelf niches, dark tower x 5.5..6.5 at the front right. */
-const GR = {x0:-2.3, x1:5.3, z0:-6.8, z1:4.0, cx:2.7, cz:-2.6};
-const ceilY = x => (x >= -2.3 && x <= 2.7) ? 6.5 + .5077*(3.25 - Math.abs(x - .2)) : 6.5;   // vault / flat ceiling height
-/* Garage: x -10.3..-6.9, z -2.6..4 (tall single garage, 2.5 x 2.6 m door) */
+/* House plan (matches the owner's reference video): narrow and deep. Garage x -9.9..-6.9 (z -2.6..4), two-storey entry
+   block x -6.9..-2.5, great room x -2.3..5.3 / z -6.8..4 with its FRONT cut away (vaulted cross gable over x -2.3..1.6),
+   solid core x 2.4..5.5 / z -7..-2.6 whose front face holds the shelf niches, dark tower x 5.5..6.5 at the front right.
+   The shell itself is tools/house/shell.py. */
+const GR = {x0:-2.3, x1:5.3, z0:-6.8, z1:4.0, cx:2.4, cz:-2.6};
+const ceilY = x => (x >= -2.3 && x <= 1.6) ? 6.5 + .5185*(2.7 - Math.abs(x + .35)) : 6.5;   // vault / flat ceiling height
+/* Garage: x -9.9..-6.9, z -2.6..4 (tall single garage, 2.4 x 2.75 m door) */
 const GDM = {door:phys(0x3a3d40,{r:.5,m:.3}), groove:phys(0x1c1e20,{r:.42,m:.35})};   // garage door fades when a garage product is open
 { const gd = new THREE.Group(); scene.add(gd);
-  slab(-9.85,-7.35,.04,2.62,3.86,3.92,GDM.door,gd);
-  for(let i=1;i<5;i++) slab(-9.85,-7.35,.04+i*.516-.012,.04+i*.516+.012,3.92,3.935,GDM.groove,gd);
+  slab(-9.6,-7.2,.04,2.75,3.86,3.92,GDM.door,gd);
+  for(let i=1;i<5;i++) slab(-9.6,-7.2,.04+i*.542-.012,.04+i*.542+.012,3.92,3.935,GDM.groove,gd);
   // garage interior: entry door to the house, opener on the ceiling
   slab(-6.94,-6.9,.06,2.1,-1.6,-.68,M.door); slab(-6.96,-6.9,.06,2.16,-1.66,-1.6,M.trim); slab(-6.96,-6.9,.06,2.16,-.68,-.62,M.trim); slab(-6.96,-6.9,2.1,2.16,-1.66,-.62,M.trim);
-  slab(-8.85,-8.35,2.85,3.05,-1.9,-1.3,mat(0xe9e8e4,{r:.6}));               // opener motor
-  slab(-8.63,-8.57,3.05,3.09,-1.3,3.7,M.blackM);                           // rail
-  { const l = new THREE.PointLight(0xfff0dc, 3, 6, 2); l.position.set(-8.6,2.7,-.4); scene.add(l); }
-  slab(-9.92,-7.28,2.62,2.7,3.79,4.02,M.trim,gd); slab(-9.92,-9.85,.06,2.7,3.79,4.02,M.trim,gd); slab(-7.35,-7.28,.06,2.7,3.79,4.02,M.trim,gd);
+  slab(-8.65,-8.15,3.0,3.2,-1.9,-1.3,mat(0xe9e8e4,{r:.6}));                // opener motor
+  slab(-8.43,-8.37,3.2,3.24,-1.3,3.7,M.blackM);                            // rail
+  { const l = new THREE.PointLight(0xfff0dc, 3, 6, 2); l.position.set(-8.4,2.8,-.4); scene.add(l); }
+  slab(-9.67,-7.13,2.75,2.83,3.79,4.02,M.trim,gd); slab(-9.67,-9.6,.06,2.83,3.79,4.02,M.trim,gd); slab(-7.2,-7.13,.06,2.83,3.79,4.02,M.trim,gd);
 }
 
 /* The house itself (walls, gables, roofs, porch roof, garage, tower, fence, pad, drive, lawns) is a solid model built in
@@ -510,25 +511,25 @@ slab(GR.x0-.2,GR.x1+.2,FL-.14,FL,GR.z1,GR.z1+.1,M.cut);       // the floor's cut
 /* ------------------------------------------------------------------ interior build-outs (procedural) */
 // kitchen run on the back wall (z -6.8): base cabinets, quartz top, low backsplash, hood over the cooktop, window over the sink
 const KZ = GR.z0;
-slab(-2.1,1.3,FL,FL+.86,KZ,KZ+.6,M.cab);
-slab(-2.12,1.3,FL+.86,FL+.92,KZ,KZ+.64,M.quartz);
-slab(-2.1,1.3,FL+.92,FL+1.1,KZ,KZ+.02,M.quartz);                // backsplash
-slab(.55,1.3,FL+1.55,FL+2.35,KZ,KZ+.35,M.cab);                   // uppers
-for(let x=-2.1;x<1.3;x+=.6){ slab(x+.005,x+.01,FL+.05,FL+.82,KZ+.6,KZ+.61,M.trim,null,false); }
-slab(.55,.56,FL+1.57,FL+2.33,KZ+.35,KZ+.36,M.trim,null,false); slab(.92,.93,FL+1.57,FL+2.33,KZ+.35,KZ+.36,M.trim,null,false);
+slab(-2.1,1.0,FL,FL+.86,KZ,KZ+.6,M.cab);
+slab(-2.12,1.0,FL+.86,FL+.92,KZ,KZ+.64,M.quartz);
+slab(-2.1,1.0,FL+.92,FL+1.1,KZ,KZ+.02,M.quartz);                // backsplash
+slab(.35,1.0,FL+1.55,FL+2.35,KZ,KZ+.35,M.cab);                   // uppers
+for(let x=-2.1;x<1.0;x+=.62){ slab(x+.005,x+.01,FL+.05,FL+.82,KZ+.6,KZ+.61,M.trim,null,false); }
+slab(.67,.68,FL+1.57,FL+2.33,KZ+.35,KZ+.36,M.trim,null,false);
 slab(-.75,.15,FL+.9,FL+.93,KZ+.15,KZ+.5,M.steel);                // sink
 { const f = cyl(.018,.32,M.steel,16); f.position.set(-.3,FL+1.08,KZ+.1); scene.add(f); const s = cyl(.016,.2,M.steel,16); s.rotation.x = Math.PI/2; s.position.set(-.3,FL+1.23,KZ+.2); scene.add(s); }
 slab(-1.85,-1.15,FL+.92,FL+.94,KZ+.1,KZ+.55,M.blackM);           // cooktop
 slab(-1.9,-1.1,FL+1.62,FL+2.1,KZ,KZ+.45,M.steel);                // hood
 slab(-1.62,-1.38,FL+2.1,FL+3.4,KZ,KZ+.2,M.steel);                // hood flue
 // tall column by the white pillar: oven stack and a french-door fridge
-slab(1.3,1.95,FL,FL+2.9,KZ,KZ+.62,M.cab);
-slab(1.36,1.89,FL+.95,FL+1.55,KZ+.62,KZ+.63,M.steel); slab(1.36,1.89,FL+1.62,FL+2.15,KZ+.62,KZ+.63,M.steel);
-slab(1.4,1.85,FL+1.05,FL+1.45,KZ+.63,KZ+.635,M.blackM); slab(1.4,1.85,FL+1.72,FL+2.05,KZ+.63,KZ+.635,M.blackM);
-slab(1.95,2.7,FL,FL+2.2,KZ,KZ+.68,M.steel);                      // fridge
-slab(2.32,2.33,FL+.75,FL+2.18,KZ+.68,KZ+.685,M.blackM,null,false); slab(1.97,2.68,FL+.72,FL+.73,KZ+.68,KZ+.685,M.blackM,null,false);
-slab(2.26,2.29,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM); slab(2.36,2.39,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM);
-slab(1.95,2.7,FL+2.2,FL+2.9,KZ,KZ+.62,M.cab);
+slab(1.0,1.65,FL,FL+2.9,KZ,KZ+.62,M.cab);
+slab(1.06,1.59,FL+.95,FL+1.55,KZ+.62,KZ+.63,M.steel); slab(1.06,1.59,FL+1.62,FL+2.15,KZ+.62,KZ+.63,M.steel);
+slab(1.1,1.55,FL+1.05,FL+1.45,KZ+.63,KZ+.635,M.blackM); slab(1.1,1.55,FL+1.72,FL+2.05,KZ+.63,KZ+.635,M.blackM);
+slab(1.65,2.4,FL,FL+2.2,KZ,KZ+.68,M.steel);                      // fridge
+slab(2.02,2.03,FL+.75,FL+2.18,KZ+.68,KZ+.685,M.blackM,null,false); slab(1.67,2.38,FL+.72,FL+.73,KZ+.68,KZ+.685,M.blackM,null,false);
+slab(1.96,1.99,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM); slab(2.06,2.09,FL+1.1,FL+1.7,KZ+.69,KZ+.73,M.blackM);
+slab(1.65,2.4,FL+2.2,FL+2.9,KZ,KZ+.62,M.cab);
 // island with waterfall top
 slab(-1.25,1.05,FL,FL+.88,-4.6,-3.8,M.cab);
 slab(-1.3,1.1,FL+.88,FL+.94,-4.65,-3.75,M.quartz);
@@ -555,8 +556,8 @@ slab(TVX+.03,TVX+.08,FL+1.18,FL+2.0,0.62,2.08,phys(0x070809,{r:.12,x:{clearcoat:
 { const shelfM = phys(0xffffff,{r:.6,x:{map:TX.floor,color:0xd9c2a0}});
   const bookC = [0x6b4e3a,0x2f3b44,0xc9b79a,0x8a8f86,0x3d2f28,0xe2ddd2,0x51615a];
   for(const y of [FL+.95, FL+1.75, FL+2.55]){
-    slab(3.45,5.0,y,y+.03,GR.cz-.3,GR.cz,shelfM);
-    let x = 3.52; let i = Math.round(y*7);
+    slab(3.15,5.0,y,y+.03,GR.cz-.3,GR.cz,shelfM);
+    let x = 3.22; let i = Math.round(y*7);
     while(x < 4.95){ const w = .03+.025*((i*37)%5)/4, h = .22+.12*((i*53)%7)/6, gap = (i%6===0) ? .22 : .004;
       if(x+w > 4.95) break; slab(x,x+w,y+.03,y+.03+h,GR.cz-.27,GR.cz-.06,mat(bookC[i%bookC.length],{r:.75}),null,false); x += w+gap; i++; } }
   for(const [x,y] of [[5.12,FL+2.2],[5.12,FL+1.72]]) slab(x-.11,x+.11,y-.14,y+.14,GR.cz,GR.cz+.02,mat(0x1d1e20,{r:.5}),null,false); }
@@ -573,7 +574,7 @@ slab(TVX+.03,TVX+.08,FL+1.18,FL+2.0,0.62,2.08,phys(0x070809,{r:.12,x:{clearcoat:
 // outlets (Chime Extender and Smart Plug are plugged in here) and the home's existing smoke alarm
 const plate = (x,y,z,ry) => { const p = new THREE.Mesh(new RoundedBoxGeometry(.075,.118,.008,2,.004), M.cab); p.position.set(x,y,z); p.rotation.y = ry; scene.add(p); return p; };
 plate(GR.x0+.004,FL+.32,-1.2,Math.PI/2); plate(5.15,FL+.32,GR.cz+.004,0);
-{ const sa = new THREE.Group(); sa.position.set(1.55,5.55,KZ+.01); sa.rotation.y = 0; scene.add(sa);
+{ const sa = new THREE.Group(); sa.position.set(1.15,5.55,KZ+.01); sa.rotation.y = 0; scene.add(sa);
   const b = cyl(.075,.035,M.cab,40); b.rotation.x = Math.PI/2; b.position.z = .018; sa.add(b);
   const d = new THREE.Mesh(new THREE.SphereGeometry(.05,32,12,0,Math.PI*2,0,Math.PI/2), M.cab); d.rotation.x = Math.PI/2; d.position.z = .035; d.scale.y = .35; sa.add(d); }
 // rug
@@ -592,7 +593,7 @@ const pl = (x,y,z,i,d=9) => { const l = new THREE.PointLight(warm, i, d, 2); l.p
 pl(-.05,2.3,-4.2,22,10);                        // island pendants
 pl(.3,3.4,1.7,17,12);                           // living
 pl(4.0,2.3,-.9,12);                             // dining
-pl(.2,5.8,-2.6,18,13);                          // vault fill
+pl(-.35,5.8,-2.6,18,13);                        // vault fill
 pl(4.1,4.6,1.2,8,9);                            // right bay under the flat ceiling
 { const key = new THREE.SpotLight(0xffd6a6, 70, 14, 1.05, .9, 2);
   key.position.set(.6,7.4,-1.0); key.target.position.set(.8,0,-.2);
@@ -602,12 +603,12 @@ pl(4.1,4.6,1.2,8,9);                            // right bay under the flat ceil
 for(const x of [3.6,4.8]){ const s = new THREE.SpotLight(0xffd6a6, 14, 7, .7, .9, 2); s.position.set(x,6.45,-1.9); s.target.position.set(x,0,-2.5); scene.add(s, s.target);
   const d = cyl(.05,.01,M.bulb,16); d.position.set(x,6.49,-1.9); scene.add(d); }
 // under-cabinet LED strip
-slab(.6,1.25,FL+1.535,FL+1.545,KZ+.32,KZ+.35,M.bulb,null,false);
+slab(.4,.95,FL+1.535,FL+1.545,KZ+.32,KZ+.35,M.bulb,null,false);
 // exterior: porch downlights wash the entry, sconces by the garage door
 for(const x of [-6.0,-3.9]){ const s = new THREE.SpotLight(warm, 26, 7, .75, .9, 2); s.position.set(x,3.62,4.75); s.target.position.set(x,0,4.25); scene.add(s, s.target);
   const d = cyl(.045,.01,M.bulb,16); d.position.set(x,3.66,4.8); scene.add(d); }
-{ const s = new THREE.SpotLight(warm, 26, 8, 1.0, .95, 2); s.position.set(-8.6,2.95,4.4); s.target.position.set(-8.6,0,5.6); scene.add(s, s.target); }
-for(const x of [-10.1,-7.1]){
+{ const s = new THREE.SpotLight(warm, 26, 8, 1.0, .95, 2); s.position.set(-8.4,3.1,4.4); s.target.position.set(-8.4,0,5.6); scene.add(s, s.target); }
+for(const x of [-9.78,-7.02]){
   slab(x-.06,x+.06,2.6,2.85,3.9,4.02,M.blackM); slab(x-.04,x+.04,2.58,2.6,3.92,4.0,M.bulb,null,false); }
 for(const x of [-6.2,-4.3,3.6,4.9]){ const d = cyl(.05,.01,M.bulb,16); d.position.set(x,6.49,4.3); scene.add(d); }
 { const s = new THREE.SpotLight(warm, 18, 9, .5, .9, 2); s.position.set(6.0,6.45,3.35); s.target.position.set(6.0,0,3.2); scene.add(s, s.target); }
@@ -691,7 +692,7 @@ function bakeTargets(){
 }
 /* lightmap UVs: one rectangle per box face, sized by its real dimensions, shelf-packed into a square atlas */
 /* faces nobody can ever see (inside the closed main volume, pressed against another solid) get no atlas space */
-const SEALED = [new THREE.Box3(V(-6.85,FL+.01,-6.95), V(-2.35,6.45,3.95)), new THREE.Box3(V(2.75,FL+.01,-6.95), V(5.45,6.45,-2.65))];
+const SEALED = [new THREE.Box3(V(-6.85,FL+.01,-6.95), V(-2.35,6.45,3.95)), new THREE.Box3(V(2.45,FL+.01,-6.95), V(5.45,6.45,-2.65))];
 function faceHidden(o, f, solids){
   const p = o.geometry.parameters, n = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]][f];
   const half = [p.width/2, p.height/2, p.depth/2], ax = n.findIndex(v=>v), t = [0,1,2].filter(i=>i!==ax);
@@ -1301,8 +1302,8 @@ const RLAB = {hub:'Smart Hub Pro 2',ocp:'Outdoor Camera Pro',ocspot:'Outdoor Cam
 { const ORD = RAILG.flatMap(g=>g[1]); PRODUCTS.sort((a,b)=>(ORD.indexOf(a.k)+99*(ORD.indexOf(a.k)<0))-(ORD.indexOf(b.k)+99*(ORD.indexOf(b.k)<0))); }
 const PLACE = {
   ysign: {pos:V(-5.6,.06,6.15),        view:V(.25,0,1),  stand:true, s:1, d:1.5},
-  ocspot:{pos:V(-8.9,3.15,4.02),     view:V(0,0,1),            d:1.1},
-  garage:{pos:V(-10.09,1.75,1.0),    view:V(1,0,0),  xray:true, d:.85},
+  ocspot:{pos:V(-9.0,3.4,4.02),      view:V(0,0,1),            d:1.1},
+  garage:{pos:V(-9.69,1.75,1.0),     view:V(1,0,0),  xray:true, d:.85},
   lock:  {pos:V(DOOR[1]-.22,FL+1.18,3.915), view:V(0,0,1),     d:.72},
   dbcp:  {pos:V(DOOR[1]+.34,FL+1.3,4.02), view:V(0,0,1),       d:.72},
   hub:   {pos:V(GR.x0+.02,FL+1.5,-2.2),  view:V(1,0,0),        d:1.1},
@@ -1312,10 +1313,10 @@ const PLACE = {
   water: {pos:V(-.3,FL+.012,GR.z0+.62), view:V(.05,.78,.62), flat:true, d:.62},
   fob:   {pos:V(-.9,FL+.945,-4.05),  view:V(.15,.8,.6),  flat:true, s:1.2, d:.5},
   pendant:{pos:V(GR.x0+.035,FL+1.62,3.72), view:V(1,0,0), s:1.25, d:.82},
-  icp:   {pos:V(3.8,FL+2.58,GR.cz-.15), view:V(.25,0,1), stand:true, s:1.1, d:.6},
-  fire:  {pos:V(1.92,5.55,GR.z0+.01), view:V(0,0,1),           d:.75},
+  icp:   {pos:V(3.5,FL+2.58,GR.cz-.15), view:V(.25,0,1), stand:true, s:1.1, d:.6},
+  fire:  {pos:V(1.52,5.55,GR.z0+.01), view:V(0,0,1),           d:.75},
   keypad:{pos:V(GR.x0+.02,FL+1.35,3.22), view:V(1,0,0),        d:.7},
-  therm: {pos:V(3.12,FL+1.5,GR.cz+.01), view:V(0,0,1),         d:.66},
+  therm: {pos:V(2.8,FL+1.5,GR.cz+.01), view:V(0,0,1),          d:.66},
   window:{pos:V(-5.35,FL+1.2,4.035), view:V(0,0,1), s:1.15,     d:.5},
   glass: {pos:V(GR.x1-.01,FL+2.75,1.8), view:V(-1,0,0),        d:.7},
   plug:  {pos:V(5.15,FL+.32,GR.cz+.01), view:V(0,0,1),         d:.65},
@@ -1325,10 +1326,10 @@ const PLACE = {
 const OCC = [
   [-10.3,-6.9, 0,4.5, -2.6,4.0],  // garage
   [-6.9,-2.3, 0,6.5, -7,4.0],     // entry block (and the great room's left wall)
-  [ 2.7, 5.5, 0,6.5, -7,-2.6],    // core behind the shelf wall
+  [ 2.4, 5.5, 0,6.5, -7,-2.6],    // core behind the shelf wall
   [-7.45,6.05, 6.5,8.4, -7.55,-1.0], // roof (back half; the front is open over the cutaway)
   [ 5.5, 6.5, 0,6.5, .4,3.0],     // tower
-  [-2.5, 2.9, 0,7.5, -7,-6.8],    // back wall
+  [-2.5, 2.4, 0,7.4, -7,-6.8],    // back wall
   [ 5.3, 5.5, 0,6.5, -2.6,4.0],   // great room right wall
 ].map(a => new THREE.Box3(V(a[0],a[2],a[4]), V(a[1],a[3],a[5])));
 const S = 1.45; // models are drawn a touch larger than life so they read on an iPad

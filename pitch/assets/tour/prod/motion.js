@@ -34,7 +34,7 @@ export default H => {
   rings.push(lip.map(([x, y, z]) => [x, y, z - .6]));
 
   const grey = 0x9fa0a4, white = 0xf2f2f0;
-  const PILL = { y: 8, z: 13, len: 21, wid: 7, gap: .4 };
+  const PILL = { y: 8, z: 13, len: 22, wid: 5.2, gap: .3 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
   const bodyM = K.bandMat({ color: grey, roughness: .6 }, 'z',
@@ -52,12 +52,12 @@ export default H => {
   add(u, decal(DEC.logo, 36, 9, { color: 0xc6c7c9, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .25);
 
   /* TEST pill: dark gap ring pocket (1 mm deep), grey cap 0.6 mm below the side surface, printed TEST reading downward */
-  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.0, 'x', 35, PILL.y, PILL.z, 0x4c4e51);
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.0, 'x', 35, PILL.y, PILL.z, 0x6c6e72);
   const cap = add(u, rslab(PILL.wid, PILL.len, 1.2, PILL.wid / 2, .45, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55 })), 35 - .6 - .6, PILL.y, PILL.z);
   cap.rotation.y = Math.PI / 2;
   const tg = add(u, G(), 35 - .6 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = '500 27px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
+    x.font = '400 24px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
   tx.scale.setScalar(1000); tx.rotation.z = -Math.PI / 2;
   return g;
 };

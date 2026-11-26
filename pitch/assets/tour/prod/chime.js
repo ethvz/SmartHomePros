@@ -78,6 +78,13 @@ export default H => {
     const b = .3, fg = new THREE.ExtrudeGeometry(offsetShape(P, 2.0), {depth:1.1-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:4, curveSegments:24});
     fg.translate(0, 0, 29.7 + b); fg.scale(k, k, k); const fm = add(g, new THREE.Mesh(fg, fab)); fm.receiveShadow = true; }
 
+  /* ---- status LED behind the fabric, top centre (lit: soft white dot diffused through the weave; nothing protrudes) */
+  { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.22, 'rgba(255,255,255,.85)'); gr.addColorStop(.45, 'rgba(255,255,255,.3)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const led = add(g, new THREE.Mesh(new THREE.PlaneGeometry(.006, .006), new THREE.MeshBasicMaterial({map:t, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, opacity:.45,
+      polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3})), 0, (Ht/2 - 9)*k, (30.8 + .02)*k); led.renderOrder = 3; }
+
   /* ---- left-side button: pill 21 x 5, 0.4 mm groove, cap 0.15 mm below the wall */
   { const b = G(); b.rotation.y = -Math.PI/2; add(g, b, -W/2*k, 0, 14.9*k);
     const patch = new THREE.Shape([[-3.5,-12.5],[3.5,-12.5],[3.5,12.5],[-3.5,12.5]].map(([x,y]) => new THREE.Vector2(x,y))); patch.holes.push(pill(5.8, 21.8, true));
@@ -91,7 +98,7 @@ export default H => {
   /* ---- right-side wordmark, reading bottom to top, light grey print */
   { const cc = document.createElement('canvas'); cc.width = 80; cc.height = 160;                  // 10 px/mm: 8 x 16 mm plane
     const t = new THREE.CanvasTexture(cc); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; const y = cc.getContext('2d');
-    const draw2 = () => { y.clearRect(0, 0, 80, 160); y.save(); y.translate(40, 80); y.rotate(-Math.PI/2); y.fillStyle = '#cfcfcd';
+    const draw2 = () => { y.clearRect(0, 0, 80, 160); y.save(); y.translate(40, 80); y.rotate(-Math.PI/2); y.fillStyle = '#dededc';
       const F = '"Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; y.font = `500 100px ${F}`; const w0 = y.measureText('vivint').width;
       y.font = `500 ${100*145/w0}px ${F}`; y.textAlign = 'center'; y.textBaseline = 'middle'; y.fillText('vivint', 0, 3); y.restore(); t.needsUpdate = true; };
     draw2(); if(document.fonts) document.fonts.load('600 60px "Vivint Sans"').then(draw2).catch(() => {});

@@ -18,11 +18,11 @@ export default H => {
   const rrS = (w, h, r, cx = 0, cy = 0) => new THREE.Shape(rrPts(w, h, r, cy, 14).map(([x, y]) => new THREE.Vector2(x + cx, y)));
   const circ = (x, y, r) => { const p = new THREE.Path(); p.absarc(x, y, r, 0, 2 * PI, true); return p; };
   // loft through rounded-rect sections [z, w, h, r, cy]; flat caps on the ends asked for. groups: 0 = sides, 1 = caps
-  function shell(secs, mats, { front = true, back = true } = {}) {
+  function shell(secs, mats, { front = true, back = true, skip = null } = {}) {
     secs = [...secs].sort((a, b) => a[0] - b[0]);
     const rings = secs.map(([z, w, h, r, cy]) => rrPts(w, h, r, cy || 0)), N = rings[0].length, pos = [], idx = [];
     rings.forEach((R, k) => R.forEach(([x, y]) => pos.push(x, y, secs[k][0])));
-    for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < N; i++) { const a = k * N + i, b = k * N + (i + 1) % N, c = a + N, d = b + N; idx.push(a, b, c, b, d, c); }
+    for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < N; i++) { if (skip && skip(k, i)) continue; const a = k * N + i, b = k * N + (i + 1) % N, c = a + N, d = b + N; idx.push(a, b, c, b, d, c); }
     const nSide = idx.length;
     const cap = (k, flip) => { const R = rings[k], z = secs[k][0], c0 = pos.length / 3; let cx = 0, cy = 0;
       R.forEach(([x, y]) => { cx += x / N; cy += y / N; }); pos.push(cx, cy, z); R.forEach(([x, y]) => pos.push(x, y, z));
@@ -70,7 +70,19 @@ export default H => {
   const planIn = z => { const u = Math.max(0, zr - z); return Rp - Math.sqrt(Math.max(0, Rp * Rp - u * u)); };   // plan rounding of body back + plate
   const bodyAt = z => { const t = (zb1 - z) / (zb1 - zb0); return { w: W - 1.4 * t - 2 * planIn(z), top: 66 - 2.6 * t, bot: -66 + 1.3 * t }; };
   const bS = []; for (let i = 0; i <= 18; i++) { const z = zb0 + (zb1 - zb0) * i / 18, b = bodyAt(z); bS.push([z, b.w, b.top - b.bot, R, (b.top + b.bot) / 2]); }
-  add(g, shell(bS, white));
+  const BOT = 32;                                                          // ring index of the flat bottom strip (BL end -> BR start)
+  add(g, shell(bS, white, { skip: (k, i) => i === BOT }));
+  // flat bottom strip rebuilt with real openings: three speaker slots and the release notch, dark floor 1 mm inside
+  { const L = [], Rr = []; bS.forEach(([z, w, h, r, cy]) => { const P = rrPts(w, h, R, cy); L.push([P[BOT][0], z]); Rr.push([P[BOT + 1][0], z]); });
+    const out = new THREE.Shape([...L, ...Rr.reverse()].map(([x, z]) => new THREE.Vector2(x, z)));
+    const stad = (zc, len, wd) => { const p = new THREE.Path(); p.absarc(len / 2 - wd / 2, zc, wd / 2, -PI / 2, PI / 2, false); p.absarc(-len / 2 + wd / 2, zc, wd / 2, PI / 2, 1.5 * PI, false); return p; };
+    for (const zc of [22.4, 19.7, 16.9]) out.holes.push(stad(zc, 19.5, .9));
+    out.holes.push(new THREE.Path(rrS(6.5, 1.1, .2, 0, 27.2).getPoints()));
+    const toBot = (geo, dy) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getY(i); p.setXYZ(i, x, bodyAt(z).bot + dy, z); } geo.computeVertexNormals(); return geo; };
+    add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(out, 24), 0), white));
+    const fl = new THREE.Shape([...L].map(([x, z]) => new THREE.Vector2(x * .8, z)).concat([...L].reverse().map(([x, z]) => new THREE.Vector2(-x * .8, z))));
+    add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(fl, 8), 1.0), voidM));
+    add(g, new THREE.Mesh(toBot(new THREE.ShapeGeometry(new THREE.Shape(rrS(6.5, 1.1, .2, 0, 27.2).getPoints()), 4), .9), phys(0xb9bbbc, { roughness: .6 }))); }
   // dark cores fill the hairline seams so they read as fine dark lines
   add(g, H.rslab(42.4, 131.4, 1.0, 9.7, .1, voidM), 0, 0, 27.9);
   const br = bodyAt(zb0); add(g, H.rslab(br.w - .6, br.top - br.bot - .6, .9, 9.7, .1, voidM), 0, (br.top + br.bot) / 2, 8.9);
@@ -101,11 +113,6 @@ export default H => {
   const slope = 1.3 / (zb1 - zb0), ybAt = z => bodyAt(z).bot;
   const bot = add(g, G(), 0, ybAt(18), 18); bot.rotation.x = Math.atan(slope);          // frame lying on the sloped bottom, +z toward the front
   const under = (p, z) => { p.rotation.x = PI / 2; add(bot, p, 0, -.03, (z - 18) / Math.cos(Math.atan(slope))); return p; };
-  under(pp(22, 8, (x, P) => { for (const zz of [22.4, 19.7, 16.9]) { const [a, b] = P(-9.75, zz - 19.7), [c] = P(9.75, 0);
-      x.fillStyle = '#0a0a0b'; x.beginPath(); x.roundRect(a - 4.5, b - 4.5, c - a + 9, 9, 4.5); x.fill();
-      x.fillStyle = 'rgba(255,255,255,.18)'; x.fillRect(a, b + 3, c - a, 1.5); } }), 19.7);
-  under(pp(8, 2.4, (x, P) => { const [a, b] = P(-3.25, .6), [c, d] = P(3.25, -.6); x.fillStyle = '#5c5e60'; x.fillRect(a, b, c - a, d - b);
-      x.fillStyle = '#b9bbbc'; x.fillRect(a + 4, b + 5, c - a - 8, d - b - 5); }), 27.2);
   // security-screw tab: flush with the bottom, carries on under the curved back plate as a small nub
   const tabS = rrS(10.7, 9.8, 2); const tab = H.ext(tabS, 3.5, .3, tabM); tab.rotation.x = -PI / 2;
   add(bot, tab, 0, -.04, (9 - 18) / Math.cos(Math.atan(slope)));

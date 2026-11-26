@@ -30,7 +30,10 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
         const A = all[a], B = all[b], D = all[c], cr = (B.x - A.x) * (D.y - A.y) - (B.y - A.y) * (D.x - A.x);
         if ((cr > 0) === up) idx.push(map[a], map[b], map[c]); else idx.push(map[a], map[c], map[b]); } };
     const outer = info.find(I => I.L.type === 'outer'), thru = info.filter(I => I.L.type === 'hole'), pk = info.filter(I => I.L.type === 'pocket');
-    if (outer) { cap(outer, 0, thru.map(I => [I, 0]), false); cap(outer, outer.K - 1, [...thru, ...pk].map(I => [I, I.K - 1]), true); }
+    if (outer) { cap(outer, 0, thru.map(I => [I, 0]), false);
+      if (outer.L.fan) { const c = pos.length / 3, b0 = outer.base + (outer.K - 1) * outer.n; pos.push(...outer.L.fan); col.push(1, 1, 1);   // tiny last ring: fan to a centre vertex
+        for (let i = 0; i < outer.n; i++) idx.push(b0 + i, b0 + (i + 1) % outer.n, c); }
+      else cap(outer, outer.K - 1, [...thru, ...pk].map(I => [I, I.K - 1]), true); }
     for (const I of pk) cap(I, 0, [], true);
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     if (useCol) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));

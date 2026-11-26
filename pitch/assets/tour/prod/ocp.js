@@ -10,7 +10,7 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x050506, roughness:.05, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1});
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x050506, roughness:.05, clearcoat:.6, clearcoatRoughness:.02, specularIntensity:.6, envMapIntensity:.25});
   const satinK = new THREE.MeshPhysicalMaterial({color:0x151516, roughness:.42, metalness:.15, clearcoat:.3, clearcoatRoughness:.35});
   const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
@@ -37,6 +37,7 @@ export default H => {
           uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0354)/.0708; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
         geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, Mt[p.g]); m.castShadow = m.receiveShadow = true; cad.add(m);
+      if(p.g === 1) m.scale.x = 1.072;                       // grille wrap sits 0.5 mm inside the shell sides (CAD grille reads 3 mm in)
       const k = OCPM.parts.indexOf(p);
       if(k === 0) m.visible = false;                         // the CAD's inner chassis: a tab of it pokes out below the shell
       if(p.g === 2) m.visible = false;                       // CAD collar: replaced by the dimpled locking collar below
@@ -46,7 +47,22 @@ export default H => {
     add(M, H.rslab(71, 42, 1, 7, .4, grilleMat(0xc4c6c8,[60,36])), 0, -28, 29.1);
   }
   // inner wall behind the speaker grille (the CAD's hidden chassis used to fill it): white, so the side opening is not see-through
-  add(M, H.rslab(70.6, 46, 12.5, 4, 1, mountW), 0, -26, 7.5);
+  add(M, H.rslab(70.6, 46, 7, 4, 1, mountW), 0, -26, 10);
+  // back of the mount (the CAD shell is open toward the wall): cavity floor 6 mm in, raised keyhole plate with the brass
+  // insert, 4 screw bosses with keyhole slots, side ribs, cable slot (ocp_back_1)
+  { const inner = new THREE.MeshPhysicalMaterial({color:0xd9dadb, roughness:.6, side:THREE.DoubleSide});
+    const dark = mat(0x3c3e40, {r:.8});
+    add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 6.5);                       // cavity floor
+    add(M, H.rslab(40, 54, 4, 4, .8, inner), 0, 10, 4.5);                              // raised centre plate (toward the wall)
+    for(const [bx, by] of [[-26, 27], [26, 27], [-26, -4], [26, -4]]){
+      const b = add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.6, 4.5, 32), inner)), bx, by, 4.25);
+      const k = new THREE.Shape(); k.absarc(0, 1.2, 1.9, 0, Math.PI*2); const kh = add(M, new THREE.Mesh(new THREE.ShapeGeometry(k, 24), dark), bx, by, 1.98); kh.rotation.y = Math.PI;
+      add(M, H.rslab(1.6, 4, .2, .8, .05, dark), bx, by - 1.6, 1.9); }
+    for(const rx of [-17, 17]) add(M, H.rslab(2, 62, 4, 1, .4, inner), rx, 8, 4.5);   // ribs beside the centre plate
+    const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.35, metalness:.9});
+    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 2.4, 32), brass)), 0, 8, 1.4);
+    { const h = add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, .1, 24), dark)), 0, 8, .17); }
+    { const sl = add(M, H.rslab(3.5, 8, .2, 1.75, .05, dark), 0, -6, 2.4); sl.rotation.z = Math.PI/2; } }
   // microphone pinhole on the +x side, just above the grille, near the 7 mm seam
   { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.45, -3, 15); ph.rotation.z = Math.PI/2; }
 

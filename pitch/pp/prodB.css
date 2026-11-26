@@ -331,3 +331,11 @@ html.pp #ocHist .fcol .sm img{aspect-ratio:4/3}
   html.pp :is(#ocScroll,#dbScroll) .xw-p img{top:38%;height:56%}
   html.pp :is(#ocScroll,#dbScroll) .xw-p .nm{bottom:14px;font-size:18px}
 }
+/* short screens: too little height for two stacked halves, so the split clip shows whole across the width */
+@media (max-height:740px){
+  html.pp #ocArloVid2{display:none!important}
+  html.pp #ocArloVid{height:160px!important;object-fit:contain!important;top:196px!important}
+  html.pp #ocArlo .ocar-w{top:384px!important}
+  html.pp :is(#ocScroll,#dbScroll) .xw-why{top:690px!important}
+  html.pp :is(#ocScroll,#dbScroll) .xw-why div{height:52px}
+}

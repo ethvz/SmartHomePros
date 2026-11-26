@@ -27,8 +27,8 @@ export default H => {
   const U = new THREE.Shape(); U.moveTo(-NW, ZS); U.lineTo(-NW, NB); U.absarc(0, NB, NW, Math.PI, 2 * Math.PI, false); U.lineTo(NW, ZS); U.lineTo(-NW, ZS);
   K.pocket(u, U, 1.0, '-y', -SW / 2, 0, 0, 0x9c9da0);
 
-  /* magnet on the sill edge right below (centre 21.5 mm below the sensor's, 4 mm along x), its long side facing the notch */
-  add(u, part(47.5, 14.2, 6, 7.1, .6, 5.2, 1.5, null, [2.5]), 4, -21.5, 0);
+  /* magnet on the sill edge right below (centred on it, 2.8 mm gap), its long side facing the notch */
+  add(u, part(47.5, 14.2, 6, 7.1, .6, 5.2, 1.5, null, [2.5]), 0, -(SW / 2 + 2.8 + 7.1), 0);
   return g;
 };
 

@@ -31,7 +31,10 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
         const A = all[a], B = all[b], D = all[c], cr = (B.x - A.x) * (D.y - A.y) - (B.y - A.y) * (D.x - A.x);
         if ((cr > 0) === up) idx.push(map[a], map[b], map[c]); else idx.push(map[a], map[c], map[b]); } };
     const outer = info.find(I => I.L.type === 'outer'), thru = info.filter(I => I.L.type === 'hole'), pk = info.filter(I => I.L.type === 'pocket');
-    if (outer) { cap(outer, 0, thru.map(I => [I, 0]), false); cap(outer, outer.K - 1, [...thru, ...pk].map(I => [I, I.K - 1]), true); }
+    if (outer) { cap(outer, 0, thru.map(I => [I, 0]), false);
+      if (outer.L.fan) { const c = pos.length / 3, b0 = outer.base + (outer.K - 1) * outer.n; pos.push(...outer.L.fan); col.push(1, 1, 1);   // tiny last ring: fan to a centre vertex
+        for (let i = 0; i < outer.n; i++) idx.push(b0 + i, b0 + (i + 1) % outer.n, c); }
+      else cap(outer, outer.K - 1, [...thru, ...pk].map(I => [I, I.K - 1]), true); }
     for (const I of pk) cap(I, 0, [], true);
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     if (useCol) g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
@@ -103,21 +106,21 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   /* 1-2. housing + collar: one shell, hairline at x = +36 */
   const hx = W / 2 - R, hy = HH / 2 - R;
   const wOf = (x, y) => {                                   // plan width of the front roll-off at an outline point
-    if (Math.abs(x) <= hx + 1e-6 && Math.abs(y) > hy) { const t = (x + hx) / (2 * hx); return 3 + 7.5 * Math.sin(Math.PI * t); }
-    if (Math.abs(y) <= hy + 1e-6) { const t = (y + hy) / (2 * hy); return 3 + 4 * Math.sin(Math.PI * t); }
-    return 3; };
+    if (Math.abs(x) <= hx + 1e-6 && Math.abs(y) > hy) { const t = (x + hx) / (2 * hx); return 3.8 + 6.7 * Math.sin(Math.PI * t); }
+    if (Math.abs(y) <= hy + 1e-6) { const t = (y + hy) / (2 * hy); return 3.8 + 3.2 * Math.sin(Math.PI * t); }
+    return 3.8; };
   const VX = []; for (let i = 0; i < 15; i++) VX.push(-37.5 + i * 67 / 14);       // vent grooves across the top wall (they notch the silhouette)
   const groove = (x, y) => { if (y < hy || Math.abs(x) > hx) return 0; let gmax = 0; for (const v of VX) gmax = Math.max(gmax, 1 - sm(.6, .85, Math.abs(x - v))); return gmax; };
   const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [], g0 = 2.2 * groove(x, y);
     for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)) + g0; out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
     const gv = 2.2 * groove(x, y), zs = D - h, dr = z => .6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
-    for (const [z, d] of [[1.8, gv], [2.3, gv], [16.4, gv], [17, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
+    for (const [z, d] of [[1.8, gv], [2.3, gv], [zs - 1.8, gv], [zs - 1.1, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
     for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = .6 + (w - .6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
     const bx = x + nx * w, by = y + ny * w;
-    for (let j = 1; j <= 12; j++) { const f = 1 - .94 * j / 12; out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
+    for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
   const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .3, col: 0x9c9c9a, k: .9, mask: 'vOP.z < 27.5' }]);
-  add(P, solid([{ type: 'outer', pts: pts(rrShape(W, HH, R), 1100), prof: shellProf }], shellMat));
+  add(P, solid([{ type: 'outer', pts: pts(rrShape(W, HH, R), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat));
   const zTop = D + crown;
 
   /* 4. flush button: hairline ring only.  5. LED glowing through the shell */

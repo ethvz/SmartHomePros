@@ -16,11 +16,11 @@ export default H => {
   };
   const rrS = (w, h, r, cx = 0, cy = 0) => new THREE.Shape(rrPts(w, h, r, cy, 14).map(([x, y]) => new THREE.Vector2(x + cx, y)));
   const circ = (x, y, r) => { const p = new THREE.Path(); p.absarc(x, y, r, 0, 2 * PI, true); return p; };
-  function shell(secs, mats, { front = true, back = true } = {}) {
+  function shell(secs, mats, { front = true, back = true, skip = null } = {}) {
     secs = [...secs].sort((a, b) => a[0] - b[0]);
     const rings = secs.map(([z, w, h, r, cy]) => rrPts(w, h, r, cy || 0)), N = rings[0].length, pos = [], idx = [];
     rings.forEach((R, k) => R.forEach(([x, y]) => pos.push(x, y, secs[k][0])));
-    for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < N; i++) { const a = k * N + i, b = k * N + (i + 1) % N, c = a + N, d = b + N; idx.push(a, b, c, b, d, c); }
+    for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < N; i++) { if (skip && skip(k, i)) continue; const a = k * N + i, b = k * N + (i + 1) % N, c = a + N, d = b + N; idx.push(a, b, c, b, d, c); }
     const nSide = idx.length;
     const cap = (k, flip) => { const R = rings[k], z = secs[k][0], c0 = pos.length / 3; let cx = 0, cy = 0;
       R.forEach(([x, y]) => { cx += x / N; cy += y / N; }); pos.push(cx, cy, z); R.forEach(([x, y]) => pos.push(x, y, z));
@@ -40,7 +40,7 @@ export default H => {
   const foot = phys(0x2e2f31, { roughness: .72 });
   const pivot = phys(0x2a2b2d, { roughness: .4, clearcoat: .2 });
   const grey = phys(0x4b4c4f, { roughness: .6, sheen: .35, sheenRoughness: .7, sheenColor: 0x9a9ca0 });
-  const glass = phys(0x050506, { roughness: .04, clearcoat: 1, clearcoatRoughness: .02, specularIntensity: 1 });
+  const glass = phys(0x050506, { roughness: .04, clearcoat: 1, clearcoatRoughness: .02, specularIntensity: 1, envMapIntensity: .6 });
   const discM = phys(0x1c1c1f, { roughness: .05, clearcoat: 1, clearcoatRoughness: .02 });
   const barrel = phys(0x0b0b0c, { roughness: .1, clearcoat: 1 });
   const voidM = new THREE.MeshStandardMaterial({ color: 0x030303, roughness: .9, side: DS });
@@ -102,7 +102,13 @@ export default H => {
   const gS = [[20.7, 60, 60, 12, 0], [3, 60, 60, 12, 0]];
   for (let i = 1; i <= 14; i++) { const a = i / 14 * PI / 2, k = 1 - Math.cos(a), iT = 17 * k, iB = 15 * k, iS = 17 * k;
     gS.push([3 - 17.2 * Math.sin(a), 60 - 2 * iS, 60 - iT - iB, 12 - 4 * k, (iB - iT) / 2]); }
-  add(hd, shell(gS, grey));
+  add(hd, shell(gS, grey, { skip: (k, i) => k === 14 && i === 32 }));     // flat bottom strip z 3..20.7 rebuilt below with real holes
+  { const S = new THREE.Shape([[-18, 3], [18, 3], [18, 20.7], [-18, 20.7]].map(([x, z]) => new THREE.Vector2(x, z)));
+    [8, 9, 10, 11, 10, 9, 8].forEach((n, r) => { for (let i = 0; i < n; i++) S.holes.push(circ((i - (n - 1) / 2) * 2.75, 10.8 + (r - 3) * 2.38, .7)); });
+    const toB = (geo, y) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i), y, p.getY(i)); geo.computeVertexNormals(); return geo; };
+    add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(S, 12), -30), grey));
+    const fl = new THREE.Shape(); fl.absellipse(0, 10.8, 16.5, 9, 0, 2 * PI, false);
+    add(hd, new THREE.Mesh(toB(new THREE.ShapeGeometry(fl, 32), -29.1), voidM)); }
   const cS = [[20.9, 60, 60, 12], [22.6, 60, 60, 12]];
   for (let i = 1; i <= 8; i++) { const a = i / 8 * PI / 2, s = 1.2 * (1 - Math.cos(a)); cS.push([22.6 + 1.2 * Math.sin(a), 60 - 2 * s, 60 - 2 * s, 12 - s]); }
   add(hd, shell(cS, glass, { front: false }));
@@ -126,11 +132,6 @@ export default H => {
   const tg = add(hd, pp(16.5, 8, (x, P) => { const [a, b] = P(-7.75, 3.5), [c, d] = P(7.75, -3.5); x.fillStyle = '#18191a'; x.beginPath(); x.roundRect(a, b, c - a, d - b, 35); x.fill(); }), 0, 30.02, 7.8);
   tg.rotation.x = -PI / 2;
   // speaker grille (hex holes) and microSD flap on the bottom
-  const gr = add(hd, pp(30, 15, (x, P) => { const rows = [8, 9, 10, 11, 10, 9, 8];
-    rows.forEach((n, r) => { for (let i = 0; i < n; i++) { const [cx, cy] = P((i - (n - 1) / 2) * 2.4, (r - 3) * 2.078);
-      x.fillStyle = '#3a3b3e'; x.beginPath(); x.arc(cx, cy, 6.2, 0, 2 * PI); x.fill();
-      x.fillStyle = '#050505'; x.beginPath(); x.arc(cx, cy, 5, 0, 2 * PI); x.fill(); } }); }), 0, -30.02, 12.8);
-  gr.rotation.x = PI / 2;
   const sd = add(hd, pp(22, 9, (x, P) => { const [a, b] = P(-10, 3.25), [c, d] = P(10, -3.25);
     x.fillStyle = '#55565a'; x.strokeStyle = '#2a2b2d'; x.lineWidth = 2.5; x.beginPath(); x.roundRect(a, b, c - a, d - b, 30); x.fill(); x.stroke();
     const [e, f] = P(-3, 3.25), [h, k] = P(3, 1.75); x.fillStyle = '#2f3032'; x.beginPath(); x.roundRect(e, f, h - e, k - f, 6); x.fill(); }), 0, -30.0, 1.6);
