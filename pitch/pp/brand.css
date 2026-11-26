@@ -34,7 +34,9 @@ html.pp #p-about .rec2 .top .eb{display:none}
 html.pp #p-about .rec2 .top h3{margin-top:0!important;font-size:22px}
 html.pp #p-about .rec2 .logos{left:18px;right:18px;top:84px!important;bottom:16px;gap:10px;
   grid-template-columns:repeat(3,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
-html.pp #p-about .nrgt .nl{left:22px;top:22px;width:96px}
+html.pp #p-about .nrgt .nl{left:22px;top:20px;width:76px}
+/* NRG tile: logo up top, caption 21px at the bottom: never on top of each other */
+html.pp #p-about .nrgt h3{font-size:21px;letter-spacing:-.4px;line-height:1.12}
 /* yard-sign tile: the sign oversized, peeking in from the top-right corner (its post clears the caption) */
 html.pp #p-about .ab:nth-child(8){overflow:hidden}
 /* sized from the tile height (--r4) so the disc is half off the right edge at every screen height; the caption keeps the left */
@@ -137,5 +139,7 @@ html.pp #p-history>.bg,html.pp #p-history>.sc{left:0!important;width:100%!import
 html.pp #p-history>.bg{object-position:50% 50%}
 html.pp #p-history .hy2-h{left:32px;top:var(--bt)}
 html.pp #p-history .hy2-h h1{font-size:62px;letter-spacing:-2px}
-html.pp #p-history .hyx{transform:scale(.95)!important;left:-396px!important;
-  top:calc((var(--bt) + 140px + var(--U))/2 - 638px)!important}
+/* wheel at .8 so the neighbouring years sit inside the screen; its content (year .. swipe hint, 422..945 unscaled)
+   centred between the title and the footer */
+html.pp #p-history .hyx{transform:scale(.8)!important;left:calc(300px - 1466px*.8/2)!important;
+  top:calc((var(--bt) + 140px + var(--U))/2 - 547px)!important}

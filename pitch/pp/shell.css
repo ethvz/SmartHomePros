@@ -126,7 +126,7 @@ html.pp #homeTrack{height:calc(var(--H) - var(--ppHomeFoot))!important}
 html.pp #p-home .hpane{height:calc(var(--H) - var(--ppHomeFoot))!important}
 html.pp #homeAll .hall-h{left:20px;right:20px;top:16px;height:auto}
 html.pp #homeAll .hall-h h1{display:none}
-html.pp #allTiles .ht .cl{font-size:16px;line-height:1.12;bottom:6%;padding:0 4px}
+html.pp #allTiles .ht .cl{font-size:16px!important;line-height:1.12;bottom:6%!important;padding:0 4px}
 html.pp #allTiles .ht .cl[data-pps]{font-size:0!important}
 html.pp #allTiles .ht .cl[data-pps]::after{content:attr(data-pps);font-size:16px}
 /* small tiles: the product sits a little higher so a two-line name never touches it */
@@ -142,10 +142,11 @@ html.pp .hcat[data-c=sensors]{grid-template-columns:repeat(12,minmax(0,1fr));gri
 html.pp .hcat[data-c=sensors] .ht{grid-column:span 4}
 html.pp .hcat[data-c=sensors] .ht[data-k=shp2]{grid-column:span 6}
 html.pp .hcat[data-c=sensors] .ht:is([data-k=keypad],[data-k=app]){grid-column:span 3}
-/* the Hub's alarm screen: the device sized from the tile height, its frame top just under the name, centred,
-   running off the tile's bottom (the artwork ends there) */
+/* the Hub's alarm screen: the whole device width (95% of the tile), centred in the space under the name; the artwork's
+   cut-off bottom edge fades out */
 html.pp .hcat[data-c=sensors] .ht[data-k=shp2]{overflow:hidden}
-html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:fill!important;inset:auto!important;top:40px!important;bottom:auto!important;height:calc(100% - 40px)!important;width:auto!important;max-width:none!important;left:50%!important;transform:translateX(-50%)!important}
+html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:fill!important;inset:auto!important;width:132%!important;height:auto!important;max-width:none!important;left:50%!important;transform:translateX(-50%)!important;
+  top:calc(40px + (100% - 40px - 163px)/2)!important;bottom:auto!important;-webkit-mask-image:linear-gradient(180deg,#000 86%,transparent 100%);mask-image:linear-gradient(180deg,#000 86%,transparent 100%)}
 /* Smart Home: the Hub across the top, then Lock | Garage, Thermostat | Plug */
 html.pp .hcat[data-c=smart]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr}
 html.pp .hcat[data-c=smart] .ht[data-k=shp2]{grid-column:span 2}
