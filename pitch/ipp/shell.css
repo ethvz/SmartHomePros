@@ -17,6 +17,7 @@ html.ipp #allTiles .ht .cl{font-size:15px!important}
 .ippalt{display:none}
 html.ipp .ht>.ippalt,html.ipp #flipLayer :is(.fa,.fb)>.ippalt{display:block}
 html.ipp #flipLayer :is(.fa,.fb):has(>img.ippalt)>img:not(.ippalt){display:none!important}
+html.ipp :is(.ht,.fa,.fb):has(>img.ippalt)>.hubt{display:none!important}
 html.ipp .ht:has(>img.ippalt)>img:not(.ippalt){display:none!important}
 html.ipp :is(.ht,.fa,.fb)>img.ippalt{transform:translate(-50%,-50%)!important;object-fit:contain!important}
 
