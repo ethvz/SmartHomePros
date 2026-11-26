@@ -245,3 +245,4 @@ html.pp .cv2 .cv-card .hd.on{animation:ppHdOn .38s cubic-bezier(.22,1,.36,1)}
 /* Playback: the Playback / Premium Video states add .full to .pbx, and the global .full{inset:0;height:100%} squashed the list */
 html.pp #p-playback .pbx.full{position:absolute!important;inset:0 0 calc(var(--prB) + 8px) 0!important;width:auto!important;height:auto!important;object-fit:initial}
 @media (prefers-reduced-motion:reduce){html.pp .cv2 .cv-card .hd.on{animation:none}}
+html.pp .ppc.fe.fw{-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 30px),transparent),linear-gradient(180deg,transparent,#000 20px,#000 calc(100% - 20px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 30px),transparent),linear-gradient(180deg,transparent,#000 20px,#000 calc(100% - 20px),transparent)}

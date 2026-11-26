@@ -26,21 +26,23 @@
      slide fills the screen behind the crops. 8th item: extra class on the crop.
      A crop's 9th item is options: g = may zoom in up to g x to fill leftover height (the picture is cropped narrower around
      the focal point f, 0..1 of its width; with x set it grows wider instead), x = fixed left edge on the stage: the crop may
-     run past the right edge (oversized product "bleeding" off the screen), bl = ease it in from the edge.
+     run past the right edge (oversized product "bleeding" off the screen), r = instead keep that share of it past the right
+     edge whatever its size; bl = ease it in from the edge. Products start small and grow into the leftover height, so the
+     baked step text above them keeps one size on every sub-slide.
      The sub-tab row (S1/S3) is pinned just above the footer so the buttons never move between sub-slides. */
   const S1 = [[340, 774, 660, 160, 600, , , 'ft']], S3 = [[256, 774, 832, 160, 600, , , 'ft']];
   const SPEC = {
     mon_hero: [[[70, 215, 585, 215, 560]], [[660, 60, 716, 904, 600, 0, 964]]],
-    mon_home: [[[180, 130, 640, 510, 600, 122, 762, , { g: 1.7, f: .47 }]], [[806, 214, 394, 466, 424, , , 'fe']], S1],
+    mon_home: [[[180, 130, 640, 510, 600, 122, 762, , { g: 1.7, f: .47 }]], [[806, 214, 394, 466, 424, , , 'fe fw']], S1],
     mon_trained: [[[0, 128, 700, 512, 600, 128, 762, , { g: 1.7, f: .74 }]], [[730, 290, 580, 370, 560, , , 'fe']], S1],
     mon_911: [[[460, 0, 916, 500, 600, 0, 498, , { g: 1.9, f: .74 }]], [[700, 500, 560, 160, 560, , , 'fe']], S1],
     mon_simple: [[[0, 128, 700, 572, 600, 128, 762, , { g: 1.7, f: .36 }]], [[700, 390, 580, 290, 560, , , 'fe']], S1],
     mon_insurance: { bg: 1, rows: [[[60, 0, 780, 964, 600]]] },
-    mon_breakin: [[[110, 236, 470, 418, 520]], [[588, 140, 788, 600, 720, , , 'bl', { x: 34, g: 1.3 }]], S3],
-    mon_smoke: [[[110, 230, 560, 380, 600]], [[716, 126, 660, 590, 700, , , 'bl', { x: 150, g: 1.3 }]], S3],
-    mon_water: [[[110, 270, 540, 320, 600]], [[700, 160, 676, 440, 800, , , 'bl', { x: -30, g: 1.3 }]], S3],
-    mon_medical: [[[110, 270, 540, 330, 600]], [[640, 0, 736, 720, 600, 0, 762, , { g: 1.8, f: .56 }]], S3],
-    mon_duress: [[[110, 260, 540, 400, 600]], [[660, 0, 716, 740, 600, 0, 762, , { g: 1.8, f: .57 }]], S3],
+    mon_breakin: [[[110, 236, 470, 418, 520]], [[588, 140, 788, 600, 300, , , 'bl', { r: .18, g: 2.6 }]], S3],
+    mon_smoke: [[[110, 230, 560, 380, 600]], [[716, 126, 660, 590, 300, , , 'bl', { r: .12, g: 2.4 }]], S3],
+    mon_water: [[[110, 270, 540, 320, 600]], [[700, 160, 676, 440, 340, , , 'bl', { r: .2, g: 2.6 }]], S3],
+    mon_medical: [[[110, 270, 540, 330, 600]], [[640, 200, 736, 300, 600, 0, 762, , { g: 1.8, f: .56 }]], S3],
+    mon_duress: [[[110, 260, 540, 400, 600]], [[660, 100, 716, 360, 600, 0, 762, , { g: 1.8, f: .57 }]], S3],
     mon_trusted: [[[80, 180, 900, 190, 600]], [[95, 415, 285, 385, 290], [408, 415, 285, 385, 290]], [[722, 415, 285, 385, 290], [1035, 415, 285, 385, 290]]],
     military_hero: { at: 'bottom', fade: 1, rows: [[[700, 275, 676, 689, 720]]],
       html: '<div class="ppmil"><h2>We’re proud to protect those who sacrifice to protect us.</h2><ul><li>Special offers for deployed family members</li><li>24/7 monitoring and support</li><li>$4 million in charitable donations to military families</li></ul></div>' }
@@ -71,7 +73,7 @@
       /* 2: then zoom in (photos crop narrower around their focal point; edge-bleed products grow past the edge) */
       spec.forEach(r => r.forEach(c => { const o = c[8]; if (extra <= 1 || !o || !o.g || r.length > 1) return;
         const h = c[3] * c[4] / c[2], f = Math.min(o.g, (h + extra) / h); if (f <= 1.001) return;
-        if (o.x != null) c[4] *= f; else { const cw = c[2] / f; c[0] += (c[2] - cw) * (o.f == null ? .5 : o.f); c[2] = cw; }
+        if (o.x != null || o.r != null) c[4] *= f; else { const cw = c[2] / f; c[0] += (c[2] - cw) * (o.f == null ? .5 : o.f); c[2] = cw; }
         extra -= h * (f - 1); }));
       const rows = spec.map(r => ({ cs: r, h: rh(r), w: r.reduce((a, c) => a + c[4], 0) + (r.length - 1) * GAP }));
       const tot = sum(), k = Math.min(1, avail / tot);
@@ -82,7 +84,7 @@
       const place = (r, kk, y0) => {
         let x = (600 - r.w * kk) / 2;
         r.cs.forEach(([cx, cy, cw, ch, tw, , , fx, o]) => {
-          if (o && o.x != null) x = o.x;
+          if (o && o.x != null) x = o.x; else if (o && o.r != null) x = 600 - tw * kk * (1 - o.r); /* r: share of it past the right edge */
           const s = tw * kk / cw, d = document.createElement('div'); d.className = 'ppc' + (sp.fade ? ' fade' : '') + (fx ? ' ' + fx : '');
           Object.assign(d.style, { left: x + 'px', top: y0 + (r.h * kk - ch * s) / 2 + 'px', width: cw * s + 'px', height: ch * s + 'px' });
           const im = document.createElement('img'); im.src = g.dataset.src; im.alt = ''; im.decoding = 'async'; im.draggable = false;

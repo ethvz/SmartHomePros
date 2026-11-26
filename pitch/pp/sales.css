@@ -147,7 +147,7 @@ html.pp #p-pricing .kit{left:16px!important;width:568px!important;height:var(--k
 html.pp #p-pricing .kit:nth-child(1){top:var(--kT)!important}
 html.pp #p-pricing .kit:nth-child(2){top:calc(var(--kT) + var(--kH) + 14px)!important}
 html.pp #p-pricing .kit:nth-child(3){top:calc(var(--kT) + var(--kH) * 2 + 28px)!important}
-html.pp #p-pricing.no4 .kit{height:var(--kH2)!important;align-content:space-evenly;padding-top:14px}
+html.pp #p-pricing.no4 .kit{height:var(--kH2)!important;align-content:center;row-gap:12px}
 html.pp #p-pricing.no4 .kit:nth-child(2){top:calc(var(--kT) + var(--kH2) + 14px)!important}
 html.pp #p-pricing.no4 .kit:nth-child(3){top:calc(var(--kT) + var(--kH2) * 2 + 28px)!important}
 html.pp #p-pricing .kit>*{position:static!important;transform:none!important}

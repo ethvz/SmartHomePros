@@ -370,7 +370,7 @@ html.pp #ocScroll .ocm-card img[data-im="ocm/sd2"]{object-position:0 50%!importa
 
 /* OCP Spotlight clip: enlarged; on short screens more, grown from the top so the head stays above the phone */
 html.pp #ocScroll .ocm-sv{scale:1.55;transform-origin:50% 40%}
-@media (max-height:740px){html.pp #ocScroll .ocm-sv{scale:2.1;transform-origin:50% 18%}html.pp #ocScroll .ocm-card img[data-im="ocm/spotv"]{scale:2.1!important;transform-origin:50% 18%}}
+@media (max-height:740px){html.pp #ocScroll .ocm-sv{scale:2.1;transform-origin:50% 22%}html.pp #ocScroll .ocm-card img[data-im="ocm/spotv"]{scale:2.1!important;transform-origin:50% 18%}}
 
 /* 360 spin, both cameras: the frame covers the screen (prodB.js sets --spk = screen height / frame height); products sit mid-frame */
 html.pp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{transform:translate(calc((600px - 1376px * var(--spk,.62)) / 2),0) scale(var(--spk,.62))}

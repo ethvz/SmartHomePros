@@ -150,7 +150,10 @@
   function histFit() {
     const hx = Q('#ocHist'); if (!hx) return;
     if (!isPP()) { hx.style.removeProperty('transform'); return; }
-    hx.style.transform = ''; const H = avail() - 10, last = hx.lastElementChild, h = last ? last.offsetTop + last.offsetHeight + 8 : 0;
+    hx.style.transform = ''; const H = avail() - 10, last = hx.lastElementChild; let h = last ? last.offsetTop + last.offsetHeight + 8 : 0;
+    /* the footage notes hang below their grid (absolute), so measure them too */
+    const fn = hx.querySelector('.fnote'), r0 = hx.getBoundingClientRect(), z = r0.width / (hx.offsetWidth || 1);
+    if (fn && fn.offsetParent && z > 0) h = Math.max(h, (fn.getBoundingClientRect().bottom - r0.top) / z + 8);
     if (h > H && h > 0) { const k = H / h; hx.style.transformOrigin = '50% 0'; hx.style.transform = `scale(${k.toFixed(4)})`; }
   }
   function histWatch() { const hx = Q('#ocHist'); if (!hx || hx.__ppw) return; hx.__ppw = 1; new MutationObserver(() => requestAnimationFrame(histFit)).observe(hx, { childList: true }); }
