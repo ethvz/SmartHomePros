@@ -81,7 +81,7 @@ export default H => {
   // CO pad (big round corner outer / away from the LED), LED window, FIRE pad (mirror)
   const coPts = polarPad(44.6, 55.4, 125, 139.6, [1.2, 1.4, 6.5, 1.2]);
   const fiPts = polarPad(44.6, 55.4, 100.4, 115, [1.2, 6.5, 1.4, 1.2]);
-  pad(coPts, '#6e7072'); pad(fiPts, '#6e7072');
+  pad(coPts, '#626466'); pad(fiPts, '#626466');
   { const ledPts = polarPad(46.6, 54, 117.2, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#505355');
     x.fillStyle = '#626567'; drawPts(polarPad(48.2, 52.4, 118.4, 121.6, [.8, .8, .8, .8])); x.fill(); }
   // soft sheen on the smoked pads (lighter toward their outer edge)
@@ -167,11 +167,11 @@ export default H => {
   { const s = new THREE.Shape(); const f0 = faceZ(44.2) - 1.5, f1 = faceZ(48.4) - 1.5;
     s.moveTo(25.5, 55.2); s.lineTo(37.5, 55.2); s.bezierCurveTo(42.2, 55.2, 44.2, 52.5, 44.2, 47); s.lineTo(44.2, f0); s.lineTo(48.4, f1); s.lineTo(48.4, 47.5);
     s.bezierCurveTo(48.4, 55.6, 44.6, 58.6, 37.5, 58.6); s.lineTo(25.5, 58.6); s.lineTo(25.5, 55.2);
-    const bv = .8, W0 = 7.2;
+    const bv = .9, W0 = 9.2;
     const sg = new THREE.ExtrudeGeometry(s, { depth: W0 - 2 * bv, bevelEnabled: true, bevelThickness: bv, bevelSize: bv, bevelOffset: -bv, bevelSegments: 4, curveSegments: 20 });
     sg.translate(0, 0, -(W0 - 2 * bv) / 2);
-    const p = sg.attributes.position;                       // taper: 7.2 mm wide at the foot -> 5.4 mm at the cap
-    for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 26) / (48.4 - 26))); p.setZ(i, p.getZ(i) * (.75 + .25 * t)); }
+    const p = sg.attributes.position;                       // taper: 9.2 mm wide at the foot -> 7 mm at the cap
+    for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 26) / (48.4 - 26))); p.setZ(i, p.getZ(i) * (.76 + .24 * t)); }
     sg.computeVertexNormals();
     for (const a of [90, 30, -30, -90, 150, 210]) { const c = Math.cos(a * D2R), sn = Math.sin(a * D2R);
       const M = new THREE.Matrix4().makeBasis(new THREE.Vector3(c, sn, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(sn, -c, 0));

@@ -34,8 +34,8 @@ export default H => {
   { const V2 = (r, z) => new THREE.Vector2(r, z);
     const cs = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(1.32, 25.42), V2(1.05, 25.2), V2(.82, 24.85), V2(.8, 24.6)], 40), white), 0, 11.6, 0);
     cs.rotation.x = Math.PI / 2;
-    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(.8, 24.6), V2(.8, 21.5), V2(0, 21.5)], 32),
-      new THREE.MeshStandardMaterial({ color: 0x2a1e16, roughness: .8, side: THREE.DoubleSide })), 0, 11.6, 0);
+    const bore = add(g, new THREE.Mesh(new THREE.LatheGeometry([V2(.8, 24.6), V2(.8, 14), V2(0, 14)], 32),
+      new THREE.MeshStandardMaterial({ color: 0x1a120c, roughness: .9, envMapIntensity: .1, side: THREE.DoubleSide })), 0, 11.6, 0);
     bore.rotation.x = Math.PI / 2; }
 
   outer.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });

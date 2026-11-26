@@ -49,7 +49,7 @@ export default H => {
   const smoke = phys(0x161618, { roughness: .18, clearcoat: 1, clearcoatRoughness: .05, envMapIntensity: .45 });
   const voidM = new THREE.MeshStandardMaterial({ color: 0x030303, roughness: .9, side: DS });
   const btn = phys(0x0a0a0a, { roughness: .06, clearcoat: 1, clearcoatRoughness: .03 });
-  const ringM = new THREE.MeshStandardMaterial({ color: 0xff3a14, roughness: .35, emissive: 0xff3412, emissiveIntensity: 1.25, envMapIntensity: .1, side: DS });
+  const ringM = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: 0xff4a1c, emissiveIntensity: 1.0, envMapIntensity: .15, toneMapped: false, side: DS });
   const lensM = H.PM.lens.clone(); lensM.side = DS;
 
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
@@ -146,6 +146,6 @@ export default H => {
   const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace;
   add(B, new THREE.Mesh(new THREE.PlaneGeometry(38, 38), new THREE.MeshBasicMaterial({ map: gt, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })), 0, 0, .04);
 
-  g.traverse(o => { if (o.isMesh && !o.material.transparent) o.castShadow = o.receiveShadow = true; });
+  g.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = false; } });
   return out;
 };

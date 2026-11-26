@@ -12,7 +12,7 @@ export default H => {
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
   const glassK = new THREE.MeshPhysicalMaterial({color:0x050506, roughness:.05, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1});
   const satinK = new THREE.MeshPhysicalMaterial({color:0x151516, roughness:.42, metalness:.15, clearcoat:.3, clearcoatRoughness:.35});
-  const lensM = PM.lens;
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
 
   // ---------------------------------------------------------------- mount (engineering CAD), decoded exactly like the inline model

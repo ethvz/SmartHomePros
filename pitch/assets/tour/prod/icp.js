@@ -144,6 +144,6 @@ export default H => {
   add(hd, lathe(hb, satin));
   add(hd, H.rslab(5, 3.5, .4, .8, .1, voidM), 0, 0, -19.35);
 
-  g.traverse(o => { if (o.isMesh && !o.material.transparent) o.castShadow = o.receiveShadow = true; });
+  g.traverse(o => { if (o.isMesh && !o.material.transparent) { o.castShadow = true; o.receiveShadow = false; } });
   return out;
 };

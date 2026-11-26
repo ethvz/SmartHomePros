@@ -106,7 +106,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     if (Math.abs(x) <= hx + 1e-6 && Math.abs(y) > hy) { const t = (x + hx) / (2 * hx); return 3 + 5 * Math.sin(Math.PI * t) + 2 * sm(.8, 1, t); }
     if (Math.abs(y) <= hy + 1e-6) { const t = (y + hy) / (2 * hy); return x > 0 ? 5 + 4 * Math.sin(Math.PI * t) : 3 + 1.5 * Math.sin(Math.PI * t); }
     return x > 0 ? 5 : 3; };
-  const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = .85 * w + .8, out = [];
+  const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [];
     for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
     for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = w * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
     const bx = x + nx * w, by = y + ny * w;
