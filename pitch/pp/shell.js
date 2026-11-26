@@ -60,7 +60,7 @@
   let logoR = 0;
   function logoFit() {
     const lg = $('#barlogo'); if (!lg) return;
-    if (!PP()) { bar.classList.remove('ppnologo'); return; }
+    if (!PP()) { if (bar.classList.contains('ppnologo')) bar.classList.remove('ppnologo'); return; }
     const sc = (st.getBoundingClientRect().width / st.offsetWidth) || 1, b0 = bar.getBoundingClientRect().left;
     if (!bar.classList.contains('ppnologo')) { const r = lg.getBoundingClientRect(); if (r.width) logoR = (r.right - b0) / sc; }
     if (!logoR) return;
