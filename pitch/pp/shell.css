@@ -45,15 +45,23 @@ html.pp #bar:not(.home) #barRight.pnav.pph .bbtn{flex:1 1 0!important;width:auto
 html.pp #bar:not(.home) #barRight.pnav.pph .rdiv{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn span{display:none}
 html.pp #barRight.pnav.pph.ico .bbtn .ic{width:24px!important;height:24px!important}
+/* many sections: icons only, but the current one keeps its name */
+html.pp #barRight.pnav.pph.ico .bbtn.on{flex:2.1 1 0!important}
+html.pp #barRight.pnav.pph.ico .bbtn.on span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html.pp #bar:not(.home) #barRight.pnav.pph.idle{opacity:1}
 html.pp #bar.ppnav #barlogo,html.pp #bar.hx-ctr #barlogo,html.pp #bar.ppnologo #barlogo{display:none!important}
 /* the vertical rail that stays (Yard Sign's 2 buttons, beside the centred About/Videos/Yard Sign pill): mid-screen on the right */
-html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph){top:calc((var(--ppFoot) - var(--H)) / 2)!important;right:10px!important;left:auto!important}
+/* the vertical rail that stays (Yard Sign's 2 buttons, next to the centred About/Videos/Yard Sign pill): lower right, just above the footer */
+html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph){top:auto!important;bottom:calc(var(--ppB) + 72px)!important;right:12px!important;left:auto!important;transform:none!important;animation:none!important;width:auto!important;padding:5px!important}
+html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph) .bbtn{width:68px!important;height:68px!important;border-radius:34px!important}
+html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph) .bbtn span{font-size:12px!important}
 /* Buyouts amount button: centred, the same height as the other pills */
 html.pp #bar #amtBtn{bottom:var(--ppB)!important;height:60px!important;border-radius:30px!important}
 
 /* ---------- page title ---------- */
-html.pp #gTitle{left:8px!important;width:584px!important;top:14px}
+/* #gTitle and #bkPill live in #screen, which sits at left:var(--gx) (negative here): undo that offset */
+html.pp #gTitle{left:calc(8px - var(--gx,0px))!important;width:584px!important;top:14px}
+html.pp #bkPill{left:calc(16px - var(--gx,0px))!important}
 html.pp #gTitle span{font-size:15px!important;letter-spacing:2.2px!important;max-width:552px;overflow:hidden;text-overflow:ellipsis}
 html.pp body.hasbk #gTitle{transform:translateX(96px)}
 
@@ -67,14 +75,26 @@ html.pp #drawer .m2-t{height:92px!important;font-size:20px!important;padding:0 1
 html.pp #drawer .m2-t .ic{width:26px;height:26px}
 html.pp #drawer .m2-s{height:56px!important;font-size:17px!important;padding:0 10px!important;gap:10px!important}
 html.pp #drawer .m2-f{flex-wrap:wrap;gap:12px 20px}
+html.pp #stage #drawer{overflow-y:auto;overscroll-behavior:contain}
+@media (max-height:700px){
+  html.pp #stage #drawer{padding:18px 18px 16px!important}
+  html.pp #drawer .m2-h{margin-bottom:12px!important}
+  html.pp #drawer .m2-t{height:74px!important;font-size:19px!important}
+  html.pp #drawer .m2-l{margin:12px 4px 4px!important}
+  html.pp #drawer .m2-s{height:46px!important;font-size:16px!important}
+  html.pp #drawer .m2-f{padding-top:8px}
+}
 
 /* ---------- product sheet (Products pill) ---------- */
 html.pp #psheet .pan{left:10px!important;right:10px!important;bottom:calc(var(--ppFoot) + 4px)!important;height:372px!important}
 html.pp #psheet .hd{left:26px;right:18px}
 html.pp #psheet .car{padding:0 22px 24px;scroll-padding:0 22px}
+html.pp #psheet .x{width:68px!important;height:68px!important}
 
 /* ---------- generic modals ---------- */
-html.pp .modal .x,html.pp .modal .mx,html.pp .modal [data-close]{min-width:56px;min-height:56px}
+html.pp .modal .x,html.pp .modal .mx,html.pp .modal [data-close]{min-width:68px;min-height:68px}
+/* .mclose buttons carry an inline landscape left (1235-1282px): pin them top right of the 600-wide stage */
+html.pp .modal .mclose{left:auto!important;right:20px!important;top:20px!important;width:68px!important;height:68px!important}
 
 /* ---------- video player ---------- */
 /* #vlp sits outside the stage (screen pt): the 16:9 video is centred with its native controls attached to it */
@@ -90,5 +110,15 @@ html.pp #allTiles .ht .cl{font-size:15px;line-height:1.15;bottom:6%;padding:0 4p
 html.pp #homeTrack .hcat{padding:50px 16px 10px!important;gap:12px!important}
 html.pp .hcat .hrow{gap:12px!important}
 html.pp .hcat .ht .cl{font-size:15px;line-height:1.15;padding:0 4px}
+/* Sensors pane: the Hub / Keypad / App row is shorter, the Hub screen is shown whole */
+html.pp .hcat[data-c=sensors] .hrow:nth-child(2){flex:.78 1 0!important}
+html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:contain!important;object-position:50% 58%!important;inset:44px 10px 10px!important;width:calc(100% - 20px)!important;height:calc(100% - 54px)!important}
+/* big tiles: their names are baked into the artwork (unreadably small here); clip that line off and show a live 15px label */
+.ppcl{display:none}
+html.pp .ht>.ppcl{display:block;position:absolute;left:0;right:0;bottom:6%;text-align:center;font-size:15px!important;line-height:1.15;color:rgba(255,255,255,.62);pointer-events:none;z-index:3;padding:0 6px}
+html.pp .ht>.ppcl.top{top:10px;bottom:auto}
+html.pp img[src*="tiles/ocp.webp"],html.pp img[src*="tiles/ocspot.webp"]{clip-path:inset(0 0 13% 0)}
+html.pp img[src*="tiles/keypad.webp"],html.pp img[src*="tiles/app.webp"]{clip-path:inset(8% 0 0 0)}
+html.pp #allTiles .ht[data-k=shp2]::after{font-size:15px!important;color:rgba(255,255,255,.62)!important}
 /* 3D Home: the frame fills the upright screen; the footer floats over it */
 html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}

@@ -111,7 +111,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
   const shellProf = (x, y, nx, ny) => { const w = wOf(x, y), h = 1.05 * w + 1.2, out = [], g0 = 2.2 * groove(x, y);
     for (let i = 0; i <= 4; i++) { const t = i / 4 * Math.PI / 2, d = 1.5 * (1 - Math.sin(t)) + g0; out.push([x + nx * d, y + ny * d, 1.5 * (1 - Math.cos(t))]); }
     const gv = 2.2 * groove(x, y), zs = D - h, dr = z => .6 * sm(1.5, zs, z);        // 1-2 deg draft: the back is the widest part
-    for (const [z, d] of [[1.8, gv], [2.3, gv], [16.4, gv], [17, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
+    for (const [z, d] of [[1.8, gv], [2.3, gv], [zs - 1.8, gv], [zs - 1.1, 0]]) out.push([x + nx * (d + dr(z)), y + ny * (d + dr(z)), z]);
     for (let i = 0; i <= 12; i++) { const t = i / 12 * Math.PI / 2, d = .6 + (w - .6) * (1 - Math.pow(Math.cos(t), .83)); out.push([x + nx * d, y + ny * d, D - h + h * Math.pow(Math.sin(t), .83)]); }
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 12; j++) { const f = 1 - .94 * j / 12; out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
