@@ -1,9 +1,0 @@
-BEGIN:VCARD
-VERSION:3.0
-PRODID:-//Smart Home Pros//Contacts//EN
-N:Vivint – Service Desk;;;;
-FN:Vivint – Service Desk
-ORG:Vivint
-item1.TEL;type=VOICE:+18016554357
-item1.X-ABLabel:Call
-END:VCARD

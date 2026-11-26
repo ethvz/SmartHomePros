@@ -1,9 +1,0 @@
-BEGIN:VCARD
-VERSION:3.0
-PRODID:-//Smart Home Pros//Contacts//EN
-N:Vivint – Moves;;;;
-FN:Vivint – Moves
-ORG:Vivint
-item1.EMAIL;type=INTERNET;type=WORK:moves@vivint.com
-item1.X-ABLabel:Email
-END:VCARD

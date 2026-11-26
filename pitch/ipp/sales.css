@@ -1,1 +1,22 @@
 /* iPad portrait (html.ipp) layout: sales group. Every rule is scoped to html.ipp. */
+/* Stage is 1032 wide x var(--H) tall. Pages are pulled back to the stage's left edge (left:-gx, 1032 wide) so children use stage
+   coordinates. Top reserve var(--ippT) (section title), bottom reserve var(--ippFoot) (footer); landscape text sizes are kept. */
+html.ipp #stage{--isT:var(--ippT,96px);--isB:var(--ippFoot,84px);--isE:cubic-bezier(.22,1,.36,1)}
+html.ipp #p-buyouts,html.ipp #p-moves,html.ipp #p-comparisons,html.ipp #p-reviews,html.ipp #p-patents,html.ipp #p-social,html.ipp #p-packages,html.ipp #p-pricing{left:calc(-1*var(--gx,0px))!important;right:auto!important;width:1032px!important}
+
+/* ---------- Buyouts: steps on top, the gift card below them, fine print above the footer ---------- */
+html.ipp #p-buyouts h2{left:72px;top:max(86px,calc(var(--isT) - 10px))}
+html.ipp #p-buyouts .steps{left:72px;top:calc(var(--isT) + 150px)}
+html.ipp #p-buyouts .gcard{left:186px;top:calc(var(--isT) + 150px + 488px + (var(--H) - var(--isT) - 150px - 488px - var(--isB) - 96px - 430px)/2)}
+html.ipp #p-buyouts .fine{left:72px;top:auto;bottom:calc(var(--isB) + 24px);width:888px}
+@media (min-aspect-ratio:37/50){ html.ipp #p-buyouts .gcard{transform:rotate(9deg) scale(.84)} }
+
+/* ---------- Moves: the three options become wide cards stacked down the page (photo left, copy right, price under it) ---------- */
+html.ipp #p-moves h2{left:72px;top:max(66px,calc(var(--isT) - 30px))}
+html.ipp #p-moves .mcard{--mh:calc((var(--H) - var(--isT) - 100px - var(--isB) - 24px - 48px)/3);left:72px!important;width:888px;height:var(--mh);top:calc(var(--isT) + 100px);box-sizing:border-box;padding:26px 26px 26px 404px}
+html.ipp #p-moves .mcard:nth-of-type(2){top:calc(var(--isT) + 100px + var(--mh) + 24px)}
+html.ipp #p-moves .mcard:nth-of-type(3){top:calc(var(--isT) + 100px + 2*var(--mh) + 48px)}
+html.ipp #p-moves .mcard img{position:absolute;left:26px;top:26px;bottom:26px;width:352px;height:auto}
+html.ipp #p-moves .mcard h3{margin:14px 0 14px}
+html.ipp #p-moves .mcard h3 br{display:none}
+html.ipp #p-moves .mcard .price{left:404px;bottom:30px}

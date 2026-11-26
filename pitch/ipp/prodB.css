@@ -43,7 +43,7 @@ html.ipp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{width:1376px!important;hei
 
 /* ---------- Highlights (feat): heading up top, the visual in a wide band across the middle, the feature list as a 3-column grid below.
    prodB.js sets --mt / --mh (band top / height), --phs (phone scale), --phh (scaled phone height), --cl (DBCP card left) on the tab ---------- */
-html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-col{left:calc(var(--gx) + 24px)!important;right:36px;width:auto!important;top:0!important;bottom:calc(var(--bF) + 18px)!important;margin:0!important;justify-content:space-between!important;gap:0!important;transform:none!important;z-index:6}
+html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-col{left:calc(var(--gx) + 34px)!important;right:36px;width:auto!important;top:0!important;bottom:calc(var(--bF) + 18px)!important;margin:0!important;justify-content:space-between!important;gap:0!important;transform:none!important;z-index:6}
 html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-h{left:0!important;width:auto!important;max-width:760px;min-height:0!important;padding:calc(var(--bT) + 22px) 18px 0;display:block!important}
 html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list{display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px 8px;width:auto!important;left:0!important}
 html.ipp :is(#ocScroll,#dbScroll)>.dbm .dbm-list button{height:var(--lbh,58px)!important;font-size:18.5px!important;line-height:1.15;padding:0 16px!important;gap:12px;border-radius:16px;background:rgba(255,255,255,.04);transition:background .2s,color .2s,transform .12s cubic-bezier(.2,.8,.2,1)}

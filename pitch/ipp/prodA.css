@@ -27,3 +27,58 @@ html.ipp :is(#prScroll,#hbScroll,#thScroll) .hgl{left:0!important;width:1032px!i
 html.ipp :is(#prScroll,#hbScroll,#thScroll) .hgl figure{width:1032px!important}
 html.ipp :is(#prScroll,#hbScroll,#thScroll) .hg-dots{bottom:calc(var(--ipBot) + 70px)!important}
 html.ipp :is(#prScroll,#hbScroll,#thScroll) .lhero.hgw .lh-txt{bottom:calc(var(--ipBot) + 150px)!important}
+
+/* ---------- Smart Actions / Works With / FAQs (.xs): landscape cards at landscape sizes, the block centred in the tall frame ---------- */
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs{--ipY:max(0px,calc((var(--H) - var(--ipBot) - var(--ipTop) - var(--ipB,760px))/2 - 20px))}
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs>*{margin-top:var(--ipY)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs .xeb{left:var(--ipL)!important;top:calc(var(--ipTop) + 20px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs .xh{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 48px)!important}
+/* Smart Actions: one full-width list; When | Then columns share the row */
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs[data-t=act]{--ipB:calc(var(--ipN,4)*132px + 300px)}
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs[data-t=act]:not(:has(.xa:nth-child(4))){--ipN:3}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xa-list{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 214px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xa{height:132px!important;gap:20px!important;padding:0 26px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xa-col{width:268px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xa-col.t{width:auto!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xa+.xa:before{left:104px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xa-foot{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 214px + var(--ipN,4)*132px + 48px)!important;flex-wrap:wrap}
+/* Works With: picker under the title, the pair as two tall cards, reasons in a row, the link button bottom right */
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs[data-t=with]{--ipB:940px}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-pick{left:var(--ipL)!important;right:auto!important;top:calc(var(--ipTop) + 196px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-stage{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 300px)!important;height:460px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-p{width:calc(50% - 50px)!important;height:460px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-link{left:calc(50% - 50px)!important;right:calc(50% - 50px)!important;top:230px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-plus{top:230px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-why{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 784px)!important;gap:14px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-why div{padding:0 18px!important;font-size:17px!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-foot{left:var(--ipL)!important;right:auto!important;top:calc(var(--ipTop) + 906px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-go{right:var(--ipR)!important;left:auto!important;top:calc(var(--ipTop) + 890px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xw-foot:has(~.xw-go.on),html.ipp :is(#prScroll,#hbScroll,#thScroll) .xs:has(.xw-go.on) .xw-foot{max-width:480px}
+/* FAQs: title on top, the questions take the full width below it (the list already scrolls inside itself) */
+html.ipp :is(#prScroll,#hbScroll,#thScroll)>.xs[data-t=faq]>*{margin-top:0!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xf-src{left:var(--ipL)!important;top:calc(var(--ipTop) + 192px)!important}
+html.ipp :is(#prScroll,#hbScroll,#thScroll) .xf-list{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 250px)!important;bottom:calc(var(--ipBot) + 40px)!important}
+
+/* ---------- Which sensor goes where? (.sns-w): the three cards stack as wide rows; copy in two columns, render on the right ---------- */
+html.ipp #prScroll .sns-w .eb,html.ipp #prScroll .smk-w .eb{left:var(--ipL)!important;top:calc(var(--ipTop) + 20px)!important}
+html.ipp #prScroll .sns-w h2,html.ipp #prScroll .smk-w h2{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 52px)!important}
+html.ipp #prScroll .sns-w{--ch:calc((var(--H) - var(--ipTop) - var(--ipBot) - 196px - 40px - 32px)/3)}
+html.ipp #prScroll .sns-c{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;height:var(--ch)!important;padding:30px 200px 0 34px!important;display:grid!important;grid-template-columns:300px 1fr;grid-template-rows:auto auto auto 1fr;column-gap:34px;align-content:start;overflow:hidden}
+html.ipp #prScroll .sns-c:nth-of-type(2){top:calc(var(--ipTop) + 196px)!important}
+html.ipp #prScroll .sns-c:nth-of-type(3){top:calc(var(--ipTop) + 196px + var(--ch) + 16px)!important}
+html.ipp #prScroll .sns-c:nth-of-type(4){top:calc(var(--ipTop) + 196px + 2*var(--ch) + 32px)!important}
+html.ipp #prScroll .sns-c>:is(.nm,h3,.md){grid-column:1}
+html.ipp #prScroll .sns-c>.nm{grid-row:1}html.ipp #prScroll .sns-c>h3{grid-row:2;width:auto!important;min-height:0!important}html.ipp #prScroll .sns-c>.md{grid-row:3}
+html.ipp #prScroll .sns-c>:is(.best,.bv,ul){grid-column:2}
+html.ipp #prScroll .sns-c>.best{grid-row:1;margin-top:0!important}html.ipp #prScroll .sns-c>.bv{grid-row:2}html.ipp #prScroll .sns-c>ul{grid-row:3/5;margin-top:12px!important}
+html.ipp #prScroll .sns-c img{right:30px!important;left:auto!important;top:50%!important;width:150px!important;height:78%!important;translate:0 -50%;object-fit:contain!important}
+html.ipp #prScroll .sns-c .go{left:34px!important;bottom:26px!important}
+
+/* ---------- Smoke: Which one is right for you? two wide cards stacked ---------- */
+html.ipp #prScroll .smk-w{--ch:calc((var(--H) - var(--ipTop) - var(--ipBot) - 220px - 40px - 18px)/2)}
+html.ipp #prScroll .smk-c{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;height:var(--ch)!important;padding:40px 230px 0 40px!important;box-sizing:border-box;overflow:hidden}
+html.ipp #prScroll .smk-c:nth-of-type(2){top:calc(var(--ipTop) + 220px)!important}
+html.ipp #prScroll .smk-c:nth-of-type(3){top:calc(var(--ipTop) + 238px + var(--ch))!important}
+html.ipp #prScroll .smk-c h3{width:auto!important}
+html.ipp #prScroll .smk-c img{right:36px!important;left:auto!important;top:50%!important;translate:0 -50%;width:190px!important;height:62%!important;object-fit:contain!important}
+html.ipp #prScroll .smk-c .go{left:40px!important;bottom:32px!important}

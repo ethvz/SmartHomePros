@@ -15,7 +15,7 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
     add: '<circle cx="10" cy="8" r="4"/><path d="M3 20a7 7 0 0 1 12.2-4.7M19 14v6M16 17h6"/>',
     book: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/>',
     srch: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
-    x: '<path d="M6 6l12 12M18 6L6 18"/>', ok: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>', chev: '<path d="M6 9l6 6 6-6"/>', ok: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
     star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'
   };
@@ -32,16 +32,27 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
   function act(k, href, lab, val, aria) {
     return '<a class="mc-a k-' + k + '" href="' + href + '" aria-label="' + esc(aria) + '"><i>' + svg(k === 'c' ? 'phone' : k === 't' ? 'text' : 'mail') + '</i><span><small>' + lab + '</small><b>' + esc(val) + '</b></span></a>';
   }
+  /* collapsed: name + one row of equal buttons (Call / Text / Email / Save, only the ones it has); tap the card to
+     expand the full list (every number and email on its own line). Two of a kind (Friends & Family's emails): the
+     button expands the card instead of guessing. */
+  function btn(k, list, href, lab, n) {
+    var many = list.length > 1;
+    return '<a class="mc-b k-' + k + '"' + (many ? ' role="button" data-x="1"' : ' href="' + href(list[0]) + '"') + ' aria-label="' + esc(lab + ' ' + n + (many ? ', ' + list.length + ' options' : '')) + '">' + svg(k === 'c' ? 'phone' : k === 't' ? 'text' : 'mail') + '<span>' + lab + (many ? ' <em>' + list.length + '</em>' : '') + '</span></a>';
+  }
   function cardHtml(d, i) {
     var q = [d.n].concat(d.c, d.t, d.e, d.c.length ? 'call phone' : '', d.t.length ? 'text sms' : '', d.e.length ? 'email' : '').join(' ').toLowerCase();
+    var tel = function (p) { return 'tel:+1' + p; }, sms = function (p) { return 'sms:+1' + p; }, ml = function (m) { return 'mailto:' + m; };
     return '<article class="mc-c' + (d.s ? ' star' : '') + '" style="--i:' + Math.min(i, 14) + '" data-q="' + esc(q) + '" data-k="' + (d.c.length ? 'c' : '') + (d.t.length ? 't' : '') + (d.e.length ? 'e' : '') + '">' +
-      '<div class="mc-ct"><h3>' + (d.s ? svg('star') : '') + esc(d.n) + '</h3>' +
-      '<a class="mc-sv" href="connect/vcf/' + d.f + '.vcf" data-f="' + d.f + '" data-n="' + esc(d.n) + '"' + (standalone ? ' target="_blank"' : '') + ' aria-label="Save ' + esc(d.n) + ' to Contacts">' + svg('add') + '<span>Save</span></a></div>' +
-      '<div class="mc-as">' +
-      d.c.map(function (p) { return act('c', 'tel:+1' + p, 'Call', fmt(p), 'Call ' + d.n + ' ' + fmt(p)); }).join('') +
-      d.t.map(function (p) { return act('t', 'sms:+1' + p, 'Text', fmt(p), 'Text ' + d.n + ' ' + fmt(p)); }).join('') +
-      d.e.map(function (m) { return act('e', 'mailto:' + m, 'Email', m, 'Email ' + d.n + ' ' + m); }).join('') +
-      '</div></article>';
+      '<button class="mc-h" type="button" aria-expanded="false"><h3>' + (d.s ? svg('star') : '') + '<span>' + esc(d.n) + '</span></h3>' + svg('chev') + '</button>' +
+      '<div class="mc-bs">' +
+        (d.c.length ? btn('c', d.c, tel, 'Call', d.n) : '') + (d.t.length ? btn('t', d.t, sms, 'Text', d.n) : '') + (d.e.length ? btn('e', d.e, ml, 'Email', d.n) : '') +
+        '<a class="mc-b mc-sv" href="connect/vcf/' + d.f + '.vcf" data-f="' + d.f + '" data-n="' + esc(d.n) + '"' + (standalone ? ' target="_blank"' : '') + ' aria-label="Save ' + esc(d.n) + ' to Contacts">' + svg('add') + '<span>Save</span></a>' +
+      '</div>' +
+      '<div class="mc-dw"><div class="mc-as">' +
+      d.c.map(function (p) { return act('c', tel(p), 'Call', fmt(p), 'Call ' + d.n + ' ' + fmt(p)); }).join('') +
+      d.t.map(function (p) { return act('t', sms(p), 'Text', fmt(p), 'Text ' + d.n + ' ' + fmt(p)); }).join('') +
+      d.e.map(function (m) { return act('e', ml(m), 'Email', m, 'Email ' + d.n + ' ' + m); }).join('') +
+      '</div></div></article>';
   }
   var el = document.createElement('div');
   el.className = 'mc'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'mcT'); el.setAttribute('aria-hidden', 'true');
@@ -60,6 +71,30 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
   var $ = function (s) { return el.querySelector(s); };
   var pn = $('.mc-pn'), ls = $('.mc-ls'), inp = $('input'), cards = Array.prototype.slice.call(el.querySelectorAll('.mc-c')), opener = null, filt = '';
 
+  /* ---- expand / collapse (one open at a time) ---- */
+  function setOpen(c, on) {
+    if (!c || c.classList.contains('open') === on) return;
+    c.classList.toggle('open', on); c.querySelector('.mc-h').setAttribute('aria-expanded', String(on));
+    c.querySelectorAll('.mc-a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
+  }
+  function toggle(c) {
+    var on = !c.classList.contains('open');
+    cards.forEach(function (o) { if (o !== c) setOpen(o, false); });
+    setOpen(c, on);
+    if (on) setTimeout(function () { /* keep the opened card in view */
+      var r = c.getBoundingClientRect(), L = ls.getBoundingClientRect(), over = r.bottom - (L.bottom - 70);
+      if (over > 0) ls.scrollBy({ top: Math.min(over, r.top - L.top - 8), behavior: reduce && reduce.matches ? 'auto' : 'smooth' });
+    }, 380);
+  }
+  el.querySelectorAll('.mc-a').forEach(function (a) { a.tabIndex = -1; });
+  el.addEventListener('click', function (e) {
+    var c = e.target.closest('.mc-c'); if (!c) return;
+    var b = e.target.closest('a, button:not(.mc-h)');
+    if (b && !b.dataset.x) return;          /* a real action (Call / Text / Email / Save / a list line) */
+    if (b && b.dataset.x) { e.preventDefault(); if (!c.classList.contains('open')) toggle(c); return; }
+    toggle(c);
+  });
+
   /* ---- search + filter ---- */
   function apply() {
     var q = inp.value.trim().toLowerCase(), qd = q.replace(/\D/g, ''), n = 0;
@@ -69,6 +104,7 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
       if (c.hidden === hit) c.hidden = !hit; if (hit) n++;
     });
     $('.mc-no').hidden = n > 0; el.classList.toggle('q', !!q);
+    if (q && n === 1) { var only = cards.filter(function (c) { return !c.hidden; })[0]; if (!only.classList.contains('open')) toggle(only); }
   }
   inp.addEventListener('input', apply);
   inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') inp.blur(); });

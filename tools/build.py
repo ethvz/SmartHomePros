@@ -91,8 +91,6 @@ def patch_recruit():
     s = re.sub(NAV_RE, '', s)
     assert '</head>' in s, 'patch target missing: fr nav include'
     s = s.replace('</head>', '<link rel="stylesheet" href="../nav/shpnav.css?v=%s">\n<script src="../nav/shpnav.js?v=%s" defer></script>\n</head>' % (nv, nv), 1)
-    # no black bar at the bottom: the page runs under the home indicator (the controls are kept clear of it in nav/shpnav.css)
-    s = sub(s, '- safeTop - safeBot;', '- safeTop;   /* Smart Home Pros: under the home indicator too (no black bar); safeBot still read for the controls */', 'fr stage height')
     open(p, 'w', encoding='utf-8').write(s)
     p = os.path.join(ROOT, 'recruit/sw.js'); s = open(p).read()
     s = sub(s, 'ks.filter(k => k !== V && k !== MC && k !== META)', "ks.filter(k => k.startsWith('fast-recruit-') && k !== V)", 'fr sw caches')
