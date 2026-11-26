@@ -1,5 +1,5 @@
 /* iPhone portrait (html.pp) behaviour: prodA group. Only act when document.documentElement.classList.contains("pp"). */
-(function(){
+(function(){ try{
   const BOX=['#prScroll','#hbScroll','#thScroll'], isPP=()=>document.documentElement.classList.contains('pp'), $=q=>document.querySelector(q);
 
   /* ---- Hardware|Specs strips: in pp each pane is 600 wide, so the swipe step must follow the pane width (.wide makes
@@ -35,7 +35,7 @@
       c.dataset.n=n; const rows=list?0:n>4?2:n?(n===4?2:1):0, ctlH=list?list.children.length*64:rows*112+(rows?(rows-1)*12:0);
       const r=ROI[id+':'+sec.dataset.t]||[0,0,1376,964], top0=104, bot=170, gap=ctlH?28:0;
       const k=Math.min(600/r[2],(H-top0-bot-ctlH-gap)/r[3]), vh=r[3]*k, tot=vh+gap+ctlH, y=top0+Math.max(0,(H-top0-bot-tot)/2);
-      w.style.transform=`translate(${(300-(r[0]+r[2]/2)*k).toFixed(1)}px,${(y-r[1]*k).toFixed(1)}px) scale(${k.toFixed(4)})`;
+      w.style.translate=`${(300-(r[0]+r[2]/2)*k).toFixed(1)}px ${(y-r[1]*k).toFixed(1)}px`; w.style.scale=k.toFixed(4);
       c.style.top=(y+vh+gap).toFixed(0)+'px'; c.style.height=ctlH+'px'; sec.style.setProperty('--ppk',k.toFixed(4));
     }); }
 
@@ -49,4 +49,5 @@
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
   new MutationObserver(later).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   addEventListener('resize',later); addEventListener('orientationchange',()=>setTimeout(later,300)); later();
+  }catch(e){ window.__ppAerr=String(e&&e.stack||e); }
 })();

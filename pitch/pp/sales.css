@@ -85,9 +85,8 @@ html.pp #p-moves .mcard{--ch:calc((var(--H) - 176px - 88px - 28px) / 3);left:16p
 html.pp #p-moves .mcard:nth-of-type(1){top:176px}
 html.pp #p-moves .mcard:nth-of-type(2){top:calc(176px + var(--ch) + 14px)}
 html.pp #p-moves .mcard:nth-of-type(3){top:calc(176px + var(--ch) * 2 + 28px)}
-html.pp #p-moves .mcard img{display:block;width:100%;height:calc(var(--ch) - 168px);border-radius:20px!important;object-position:50% 55%}
+html.pp #p-moves .mcard img{display:block;width:100%;height:calc(var(--ch) - 162px);border-radius:20px!important;object-position:50% 55%}
 html.pp #p-moves .mcard h3{font-size:25px;line-height:29px;margin:12px 12px 6px}
-html.pp #p-moves .mcard h3 br{display:none}
 html.pp #p-moves .mcard p{font-size:17px;line-height:23px;margin:0 12px}
 html.pp #p-moves .mcard .price{left:auto;right:22px;top:22px;bottom:auto;height:46px;width:auto;padding:0 20px;font-size:20px;font-weight:600;background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 html.pp #p-moves .mcard small{margin:4px 12px 0;font-size:13px}

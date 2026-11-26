@@ -38,7 +38,7 @@ html.pp #p-about .nrgt .nl{left:22px;top:22px;width:96px}
 html.pp #p-about .ab:nth-child(8)>img:not(.bg){width:auto!important;height:calc(100% - 20px)!important;top:10px!important}
 
 /* ================= GIVES BACK: photo + live stats instead of the landscape art ================= */
-html.pp #p-gives{background:#edeae4}
+html.pp #p-gives{background:linear-gradient(180deg,#edeae4 0,#edeae4 calc(100% - var(--ppFoot,68px)),#000 calc(100% - var(--ppFoot,68px)))}
 html.pp #p-gives>img.full{display:none!important}
 html.pp #p-gives .gvp{display:flex;flex-direction:column;position:absolute;left:0;top:0;width:100%;height:var(--U);color:#111}
 html.pp .gvp-ph{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;background:#3a4a55}
@@ -62,7 +62,7 @@ html.pp #p-gives.on .gvp-hd,html.pp #p-gives.on .gvp-cd{animation:fadeUp .9s var
 html.pp #p-gives.on .gvp-cd{animation-delay:.12s}
 
 /* ================= AWARDS: one column, same scrolling list ================= */
-html.pp #p-awards .scroll{padding:0 24px 150px}
+html.pp #p-awards .scroll{padding:0 24px 150px;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - var(--ppFoot,68px) - 70px),transparent calc(100% - var(--ppFoot,68px)));mask-image:linear-gradient(180deg,#000 calc(100% - var(--ppFoot,68px) - 70px),transparent calc(100% - var(--ppFoot,68px)))}
 html.pp #p-awards .aw-h{padding:calc(var(--bt) + 24px) 0 26px}
 html.pp #p-awards .aw-h h1{font-size:60px;letter-spacing:-1.8px}
 html.pp #p-awards .aw-h h2{font-size:38px}
@@ -88,7 +88,7 @@ html.pp #p-install .lh-txt p{margin-top:20px;font-size:21px;max-width:none}
 
 /* ================= MAP: full-width map, counter stacked above it ================= */
 html.pp #p-map{background:radial-gradient(120% 60% at 50% 62%,rgba(5,229,175,.10),rgba(0,0,0,0) 60%),#000}
-html.pp #p-map .usm{left:-50px!important;width:700px!important;height:434px!important;top:calc(var(--U)*.5 + 130px)!important;transform:translateY(-50%)!important}
+html.pp #p-map .usm{left:20px!important;width:560px!important;height:347px!important;top:calc(var(--U)*.5 + 137px)!important;transform:translateY(-50%)!important}
 html.pp #p-map .usm-t{top:auto!important;bottom:calc(100% + 34px);left:50%;transform:translateX(-50%)!important;padding:0;background:none;white-space:nowrap}
 html.pp #p-map .usm-t i{font-size:26px;letter-spacing:5px}
 html.pp #p-map .usm-t b{font-size:128px;letter-spacing:-4.5px;margin:14px 0 10px}
@@ -99,12 +99,12 @@ html.pp #p-sign .sgn-sc{left:0!important;width:100%!important;height:100%!import
 html.pp #p-sign .sgn-s{height:var(--H)!important}
 html.pp #p-sign .sgn-s:first-child>img:first-child{object-position:0 0!important;transform-origin:0 0;transform:scale(3.4);filter:blur(10px) brightness(.8) saturate(1.15)}
 html.pp #p-sign .sgn-s>img.sgn-pp{display:block;inset:auto!important;left:20px!important;right:20px!important;top:calc(var(--bt) + 10px)!important;
-  width:560px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 100%!important;
+  width:540px!important;left:30px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 0!important;
   filter:drop-shadow(0 26px 34px rgba(0,0,0,.45))}
 html.pp #p-sign.on .sgn-pp{animation:sgnUp .9s cubic-bezier(.22,1,.36,1) backwards}
 @keyframes sgnUp{from{opacity:0;transform:translateY(60px)}}
 html.pp #p-sign .sgn-s:nth-child(2) img{object-position:24% 60%!important}
-html.pp #p-sign .sgn-dots{left:18px}
+html.pp #p-sign .sgn-dots{left:16px;padding:12px 9px;border-radius:14px;background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 
 /* ================= VIDEOS: 2-column library ================= */
 html.pp #p-videos .vl2{padding:calc(var(--bt) + 10px) 24px 150px}
@@ -116,7 +116,7 @@ html.pp #p-videos .vl2-g{grid-template-columns:1fr 1fr;gap:14px}
 html.pp #p-videos .vl2-c{border-radius:24px;aspect-ratio:4/5}
 html.pp #p-videos .vl2-c.big{grid-column:span 2;grid-row:auto;aspect-ratio:16/11}
 html.pp #p-videos .vl2-c .mt{left:18px;right:18px;bottom:16px}
-html.pp #p-videos .vl2-c .mt em{font-size:13px}
+html.pp #p-videos .vl2-c .mt em{font-size:15px}
 html.pp #p-videos .vl2-c .mt b{font-size:20px}
 html.pp #p-videos .vl2-c.big .mt{left:24px;bottom:22px}
 html.pp #p-videos .vl2-c.big .mt b{font-size:34px}
@@ -126,5 +126,5 @@ html.pp #p-history>.bg,html.pp #p-history>.sc{left:0!important;width:100%!import
 html.pp #p-history>.bg{object-position:50% 50%}
 html.pp #p-history .hy2-h{left:32px;top:var(--bt)}
 html.pp #p-history .hy2-h h1{font-size:62px;letter-spacing:-2px}
-html.pp #p-history .hyx{transform:scale(.82)!important;left:-301px!important;
-  top:max(calc(var(--bt) + 150px - 328px),calc(var(--U)*.56 - 551px))!important}
+html.pp #p-history .hyx{transform:scale(.95)!important;left:-396px!important;
+  top:calc((var(--bt) + 140px + var(--U))/2 - 638px)!important}

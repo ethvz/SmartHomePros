@@ -8,9 +8,6 @@
     document.querySelectorAll('#p-social .hot').forEach(h=>h.style.setProperty('--soc',`url("${u}")`)); };
   if(soc){ setSoc(); soc.addEventListener('load',setSoc); }
 
-  /* Moves: titles run on one line upright (pp hides the <br>), so keep a space where the break was (invisible on iPad) */
-  document.querySelectorAll('#p-moves .mcard h3 br').forEach(br=>{ const p=br.previousSibling; if(!(p&&p.nodeType===3&&/\s$/.test(p.data))) br.before(' '); });
-
   /* Packages: scale each card's icon lines to fill the space under its title, as large as fits */
   const fitPk=()=>{ const pg=document.getElementById('p-packages'); if(!pg) return;
     const devs=pg.querySelectorAll('.pk-dev');
