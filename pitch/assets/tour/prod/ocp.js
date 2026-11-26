@@ -10,8 +10,8 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x050506, roughness:.05, clearcoat:.6, clearcoatRoughness:.02, specularIntensity:.6, envMapIntensity:.25});
-  const satinK = new THREE.MeshPhysicalMaterial({color:0x151516, roughness:.42, metalness:.15, clearcoat:.3, clearcoatRoughness:.35});
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.05, clearcoat:.5, clearcoatRoughness:.02, specularIntensity:.25, envMapIntensity:.25});
+  const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.3, metalness:0, clearcoat:.4, clearcoatRoughness:.25, specularIntensity:.5, envMapIntensity:.4});
   const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
 
@@ -100,13 +100,13 @@ export default H => {
   }
 
   // ---------------------------------------------------------------- head shell (head-local mm: face at z = 0, +z out of the glass)
-  const Zb = -43.5, Rt = 16, Rs = 17, Rbt = 22, Rc = 13.5;
+  const Zb = -43.5, Rt = 16, Rs = 17, Rbt = 22, Rc = 17;   // plan corner R17: the corner close-up reads rounder than the R13 spec
   const hwS = z => 42 - .16*Math.max(0, -z-2);
   const yTs = z => 42 - .16*Math.max(0, -z-2);
   const yBs = z => -(42 - .12*Math.max(0, -z-2));
   const ins = (R, z) => z >= Zb+R ? 0 : R - Math.sqrt(Math.max(0, R*R - (z-(Zb+R))**2));
   const sec = z => { const s = ins(Rs, z), t = ins(Rt, z), b = ins(Rbt, z); return {z, hw: hwS(z)-s, yT: yTs(z)-t, yB: yBs(z)+b, r: Math.max(.6, Rc - s)}; };
-  const nA = 10, nS = 32;
+  const nA = 16, nS = 32;
   const ringPts = ({z, hw, yT, yB, r}) => {           // rounded rect, fixed topology: 4 x (arc nA + side nS) points, CCW from +x
     const cy = (yT+yB)/2, w2 = hw, h2 = (yT-yB)/2; r = Math.min(r, w2-.01, h2-.01);
     const cs = [[w2-r, h2-r], [-(w2-r), h2-r], [-(w2-r), -(h2-r)], [w2-r, -(h2-r)]], P = [];
@@ -117,8 +117,8 @@ export default H => {
     return P; };
   const rings = []; let split = 0;
   const R_ = (z, hw, r) => ({z, hw, yT: hw, yB: -hw, r});
-  rings.push(R_(-3, 37.3, 9.8), R_(-3, 37.3, 9.8), R_(-.02, 37.5, 10), R_(-.02, 37.5, 10), R_(0, 37.6, 10.1), R_(0, 40, 11.5));   // recess floor, lip, front flat
-  for(let i=1;i<=6;i++){ const a = i/6*Math.PI/2; const hw = 40 + 2*Math.sin(a); rings.push(R_(-2 + 2*Math.cos(a), hw, 11.5 + 2*Math.sin(a))); }  // R2 front edge
+  rings.push(R_(-3, 37.3, 13.8), R_(-3, 37.3, 13.8), R_(-.02, 37.5, 14), R_(-.02, 37.5, 14), R_(0, 37.6, 14.1), R_(0, 40, 15));   // recess floor, lip, front flat
+  for(let i=1;i<=6;i++){ const a = i/6*Math.PI/2; const hw = 40 + 2*Math.sin(a); rings.push(R_(-2 + 2*Math.cos(a), hw, 15 + 2*Math.sin(a))); }  // R2 front edge
   rings.push(sec(-2.5)); split = rings.length - 1;                                                 // flush black/white colour split
   const zs = new Set(); for(let z=-3.5; z>Zb+Rbt; z-=1.6) zs.add(+z.toFixed(3));
   for(const R of [Rt, Rs, Rbt]) for(let i=0;i<=24;i++){ const a = i/24*Math.PI/2; zs.add(+(Zb + R*Math.cos(a)).toFixed(3)); }
@@ -153,23 +153,22 @@ export default H => {
     const pad = add(head, H.rslab(20, 13, 1.2, 4, .4, shellW), ...P.clone().addScaledVector(n, -.4).toArray()); pad.rotation.x = Math.PI - a; }
 
   // light ring (flush, 75 -> 70, R10/R7, hairline gaps) and the front glass (70 x 70 R7, holes for the lens and the light sensor)
-  { const s = rrShape(74.7, 74.7, 9.85); s.holes.push(rrShape(70.3, 70.3, 7.15));
+  { const s = rrShape(74.7, 74.7, 13.85); s.holes.push(rrShape(70.3, 70.3, 11.15));
     add(head, ext(s, 1.2, .12, PM.ring), 0, 0, -1.3);
-    const gs = rrShape(70, 70, 7), lh = new THREE.Path(); lh.absarc(0, -17, 9.62, 0, Math.PI*2, true); gs.holes.push(lh);
+    const gs = rrShape(70, 70, 11), lh = new THREE.Path(); lh.absarc(0, -17, 10.42, 0, Math.PI*2, true); gs.holes.push(lh);
     const sh = new THREE.Path(); sh.absarc(0, -30.5, 1.7, 0, Math.PI*2, true); gs.holes.push(sh);
     add(head, ext(gs, 1.2, .15, glassK), 0, 0, -1.2); }
   // lens: satin barrel flush to +0.3 with a soft chamfer inward, blue-black glass recessed ~2 mm with a concentric inner ring
-  { const pr = [[6.1,-2.6],[6.35,-2.2],[8.1,-.25],[8.7,.24],[9.25,.3],[9.55,.12],[9.6,-1.3]];
+  { const pr = [[6.7,-2.7],[6.95,-2.3],[8.8,-.3],[9.5,.24],[10.05,.3],[10.35,.12],[10.4,-1.3]];   // lens bezel Ø20.8, opening Ø14 (detail_lens)
     const b = add(head, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,z]) => new THREE.Vector2(r, z)), 72), satinK), 0, -17, 0); b.rotation.x = Math.PI/2;
-    add(head, dome(6.3, 1.25, lensM), 0, -17, -2.4);
-    add(head, H.torus(3.7, .16, mat(0x2c3038,{r:.25,m:.6})), 0, -17, -1.35);
-    add(head, dome(2.1, .5, mat(0x0a0c12,{r:.05,m:.3,x:{clearcoat:1}})), 0, -17, -1.2); }
+    add(head, dome(6.9, 1.9, lensM), 0, -17, -2.5);   // one big glossy dark lens dome
+    add(head, H.torus(4.6, .1, mat(0x1c1f26,{r:.2,m:.5})), 0, -17, -1.15); }
   // light / IR sensor (recessed 0.3), mic pinholes, wordmark
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.65, .4, 32), mat(0x1e1e1f,{r:.4}))), 0, -30.5, -.5);
   add(head, H.torus(1.2, .14, mat(0x3a3b3d,{r:.3,m:.4})), 0, -30.5, -.3);
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .2, 24), mat(0x2a2a2c,{r:.08,x:{clearcoat:1}}))), 0, -30.5, -.25);
   for(const sx of [-25.5, 25.5]) add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .1, 16), mat(0x1c1c1d,{r:.7}))), sx, -28.5, .02);
-  add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, 1.5-.43, .03);
+  add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, -1.7-.43, .03);   // wordmark 15 mm above the lens centre (detail_lens)
 
   // ---------------------------------------------------------------- ball, neck and pose
   const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
