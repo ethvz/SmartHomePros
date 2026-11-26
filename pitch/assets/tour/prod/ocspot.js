@@ -15,8 +15,8 @@ export default H => {
   const greyP = mat(0xbec0c2, {r:.55});
 
   // ---------------------------------------------------------------- bracket: vertical band + J bend (side profile extruded across 77 mm)
-  const Wb = 77, yTop = -40, yTg = -84, tT = 7, Tb = 12, Ro = 27, Ri = Ro - Tb, zTg = 74;
-  { const s = new THREE.Shape();                              // profile in (u = z, v = y): band 12 thick, outer bend R20, tongue 7 thick
+  const Wb = 77, yTop = -40, yTg = -85, tT = 6, Tb = 10, Ro = 24, Ri = Ro - Tb, zTg = 74;
+  { const s = new THREE.Shape();                              // profile in (u = z, v = y): band 10 thick, outer bend R24, tongue 6 thick
     s.moveTo(0, yTop); s.lineTo(0, yTg + Ro);
     s.absarc(Ro, yTg + Ro, Ro, Math.PI, 1.5*Math.PI, false); // outer bend -> tongue underside
     s.lineTo(Ro + 8, yTg); s.lineTo(Ro + 8, yTg + tT);       // overlaps the tongue plate
@@ -33,7 +33,7 @@ export default H => {
   // ---------------------------------------------------------------- light bar housing
   // plan (x, z): centre face z = 88 (~80 wide), wings back to (+-88, 20), rounded back; section: top y = -84, bottom y = -150,
   // the back a half-ellipse (rearmost z = 8 at mid height), all three LED faces leaning back 12 mm toward the bottom.
-  const zF = 88, yT = -84, yB = -150, lean = 15, wing = V2(66, 47).normalize(), cW = wing.x*40 + wing.y*zF;   // centre face ~80 wide, wings ~54 deg to the wall (front photo)
+  const zF = 86, yT = -85, yB = -149, lean = 13, wing = V2(66, 47).normalize(), cW = wing.x*40 + wing.y*zF;   // centre face ~80 wide, wings ~54 deg to the wall (front photo)
   const zBack = y => 20 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/33)**2));   // half-ellipse back, rearmost z = 6
   const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, zF - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
   const RC = [4, 4, 4, 4];                                    // corner radii: front corners R4; the wings run right back to the rounded (half-ellipse) back
@@ -49,7 +49,7 @@ export default H => {
     return P; };
   const NP = 4*(nC+1+nE-1);
   const leanAt = y => lean*(yT - y)/(yT - yB);
-  const wY0 = yT - 4, wY1 = yB + 4, band = 5;                      // window band: housing sits 5 mm back (reflector plates fill it)
+  const wY0 = yT - 4, wY1 = yB + 4, band = 7;                      // window band: housing sits 7 mm back, behind the reflector plates
   const levels = [];
   for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yT - 3 + 3*Math.cos(a), 3 - 3*Math.sin(a), 0]); }    // top edge R3
   levels.push([wY0+.6, 0, 0], [wY0+.3, .3, 0], [wY0, band, 1]);
@@ -83,7 +83,7 @@ export default H => {
     const down = nh.clone().multiplyScalar(-dv.x).add(new THREE.Vector3(0, -dv.y, 0)).normalize();   // down the leaning face
     const up = down.clone().negate(), out = new THREE.Vector3().crossVectors(t, up).normalize();
     f.matrix.makeBasis(t, up, out); f.matrix.setPosition(new THREE.Vector3(F.p.x, yT, F.p.y).addScaledVector(down, vMid)); f.matrixAutoUpdate = false;
-    const insetR = .8 + 1.5;                                  // reflector surface 1.5 behind the window, window 0.8 below the lip
+    const insetR = 2.2;                                       // reflector surface ~2 mm behind the flush outer window
     const plate = new THREE.Shape(); { const w = F.w/2, h = hW/2; plate.moveTo(-w, -h); plate.lineTo(w, -h); plate.lineTo(w, h); plate.lineTo(-w, h); plate.lineTo(-w, -h); }
     for(const cx of F.cols){ const p = new THREE.Path(); p.absarc(cx, 12, 6, 0, Math.PI, false); p.absarc(cx, -12, 6, Math.PI, 2*Math.PI, false); p.closePath(); plate.holes.push(p); }
     const pm = ext(plate, 2.5, .5, refl); add(f, pm, 0, 0, -insetR - 2.5); pm.castShadow = false; pm.receiveShadow = true;
@@ -99,19 +99,19 @@ export default H => {
       const start = 3*B + nC + 2, end = 6*B - 2;              // right wing (just inside its rear end) -> front -> left wing
       for(let i=start;i<=end;i++) out.push(ring[i]);
       return out; };
-    const glass = new THREE.MeshPhysicalMaterial({color:0xffffff, roughness:.05, metalness:0, transparent:true, opacity:.22, clearcoat:1, clearcoatRoughness:.03, side:THREE.DoubleSide, depthWrite:false});
+    const glass = new THREE.MeshPhysicalMaterial({color:0xe9eef2, roughness:.04, metalness:0, transparent:true, opacity:.32, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:1.6, side:THREE.DoubleSide, depthWrite:false});
     const smoke = new THREE.MeshPhysicalMaterial({color:0x7a7d80, roughness:.18, transparent:true, opacity:.9, clearcoat:.6, side:THREE.DoubleSide});
     const strip = (yA, yB2, m, dE = 0) => { const lv = [yA, (yA+yB2)/2, yB2], pos = [], idx = []; let n = 0;
-      for(const y of lv){ const C = chainAt(leanAt(y) + .8 - dE, y); n = C.length; for(const [x, z] of C) pos.push(x, y, z); }
+      for(const y of lv){ const C = chainAt(leanAt(y) + .12 - dE, y); n = C.length; for(const [x, z] of C) pos.push(x, y, z); }
       for(let r=0;r<lv.length-1;r++) for(let i=0;i<n-1;i++){ const a = r*n+i, b = a+1, c = a+n, d = c+1; idx.push(a,b,c, b,d,c); }
       const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
       return add(M, new THREE.Mesh(ge, m)); };
-    strip(wY0 - .1, wY1 + .1, glass).renderOrder = 2;
-    strip(wY0 - .1, wY0 - 1.9, smoke, .12); strip(wY1 + 1.9, wY1 + .1, smoke, .12);
+    strip(wY0 + .2, wY1 - .2, glass).renderOrder = 2;                 // flush outer window over the whole band
+    strip(wY0 + .2, wY0 - 1.8, smoke, .06); strip(wY1 + 1.8, wY1 - .2, smoke, .06);
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below)
-  { const yP = -96, th = .33, zP = zBack(yP);
+  { const yP = -97, th = .33, zP = zBack(yP);
     const p = add(M, H.rslab(70, 22, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
     for(const sx of [-30, 30]){ const c = add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, .3, 32), mat(0xd9dadb,{r:.45}))), sx, 0, .65); } }
   return g;

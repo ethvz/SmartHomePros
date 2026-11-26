@@ -100,7 +100,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
 
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
   const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6, sheen: .25, sheenRoughness: .8, sheenColor: 0xffffff });
-  const shell = lineMat(body, [{ ax: 'y', at: 10, B: 0x9a9a98, rB: .55, w: .3, col: 0x6c6c6a, k: .9 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
+  const shell = lineMat(body, [{ ax: 'y', at: 10, B: 0x8c8c8a, rB: .55, w: .3, col: 0x6c6c6a, k: .9 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
   const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5 + 1.7 * u, st = 8, out = [];
     for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
     for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
@@ -110,7 +110,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
     { type: 'pocket', pts: circ(0, -6.5, 9, 120), prof: uni(dishP) },
-    { type: 'hole', pts: circ(0, 18.5, 3, 72), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
+    { type: 'hole', pts: circ(0, 18.5, 3.2, 72), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
   add(B, solid(loops, shell));
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
@@ -126,7 +126,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* 7. debossed "vivint" on the cap (tone on tone) */
   const logo = plane(30, 10, 40, () => {});
   logo.material.roughness = .55; add(B, logo, 0, 12.6, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 25 * 40, 3,
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 22 * 40, 3,
     'rgba(40,40,40,.42)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
 
   if ((/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search))) return g;   // product-photo studio views: the pendant alone

@@ -137,7 +137,19 @@
   }
   function histWatch() { const hx = Q('#ocHist'); if (!hx || hx.__ppw) return; hx.__ppw = 1; new MutationObserver(() => requestAnimationFrame(histFit)).observe(hx, { childList: true }); }
 
-  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); return; } aiLayout(); cmLayout(); featLayout(); histFit(); }
+
+  /* ---------- OCP vs Arlo: a second, synced copy of the split clip so each half gets its own full-width row ---------- */
+  function arloTwin() {
+    const v = Q('#ocArloVid'); if (!v) return; let t = Q('#ocArloVid2');
+    if (!isPP()) { if (t) t.pause(); return; }
+    if (!t) { t = v.cloneNode(false); t.id = 'ocArloVid2'; t.removeAttribute('style'); t.muted = true; v.after(t);
+      const sync = () => { if (!isPP()) return; if (Math.abs(t.currentTime - v.currentTime) > .12) { try { t.currentTime = v.currentTime; } catch (e) {} }
+        if (v.paused !== t.paused) v.paused ? t.pause() : t.play().catch(() => {}); };
+      ['play', 'pause', 'seeked', 'timeupdate'].forEach(ev => v.addEventListener(ev, sync)); }
+    if (!t.src && v.currentSrc) t.src = v.currentSrc;
+  }
+
+  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); arloTwin(); return; } aiLayout(); cmLayout(); featLayout(); histFit(); arloTwin(); }
   function boot() { aiBuild(); cmBuild(); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
