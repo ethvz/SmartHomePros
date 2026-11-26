@@ -788,6 +788,31 @@ function rring(w,h,r,t,d,m){
   const s = rrShape(w,h,r); s.holes.push(rrShape(w-2*t,h-2*t,r-t));
   return new THREE.Mesh(new THREE.ExtrudeGeometry(s,{depth:d, bevelEnabled:false, curveSegments:32}), m);
 }
+/* flush colour split: ONE continuous surface whose colour/finish changes across a plane (as real two-shot mouldings and
+   cap/base joins do), with a fine dark parting line. axis 'x'|'y'|'z' in the mesh's local space; below `at` = A, above = B. */
+function splitMat(A, B, axis, at, line=.00035, lineCol=0x6a6d70){
+  const m = A.clone(); const cb = new THREE.Color(B.color), cl = new THREE.Color(lineCol), rb = B.roughness ?? A.roughness;
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uB = {value:cb}; sh.uniforms.uL = {value:cl}; sh.uniforms.uAt = {value:at}; sh.uniforms.uW = {value:line}; sh.uniforms.uRB = {value:rb};
+    sh.vertexShader = 'varying vec3 vOP;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vOP = position;');
+    sh.fragmentShader = 'varying vec3 vOP; uniform vec3 uB; uniform vec3 uL; uniform float uAt; uniform float uW; uniform float uRB;\n' + sh.fragmentShader
+      .replace('#include <color_fragment>', `#include <color_fragment>
+  float sd = vOP.${axis} - uAt; float fw = max(fwidth(sd), 1e-6);
+  float hi = smoothstep(-fw, fw, sd); diffuseColor.rgb = mix(diffuseColor.rgb, uB, hi);
+  diffuseColor.rgb = mix(diffuseColor.rgb, uL, (1.0 - smoothstep(uW*.5 - fw, uW*.5 + fw, abs(sd))) * .85);`)
+      .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+  roughnessFactor = mix(roughnessFactor, uRB, smoothstep(-fwidth(vOP.${axis}-uAt), fwidth(vOP.${axis}-uAt), vOP.${axis}-uAt));`);
+  };
+  m.customProgramCacheKey = () => 'split' + axis + at + cb.getHex() + cl.getHex() + rb;
+  return m;
+}
+/* extruded body (back at z=0, face at z=d) with pockets cut into it: each pocket is a Shape/Path outline; the pocket's walls
+   come from the extrusion, the floor is a cap placed `depth` below the face. Returns the body mesh; add caps separately. */
+function pocketBody(outline, d, b, m, pockets=[]){
+  const s = outline.clone ? outline : outline; for(const p of pockets) s.holes.push(p);
+  const g = new THREE.ExtrudeGeometry(s, {depth:d-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:6, curveSegments:32});
+  g.translate(0,0,b); g.computeVertexNormals(); const x = new THREE.Mesh(g, m); x.castShadow = x.receiveShadow = true; return x;
+}
 /* loft: a smooth shell through superellipse sections [z, w, h, p] (p≈2 round … 8+ square), closed at both ends.
    Used for camera heads and other moulded bodies that taper or round off toward the back. */
 function sqPt(w,h,p,t){ const c=Math.cos(t), s=Math.sin(t); return [w/2*Math.sign(c)*Math.abs(c)**(2/p), h/2*Math.sign(s)*Math.abs(s)**(2/p)]; }
@@ -991,7 +1016,9 @@ const MODELS = {
       geo.setIndex(new THREE.BufferAttribute(p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni),1));
       if(p.g===1){ const uv = new Float32Array(p.nv*2); for(let i=0;i<p.nv;i++){ uv[2*i]=(pos[3*i]+.0354)/.0708; uv[2*i+1]=(pos[3*i+1]+.0493)/.0475; } geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, M[p.g]); m.castShadow = true; g.add(m);
+      if(OCPM.parts.indexOf(p) === 0) m.visible = false;   // the CAD's inner chassis: a tab of it pokes out below the shell
     }
+    add(g, rslab(.074, .097, .002, .008, .0006, PM.mount), 0, -.0005, .001);   // closes the back of the mount against the wall
     // head (no CAD yet): white stem out of the mount's knurled collar, rising into the underside of a rounded-square head
     // with a black glass face, a red light ring around its edge, the lens low on the centre line (Gen 3 official renders)
     const SO = V(0,.0193,.046), head = ocpHead(), HP = V(0,.066,.092);
@@ -1566,6 +1593,34 @@ if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).th
 });
 // test hooks for review
 window.__tour = { focus:k=>focus(byKey[k]), overview, state, camera, controls, scene, THREE, MODELS, renderer };
+/* dev studio: ?studio=<product>&az=<deg>&el=<deg>[&fill=<0..1>] shows one product alone on a light backdrop, lit like a
+   product shot, from that angle (az 0 = straight at its face, + = from its right). Used to render review sheets. */
+if(/[?&]studio=/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(() => new Promise(r => setTimeout(r, 700))).then(() => {   // after the intro overview() has started
+  const Q = new URLSearchParams(location.search), k = Q.get('studio'), az = +(Q.get('az')||0)*Math.PI/180, el = +(Q.get('el')||0)*Math.PI/180, fill = +(Q.get('fill')||.62);
+  document.body.classList.add('studio'); const st = document.createElement('style');
+  st.textContent = 'body.studio > *:not(canvas){display:none!important} body.studio canvas{display:block!important}'; document.head.appendChild(st);
+  for(const o of scene.children) o.visible = false;
+  scene.background = new THREE.Color(0xf1f1f0); scene.environmentIntensity = .85;
+  const g = new THREE.Group(); scene.add(g);
+  const m = MODELS[k](); const box = new THREE.Box3().setFromObject(m), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+  m.position.sub(c); g.add(m);
+  const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(-.5, .9, .8); g.add(key);
+  const fl = new THREE.DirectionalLight(0xffffff, .9); fl.position.set(.9, .1, .6); g.add(fl);
+  const rim = new THREE.DirectionalLight(0xffffff, 1.1); rim.position.set(.2, .7, -1); g.add(rim);
+  g.add(new THREE.HemisphereLight(0xffffff, 0xb9b9b9, .55));
+  state.focus = null; state.fly = null; state.idleAt = Infinity; controls.autoRotate = false; controls.enableDamping = false; openLimits();
+  const R = Math.max(sz.x, sz.y, sz.z) * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov/2)) / fill * 1.15;
+  controls.target.set(0,0,0); camera.position.set(Math.sin(az)*Math.cos(el)*R, Math.sin(el)*R, Math.cos(az)*Math.cos(el)*R); camera.lookAt(0,0,0); controls.update();
+  if(Q.has('grid')){                                   // review sheet: six views in one image (front, 3/4 left, 3/4 right, right side, top, back)
+    const V6 = [[0,0],[-40,15],[40,15],[90,0],[0,75],[180,10]].map(([a,e]) => { const c = camera.clone(), A = a*Math.PI/180, E = e*Math.PI/180;
+      c.position.set(Math.sin(A)*Math.cos(E)*R, Math.sin(E)*R, Math.cos(A)*Math.cos(E)*R); c.up.set(0,1,0); c.lookAt(0,0,0); c.aspect = 1; c.near = R*.05; c.far = R*20; c.clearViewOffset(); c.updateProjectionMatrix(); return c; });
+    const orig = renderer.render.bind(renderer), v2 = new THREE.Vector2();
+    renderer.render = (sc, cam) => { renderer.getSize(v2); const w = Math.floor(v2.x/3), h = Math.floor(v2.y/2); renderer.setScissorTest(true);
+      V6.forEach((c, i) => { const x = (i%3)*w, y = (1-Math.floor(i/3))*h; renderer.setViewport(x, y, w, h); renderer.setScissor(x+1, y+1, w-2, h-2); orig(sc, c); });
+      renderer.setScissorTest(false); renderer.setViewport(0, 0, v2.x, v2.y); };
+  }
+  window.__studioReady = true; document.title = 'STUDIO_READY ' + sz.toArray().map(v => (v*1000).toFixed(1)).join('x');
+});
 </script>
 <p id="credits" style="position:fixed;left:12px;bottom:4px;margin:0;font-size:9px;color:rgba(255,255,255,.28);z-index:1;pointer-events:none">Sofa: Wayfair (CC BY 4.0) · Car: “Tesla 2018 Model 3” by Ameer Studio (CC BY 4.0, modified) · Furniture &amp; textures: Poly Haven (CC0)</p>
 </body></html>
