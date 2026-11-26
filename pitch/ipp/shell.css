@@ -18,6 +18,10 @@ html.ipp #allTiles .ht .cl{font-size:15px!important}
 html.ipp .ht>.ippalt,html.ipp #flipLayer :is(.fa,.fb)>.ippalt{display:block}
 html.ipp #flipLayer :is(.fa,.fb):has(>img.ippalt)>img:not(.ippalt){display:none!important}
 html.ipp :is(.ht,.fa,.fb):has(>img.ippalt)>.hubt{display:none!important}
+html.ipp #allTiles .ht[data-k=shp2]::after,html.ipp #flipLayer .ht[data-f=shp2] .sm::after{content:none!important}
+/* name at the bottom like every other tile, above the glass layer (.lg refracts what sits under it) */
+html.ipp :is(.ht,.fa,.fb)>.cl.ippalt{top:auto!important;bottom:7%!important;z-index:3}
+html.ipp .hcat .ht[data-k=shp2]:has(img[src*="scr.webp"])>.cl.ippalt.ippalt{top:auto!important;bottom:7%!important;font-size:16px!important;color:rgba(255,255,255,.62)!important}
 html.ipp .ht:has(>img.ippalt)>img:not(.ippalt){display:none!important}
 html.ipp :is(.ht,.fa,.fb)>img.ippalt{transform:translate(-50%,-50%)!important;object-fit:contain!important}
 

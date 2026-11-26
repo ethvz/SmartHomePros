@@ -166,7 +166,7 @@ html.ipp #hbScroll .hbh-vid{object-fit:cover}
 html.ipp #p-hub #emuLayer{width:1032px!important}
 html.ipp #p-hub #emuLayer .st{height:var(--H)!important}
 /* Hardware | Specs: the Hub on top (ipp/prodA.js tells the 3D view where), the callouts / table under it at full size */
-html.ipp #p-hub #hbScroll .otab.fb>.strip{width:2064px!important;height:var(--H)!important}
+html.ipp #p-hub #hbScroll .otab.fb>.strip{left:0!important;width:2064px!important;height:var(--H)!important}
 html.ipp #p-hub #hbScroll .otab.fb .hbpane{width:1032px!important;height:var(--H)!important;transform:none!important}
 html.ipp #p-hub #hbCall{display:grid!important;grid-template-columns:1fr 1fr;align-content:start;gap:30px 64px;padding:calc(var(--ipTop) + 560px) var(--ipR) 0 var(--ipL);box-sizing:border-box}
 html.ipp #p-hub #hbCall>.hbln,html.ipp #p-hub #hbCall>.hbdot{display:none!important}
@@ -187,7 +187,10 @@ html.ipp #p-hub #hbOut .hbfoot{left:var(--ipL)!important;right:var(--ipR)}
 /* hero: the whole Hub in view (the landscape video at near its landscape size) over a soft copy of its wall; title on top */
 html.ipp #hbScroll [data-t=hero]{background:#3b3026}
 html.ipp #hbScroll [data-t=hero]::before{content:"";position:absolute;inset:-60px;background:url(../assets/hb/hero_v.jpg?v=73) 50% 50%/cover;filter:blur(30px) brightness(.78);z-index:0;pointer-events:none}
-html.ipp #hbScroll .hbh-vid{left:-129px!important;width:1290px!important;height:968px!important;top:calc(var(--H)/2 - 444px)!important;object-fit:cover!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 89%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 89%,transparent 100%)}
+html.ipp #hbScroll .hbh-vid{left:-7px!important;width:1040px!important;height:780px!important;top:calc(var(--H)/2 - 360px)!important;object-fit:cover!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 89%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 11%,#000 89%,transparent 100%)}
 html.ipp #hbScroll .hbh-top{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 50px)!important}
 /* Competitive table: six rivals share the width */
 html.ipp #p-hub #hbScroll #hbCmp .hbt{grid-template-columns:150px repeat(6,1fr)!important}
+html.ipp #p-hub #hbScroll #hbCmp .hbt>*{min-width:0}
+html.ipp #p-hub #hbCmp .hbt .well img{width:108px!important;height:84px!important}
+html.ipp #p-hub #hbCmp .hbt .well{height:92px!important}

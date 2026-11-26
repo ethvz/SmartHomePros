@@ -1,9 +1,0 @@
-BEGIN:VCARD
-VERSION:3.0
-PRODID:-//Smart Home Pros//Contacts//EN
-N:Vivint – Backends;;;;
-FN:Vivint – Backends
-ORG:Vivint
-item1.EMAIL;type=INTERNET;type=WORK:repbackends@vivint.com
-item1.X-ABLabel:Email
-END:VCARD

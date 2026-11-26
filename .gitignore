@@ -7,3 +7,6 @@ _bisect/
 _artifact/
 _artifact.manifest
 .claude/artifact-stamp
+
+# iCloud conflict copies (Documents is iCloud-synced): never ship "name 2.ext" duplicates
+* 2.*

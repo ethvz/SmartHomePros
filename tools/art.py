@@ -13,7 +13,7 @@ SERVED = set('htm html css cjs js jsx mjs wasm csv cts geojson json map md mts t
 LANDING_KEEP = {'pitch/assets/home2.webp', 'pitch/assets/vl/imagine.webp', 'pitch/assets/icon-192.png', 'recruit/a_470ace19f4f41e262a08af30291d0034.webp', 'recruit/icon.png', 'connect/bg.webp'}
 PACK_MAX = 7_000_000
 # the SHP page's own pictures (connect/: background, announcements) ship as plain files
-LANDING_KEEP |= {os.path.relpath(_f, ROOT) for _f in __import__('glob').glob(os.path.join(ROOT, 'connect', '**', '*.*'), recursive=True)}
+LANDING_KEEP |= {os.path.relpath(_f, ROOT) for _f in __import__('glob').glob(os.path.join(ROOT, 'connect', '**', '*.*'), recursive=True) if ' 2.' not in os.path.basename(_f)}   # skip iCloud conflict copies
 # images that the iPhone-portrait stylesheets (pitch/pp/*.css) reference with url(): those files are not run through the
 # packer's HTML transform, so their images must stay as plain files in the artifact
 for _c in __import__('glob').glob(os.path.join(ROOT, 'pitch', 'pp', '*.css')) + __import__('glob').glob(os.path.join(ROOT, 'pitch', 'ipp', '*.css')):
