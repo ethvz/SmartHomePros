@@ -64,17 +64,17 @@ export default H => {
   { const N = 512, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
     const cols = 16, rows = 24, cw = N/cols, rh = N/rows;                                   // tile = 12.8 x 14.4 mm (0.8 x 0.6 mm stitches)
     let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
-    x.fillStyle = '#5a5a5a'; x.fillRect(0, 0, N, N);                                        // dark gaps between the stitch columns
+    x.fillStyle = '#3e3e3e'; x.fillRect(0, 0, N, N);                                        // dark gaps between the stitch columns
     for(let r=0;r<rows;r++) for(let q=0;q<cols;q++) for(const side of [-1, 1]){                 // each stitch: two loops leaning into a V
       const roll = rnd(); let v = 182 + rnd()*14; if(roll < .12) v = 140 + rnd()*14; else if(roll > .92) v = 226 + rnd()*20;
       const cx = q*cw + cw/2 + side*cw*.21, cy = r*rh + rh/2;
       x.save(); x.translate(cx, cy); x.rotate(side*.6);
-      const gr = x.createLinearGradient(-cw*.19, 0, cw*.19, 0), e = `rgb(${v*.6|0},${v*.6|0},${v*.6|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
+      const gr = x.createLinearGradient(-cw*.19, 0, cw*.19, 0), e = `rgb(${v*.5|0},${v*.5|0},${v*.5|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
       gr.addColorStop(0, e); gr.addColorStop(.45, m); gr.addColorStop(1, e);
-      x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.19, rh*.62, 0, 0, Math.PI*2); x.fill(); x.restore(); }
+      x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.17, rh*.6, 0, 0, Math.PI*2); x.fill(); x.restore(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/12.8, 1/14.4); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
-    const fab = new THREE.MeshPhysicalMaterial({color:0xb6b6b6, map:t, bumpMap:bt, bumpScale:2, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
+    const fab = new THREE.MeshPhysicalMaterial({color:0xb0b0b0, map:t, bumpMap:bt, bumpScale:3, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});
     const b = .3, fg = new THREE.ExtrudeGeometry(offsetShape(P, 2.0), {depth:1.1-2*b, bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelOffset:-b, bevelSegments:4, curveSegments:24});
     fg.translate(0, 0, 29.7 + b); fg.scale(k, k, k); const fm = add(g, new THREE.Mesh(fg, fab)); fm.receiveShadow = true; }
 

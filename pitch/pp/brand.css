@@ -1,1 +1,129 @@
 /* iPhone portrait (html.pp) layout: brand group. Every rule is scoped to html.pp. */
+/* (.gvp is only ever shown in pp) */
+.gvp,.sgn-pp{display:none}
+
+/* ---- every brand section: sit on the 600-wide upright stage, not the 1376 landscape canvas ---- */
+html.pp :is(#p-about,#p-gives,#p-awards,#p-install,#p-map,#p-sign,#p-videos,#p-history){
+  left:var(--brx,calc(-1*var(--gx,0px)))!important;right:auto!important;width:var(--W,600px)!important;overflow:hidden!important;
+  --bt:max(56px,calc(var(--brsat,0px) + 20px));--U:calc(var(--H,1230px) - var(--ppFoot,68px))}
+
+/* ================= ABOUT: bento re-gridded to 2 columns, filling the screen ================= */
+html.pp #p-about{--g:14px;--cw:269px;--A:calc(var(--U) - var(--bt) - 20px - 4*var(--g));
+  --r1:calc(var(--A)*.26);--r2:calc(var(--A)*.16);--r4:calc(var(--A)*.21);
+  --y2:calc(var(--bt) + var(--r1) + var(--g));--y3:calc(var(--y2) + var(--r2) + var(--g));
+  --y4:calc(var(--y3) + var(--r2) + var(--g));--y5:calc(var(--y4) + var(--r4) + var(--g))}
+html.pp #p-about>.ab{border-radius:28px!important}
+html.pp #p-about>.ab:nth-child(1){left:24px!important;top:var(--bt)!important;width:552px!important;height:var(--r1)!important}
+html.pp #p-about>.ab:nth-child(2){left:24px!important;top:var(--y2)!important;width:var(--cw)!important;height:var(--r2)!important}
+html.pp #p-about>.ab:nth-child(3){left:307px!important;top:var(--y2)!important;width:var(--cw)!important;height:var(--r2)!important}
+html.pp #p-about>.ab:nth-child(4){left:24px!important;top:var(--y3)!important;width:var(--cw)!important;height:var(--r2)!important}
+html.pp #p-about>.ab:nth-child(5){left:307px!important;top:var(--y3)!important;width:var(--cw)!important;height:var(--r2)!important}
+html.pp #p-about>.ab:nth-child(6){left:24px!important;top:var(--y4)!important;width:var(--cw)!important;height:var(--r4)!important}
+html.pp #p-about>.ab:nth-child(7){left:307px!important;top:var(--y4)!important;width:var(--cw)!important;height:var(--r4)!important}
+html.pp #p-about>.ab:nth-child(8){left:24px!important;top:var(--y5)!important;width:var(--cw)!important;height:var(--r4)!important}
+html.pp #p-about>.ab:nth-child(9){left:307px!important;top:var(--y5)!important;width:var(--cw)!important;height:var(--r4)!important}
+html.pp #p-about .ab:active{transform:scale(.97)}
+html.pp #p-about .ab .bx{left:22px;right:22px;bottom:20px}
+html.pp #p-about .ab h2{font-size:48px;letter-spacing:-1.4px}
+html.pp #p-about .ab h3{font-size:25px;letter-spacing:-.5px}
+html.pp #p-about .ab .num{font-size:60px;letter-spacing:-2px}
+html.pp #p-about .ab .lab{font-size:17px;line-height:1.25;margin-top:6px}
+html.pp #p-about .ab .arr{right:14px;top:14px;width:34px;height:34px}
+html.pp #p-about .rec2 .top{left:22px;top:20px}
+html.pp #p-about .rec2 .top .eb{display:none}
+html.pp #p-about .rec2 .top h3{margin-top:0!important;font-size:22px}
+html.pp #p-about .rec2 .logos{left:18px;right:18px;top:84px!important;bottom:16px;gap:10px;
+  grid-template-columns:repeat(3,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
+html.pp #p-about .nrgt .nl{left:22px;top:22px;width:96px}
+html.pp #p-about .ab:nth-child(8)>img:not(.bg){width:auto!important;height:calc(100% - 20px)!important;top:10px!important}
+
+/* ================= GIVES BACK: photo + live stats instead of the landscape art ================= */
+html.pp #p-gives{background:#edeae4}
+html.pp #p-gives>img.full{display:none!important}
+html.pp #p-gives .gvp{display:flex;flex-direction:column;position:absolute;left:0;top:0;width:100%;height:var(--U);color:#111}
+html.pp .gvp-ph{position:relative;flex:1 1 auto;min-height:200px;overflow:hidden;background:#3a4a55}
+html.pp .gvp-img{position:absolute;left:0;top:0;background:url(../assets/gives.webp?v=176) 0 0/100% 100% no-repeat;transform-origin:0 0}
+html.pp #p-gives.on .gvp-img{animation:gvpZ 9s cubic-bezier(.2,.6,.2,1) both}
+@keyframes gvpZ{from{scale:1.06}to{scale:1}}
+html.pp .gvp-ph::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,0) 26%,rgba(0,0,0,0) 78%,rgba(237,234,228,.85) 100%)}
+html.pp .gvp-hd{position:relative;flex:none;padding:18px 32px 0;margin-top:-6px}
+html.pp .gvp-eb{font-size:15px;font-weight:600;letter-spacing:2.6px;text-transform:uppercase;color:#1a1a1a}
+html.pp .gvp-hd h1{margin:10px 0 0;font-size:86px;line-height:.98;font-weight:600;letter-spacing:-3px;color:#111}
+html.pp .gvp-heart{position:absolute;right:34px;top:22px;width:150px;height:128px;
+  background:url(../assets/gives.webp?v=176) -466px -59px/1290px auto no-repeat}
+html.pp .gvp-cd{flex:none;margin:20px 20px 20px;padding:26px 22px 22px;border-radius:30px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.07)}
+html.pp .gvp-t{text-align:center;font-size:15px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:#1a1a1a}
+html.pp .gvp-g{display:grid;grid-template-columns:1fr 1fr;gap:18px 10px;margin-top:20px}
+html.pp .gvp-g div{display:flex;flex-direction:column;align-items:center;text-align:center}
+html.pp .gvp-g svg{width:38px;height:38px;color:#e8793a}
+html.pp .gvp-g b{margin-top:6px;font-size:46px;line-height:1.05;font-weight:500;letter-spacing:-1.4px;font-variant-numeric:tabular-nums;color:#151515}
+html.pp .gvp-g span{margin-top:2px;font-size:18px;color:#222}
+html.pp #p-gives.on .gvp-hd,html.pp #p-gives.on .gvp-cd{animation:fadeUp .9s var(--ease,cubic-bezier(.22,1,.36,1)) backwards}
+html.pp #p-gives.on .gvp-cd{animation-delay:.12s}
+
+/* ================= AWARDS: one column, same scrolling list ================= */
+html.pp #p-awards .scroll{padding:0 24px 150px}
+html.pp #p-awards .aw-h{padding:calc(var(--bt) + 24px) 0 26px}
+html.pp #p-awards .aw-h h1{font-size:60px;letter-spacing:-1.8px}
+html.pp #p-awards .aw-h h2{font-size:38px}
+html.pp #p-awards .aw-h[style]{padding-top:54px!important}
+html.pp #p-awards .aw-grid{grid-template-columns:1fr;gap:14px}
+html.pp #p-awards .aw-c{gap:20px;min-height:0;padding:20px 22px 20px 20px;border-radius:28px}
+html.pp #p-awards .aw-b{width:118px;height:118px}
+html.pp #p-awards .aw-c h3{font-size:23px}
+html.pp #p-awards .aw-c p{font-size:17px;line-height:1.38}
+html.pp #p-awards .aw-row{gap:16px;padding:16px 20px;min-height:96px}
+html.pp #p-awards .aw-row .dt{width:96px;font-size:15px}
+html.pp #p-awards .aw-row b{font-size:19px}
+html.pp #p-awards .aw-row .nl{width:78px;height:56px}
+
+/* ================= INSTALL: upright photo, installer centred, copy on a bottom scrim ================= */
+html.pp #p-install .lh-media,html.pp #p-install .lh-scrim{left:0!important;width:100%!important;height:100%!important}
+html.pp #p-install .lh-ph{width:100%!important;height:100%!important;object-position:61% 38%!important}
+html.pp #p-install .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.35) 0,rgba(0,0,0,0) 14%,rgba(0,0,0,0) 44%,rgba(0,0,0,.6) 64%,rgba(0,0,0,.9) 100%)!important}
+html.pp #p-install .lh-txt{left:32px;right:32px;width:auto;bottom:calc(68px + 44px)}
+html.pp #p-install .lh-txt .eb{font-size:15px;margin-bottom:14px}
+html.pp #p-install .lh-txt h1{font-size:78px;letter-spacing:-2.4px}
+html.pp #p-install .lh-txt p{margin-top:20px;font-size:21px;max-width:none}
+
+/* ================= MAP: full-width map, counter stacked above it ================= */
+html.pp #p-map .usm{left:0!important;width:600px!important;height:372px!important;top:calc(var(--U)*.6)!important;transform:translateY(-50%)!important}
+html.pp #p-map .usm-t{top:auto!important;bottom:calc(100% + 18px);left:50%;transform:translateX(-50%)!important;padding:0;background:none;white-space:nowrap}
+html.pp #p-map .usm-t i{font-size:24px;letter-spacing:4px}
+html.pp #p-map .usm-t b{font-size:104px;letter-spacing:-3.5px;margin:10px 0 6px}
+html.pp #p-map .usm-t span{font-size:42px}
+
+/* ================= YARD SIGN: slides fill the upright screen ================= */
+html.pp #p-sign .sgn-sc{left:0!important;width:100%!important;height:100%!important}
+html.pp #p-sign .sgn-s{height:var(--H)!important}
+html.pp #p-sign .sgn-s:first-child>img:first-child{object-position:0 0!important;transform-origin:0 0;transform:scale(3.4);filter:blur(10px) brightness(.8) saturate(1.15)}
+html.pp #p-sign .sgn-s>img.sgn-pp{display:block;inset:auto!important;left:20px!important;right:20px!important;top:calc(var(--bt) + 10px)!important;
+  width:560px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 100%!important;
+  filter:drop-shadow(0 26px 34px rgba(0,0,0,.45))}
+html.pp #p-sign.on .sgn-pp{animation:sgnUp .9s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes sgnUp{from{opacity:0;transform:translateY(60px)}}
+html.pp #p-sign .sgn-s:nth-child(2) img{object-position:24% 60%!important}
+html.pp #p-sign .sgn-dots{left:18px}
+
+/* ================= VIDEOS: 2-column library ================= */
+html.pp #p-videos .vl2{padding:calc(var(--bt) + 10px) 24px 150px}
+html.pp #p-videos .vl2-h h2{font-size:58px;margin:0 0 22px}
+html.pp #p-videos .vl2-chips{width:auto;flex-wrap:wrap;gap:10px;padding:0;background:none;border-radius:0;margin-bottom:24px}
+html.pp #p-videos .vl2-chips b{height:60px;padding:0 24px;border-radius:30px;background:#1c1c1c;font-size:18px}
+html.pp #p-videos .vl2-chips b:active{transform:scale(.96)}
+html.pp #p-videos .vl2-g{grid-template-columns:1fr 1fr;gap:14px}
+html.pp #p-videos .vl2-c{border-radius:24px;aspect-ratio:4/5}
+html.pp #p-videos .vl2-c.big{grid-column:span 2;grid-row:auto;aspect-ratio:16/11}
+html.pp #p-videos .vl2-c .mt{left:18px;right:18px;bottom:16px}
+html.pp #p-videos .vl2-c .mt em{font-size:13px}
+html.pp #p-videos .vl2-c .mt b{font-size:20px}
+html.pp #p-videos .vl2-c.big .mt{left:24px;bottom:22px}
+html.pp #p-videos .vl2-c.big .mt b{font-size:34px}
+
+/* ================= HISTORY: wheel scaled up and centred; text readable ================= */
+html.pp #p-history>.bg,html.pp #p-history>.sc{left:0!important;width:100%!important}
+html.pp #p-history>.bg{object-position:50% 50%}
+html.pp #p-history .hy2-h{left:32px;top:var(--bt)}
+html.pp #p-history .hy2-h h1{font-size:62px;letter-spacing:-2px}
+html.pp #p-history .hyx{transform:scale(.82)!important;left:-301px!important;
+  top:max(calc(var(--bt) + 150px - 328px),calc(var(--U)*.56 - 551px))!important}

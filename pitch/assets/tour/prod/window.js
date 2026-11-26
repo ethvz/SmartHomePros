@@ -6,7 +6,7 @@ export default H => {
   const { THREE, G, add } = H;
   const K = kit(THREE);
   const g = G(), u = add(g, G()); u.scale.setScalar(.001);
-  const grey = 0xbdbec1, white = 0xf2f2f0;
+  const grey = 0xb3b4b7, white = 0xf2f2f0;
 
   /* one two-tone part: plan L x Wd, corner R, back edge rb, split at zs, straight white wall to zr, front roll rf up to D */
   const part = (L, Wd, R, D, rb, zs, rf, cut, extra = []) => {
@@ -109,7 +109,7 @@ function kit(THREE){
     const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
     for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
       const t = i / 512, v = Math.sin(t * Math.PI * 2 * 6.5) * .5 + Math.sin(t * Math.PI * 2 * 13) * .12;
-      let l = 240 + v * 3.5;
+      let l = 240 + v * 2.5;
       if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
         l *= (1 - .3 * Math.exp(-top / .035) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
       const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }

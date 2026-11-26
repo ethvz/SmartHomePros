@@ -1,1 +1,203 @@
 /* iPhone portrait (html.pp) layout: protect group. Every rule is scoped to html.pp. */
+/* Stage is 600 wide x var(--H) tall; top ~96px is the floating section title (#gTitle), bottom 68px is the footer (#bar).
+   Each section page is pulled back to the stage's left edge (left:-gx, 600 wide) so children use plain stage coordinates.
+   Short phones (iPhone SE class, screen aspect >= 1:2) get a compact variant via @media (min-aspect-ratio:1/2). */
+html.pp #p-protection,html.pp #p-monitoring,html.pp #p-verify,html.pp #p-military,html.pp #p-playback,html.pp #p-psa,html.pp #p-nrg{left:calc(-1*var(--gx,0px))!important;right:auto!important;width:600px!important}
+
+/* ---------- Protection: warranty list over a wide "more protection" card; coverage card fills the screen ---------- */
+html.pp #p-protection h2{left:40px;top:104px;font-size:58px;line-height:62px}
+html.pp .wlist{left:28px;top:256px;width:544px}
+html.pp .wlist .row{font-size:25px;line-height:1.25;min-height:0;padding:20px 0 20px 10px;gap:18px}
+html.pp .wlist .row svg{flex:none}
+html.pp .ptab{left:28px;width:544px;top:auto;bottom:96px;height:calc(var(--H) - 96px - 700px);min-height:220px;max-height:420px;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.pp .ptab:active{transform:scale(.98)}
+html.pp .ptab .lbl,html.pp .cvMorph .lbl{left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;white-space:normal;font-size:38px;line-height:1.1;padding:0 40px}
+html.pp #stage #covTbl.cv2{left:0!important;width:600px!important;height:var(--H)!important}
+html.pp .cv2 .cv-card{left:16px!important;top:30px!important;width:568px!important;height:calc(var(--H) - 30px - 84px)!important;transform:none!important;padding:28px 20px 18px!important;border-radius:28px}
+@keyframes ppCvIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+html.pp .cv2:not(.mx) .cv-card{animation:ppCvIn .4s cubic-bezier(.22,1,.36,1)}
+html.pp #p-protection .cv2 .cv-card .hh h2{font-size:40px}
+html.pp .cv2 .cv-card .hx .eb{font-size:13px}
+html.pp .cv2 .cvx{top:24px!important;right:20px!important;width:68px;height:68px;border-radius:34px}
+html.pp .cv2 .cv-card .hgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;column-gap:8px;row-gap:6px;margin-top:16px}
+html.pp .cv2 .cv-card .hgrid>div:first-child{display:none}
+html.pp .cv2 .cv-card .hd{padding:14px 6px 12px;text-align:center;align-items:center;transition:background .3s,transform .12s}
+html.pp .cv2 .cv-card .hd:active{transform:scale(.96)}
+html.pp .cv2 .cv-card .hd b{font-size:15px;line-height:1.2}
+html.pp .cv2 .cv-card .hd .pr{font-size:30px;justify-content:center}
+html.pp .cv2 .cv-card .hd .ad{font-size:13px}
+html.pp .cv2 .cv-card .rl{grid-column:span 2;font-size:19px;line-height:1.2;display:flex;align-items:center}
+html.pp .cv2 .cv-card .hc:not(.on){display:none!important}
+html.pp .cv2 .cv-card .hc{min-height:52px!important;font-size:15px!important;line-height:1.25;text-align:center;padding:6px 8px!important;animation:ppHc .35s cubic-bezier(.22,1,.36,1)}
+@keyframes ppHc{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+html.pp .cv2 .cv-card .fn{font-size:12.5px!important;line-height:1.45;margin-top:12px!important}
+
+/* ---------- Monitoring: each landscape slide is re-cut into stacked crops (built by protect.js) ---------- */
+html.pp #monScroll{left:0!important;width:600px!important}
+html.pp #p-monitoring .mtab{width:600px!important;height:var(--H)!important;margin-left:0!important;overflow:hidden}
+html.pp #p-monitoring .mtab>img.full,html.pp #p-monitoring .mtab>.hot{display:none!important}
+.ppx{display:none}
+html.pp .ppx{display:block;position:absolute;left:0;top:0;width:600px;height:var(--H);pointer-events:none}
+html.pp .ppx>.ppg{position:absolute;inset:0}
+html.pp .ppx>.ppg[hidden]{display:none}
+html.pp .ppx>.ppg.in{animation:ppFade .35s ease}
+@keyframes ppFade{from{opacity:0}to{opacity:1}}
+html.pp .ppc{position:absolute;overflow:hidden}
+html.pp .ppc>img{position:absolute;max-width:none;pointer-events:none}
+html.pp .ppx .hot{pointer-events:auto;transition:transform .12s cubic-bezier(.2,.8,.2,1),background .2s}
+html.pp .ppx .hot:active{transform:scale(.95);background:rgba(255,255,255,.08)}
+
+/* ---------- Verify a rep: portrait crop of the photo, copy at the bottom over a scrim ---------- */
+html.pp #vrBg img{width:100vw;height:100vh;min-height:0;object-position:60% 30%;transform-origin:60% 30%}
+html.pp #vrBg .sc{background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.72) 32%,rgba(0,0,0,0) 60%),linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,0) 16%)}
+html.pp #p-verify .vr-txt{left:40px;right:40px;width:auto;bottom:112px}
+html.pp #p-verify h1{font-size:74px}
+html.pp #p-verify p{font-size:22px;max-width:none;margin:20px 0 30px}
+html.pp #p-verify .vr-btn{height:72px;padding:0 34px;border-radius:36px;font-size:22px}
+html.pp #p-verify .vr-pts{margin-top:24px}
+html.pp #p-verify .vr-pts span{height:48px;padding:0 18px;border-radius:24px;font-size:17px}
+
+/* ---------- Military: hero re-cut into crops (protect.js); policy sheet still scrolls up over it ---------- */
+html.pp #p-military>img.full{display:none!important}
+html.pp .ppc.fade{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 34%);mask-image:linear-gradient(180deg,transparent 0,#000 34%)}
+html.pp .ppmil{position:absolute;left:40px;right:40px;top:100px;color:#fff}
+html.pp #p-military .ppmil h2{margin:0;font-size:50px;line-height:1.06;font-weight:600;letter-spacing:-1.2px}
+html.pp #p-military .ppmil ul{list-style:none;margin:34px 0 0;padding:0;display:flex;flex-direction:column;gap:22px}
+html.pp #p-military .ppmil li{position:relative;padding-left:46px;font-size:25px;line-height:1.25;color:rgba(255,255,255,.92)}
+html.pp .ppmil li::before{content:"";position:absolute;left:0;top:4px;width:26px;height:26px;border-radius:50%;background:#d0021b}
+html.pp #p-military.on .ppmil>*{animation:fadeUp .8s var(--ease) backwards}html.pp #p-military.on .ppmil>ul{animation-delay:.1s}
+html.pp #p-military .sheet{margin:var(--H) 0 0!important;width:600px;box-sizing:border-box;padding:48px 32px 140px;border-radius:32px 32px 0 0}
+html.pp #p-military h2{font-size:38px;line-height:1.1}
+html.pp #p-military .lead{font-size:22px;margin:12px 0 30px}
+html.pp #p-military .blk{margin-left:0}
+html.pp #p-military h3{font-size:22px}
+html.pp #p-military p,html.pp #p-military li{font-size:19px;line-height:28px}
+html.pp #p-military ul{margin-left:24px}
+html.pp #p-military .gap{height:56px}
+
+/* ---------- Playback: one column; feature list takes the rest of the height ---------- */
+html.pp .pbx{bottom:84px;padding:100px 28px 0;display:flex;flex-direction:column;box-sizing:border-box}
+html.pp #p-playback .pbx h2{font-size:54px;letter-spacing:-1.4px}
+html.pp .pbx-tog{width:100%;height:76px;margin-top:22px;flex:none}
+html.pp .pbx-tog button{font-size:18px;transition:color .3s,transform .12s}
+html.pp .pbx-tog button:active{transform:scale(.95)}
+html.pp .pbx-tog em{font-size:11px}
+html.pp .pbx-l{position:relative;left:auto;top:auto;width:auto;margin-top:24px;flex:none;display:grid;grid-template-columns:auto 1fr;column-gap:18px;align-items:end}
+html.pp .pbx-n{font-size:96px;letter-spacing:-4px}
+html.pp .pbx-c{margin:0 0 8px;font-size:19px;line-height:1.3;height:auto}
+html.pp .pbx-bar{grid-column:1/-1;width:100%!important;height:58px!important;margin-top:20px;border-radius:16px!important}
+html.pp .pbx-bar.full i{top:14px!important;bottom:14px!important}
+html.pp .pbx-t{grid-column:1/-1;margin-top:8px;font-size:14px}
+html.pp .pbx-k{grid-column:1/-1;margin-top:10px;font-size:15px}
+html.pp .pbx-r{position:relative;left:auto;top:auto;width:auto;flex:1;min-height:0;margin-top:20px;padding:6px 22px;display:flex;flex-direction:column;border-radius:26px}
+html.pp .pbx-row{flex:1;min-height:0;font-size:18px;gap:14px}
+html.pp .pbx-row .tx small{font-size:13.5px}
+html.pp .pbx-row .vl{font-size:18px}
+html.pp .pbx-row[data-ai]:active{background:rgba(255,255,255,.06)}
+
+/* ---------- PSA: header, key facts and section buttons on top; the agreement scrolls below ---------- */
+html.pp .psa2{flex-direction:column}
+html.pp .psa-side{width:auto;padding:98px 28px 0;flex:none}
+html.pp .psa-side .t2{font-size:36px;letter-spacing:-.8px}
+html.pp .psa-side .t2 br{display:none}
+html.pp .psa-ver{display:none}
+html.pp .psa-key{margin-top:16px;gap:8px}
+html.pp .psa-key div{padding:12px 16px 12px;border-radius:18px;transition:transform .12s}
+html.pp .psa-key div:active{transform:scale(.97)}
+html.pp .psa-key b{font-size:28px}
+html.pp .psa-key span{font-size:15px;line-height:1.3}
+html.pp .psa-disc{font-size:15px;line-height:1.4;margin-top:10px}
+html.pp .psa-nav{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+html.pp .psa-nav button{height:64px;padding:0 8px;text-align:center;font-size:15px;line-height:1.2;background:#141414;border-radius:16px;transition:background .25s,color .25s,transform .12s}
+html.pp .psa-nav button:active{transform:scale(.96)}
+html.pp .psa-nav button.on{background:#262628}
+html.pp .psa-doc{flex:1;min-height:0;padding:16px 14px 110px;margin-top:12px}
+html.pp .psa-pg{max-width:none;padding:30px 24px 26px;font-size:16px;line-height:1.55;border-radius:16px;margin-bottom:18px}
+html.pp .psa-pg .hd img{height:24px}
+html.pp .psa-pg .hd .acc{font-size:12px}html.pp .psa-pg .hd .acc i{width:90px}
+html.pp .psa-pg h3{font-size:25px;line-height:1.2}
+html.pp .psa-pg h4{font-size:18px}
+html.pp .psa-pg h5{font-size:16.5px}
+html.pp .psa-pg .fl{grid-template-columns:1fr 1fr;gap:10px 14px}
+html.pp .psa-pg .fl.c1{grid-template-columns:1fr}
+html.pp .psa-pg .fl div{font-size:12px;padding-top:24px}
+html.pp .psa-pg .eq{grid-template-columns:1fr}
+html.pp .psa-pg .eq div{font-size:15px}
+html.pp .psa-pg .eq div span{font-size:12.5px}
+html.pp .psa-pg .sig div{font-size:12px}
+html.pp .psa-pg .small{font-size:14px}
+html.pp .psa-pg .ft{font-size:11px;gap:12px}
+
+/* ---------- NRG: one column (protect.js wraps the blocks in .ppw, which is display:contents off phone-portrait) ---------- */
+.ppw{display:contents}
+html.pp #p-nrg .ng-bg{left:0;width:600px}
+html.pp #p-nrg .ng-p1{left:0;width:100%;height:52%;object-position:55% 40%}
+html.pp #p-nrg .ng-p2{left:0;right:auto;top:auto;bottom:0;width:100%;height:56%;object-position:62% 50%}
+html.pp #p-nrg .ng-seam{left:0;width:100%;top:36%;bottom:auto;height:24%;background:linear-gradient(180deg,transparent,#000 50%,transparent)}
+html.pp #p-nrg .ng-sc{background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.35) 25%,rgba(0,0,0,.45) 70%,#000)}
+html.pp #p-nrg .ppw{display:flex;flex-direction:column;gap:12px;position:absolute;left:28px;right:28px;top:100px;bottom:84px}
+html.pp #p-nrg .ppw>*{position:relative!important;left:auto!important;right:auto!important;top:auto!important;width:auto!important;height:auto!important;flex:none}
+html.pp #p-nrg .ppw>.ng-logo{position:absolute!important;right:0!important;left:auto!important;top:-8px!important;width:104px!important}
+html.pp #p-nrg h1{font-size:46px;letter-spacing:-1.6px}
+html.pp #p-nrg .ng-h{margin-bottom:6px}
+html.pp #p-nrg .ppw{justify-content:space-between}
+html.pp #p-nrg .ppw>.ng-card{padding:24px 26px;display:flex;flex-direction:column}
+html.pp #p-nrg .ng-hero{margin:12px 0 12px}
+html.pp #p-nrg .ng-hero b{font-size:88px}
+html.pp #p-nrg .ng-hero span{font-size:20px}
+html.pp #p-nrg .ng-card p{font-size:18px;line-height:1.45}
+html.pp #p-nrg .ng-chips{position:static;margin-top:auto;padding-top:16px}
+html.pp #p-nrg .ng-chips b{font-size:17px}
+html.pp #p-nrg .ppw>.ng-f{padding:18px 24px;border-radius:26px}
+html.pp #p-nrg .ng-row{margin-top:8px;gap:18px}
+html.pp #p-nrg .ng-big{font-size:44px}
+html.pp #p-nrg .ng-t{font-size:17px;line-height:1.38}
+html.pp #p-nrg .ppw>.ng-src{font-size:11.5px;line-height:1.4}
+
+/* ---------- short phones (iPhone SE / 8 class) ---------- */
+@media (min-aspect-ratio:1/2){
+  html.pp #p-protection h2{top:96px;font-size:50px;line-height:54px}
+  html.pp .wlist{top:226px}
+  html.pp .wlist .row{font-size:22px;padding:14px 0 14px 8px}
+  html.pp .ptab{height:calc(var(--H) - 96px - 620px);min-height:160px}
+  html.pp .ptab .lbl,html.pp .cvMorph .lbl{font-size:32px}
+  html.pp .ptab>svg:first-child{top:20px!important}html.pp .ptab>svg:last-child{bottom:14px!important}
+  html.pp #p-protection .cv2 .cv-card .hh h2{font-size:34px}
+  html.pp .cv2 .cv-card .hd{padding:10px 4px 8px}html.pp .cv2 .cv-card .hd .pr{font-size:26px}html.pp .cv2 .cv-card .hd .ad{display:none}
+  html.pp .cv2 .cv-card .hc{min-height:44px!important}
+  html.pp .cv2 .cv-card .rl{font-size:17px}
+  html.pp .pbx{padding-top:96px}
+  html.pp #p-playback .pbx h2{font-size:46px}
+  html.pp .pbx-tog{height:68px;margin-top:16px}
+  html.pp .pbx-l{margin-top:14px}
+  html.pp .pbx-n{font-size:76px}
+  html.pp .pbx-bar{height:48px!important;margin-top:12px}
+  html.pp .pbx-k{display:none}
+  html.pp .pbx-r{margin-top:14px;padding:2px 20px}
+  html.pp .pbx-row{font-size:17px}
+  html.pp .pbx-row .tx small{display:none}
+  html.pp .psa-side{padding-top:94px}
+  html.pp .psa-side .t2{font-size:32px}
+  html.pp .psa-key{grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+  html.pp .psa-key div{padding:10px 10px}
+  html.pp .psa-key b{font-size:21px}
+  html.pp .psa-key span{font-size:12.5px}
+  html.pp .psa-disc{display:none}
+  html.pp .psa-nav button{height:56px;font-size:14px}
+  html.pp #p-nrg .ppw{top:96px;gap:10px}
+  html.pp #p-nrg h1{font-size:40px}
+  html.pp #p-nrg .ppw>.ng-logo{width:92px!important}
+  html.pp #p-nrg .ng-hero{margin:6px 0 8px}
+  html.pp #p-nrg .ng-hero b{font-size:68px}
+  html.pp #p-nrg .ng-card p{font-size:16.5px;line-height:1.4}
+  html.pp #p-nrg .ng-chips{display:none}
+  html.pp #p-nrg .ppw>.ng-card{padding:18px 22px}
+  html.pp #p-nrg .ppw>.ng-f{padding:14px 22px}
+  html.pp #p-nrg .ng-big{font-size:38px}
+  html.pp #p-nrg .ng-t{font-size:15.5px}
+  html.pp #p-military .sheet{padding-top:40px}
+  html.pp #p-military .ppmil h2{font-size:42px}html.pp #p-military .ppmil ul{margin-top:22px;gap:14px}html.pp #p-military .ppmil li{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  html.pp .ppx>.ppg.in,html.pp .cv2 .cv-card,html.pp .cv2 .cv-card .hc{animation:none!important}
+}

@@ -109,7 +109,7 @@ export default H => {
     draw();
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.premultiplyAlpha = true;
     if(document.fonts) Promise.all(['300', '400', '500'].map(w => document.fonts.load(`${w} 60px "Vivint Sans"`))).then(() => { draw(); t.needsUpdate = true; }).catch(() => {});
-    const m = new THREE.MeshBasicMaterial({map:t, transparent:true, premultipliedAlpha:true, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
+    const m = new THREE.MeshBasicMaterial({map:t, transparent:true, blending:THREE.CustomBlending, blendSrc:THREE.OneFactor, blendDst:THREE.OneMinusSrcAlphaFactor, depthWrite:false, toneMapped:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
     add(g, new THREE.Mesh(new THREE.PlaneGeometry(.1, .1), m), 0, 0, (D + .03)*k); }
 
   /* ---- status light: blue glow out of the BOTTOM of the groove only, strongest over the central ~70 mm */

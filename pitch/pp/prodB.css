@@ -1,1 +1,155 @@
 /* iPhone portrait (html.pp) layout: prodB group. Every rule is scoped to html.pp. */
+#aiPP,#cmPP{display:none}
+
+/* ---------- AI wheel (#p-ai): tall ellipse of bubbles cut from the wheel artwork (built in prodB.js) ---------- */
+html.pp #p-ai>img.full,html.pp #p-ai>#aiHot{display:none}
+html.pp #p-ai{background:#000}
+html.pp #aiPP{display:block;position:absolute;left:calc(-1*var(--gx,0px));top:0;width:600px}
+html.pp #aiPP .aiRing{position:absolute;left:0;top:0;width:100%;height:100%;opacity:.9}
+html.pp #aiPP .aiC{position:absolute;border-radius:50%;background-repeat:no-repeat;pointer-events:none}
+html.pp #aiPP .aiB{position:absolute;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html.pp #aiPP .aiB i{position:absolute;inset:0;border-radius:50%;background-repeat:no-repeat;box-shadow:0 10px 30px rgba(0,0,0,.55);transition:transform .15s cubic-bezier(.2,.8,.2,1),filter .15s}
+html.pp #aiPP .aiB:active i{transform:scale(.93);filter:brightness(1.18)}
+html.pp #p-ai.on #aiPP .aiB{animation:ppBub .6s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i)*45ms + .1s)}
+html.pp #p-ai.on #aiPP .aiC{animation:ppFade .9s ease backwards}
+html.pp #p-ai.on #aiPP .aiRing{animation:ppFade 1.2s ease .2s backwards}
+@keyframes ppBub{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes ppFade{from{opacity:0}to{opacity:1}}
+
+/* AI detail modal: one upright card, picture on top, text below */
+html.pp #m-ai{bottom:var(--ppFoot,76px)!important}
+html.pp .aibox{left:16px;top:16px;bottom:16px;width:568px;box-sizing:border-box;height:auto;display:flex;flex-direction:column;padding:22px 26px 24px;border-radius:30px;overflow:hidden}
+html.pp .aibox>*{position:relative!important;left:auto!important;top:auto!important;width:auto!important}
+html.pp .aibox .img{order:0;flex:1 1 300px;min-height:150px;height:auto;width:100%!important;border-radius:20px;margin-top:44px}
+html.pp .aibox h2{order:1;font-size:44px;line-height:46px;margin:20px 0 0;letter-spacing:-.8px}
+html.pp .aibox h2 .tag{font-size:12px;top:-4px}
+html.pp .aibody{order:2;flex:none;margin-top:14px}
+html.pp .aibody .q{font-size:19px;line-height:25px;gap:16px;padding-bottom:16px}
+html.pp .aibody h6{margin:16px 0 6px;font-size:14px}
+html.pp .aibody p.t{font-size:18px;line-height:24px}
+html.pp .aibody .fn{margin-top:12px}
+html.pp .aibox .prods{order:3;flex:none;height:auto;margin-top:16px;border-radius:18px;padding:14px 18px;display:flex;align-items:center;gap:16px}
+html.pp .aibox .prods h5{flex:none;font-size:13px;writing-mode:vertical-rl;transform:rotate(180deg);color:#667}
+html.pp .aibox .prods .chips{margin:0;flex:1}
+html.pp .aibox .chip{min-height:0;flex-direction:row;padding:12px 12px;font-size:15px;line-height:18px;gap:10px;text-align:left;max-width:none}
+html.pp .aibox .chip svg{flex:none}
+html.pp .aix{position:absolute!important;right:20px!important;left:auto!important;top:18px!important;width:52px!important;height:52px}
+@media (max-height:700px){html.pp .aibody .q{font-size:17px;line-height:22px}html.pp .aibody p.t{font-size:16px;line-height:21px}html.pp .aibox h2{font-size:38px;line-height:40px}}
+
+/* ---------- Compatibility (#p-compat): brand cards cut from the grid artwork and stacked ---------- */
+html.pp #p-compat>img.full,html.pp #p-compat>.hot{display:none}
+html.pp #p-compat{background:#000}
+html.pp #cmPP{display:block;position:absolute;left:calc(-1*var(--gx,0px));top:0;width:600px}
+html.pp #cmPP h2{position:absolute;left:30px;top:36px;font-size:56px;font-weight:600;letter-spacing:-1.4px;color:#fff;line-height:1}
+html.pp #cmPP .cmR{position:absolute;display:flex}
+html.pp #cmPP .cmC{flex:none;background-repeat:no-repeat;position:relative;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.pp #cmPP .cmC.hot{cursor:pointer;-webkit-tap-highlight-color:transparent}
+html.pp #cmPP .cmC.hot:active{transform:scale(.97);background-color:transparent;filter:brightness(.92)}
+html.pp #p-compat.on #cmPP .cmR{animation:ppUp .6s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i)*55ms + .05s)}
+html.pp #p-compat.on #cmPP h2{animation:ppUp .6s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes ppUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+/* compatibility detail modal: the wide picture fills the width, centred above the footer */
+html.pp #m-compat{bottom:var(--ppFoot,76px)}
+html.pp #cmImg{left:0!important;width:600px!important;height:auto!important;top:50%!important;transform:translateY(-50%);border-radius:0}
+html.pp #m-compat .mclose{left:520px!important;top:28px!important}
+
+/* ---------- What's New (#p-whatsnew): months stack, text wraps to the upright width ---------- */
+html.pp #p-whatsnew h2{left:calc(32px - var(--gx,0px));top:40px;font-size:56px;letter-spacing:-1.4px}
+html.pp #p-whatsnew .wnl{left:calc(32px - var(--gx,0px));top:128px;width:536px}
+html.pp #p-whatsnew .wnm{flex-direction:column;padding:22px 0 24px}
+html.pp #p-whatsnew .wnm .mo{width:auto;font-size:15px;letter-spacing:2px;margin-bottom:12px;color:rgb(5,229,175)!important}
+html.pp #p-whatsnew .wnm li{font-size:18px;line-height:25px;margin-bottom:12px;padding-left:24px}
+html.pp #p-whatsnew .wnm li:before{top:8px;width:10px;height:10px}
+html.pp #p-whatsnew .wnm li i.blk{margin-top:4px;line-height:24px}
+@media (min-height:880px){html.pp #p-whatsnew .wnl{top:150px}html.pp #p-whatsnew .wnm{padding:28px 0 30px}html.pp #p-whatsnew .wnm li{font-size:19px;line-height:27px;margin-bottom:14px}}
+
+/* ---------- PreView / BirdsEye placeholders ---------- */
+html.pp #p-preview .ph,html.pp #p-birdseye .ph{left:calc(-1*var(--gx,0px));right:auto;width:600px;bottom:var(--ppFoot,76px);padding:0 48px;box-sizing:border-box}
+html.pp #p-preview .ph p,html.pp #p-birdseye .ph p{font-size:20px;line-height:28px}
+
+/* =====================================================================================================
+   Outdoor Camera Pro (#p-ocp / #ocScroll) and Doorbell Camera Pro (#p-dbcp / #dbScroll)
+   Each sub-section becomes one upright screen (600 x --H stage px); the page keeps its vertical snap scroll.
+   --pf = footer clearance (shell sets --ppFoot on #stage)
+   ===================================================================================================== */
+html.pp :is(#ocScroll,#dbScroll){--pf:var(--ppFoot,76px);width:600px!important}
+html.pp :is(#ocScroll,#dbScroll)>*{width:600px!important;margin:0!important;height:var(--H)!important;transform:none!important;scroll-margin-top:0!important;border-radius:0!important;clip-path:none!important;-webkit-clip-path:none!important;overflow:hidden!important;left:0!important}
+html.pp :is(#ocScroll,#dbScroll)>[hidden]{display:none!important}
+html.pp :is(#p-ocp,#p-dbcp) .ptitle{display:none}
+/* next-section chevron, clear of the footer */
+html.pp :is(#ocScroll,#dbScroll) .nxa{left:50%!important;top:auto!important;bottom:calc(var(--pf) + 6px)!important;width:160px;height:84px;margin-left:-80px}
+html.pp :is(#ocScroll,#dbScroll) .nxa i{top:24px}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=hero]::after{display:none}
+
+/* ---------- hero: OCP (text up top, the camera big in the middle, Deter / Spotlight toggles below) ---------- */
+html.pp #ocScroll .ochx{left:0!important;width:600px!important;height:var(--H)!important;margin:0!important}
+html.pp #ocScroll .och-txt{left:36px!important;top:96px!important;width:528px!important;margin:0!important}
+html.pp #ocScroll .och-txt .eb{font-size:14px;letter-spacing:2.2px}
+html.pp #ocScroll .och-txt h1{font-size:54px;letter-spacing:-1.4px;margin-top:14px}
+html.pp #ocScroll .och-sub{font-size:20px;margin-top:16px;max-width:none}
+html.pp #ocScroll .och-prod{left:20px!important;width:560px!important;top:calc(330px + (var(--H) - 1230px) * .25)!important;height:calc(var(--H) - 330px - var(--pf) - 250px - (var(--H) - 1230px) * .25)!important;margin:0!important}
+html.pp #ocScroll .och-glow{left:-60px!important;width:720px!important;height:720px!important;top:calc(var(--H) * .5 - 360px)!important;margin:0!important}
+html.pp #ocHeroHot .fsp.htog{left:50%!important;transform:translateX(-50%);top:auto!important}
+html.pp #ocHeroHot .fsp.htog:nth-of-type(1){bottom:calc(var(--pf) - var(--H) + 168px)!important}
+html.pp #ocHeroHot .fsp.htog:nth-of-type(2){bottom:calc(var(--pf) - var(--H) + 98px)!important}
+html.pp #ocHeroHot .fsp.htog{height:62px!important}
+html.pp #ocHeroHot .fsp.htog button{font-size:18px!important}
+html.pp #ocHeroHot .ocb[data-go=ai]{left:auto!important;right:24px;top:24px!important}
+html.pp #ocHeroHot .ocb[data-whistle]{left:auto!important;right:104px;top:24px!important}
+/* hero photo gallery (swipe left on the hero) */
+html.pp :is(#ocScroll,#dbScroll) .hgl{left:0!important;width:600px!important;height:var(--H)!important}
+html.pp :is(#ocScroll,#dbScroll) .hgl figure{width:600px!important}
+html.pp :is(#ocScroll,#dbScroll) .hg-dots{bottom:calc(var(--pf) + 22px)!important;left:50%!important}
+
+/* ---------- hero: DBCP (season video fills the screen, words at the bottom) ---------- */
+html.pp #dbScroll .dbh-vid{left:0!important;width:600px!important;height:var(--H)!important;object-position:56% 50%}
+html.pp #dbScroll .dbh-scrim{left:0!important;width:600px!important;height:var(--H);background:linear-gradient(180deg,rgba(0,0,0,.35) 0,transparent 18%,transparent 42%,rgba(0,0,0,.82) 78%,rgba(0,0,0,.9) 100%)!important}
+html.pp #dbScroll .dbh-txt{left:36px!important;right:36px;width:auto!important;top:auto!important;bottom:calc(var(--pf) + 96px);margin:0!important}
+html.pp #dbScroll .dbh-txt h1{font-size:66px;letter-spacing:-1.8px;margin:0 0 16px}
+html.pp #dbScroll .dbh-txt p{font-size:21px;max-width:none}
+html.pp #dbScroll .dbai.aiorb{top:24px!important;right:24px!important}
+
+/* ---------- 360 spin (scroll-scrubbed frames): canvas fills the upright screen ---------- */
+html.pp :is(#ocScroll,#dbScroll)>.hum{height:calc(var(--H) + 774px)!important;overflow:clip!important}
+html.pp :is(#ocScroll,#dbScroll)>.hum .hum-st{width:600px!important;height:var(--H)!important}
+html.pp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{width:600px!important;height:var(--H)!important;margin:0!important;left:0!important}
+
+/* ---------- Smart Actions / Works With / FAQs (.xs): same upright layout as the other product pages ---------- */
+html.pp :is(#ocScroll,#dbScroll)>.xs .xeb{left:36px!important;top:96px!important}
+html.pp :is(#ocScroll,#dbScroll)>.xs .xh{left:36px!important;right:36px!important;top:124px!important;font-size:50px!important;letter-spacing:-1.2px}
+html.pp :is(#ocScroll,#dbScroll) .xa-list{left:20px!important;right:20px!important;top:276px!important}
+html.pp :is(#ocScroll,#dbScroll) .xa{display:grid!important;grid-template-columns:58px 1fr 60px;grid-template-rows:auto auto;column-gap:20px;row-gap:12px;height:auto!important;padding:22px 24px!important}
+html.pp :is(#ocScroll,#dbScroll) .xa-ic{grid-row:1/3;align-self:center}
+html.pp :is(#ocScroll,#dbScroll) .xa-col{width:auto!important;grid-column:2}
+html.pp :is(#ocScroll,#dbScroll) .xa-col.t{grid-row:2}
+html.pp :is(#ocScroll,#dbScroll) .xa-ar{display:none}
+html.pp :is(#ocScroll,#dbScroll) .xa-tog{grid-column:3;grid-row:1/3;align-self:center}
+html.pp :is(#ocScroll,#dbScroll) .xa+.xa:before{left:24px;right:24px}
+html.pp :is(#ocScroll,#dbScroll) .xa-v{font-size:20px}
+html.pp :is(#ocScroll,#dbScroll) .xa-foot{left:36px!important;right:36px!important;top:auto!important;bottom:calc(var(--pf) + 96px)!important;font-size:17px;flex-wrap:wrap}
+html.pp :is(#ocScroll,#dbScroll) .xw-pick{left:20px!important;right:20px!important;top:262px!important;gap:8px;display:grid!important;grid-template-columns:1fr 1fr}
+html.pp :is(#ocScroll,#dbScroll) .xw-pick button{min-width:0;height:68px;padding:0 10px 0 8px;font-size:17px;gap:8px;width:auto!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-pick button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.pp :is(#ocScroll,#dbScroll) .xw-pick img{width:48px;height:48px;flex:none}
+html.pp :is(#ocScroll,#dbScroll) .xw-stage{left:20px!important;right:20px!important;top:426px!important;height:340px!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-p{width:268px!important;height:340px!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-p .nm{font-size:20px;bottom:24px;padding:0 12px}
+html.pp :is(#ocScroll,#dbScroll) .xw-link{left:268px!important;right:268px!important;top:170px!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-plus{top:170px!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-why{left:20px!important;right:20px!important;top:786px!important;grid-template-columns:1fr!important;gap:10px!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-why div{height:64px;font-size:18px}
+html.pp :is(#ocScroll,#dbScroll) .xw-foot{display:none!important}
+html.pp :is(#ocScroll,#dbScroll) .xw-go{right:20px!important;left:20px!important;justify-content:center;top:auto!important;bottom:calc(var(--pf) + 100px)!important;height:68px}
+@media (max-height:740px){
+  html.pp :is(#ocScroll,#dbScroll) .xw-stage{top:410px!important;height:280px!important}
+  html.pp :is(#ocScroll,#dbScroll) .xw-p{height:280px!important;width:250px!important}
+  html.pp :is(#ocScroll,#dbScroll) .xw-link{left:250px!important;right:250px!important;top:140px!important}
+  html.pp :is(#ocScroll,#dbScroll) .xw-plus{top:140px!important}
+  html.pp :is(#ocScroll,#dbScroll) .xw-why{display:none!important}
+}
+html.pp :is(#ocScroll,#dbScroll) .xf-src{left:36px!important;top:252px!important}
+html.pp :is(#ocScroll,#dbScroll) .xf-list{left:20px!important;right:20px!important;top:296px!important;bottom:calc(var(--pf) + 24px)!important}
+html.pp :is(#ocScroll,#dbScroll) .xf-q{min-height:76px;padding:14px 22px;font-size:20px}
+html.pp :is(#ocScroll,#dbScroll) .xf-a p{padding:0 22px 22px;font-size:18px}
+html.pp :is(#ocScroll,#dbScroll) .xf.on .xf-a{max-height:420px}

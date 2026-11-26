@@ -1,1 +1,93 @@
-/* iPhone portrait (html.pp) layout: shell group. Every rule is scoped to html.pp. */
+/* iPhone portrait (html.pp) layout: shell group. Every rule is scoped to html.pp.
+   Footer geometry (stage px, set on #stage by pp/shell.js):
+     --ppB     bottom clearance for the home indicator (>= 8px)
+     --ppFoot  height kept clear by the footer on section pages (one row of 60px controls + margins)
+     --ppHomeFoot  same on the Home page, where the footer has two rows */
+
+html.pp #stage{--ppB:8px;--ppFoot:76px;--ppHomeFoot:148px}
+
+/* ---------- footer ---------- */
+html.pp #bar{height:calc(var(--ppB) + 60px)!important;padding:0 12px var(--ppB)!important;box-sizing:border-box;gap:4px!important;align-items:center}
+html.pp #burger{width:60px!important;height:60px!important;flex:none;margin:0!important}
+html.pp #burger:active{transform:scale(.92)}
+html.pp #barlogo,html.pp #bar.home #barlogo{flex:none!important;height:27px!important;width:auto!important;margin:0 0 0 2px!important}
+/* all footer pills: one height (60), readable labels, a press state */
+html.pp #bar #hmode,html.pp #bar #homeX,html.pp #barRight.pnav{bottom:var(--ppB)!important;padding:5px!important;gap:2px!important}
+html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #bar.home #barRight.pnav .bbtn{height:50px!important;border-radius:25px!important;gap:4px!important}
+html.pp #bar #hmode button span,html.pp #bar #homeX .bbtn span,html.pp #barRight.pnav .bbtn span{font-size:12px!important;letter-spacing:0!important}
+html.pp #bar #hmode button svg,html.pp #bar #homeX .bbtn .ic,html.pp #barRight.pnav .bbtn .ic{width:22px!important;height:22px!important}
+html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barRight.pnav .bbtn:active{transform:scale(.93)}
+
+/* Home: two rows. Upper row = what the page shows (Tiles | 3D Home on the left, the four categories on the right);
+   lower row = burger + logo, and About / Videos / Yard Sign on the right */
+html.pp #bar #hmode{left:12px!important;right:auto!important;transform:none!important;bottom:calc(var(--ppB) + 70px)!important}
+html.pp #bar #hmode button{width:78px!important}
+html.pp #bar #hmode i{top:5px!important;left:5px!important;width:78px!important;height:50px!important;border-radius:25px!important}
+html.pp #bar #hmode.d3 i{transform:translateX(80px)!important}
+html.pp #bar.home #barRight.pnav{left:auto!important;right:12px!important;transform:none!important;bottom:calc(var(--ppB) + 70px)!important;width:calc(100% - 12px - 12px - 166px - 10px)!important;box-sizing:border-box;justify-content:space-between}
+html.pp #bar.home #barRight.pnav .bbtn{flex:1 1 0!important;width:auto!important;min-width:0}
+html.pp #bar #homeX{left:auto!important;right:12px!important;transform:none!important}
+html.pp #bar #homeX .bbtn{width:84px!important}
+html.pp #homeX .hxi{width:84px!important;height:50px!important;border-radius:25px!important;transform:translateX(calc(var(--hxi)*86px))!important}
+/* About / Videos / Yard Sign pages: their pill sits in the middle of the footer */
+html.pp #bar.hx-ctr #homeX{right:auto!important;left:50%!important;transform:translateX(-50%)!important}
+
+/* All Products: a footer pill like the others (icon over a short label) */
+html.pp #bar #prodBtn{right:12px!important;bottom:var(--ppB)!important;height:60px!important;width:84px!important;padding:0!important;border-radius:30px!important;flex-direction:column;justify-content:center;gap:4px;font-size:0!important;color:#fff}
+html.pp #bar #prodBtn svg{width:22px!important;height:22px!important}
+html.pp #bar #prodBtn::after{content:"Products";font-size:12px;font-weight:500;line-height:1;color:rgba(255,255,255,.75)}
+
+/* Section nav on section pages: a pill along the footer between the burger and Products (icons; labels when they fit).
+   Drag along it to fly through the sections. */
+html.pp #stage #bar:not(.home) #barRight.pnav.pph{position:absolute!important;top:auto!important;right:auto!important;left:82px!important;bottom:var(--ppB)!important;transform:none!important;
+  flex-direction:row!important;width:calc(100% - 82px - 106px)!important;height:60px!important;box-sizing:border-box;margin:0!important;padding:5px!important;gap:2px!important;justify-content:space-between;touch-action:none;animation:none!important}
+html.pp #bar:not(.home) #barRight.pnav.pph .bbtn{flex:1 1 0!important;width:auto!important;min-width:0;height:50px!important;border-radius:25px!important;gap:4px}
+html.pp #bar:not(.home) #barRight.pnav.pph .rdiv{display:none}
+html.pp #barRight.pnav.pph.ico .bbtn span{display:none}
+html.pp #barRight.pnav.pph.ico .bbtn .ic{width:24px!important;height:24px!important}
+html.pp #bar:not(.home) #barRight.pnav.pph.idle{opacity:1}
+html.pp #bar.ppnav #barlogo,html.pp #bar.hx-ctr #barlogo{display:none!important}
+/* the vertical rail that stays (Yard Sign's 2 buttons, beside the centred About/Videos/Yard Sign pill): mid-screen on the right */
+html.pp #stage #bar:not(.home) #barRight.pnav:not(.pph){top:calc((var(--ppFoot) - var(--H)) / 2)!important;right:10px!important;left:auto!important}
+/* Buyouts amount button: centred, the same height as the other pills */
+html.pp #bar #amtBtn{bottom:var(--ppB)!important;height:60px!important;border-radius:30px!important}
+
+/* ---------- page title ---------- */
+html.pp #gTitle{left:8px!important;width:584px!important;top:14px}
+html.pp #gTitle span{font-size:15px!important;letter-spacing:2.2px!important;max-width:552px;overflow:hidden;text-overflow:ellipsis}
+html.pp body.hasbk #gTitle{transform:translateX(96px)}
+
+/* ---------- burger menu ---------- */
+html.pp #stage #drawer{left:12px!important;right:12px!important;width:auto!important;top:12px!important;bottom:calc(var(--ppFoot) + 4px)!important;padding:26px 22px 22px!important;box-sizing:border-box}
+html.pp #drawer .m2-h{gap:10px;flex-wrap:nowrap}
+html.pp #drawer .m2-h img{height:26px}
+html.pp #drawer .m2-h .sub{font-size:14px;white-space:nowrap}
+html.pp #drawer .m2-wn{height:44px;padding:0 16px;font-size:15px;white-space:nowrap}
+html.pp #drawer .m2-t{height:88px!important;font-size:20px!important;padding:0 18px!important;gap:12px!important;border-radius:22px}
+html.pp #drawer .m2-t .ic{width:26px;height:26px}
+html.pp #drawer .m2-s{height:52px!important;font-size:17px!important;padding:0 10px!important;gap:10px!important}
+html.pp #drawer .m2-f{flex-wrap:wrap;gap:12px 20px}
+
+/* ---------- product sheet (Products pill) ---------- */
+html.pp #psheet .pan{left:10px!important;right:10px!important;bottom:calc(var(--ppFoot) + 4px)!important;height:372px!important}
+html.pp #psheet .hd{left:26px;right:18px}
+html.pp #psheet .car{padding:0 22px 24px;scroll-padding:0 22px}
+
+/* ---------- generic modals ---------- */
+html.pp .modal .x,html.pp .modal .mx,html.pp .modal [data-close]{min-width:56px;min-height:56px}
+
+/* ---------- video player ---------- */
+html.pp #vlp .x{width:60px;height:60px}
+
+/* ---------- Home ---------- */
+html.pp #homeTrack{height:calc(var(--H) - var(--ppHomeFoot))!important}
+html.pp #p-home .hpane{height:calc(var(--H) - var(--ppHomeFoot))!important}
+html.pp #homeAll .hall-h{left:20px;right:20px;top:16px;height:auto}
+html.pp #homeAll .hall-h h1{display:none}
+html.pp #allTiles .ht .cl{font-size:15px;line-height:1.15;bottom:6%;padding:0 4px}
+/* category panes: header up top, rows of tiles fill the rest */
+html.pp #homeTrack .hcat{padding:50px 16px 10px!important;gap:12px!important}
+html.pp .hcat .hrow{gap:12px!important}
+html.pp .hcat .ht .cl{font-size:15px;line-height:1.15;padding:0 4px}
+/* 3D Home: the frame fills the upright screen; the footer floats over it */
+html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}

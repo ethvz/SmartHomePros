@@ -1,1 +1,110 @@
 /* iPhone portrait (html.pp) layout: sales group. Every rule is scoped to html.pp. */
+/* --salesH = window.SH as a plain number (set by pp/sales.js) so sizes can scale with the screen's height. */
+
+/* each section is a 600-wide upright page, centred whether #screen is 1376 or 600 wide */
+html.pp #p-packages,html.pp #p-comparisons,html.pp #p-buyouts,html.pp #p-reviews,html.pp #p-patents,html.pp #p-moves,html.pp #p-social{
+  left:50%!important;right:auto!important;width:600px!important;margin-left:-300px}
+
+/* ===== Packages: four stacked cards, hub + name + price on top, the kit's icons below ===== */
+html.pp .pk2{left:16px;right:16px;width:auto;top:96px;bottom:90px;height:auto;display:flex;flex-direction:column;gap:12px}
+html.pp .pk2::after{content:"Costs assume 60 months, 0% APR";flex:none;text-align:center;font-size:13px;line-height:16px;color:#8e8e93;margin-top:0;position:relative;z-index:2}
+html.pp #p-packages .pk2-r{position:relative;top:auto!important;left:auto;right:auto;height:auto!important;flex:1 1 0;min-height:0;
+  display:grid;grid-template-columns:112px minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr);column-gap:14px;align-items:center;
+  padding:12px 18px 10px 12px;border-radius:26px;background:linear-gradient(180deg,#17171a,#0d0d0f);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+html.pp .pk-hub{grid-column:1;grid-row:1/3;width:112px;height:76px}
+html.pp .pk-tx{display:contents}
+html.pp .pk-tx h3{grid-column:2;grid-row:1;align-self:end;font-size:27px;line-height:1.1;letter-spacing:-.5px;white-space:nowrap;text-align:left}
+html.pp .pk-tx .in{grid-column:2;grid-row:2;align-self:start;font-size:18px;margin-top:4px;color:#a1a1a6;text-align:left}
+html.pp .pk-tx .mo{grid-column:3;grid-row:1/3;text-align:right;font-size:36px;font-weight:600;letter-spacing:-.6px;margin:0;line-height:1}
+html.pp .pk-tx .mo small{font-size:15px;font-weight:400;letter-spacing:0;margin-top:5px}
+html.pp .pk-tx .pk-fine{display:none}
+html.pp .pk-dev{grid-column:1/-1;grid-row:3;align-self:stretch;min-height:0;padding:0;gap:8px;align-items:center;justify-content:center}
+html.pp .pk-line{width:max-content;gap:18px}
+
+/* ===== Comparisons: same table, narrow brand columns with upright names ===== */
+html.pp #p-comparisons h2{left:24px;top:90px;font-size:58px}
+html.pp .cmp{left:12px;top:176px;width:576px;height:calc(var(--H) - 176px - 88px)}
+html.pp .cmp col:nth-child(1){width:218px!important}
+html.pp .cmp col:nth-child(2){width:70px!important}
+html.pp .cmp col:nth-child(n+3){width:48px!important}
+html.pp .cmp th{height:112px;font-size:15px;vertical-align:bottom;padding-bottom:10px}
+html.pp .cmp th:nth-child(n+3){writing-mode:vertical-rl;transform:rotate(180deg);text-align:left;vertical-align:middle;padding:0 0 0 10px;white-space:nowrap;line-height:48px}
+html.pp .cmp th img{height:16px!important}
+html.pp .cmp td{height:auto}
+html.pp .cmp td.l{font-size:15.5px;line-height:19px;padding-right:10px}
+html.pp .cmp td.c{border-width:0 3px 4px!important}
+html.pp .cmp td.c svg{width:20px;height:20px}
+html.pp .cmp .rate td{font-size:15px}
+html.pp .cmp .rate td.v{font-size:24px}
+
+/* ===== Buyouts: title, the gift card, then the three steps ===== */
+html.pp #p-buyouts h2{left:28px;top:90px;font-size:56px}
+html.pp #p-buyouts .gcard{left:calc(50% - 330px);top:calc(var(--H) / 2 - 400px);transform:none;rotate:7deg;scale:min(.78,calc((var(--salesH) - 650) / 640))}
+html.pp #p-buyouts .steps{left:36px;right:28px;top:calc(var(--H) - 548px)}
+html.pp #p-buyouts .step{gap:24px;margin-bottom:26px;min-height:88px}
+html.pp #p-buyouts .step:last-child{margin-bottom:0}
+html.pp #p-buyouts .step .n{width:68px;height:68px;font-size:30px}
+html.pp #p-buyouts .step p{font-size:24px;line-height:30px;padding-top:2px}
+html.pp #p-buyouts .step:not(:last-child):after{left:33px;top:74px;height:auto;bottom:-20px}
+html.pp #p-buyouts .fine{left:30px;right:30px;width:auto;top:auto;bottom:88px;font-size:12px;line-height:15.5px}
+
+/* ===== Reviews: tall hero on top, big swipeable cards fill the rest ===== */
+html.pp #p-reviews .rv2-hero{left:16px;top:20px;width:568px;height:calc(var(--H) * .54);border-radius:28px}
+html.pp #p-reviews .rv2-hero img{object-position:60% 50%}
+html.pp #p-reviews .rv2-hero i{background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0) 42%),linear-gradient(0deg,rgba(0,0,0,.35),rgba(0,0,0,0) 35%)}
+html.pp #p-reviews .rv2-hero .tx{left:30px;top:66px}
+html.pp #p-reviews .rv2-hero h2{font-size:70px}
+html.pp #p-reviews .rv2-hero p{font-size:20px}
+html.pp #p-reviews .rv2-sc{top:calc(var(--H) * .54 + 36px)!important;height:calc(var(--H) * .46 - 36px - 88px);padding:0 16px!important;scroll-padding:0 16px;gap:14px!important}
+html.pp #p-reviews .rv2-sc .rc{width:492px!important;height:100%!important;padding:32px 30px!important;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.pp #p-reviews .rv2-sc .rc:active{transform:scale(.985)}
+html.pp #p-reviews .rv2-sc .rc b{font-size:23px}
+html.pp #p-reviews .rv2-sc .rc .d{font-size:16px}
+html.pp #p-reviews .rv2-sc .rc .st{font-size:24px!important;color:var(--vg,#05e5af)}
+html.pp #p-reviews .rv2-sc .rc h4{font-size:30px!important;line-height:1.2;margin:30px 0 14px!important}
+html.pp #p-reviews .rv2-sc .rc p{font-size:23px!important}
+
+/* ===== Patents: four marquee rows of bigger cards fill the height ===== */
+html.pp #p-patents h2{left:28px;top:84px;font-size:68px}
+html.pp #p-patents .sc{top:186px;right:0}
+html.pp #p-patents .sc:after{width:120px}
+html.pp #p-patents .prow{height:calc((var(--H) - 324px) / 4 - 18px);gap:16px}
+html.pp #p-patents .prow:nth-child(1){top:230px!important}
+html.pp #p-patents .prow:nth-child(2){top:calc(230px + (var(--H) - 324px) / 4)!important}
+html.pp #p-patents .prow:nth-child(3){top:calc(230px + (var(--H) - 324px) / 2)!important}
+html.pp #p-patents .prow:nth-child(4){top:calc(230px + (var(--H) - 324px) * .75)!important}
+html.pp #p-patents .pc{width:380px;height:100%;padding:18px 22px;border-radius:20px}
+html.pp #p-patents .pc .no{font-size:11px}
+html.pp #p-patents .pc h4{font-size:20px;line-height:24px;width:250px;max-height:72px;margin-top:8px}
+html.pp #p-patents .pc .seal{left:22px;bottom:20px;width:58px;height:58px}
+html.pp #p-patents .pc .ab{left:94px;right:150px;bottom:22px}
+
+/* ===== Moves: the three options stacked as wide cards (photo left, words right) ===== */
+html.pp #p-moves h2{left:28px;top:84px!important;font-size:58px!important}
+html.pp #p-moves .mcard{--ch:calc((var(--H) - 176px - 88px - 28px) / 3);left:16px!important;width:568px;height:var(--ch);padding:10px 10px 0;border-radius:28px!important;overflow:hidden}
+html.pp #p-moves .mcard:nth-of-type(1){top:176px}
+html.pp #p-moves .mcard:nth-of-type(2){top:calc(176px + var(--ch) + 14px)}
+html.pp #p-moves .mcard:nth-of-type(3){top:calc(176px + var(--ch) * 2 + 28px)}
+html.pp #p-moves .mcard img{display:block;width:100%;height:calc(var(--ch) - 168px);border-radius:20px!important;object-position:50% 55%}
+html.pp #p-moves .mcard h3{font-size:25px;line-height:29px;margin:12px 12px 6px}
+html.pp #p-moves .mcard h3 br{display:none}
+html.pp #p-moves .mcard p{font-size:17px;line-height:23px;margin:0 12px}
+html.pp #p-moves .mcard .price{left:auto;right:22px;top:22px;bottom:auto;height:46px;width:auto;padding:0 20px;font-size:20px;font-weight:600;background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html.pp #p-moves .mcard small{margin:4px 12px 0;font-size:13px}
+
+/* ===== Social: the four phones as a 2 x 2 grid of tappable tiles (crops of the same picture) ===== */
+html.pp #p-social>img{display:none}
+html.pp #p-social h2{display:block!important;left:28px;top:84px;font-size:56px;font-weight:500;letter-spacing:-1.5px}
+html.pp #p-social .hot{--s:calc((var(--salesH) - 294) / 1400);--cw:275px;--chh:calc((var(--H) - 294px) / 2);
+  width:var(--cw)!important;height:var(--chh)!important;border-radius:30px!important;background-color:#111;background-image:var(--soc);background-repeat:no-repeat;background-origin:border-box;background-clip:content-box;
+  padding:0 calc((275px - 304px * var(--s)) / 2);background-size:calc(1376px * var(--s)) auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.pp #p-social .hot:active{transform:scale(.97)}
+html.pp #p-social .hot:nth-of-type(odd){left:18px!important}
+html.pp #p-social .hot:nth-of-type(even){left:307px!important}
+html.pp #p-social .hot:nth-of-type(-n+2){top:196px!important}
+html.pp #p-social .hot:nth-of-type(n+3){top:calc(210px + var(--chh))!important}
+html.pp #p-social .hot:nth-of-type(1){background-position:calc(137.5px - 223px * var(--s)) calc(var(--chh) / 2 - 482px * var(--s))}
+html.pp #p-social .hot:nth-of-type(2){background-position:calc(137.5px - 541px * var(--s)) calc(var(--chh) / 2 - 482px * var(--s))}
+html.pp #p-social .hot:nth-of-type(3){background-position:calc(137.5px - 863px * var(--s)) calc(var(--chh) / 2 - 482px * var(--s))}
+html.pp #p-social .hot:nth-of-type(4){background-position:calc(137.5px - 1185px * var(--s)) calc(var(--chh) / 2 - 482px * var(--s))}
+@media (prefers-reduced-motion:reduce){html.pp #p-social .hot:active,html.pp #p-reviews .rv2-sc .rc:active{transform:none}}
