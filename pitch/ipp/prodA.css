@@ -140,3 +140,47 @@ html.ipp #prScroll .appemu .ae-copy h2{font-size:58px}
 html.ipp #prScroll .ichv .ich-vid{object-fit:cover}
 html.ipp #prScroll .ichv .ich-txt{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 60px)!important;width:auto!important;max-width:760px}
 html.ipp #prScroll .ichv .dbai{right:var(--ipR)!important;left:auto!important;top:calc(var(--ipTop) + 40px)!important}
+
+/* ---------- Indoor Camera Pro Highlights (.icm): headline + feature list on top (two columns), the camera render and the
+   app phone below it, overlapping as in landscape ---------- */
+html.ipp #prScroll .icm .ocm-col{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 10px)!important;bottom:auto!important;margin:0!important;justify-content:flex-start!important;gap:22px!important}
+html.ipp #prScroll .icm .dbm-h{width:auto!important;min-height:0!important}
+html.ipp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;column-gap:16px;width:auto!important}
+html.ipp #prScroll .icm .ocm-fade{display:none!important}
+html.ipp #prScroll .icm .ocm-card{left:216px!important;top:calc(var(--ipTop) + 390px)!important;height:calc(var(--H) - var(--ipTop) - 390px)!important}
+html.ipp #prScroll .icm .ocm-phone{left:56px!important;top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
+html.ipp #prScroll .icm .ocm-cap{left:72px!important;top:auto!important;bottom:calc(var(--ipBot) + 520px)!important}
+
+/* ---------- Smart Thermostat Highlights (.thc): the picture on top (scaled by --ipThk from ipp/prodA.js), headline + the ten
+   features under it in two columns ---------- */
+html.ipp #thScroll .thc .th-media{left:calc(552px - 350px*var(--ipThk,1))!important;top:calc(var(--ipTop) + 4px)!important;transform:scale(var(--ipThk,1))!important;transform-origin:0 0!important}
+html.ipp #thScroll .thc .thc-col{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 30px + 700px*var(--ipThk,1))!important;bottom:auto!important;justify-content:flex-start}
+html.ipp #thScroll .thc .thc-col h2{height:auto!important;display:block}
+html.ipp #thScroll .thc .thc-col .sub{width:auto!important;height:auto!important;min-height:0;margin:10px 0 20px}
+html.ipp #thScroll .thc #thfL{width:auto!important;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;row-gap:2px}
+
+/* ---------- Smart Hub ---------- */
+/* hero: the Hub photo / video fills the screen */
+html.ipp #hbScroll .hbh-vid{object-fit:cover}
+/* Modes / Hardware sections float over the live 3D Hub (#emuLayer); one upright screen each */
+html.ipp #p-hub #emuLayer{width:1032px!important}
+html.ipp #p-hub #emuLayer .st{height:var(--H)!important}
+/* Hardware | Specs: the Hub on top (ipp/prodA.js tells the 3D view where), the callouts / table under it at full size */
+html.ipp #p-hub #hbScroll .otab.fb>.strip{width:2064px!important;height:var(--H)!important}
+html.ipp #p-hub #hbScroll .otab.fb .hbpane{width:1032px!important;height:var(--H)!important;transform:none!important}
+html.ipp #p-hub #hbCall{display:grid!important;grid-template-columns:1fr 1fr;align-content:start;gap:30px 64px;padding:calc(var(--ipTop) + 560px) var(--ipR) 0 var(--ipL);box-sizing:border-box}
+html.ipp #p-hub #hbCall>.hbln,html.ipp #p-hub #hbCall>.hbdot{display:none!important}
+html.ipp #p-hub #hbCall>.hbco{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:15px;line-height:21px;padding-left:24px}
+html.ipp #p-hub #hbCall>.hbco b{font-size:20px;line-height:24px;margin-bottom:8px}
+html.ipp #p-hub #hbCall>.hbco::before{content:"";position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:50%;background:var(--vg,#05E5AF);box-shadow:0 0 10px rgba(5,229,175,.6)}
+html.ipp #p-hub #hbSpec .hbspec{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 540px)!important}
+html.ipp #p-hub #hbScroll .otab.fb>.fsp{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
+/* History / What's New / Outage: each pane is one 1032-wide screen; panes sit 1376 apart because the pill slides by 1376 */
+html.ipp #p-hub #hbX .hbpane{width:1032px!important;height:var(--H)!important;margin-right:344px}
+html.ipp #p-hub #hbScroll .hx3{height:var(--H)!important}
+html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 20px)!important}
+html.ipp #p-hub #hbScroll .hbsub{left:var(--ipL)!important;right:var(--ipR)}
+html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 120px)!important}
+html.ipp #p-hub #hbScroll .hbnew{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 130px)!important;grid-template-columns:1fr!important}
+html.ipp #p-hub #hbScroll .hb3pill{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
+html.ipp #p-hub #hbOut .hbfoot{left:var(--ipL)!important;right:var(--ipR)}

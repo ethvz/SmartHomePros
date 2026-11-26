@@ -430,7 +430,7 @@ body.focus #cFeats.on .feat{animation:none!important}
     p: function(s, f){ if(fin || failed === 2) return; var r0 = real, s0 = stage;
       if(s > stage){ stage = s; creep = Math.max(creep, BASE[s]); }
       if(s === stage) real = Math.max(real, BASE[s] + (CAP[s] - BASE[s]) * Math.max(0, Math.min(1, f || 0)));
-      if(real > r0 + 1e-4 || stage > s0){ lastAdv = Date.now(); if(failed === 1) unfail(); } },
+      if(real > r0 || stage > s0){ lastAdv = Date.now(); if(failed === 1) unfail(); } },
     finish: function(cb){ if(failed === 2) return; if(gone){ cb(); return; } if(failed === 1) unfail(); if(!fin) fin = cb; },
     fail: function(){ fail(true); },
     get shown(){ return shown; }
@@ -452,7 +452,7 @@ body.focus #cFeats.on .feat{animation:none!important}
 // progress-based (15 s with no progress), so this only runs if it is missing.
 window.__failT = setTimeout(()=>{ if(!window.__booted && !window.__ld){ const m=document.getElementById('loadMsg'); if(m) m.textContent='The 3D home could not load. Connect to the internet once, then tap Download for Offline in the menu.'; } }, 15000);
 </script>
-<script type="module">
+<script type="module" onerror="window.__ld&&__ld.fail()">
 import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';

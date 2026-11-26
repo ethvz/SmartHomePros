@@ -128,7 +128,9 @@ html:not(.pp):not(.ipp) #drawer .m2-t { height: 70px !important; }
 html:not(.pp):not(.ipp) #drawer .m2-s { height: 40px !important; }
 html:not(.pp):not(.ipp) #drawer .m2-l { margin: 14px 4px 4px !important; }
 html.pp #drawer .shpn-apps { font-size: 22px; margin: 0 0 14px; }
-@media (max-height: 700px) { html.pp #drawer .shpn-apps { font-size: 19px; margin-bottom: 10px; } }
+html.pp #stage #drawer .m2-t { height: 80px !important; }   /* room for the selector */
+html.pp #stage #drawer .m2-s { height: 50px !important; }
+@media (max-height: 700px) { html.pp #drawer .shpn-apps { font-size: 19px; margin-bottom: 10px; } html.pp #stage #drawer .m2-t { height: 66px !important; } html.pp #stage #drawer .m2-s { height: 44px !important; } }
 /* iPad portrait (html.ipp, nav block owned by the shared navigation): footer = the landscape footer (burger + logo bottom left),
    lifted clear of the home indicator; the menu card a little wider. --ippFoot = height kept clear by the footer. */
 html.ipp #stage { --ippFoot: 84px; }

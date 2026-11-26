@@ -136,7 +136,19 @@
       if(c){ const ct=(H-bot-ctlH).toFixed(0)+'px'; if(c.style.top!==ct) c.style.top=ct; c.style.height=ctlH+'px'; }
     }); }
 
-  function run(){ strips(); focal(); specs(); art(); }
+  /* ---- Smart Thermostat Highlights: the picture as large as the room above the feature list allows ---- */
+  function therm(){ const b=$('#thScroll'); if(!b) return; if(!isI()){ if(b.style.getPropertyValue('--ipThk')) b.style.removeProperty('--ipThk'); return; }
+    const H=window.SH||1400, v=Math.max(.6,Math.min(1.18,(H-TOP()-FOOT()-500)/700)).toFixed(3); if(b.style.getPropertyValue('--ipThk')!==v) b.style.setProperty('--ipThk',v); }
+
+  /* ---- Smart Hub live 3D view (#emuF): Modes keeps the landscape geometry (the Hub between the two rails); Hardware / Specs
+     draw the Hub large at the top with the text in a grid under it. Its messages carry a 'pre' geometry; we swap hw / sp. ---- */
+  const hubPre=()=>{ const T=TOP(); return { hw:{cx:552,cy:T+250,w:640}, sp:{cx:552,cy:T+240,w:600} }; };
+  function hub(){ const f=$('#emuF'), w=f&&f.contentWindow; if(!w) return; let fresh=false;
+    try{ if(!w.__ipA){ const o=w.postMessage.bind(w); w.postMessage=function(m,t){ if(isI()&&m&&m.pre) m=Object.assign({},m,{pre:Object.assign({},m.pre,hubPre())}); return o(m,t); }; w.__ipA=1; fresh=true; } }catch(e){ return; }
+    const k=(isI()?'ip':'ls')+(window.SH||0); if(fresh||hub.k!==k){ hub.k=k; } }
+  { const f=$('#emuF'); if(f) f.addEventListener('load',()=>setTimeout(hub,50)); }
+
+  function run(){ strips(); focal(); specs(); art(); therm(); hub(); }
   window.__ipA=run;
   let t=0, busy=false; later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); }catch(e){ window.__ipAerr=String(e&&e.stack||e); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
