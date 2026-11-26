@@ -365,3 +365,5 @@ html.pp #ocScroll .ocm-sv{scale:1.55;transform-origin:50% 40%}
 /* OCP rival wells a little wider so wide cameras (Nest, Blink, Eufy) reach the same size as the tall ones */
 html.pp #ocScroll .ocpk .dbwell{width:108px!important}
 html.pp #ocScroll .ocpk .dbcard{gap:8px!important}
+/* hero, w/ Spotlight renders: their artwork starts at the very top and right, so nudge them down-left to clear the subtitle */
+html.pp #ocScroll .och-prod img[data-k^=s]{transform:translate(-64px,48px) scale(.93);transform-origin:50% 0}
