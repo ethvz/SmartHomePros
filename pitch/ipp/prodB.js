@@ -63,28 +63,6 @@
   }
 
 
-  /* ---------- OCP vs Arlo: a second, synced copy of the split clip so each half gets its own full-width row.
-     Each copy sits in a rounded wrapper (display:contents off ipp). The copy is unloaded whenever the head-to-head is off screen. ---------- */
-  const arloOn = () => { const a = Q('#ocArlo'), p = Q('#p-ocp'); return !!(a && !a.hidden && p && p.classList.contains('on') && a.__ippVis); };
-  function arloTwin() {
-    const v = Q('#ocArloVid'); if (!v) return; let t = Q('#ocArloVid3');
-    if (!v.parentNode.classList.contains('ippArW')) { const w = D.createElement('div'); w.className = 'ippArW'; v.before(w); w.appendChild(v); }
-    if (!isIPP()) { if (t) arloSleep(t); return; }
-    if (!t) { t = D.createElement('video'); t.id = 'ocArloVid3'; t.muted = true; t.playsInline = true; t.setAttribute('playsinline', ''); t.preload = 'none'; t.setAttribute('aria-hidden', 'true');
-      const w = D.createElement('div'); w.className = 'ippArW'; w.appendChild(t); v.parentNode.after(w);
-      const sync = () => { if (!isIPP() || !arloOn()) return; if (!t.getAttribute('src') && v.currentSrc) { t.src = v.currentSrc; }
-        if (Math.abs(t.currentTime - v.currentTime) > .12) { try { t.currentTime = v.currentTime; } catch (e) {} }
-        if (v.paused !== t.paused) v.paused ? t.pause() : t.play().catch(() => {}); };
-      ['play', 'pause', 'seeked', 'timeupdate'].forEach(ev => v.addEventListener(ev, sync));
-      const a = Q('#ocArlo'); if (a && window.IntersectionObserver) new IntersectionObserver(es => { a.__ippVis = es[es.length - 1].isIntersecting;
-        if (!isIPP()) return;
-        if (a.__ippVis) { if (typeof OC !== 'undefined' && OC.arlo && v.paused) v.play().catch(() => {}); sync(); }
-        else { if (!v.paused) v.pause(); arloSleep(t); } }, { threshold: 0 }).observe(a);
-    }
-  }
-  /* stop and release the copy's decoder */
-  function arloSleep(t) { if (!t.paused) t.pause(); if (t.getAttribute('src')) { t.removeAttribute('src'); t.load(); } }
-
   /* ---------- Smart Actions: an oversized product render rises from the bottom-right edge under the list ---------- */
   function actBleed() {
     [['#ocScroll', 'assets/och/c0.webp?v=87'], ['#dbScroll', 'assets/db/dbcp_a1.webp?v=55']].forEach(([q, src]) => {
@@ -149,12 +127,11 @@
     const ph = Q('#dbmPhone'); if (ph && ph.style.getPropertyValue('left') === '140px') ph.style.removeProperty('left');
     const c = Q('#dbmCap'); if (c && c.style.getPropertyValue('transform') === 'none') c.style.removeProperty('transform');
   }
-  function layout() { galFocus(); arloTwin(); if (!isIPP()) { featClear(); return; } spinFit(); featLayout(); aiFit(); cmLayout(); }
+  function layout() { galFocus(); if (!isIPP()) { featClear(); return; } spinFit(); featLayout(); aiFit(); cmLayout(); }
   function galEager(sec) { sec.querySelectorAll('.hgl img[loading=lazy]').forEach(im => { im.loading = 'eager'; }); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ippo) return; el.__ippo = 1;
     /* writes only to children / other elements, never to the observed page's class */
-    new MutationObserver(() => { if (!isIPP()) return; if (el.classList.contains('on')) { requestAnimationFrame(layout); galEager(el); }
-      else if (q === '#p-ocp') { const v = Q('#ocArloVid'), t = Q('#ocArloVid3'); if (v && !v.paused) v.pause(); if (t) arloSleep(t); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
+    new MutationObserver(() => { if (isIPP() && el.classList.contains('on')) { requestAnimationFrame(layout); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
   function boot() { cmBuild(); actBleed(); secWatch(); featWatch(); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));

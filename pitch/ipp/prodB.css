@@ -68,7 +68,7 @@ html.ipp #ocScroll .ocm-phone{left:calc(var(--gx) / 2 + 516px - 460px * var(--ph
 html.ipp #ocScroll .ocm-phone.port{left:calc(var(--gx) / 2 + 516px - 278px * var(--phs))!important;top:var(--mt)!important}
 html.ipp #ocScroll .ocm:has(.ocm-phone.port) .ocm-card{opacity:0}
 html.ipp #ocScroll .ocm-svw{left:calc(var(--gx) + 10px)!important;right:auto!important;width:calc(1032px - var(--gx) - 30px);top:var(--mt)!important;bottom:auto!important;height:calc(var(--mh) - var(--phh) + 40px);-webkit-mask-image:none!important;mask-image:none!important}
-html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important;transform-origin:50% 100%;scale:2.1}
+html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important;transform-origin:50% 100%;scale:1.6}
 /* per-state product scale: exploded 4K view stays clear of the phone; radar clip shown whole */
 html.ipp #ocScroll .ocm-card img[data-im="ocm/sensor"]{height:calc(100% - 80px)!important}
 html.ipp #ocScroll .ocm-bv video{object-fit:contain!important}
@@ -98,23 +98,19 @@ html.ipp :is(#ocScroll,#dbScroll) .dbcard{height:auto!important;transition:trans
 html.ipp :is(#ocScroll,#dbScroll) .dbcard:active{transform:scale(.97)}
 html.ipp :is(#ocScroll,#dbScroll) .dbwell{width:150px!important;height:calc(100% - 24px)!important}
 
-/* OCP vs Arlo: the split clip becomes two stacked halves, Vivint on top, Arlo below (prodB.js adds the synced second copy).
-   Each copy is exactly half the clip's shape (so it shows one side whole) and is clipped top and bottom to --vh */
-#ocArloVid3{display:none}
-html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vf:calc(var(--vw) * .5612);--vh:clamp(260px,calc((var(--H) - var(--bT) - var(--bF) - 600px) / 2),var(--vf));--vt:calc(var(--bT) + 200px)}
+/* OCP vs Arlo: the split clip shown whole across the content width (as in landscape; a second synced copy halved the frame rate),
+   each side labelled, the reasons below */
+html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vh:calc(var(--vw) * 358 / 1276);--vt:calc(var(--bT) + 230px)}
 html.ipp #ocArlo h2{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important;font-size:58px!important;gap:22px!important}
 html.ipp #ocArlo h2 i{width:90px!important}
 html.ipp #ocArlo .ocar-back{left:calc(var(--gx) + 44px)!important;right:auto!important;top:calc(var(--bT) + 116px)!important}
-/* each copy sits in its own rounded wrapper (overflow clip, no clip-path on the video: that cost half the frame rate) */
-.ippArW{display:contents}
-html.ipp #ocArlo .ippArW{display:block;position:absolute;left:calc(var(--gx) + 30px);width:var(--vw);height:var(--vh);top:var(--vt);border-radius:24px;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
-html.ipp #ocArlo .ippArW+.ippArW{top:calc(var(--vt) + var(--vh) + 16px)}
-html.ipp #ocArloVid,html.ipp #ocArloVid3{position:absolute;display:block;left:0!important;top:calc((var(--vh) - var(--vf)) / 2)!important;width:var(--vw)!important;height:var(--vf)!important;border-radius:0!important;object-fit:cover!important}
-html.ipp #ocArloVid{object-position:0 50%!important}
-html.ipp #ocArloVid3{object-position:100% 50%}
-html.ipp #ocArlo .ocar-l{left:calc(var(--gx) + 50px)!important;top:calc(var(--vt) + 20px)!important}
-html.ipp #ocArlo .ocar-l+.ocar-l{top:calc(var(--vt) + var(--vh) + 36px)!important}
-html.ipp #ocArlo .ocar-w{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--vt) + 2 * var(--vh) + 56px)!important}
+html.ipp #ocArloVid{left:calc(var(--gx) + 30px)!important;top:var(--vt)!important;width:var(--vw)!important;height:var(--vh)!important;border-radius:22px!important;object-fit:cover!important}
+html.ipp #ocArlo .ocar-l{left:calc(var(--gx) + 46px)!important;top:calc(var(--vt) + 16px)!important}
+html.ipp #ocArlo .ocar-l+.ocar-l{left:calc(var(--gx) + 46px + var(--vw) / 2)!important}
+html.ipp #ocArlo .ocar-w{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--vt) + var(--vh) + 60px)!important}
+html.ipp #ocArlo .ocar-w b{font-size:34px}
+html.ipp #ocArlo .ocar-w div{gap:14px}
+html.ipp #ocArlo .ocar-w span{height:60px;font-size:19px;padding:0 26px}
 
 /* DBCP head-to-head: the two stills stay side by side (as in landscape), reasons below */
 html.ipp #dbVs .dbvs-h{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important}
