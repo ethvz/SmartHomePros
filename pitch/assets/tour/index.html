@@ -367,8 +367,8 @@ const speckle = (base, n, a, blots, ba) => (g,w,h) => { g.fillStyle = base; g.fi
   for(let i=0;i<blots;i++){ const x=rnd()*w, y=rnd()*h, r=20+rnd()*70, gr=g.createRadialGradient(x,y,0,x,y,r), d=rnd()<.5;
     gr.addColorStop(0, d ? `rgba(0,0,0,${ba})` : `rgba(255,255,255,${ba})`); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(x-r,y-r,2*r,2*r); }
   for(let i=0;i<n;i++){ const d=rnd()<.55; g.fillStyle = d ? `rgba(0,0,0,${rnd()*a})` : `rgba(255,255,255,${rnd()*a})`; g.fillRect(rnd()*w,rnd()*h,1+rnd()*1.6,1+rnd()*1.6); } };
-TXC.stucco = canvasTex(512,512, speckle('#f4f4f4', 26000, .09, 90, .035), [1.7,1.7]);
-TXC.concD = canvasTex(512,512, speckle('#f2f2f1', 18000, .12, 140, .05), [2.6,2.6]);
+TXC.stucco = canvasTex(512,512, speckle('#f4f4f4', 30000, .08, 60, .012), [1.2,1.2]);
+TXC.concD = canvasTex(512,512, speckle('#f2f2f1', 20000, .1, 80, .018), [2.0,2.0]);
 const camera = new THREE.PerspectiveCamera(40, 1, 0.03, 400);
 
 /* ------------------------------------------------------------------ helpers */
@@ -429,7 +429,8 @@ const M = {
   bulb:   mat(0xfff4e0, {x:{emissive:0xffdcaa, emissiveIntensity:3}}),
 };
 M.siding.map = M.paint.map = M.cut.map = M.ceil.map = TXC.stucco; M.conc.map = TXC.concD;
-M.roof.color.set(0x575c63);                  // charcoal shingles, as in the reference
+M.roof.color.set(0x7a8089);                  // charcoal shingles, as in the reference
+M.siding.color.set(0xd3d6dc);                // the street walls read soft grey-white at dusk, like the reference
 
 /* ------------------------------------------------------------------ site */
 const FL = 0.15;           // finished floor
@@ -1370,7 +1371,7 @@ controls.touches = {ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN};
 
 /* one diorama view: from the street, a little left of the cutaway and above it (the reference video's camera); orbit all
    the way round the sides (the back is modelled too) */
-const HOME = {target:V(-1.7,3.0,0), r:30, phi:1.33, theta:-.06, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-2.4, maxA:2.4}};
+const HOME = {target:V(-2.6,3.0,0), r:26, phi:1.43, theta:.09, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-2.4, maxA:2.4}};
 const state = { focus:null, fly:null, idleAt:performance.now(), cat:'all' };
 const shown = p => state.cat==='all' || CATS[state.cat].includes(p.k);
 
