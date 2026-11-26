@@ -73,7 +73,8 @@ def patch_recruit():
     if '.dw-foot .dw-dl {' not in s:   # offline download lives in Connect → Settings now
         s = s.replace('</style>', '  .dw-foot .dw-dl { display: none !important; } .dw-foot { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* SmartHomePros Connect: download is in Connect Settings */\n</style>', 1)
     if '.dw-foot .dw-app' not in s:
-        s = s.replace('</style>', '  .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* SmartHomePros Connect */\n</style>', 1)
+        s = s.replace('</style>', '  .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* SmartHomePros Connect */\n'
+                   '  .dw:not(.short) .dw-foot .dw-vid, .dw:not(.short) .dw-foot:has(.dw-vid) .dw-app { grid-column: auto; } .dw.short .dw-foot { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* Video Library beside Switch app */\n</style>', 1)
     open(p, 'w', encoding='utf-8').write(s)
     p = os.path.join(ROOT, 'recruit/sw.js'); s = open(p).read()
     s = sub(s, 'ks.filter(k => k !== V && k !== MC && k !== META)', "ks.filter(k => k.startsWith('fast-recruit-') && k !== V)", 'fr sw caches')

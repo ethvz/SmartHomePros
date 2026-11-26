@@ -10,15 +10,16 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.05, specularIntensity:1, envMapIntensity:1.2, clearcoat:1, clearcoatRoughness:.02});
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.03, specularIntensity:1, specularColor:0x9a9a9a, envMapIntensity:.55, clearcoat:.4, clearcoatRoughness:.03});
   const satinK = new THREE.MeshPhysicalMaterial({color:0x0e0e0f, roughness:.5, metalness:0, specularIntensity:.4, envMapIntensity:.15, side:THREE.DoubleSide});   // satin ring: rougher / duller than the glass
-  const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:3, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x141a26, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:4, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
 
   // ---------------------------------------------------------------- mount (engineering CAD), decoded exactly like the inline model
   const C = { x:0, y:21, zf:46, r:19.3 };                   // collar: CAD front face z = 46; Ø38.6 / axis from the side photos (CAD nut r16.4 reads small)
   const keepTris = (I, pos, keep) => { const out = []; for(let t=0;t<I.length;t+=3){ const a = I[t], b = I[t+1], c = I[t+2];
-    if(keep(pos[3*a+2], pos[3*b+2], pos[3*c+2])) out.push(a, b, c); } return new Uint32Array(out); };
+    if(keep(pos[3*a+2], pos[3*b+2], pos[3*c+2], a)) out.push(a, b, c); } return new Uint32Array(out); };
+  const SX = 77/70.6;                                         // the CAD front shell (70.6 wide) reads ~9 % narrow against the photos: mount is 77
   if(OCPM){
     const mountMat = mountW.clone(); mountMat.side = THREE.DoubleSide;
     const grl = grilleMat(0xc4c6c8, [6.5,4.5]); grl.side = THREE.DoubleSide;
@@ -30,20 +31,22 @@ export default H => {
       const geo = new THREE.BufferGeometry();
       const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
-      if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front
-        let x = pos[3*i], y = pos[3*i+1], z = pos[3*i+2];
-        if(z < .0128){ x = Math.max(-.0353, Math.min(.0353, x)); y = Math.max(-.0495, Math.min(.0456, y)); }   // the CAD's wider back flange pulled in to the front shell's outline
+      if(p.g === 1) for(let i=0;i<p.nv;i++) pos[3*i] *= SX*.988;   // grille scaled with the shell, sitting ~.5 inside its sides
+      if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front, 77 wide
+        let x = pos[3*i]*SX, y = pos[3*i+1], z = pos[3*i+2];
+        if(z < .0128){ x = Math.max(-.0385, Math.min(.0385, x)); y = Math.max(-.0495, Math.min(.0456, y)); }   // the CAD's wider back flange pulled in to the front shell's outline
         if(y > .036 && z > .021 && z < .04){ const dy = y - .036, dz = z - .021, L = Math.hypot(dy, dz); if(L > .010){ y = .036 + dy*.010/L; z = .021 + dz*.010/L; } }   // top-front corner R10
         pos[3*i] = x; pos[3*i+1] = y; pos[3*i+2] = z; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
       let I = p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni);
-      if(p.g === 1) I = keepTris(I, pos, (a, b, c) => Math.min(a, b, c) >= .016);   // grille: side wrap starts 16 mm off the wall (white border behind it)
+      const Nr0 = new Int8Array(OCPM.buf, p.n, p.nv*3);
+      if(p.g === 1) I = keepTris(I, pos, (a, b, c, v) => Math.min(a, b, c) >= .016 || Math.abs(Nr0[3*v])/127 < .6);   // grille: side faces start 16 mm off the wall (white border behind); the bottom wrap is kept whole
       else I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
       geo.setIndex(new THREE.BufferAttribute(I,1));
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
         for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
-          uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0354)/.0708; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
+          uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0385)/.0770; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
         geo.setAttribute('uv', new THREE.BufferAttribute(uv,2)); }
       const m = new THREE.Mesh(geo, Mt[p.g]); m.castShadow = m.receiveShadow = true; cad.add(m);
     }
@@ -51,36 +54,37 @@ export default H => {
     add(M, H.rslab(77, 99, 29, 10, 4, mountW), 0, 0, 14.5);
     add(M, H.rslab(71, 42, 1, 7, .4, grilleMat(0xc4c6c8,[60,36])), 0, -28, 29.1);
   }
-  // wall-plate layer (z 0 -> 7): a rim with exactly the front shell's outline (71 x 95.5, R10), so plate and shell are one flush
-  // surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
-  { const s = rrShape(70.6, 95.1, 10); s.holes.push(rrShape(64.6, 89.1, 7));
-    const wp = add(M, ext(s, 6.85, .35, mountW), 0, -1.95, 0); g.userData.wallPlate = wp; }
+  // wall-plate layer (z 0 -> 7): a 3 mm rim with exactly the shell's outline (77 x 95.1, R10), rounded R1 at the wall, so plate and
+  // shell are one flush surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
+  { const s = rrShape(77, 95.1, 10); s.holes.push(rrShape(71, 89.1, 7));
+    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -1.95, 0); g.userData.wallPlate = wp; }
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
-  { const s = H.rr4(70.6, 48, [0, 0, 10, 10], 0, -25.5); s.holes.push(H.rr4(68.2, 46.6, [0, 0, 8.8, 8.8], 0, -25.4));
-    add(M, ext(s, 9.3, .3, mountW), 0, 0, 7.05); }
+  { const s = H.rr4(77, 48, [0, 0, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [0, 0, 8.8, 8.8], 0, -25.4));
+    add(M, ext(s, 8.95, .3, mountW), 0, 0, 7.05);             // ends exactly at the grille's back edge (z 16)
+    add(M, H.rslab(74, 1.6, 14, .6, .3, mountW), 0, -47.4, 15); }   // liner inside the bottom rim (hides the grille's back faces)
   // back of the mount (open toward the wall, ocp_back_1 / detail_back): floor 15 mm in, thin centre plate (face 6 mm off the wall),
   // four tall U-shaped screw towers with real keyholes, channel walls, the brass insert tube standing 4 mm proud, cable slot
   { const inner = new THREE.MeshPhysicalMaterial({color:0xd6d7d8, roughness:.6, side:THREE.DoubleSide});
     const dark = mat(0x2e3032, {r:.85});
-    add(M, H.rslab(66, 90, 1, 7, .3, inner), 0, -1.75, 15.5);                      // cavity floor
+    add(M, H.rslab(72, 90, 1, 7, .3, inner), 0, -1.75, 15.5);                      // cavity floor
     const plateM = new THREE.MeshPhysicalMaterial({color:0xe7e8e9, roughness:.55, side:THREE.DoubleSide});
     add(M, H.rslab(42, 58, 2, 3, .5, plateM), 0, 11, 7);                               // centre plate, face at z = 6
     add(M, H.rslab(38, 54, 9, 3, .5, inner), 0, 11, 11.5);                             // its supports down to the floor
     const keyhole = (cx, cy) => { const p = new THREE.Path(), a0 = Math.atan2(-1.561, 1.25);
       p.moveTo(cx + 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - .061); p.absarc(cx, cy + 1.5, 2, a0, Math.PI - a0, false); p.lineTo(cx - 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - 3.6); return p; };
-    for(const [bx, by] of [[-25, 30], [25, 26], [-25, -5], [25, -9]]){
-      const sg = Math.sign(bx), sh = H.rr4(12, 11.5, sg < 0 ? [5.75, 0, 0, 5.75] : [0, 5.75, 5.75, 0], bx + sg*2, by);
+    for(const [bx, by] of [[-28, 30], [28, 26], [-28, -5], [28, -9]]){                // big U clips, 12 x 14, open to the rim
+      const sg = Math.sign(bx), sh = H.rr4(12, 14, sg < 0 ? [6, 0, 0, 6] : [0, 6, 6, 0], bx + sg*1.5, by);
       sh.holes.push(keyhole(bx, by));
-      add(M, ext(sh, 13.2, .5, inner), 0, 0, 2);                                      // tower: z 2 -> 15.2, walls run out to the rim
-      add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2, 2, .2, 20), dark)), bx, by + 1.5, 9); }
-    for(const rx of [-22.5, 22.5]) add(M, H.rslab(1.8, 58, 12, .8, .4, inner), rx, 10, 9.3);   // channel walls
+      add(M, ext(sh, 13.2, .6, inner), 0, 0, 2);                                      // tower: z 2 -> 15.2
+      add(M, H.rslab(5, 8.5, .4, 1, .1, dark), bx, by, 3.2); }                        // dark backing 1 mm behind the keyhole
+    for(const rx of [-21.5, 21.5]) add(M, H.rslab(1.8, 58, 12, .8, .4, inner), rx, 10, 9.3);   // channel walls
     const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.28, metalness:.9});
-    const tube = new THREE.LatheGeometry([[2,0],[2,3.5],[2.4,4],[3.6,4],[4,3.6],[4,0]].map(([r,y]) => new THREE.Vector2(r, y)), 48);
-    { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 6); t.rotation.x = -Math.PI/2; }   // brass tube OD 8 / ID 4, 4 mm proud of the plate
-    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2, 2, .1, 24), dark)), 0, 6, 4.5);
+    const tube = new THREE.LatheGeometry([[2.2,0],[2.2,4],[2.6,4.5],[4.1,4.5],[4.5,4.1],[4.5,0]].map(([r,y]) => new THREE.Vector2(r, y)), 48);
+    { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 6); t.rotation.x = -Math.PI/2; }   // brass tube OD 9, 4.5 mm proud of the plate
+    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, .1, 24), dark)), 0, 6, 4);
     { const sl = add(M, H.rslab(3.5, 9, .2, 1.75, .05, dark), -6, -6, 5.9); sl.rotation.z = Math.PI/2; } }
   // microphone pinhole on the +x side, just above the grille, near the 7 mm seam
-  { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 35.52, -3, 13); ph.rotation.z = Math.PI/2; }
+  { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.52, -3, 13); ph.rotation.z = Math.PI/2; }
 
   // ---------------------------------------------------------------- dimpled locking collar (white, golf-ball dimples, real step at the root)
   {
@@ -137,10 +141,10 @@ export default H => {
   for(let i=1;i<=6;i++){ const a = i/6*Math.PI/2; const hw = 40 + 2*Math.sin(a); rings.push(R_(-2 + 2*Math.cos(a), hw, 15 + 2*Math.sin(a))); }  // R2 front edge
   rings.push(sec(-2.5)); split = rings.length - 1;                                                 // flush black/white colour split
   const zs = new Set(); for(let z=-3.5; z>Zb+Rbt; z-=1.6) zs.add(+z.toFixed(3));
-  for(const R of [Rt, Rs, Rbt]) for(let i=0;i<=24;i++){ const a = i/24*Math.PI/2; zs.add(+(Zb + R*Math.cos(a)).toFixed(3)); }
+  for(const R of [Rt, Rs, Rbt]) for(let i=0;i<=60;i++){ const a = i/60*Math.PI/2; zs.add(+(Zb + R*Math.cos(a)).toFixed(3)); }
   [...zs].sort((a,b) => b-a).forEach(z => { if(z < -2.6 && z >= Zb) rings.push(sec(z)); });
   const last = sec(Zb), yc = (last.yT + last.yB)/2;
-  for(let i=1;i<=16;i++){ const f = 1 - i/16*.985; rings.push({z:Zb, hw:last.hw*f, yT: yc + (last.yT-yc)*f, yB: yc + (last.yB-yc)*f, r: Math.max(.3, last.r*f)}); }
+  for(let i=1;i<=40;i++){ const f = 1 - i/40*.985; rings.push({z:Zb, hw:last.hw*f, yT: yc + (last.yT-yc)*f, yB: yc + (last.yB-yc)*f, r: Math.max(.3, last.r*f)}); }
   const NP = 4*(nA+nS), pos = [];
   for(const r of rings) for(const p of ringPts(r)) pos.push(...p);
   const capF = pos.length/3; pos.push(0, 0, -3);
@@ -166,6 +170,7 @@ export default H => {
   { const pr = [[6.2,-2.6],[6.4,-2],[9.3,.25],[9.55,.3],[9.75,.15],[9.82,-1.3]];   // lens bezel Ø19.6 with a straight conical chamfer down to the lens (detail_lens)
     const b = add(head, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,z]) => new THREE.Vector2(r, z)), 72), satinK), 0, -17, 0); b.rotation.x = Math.PI/2;
     add(head, dome(6.2, 2.6, lensM), 0, -17, -2.9);   // one big glossy blue-black lens dome
+    add(head, H.torus(3.2, .14, mat(0x3a3f48, {r:.2})), 0, -17, -.66);   // dark inner element ring
   }
   // light / IR sensor (recessed 0.3), mic pinholes, wordmark
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.65, .4, 32), mat(0x1e1e1f,{r:.4}))), 0, -30.5, -.5);
@@ -191,11 +196,11 @@ export default H => {
   let tHit = 30; for(let t = 0; t < 60; t += .1){ const h = toHead(B.clone().add(V3(0, 0, t))); if(h.z <= 0 && h.z >= Zb && h.y >= sec(h.z).yB){ tHit = t; break; } }
   const Ln = tHit + 2, hitH = toHead(B.clone().add(V3(0, 0, tHit)));
   { // funnel: the head's lower back flows into the neck with a concave blend (no slot edge, no pad): shell vertices near the
-    // neck axis are pulled back along it, 8 mm at the neck, easing to nothing 24 mm out
+    // neck axis are pulled back along it, 3 mm at the neck, easing (smoothstep) to nothing 13 mm out
     const Ah = toHead(B), dh = V3(0, 0, 1).applyQuaternion(hInv), Pp = hg.attributes.position, w = V3(0, 0, 0);
     for(let i=0;i<Pp.count;i++){ w.set(Pp.getX(i), Pp.getY(i), Pp.getZ(i)).sub(Ah); const t = w.dot(dh);
-      if(t <= 0 || t > tHit + 14) continue; const r = w.clone().addScaledVector(dh, -t).length(); if(r >= 24) continue;
-      const u = Math.max(0, (r - 8)/16), k = 8*(1 - u)*(1 - u);
+      if(t <= 0 || t > tHit + 14) continue; const r = w.clone().addScaledVector(dh, -t).length(); if(r >= 13) continue;
+      const u = Math.max(0, (r - 8)/5), k = 3*(1 - u*u*(3 - 2*u));
       Pp.setXYZ(i, Pp.getX(i) - dh.x*k, Pp.getY(i) - dh.y*k, Pp.getZ(i) - dh.z*k); }
     hg.computeVertexNormals(); }
   const ballM = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.38, clearcoat:.25, clearcoatRoughness:.35, sheen:.3, sheenColor:0xffffff});

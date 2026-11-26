@@ -1,34 +1,41 @@
 // Vivint Door & Window Sensor + magnet, install pose on the window sash's bottom rail (back at z=0, face +z, long axis along x).
-// Sensor 68.6 x 27.9 x 12.7 mm, magnet 47.5 x 14.2 x 7.1 mm: grey bases and thin white caps on ONE continuous wall each (flush
-// hairline splits), R8.5 / R4.5 plan corners, small front rolls into flat faces; the sensor's U alignment notch faces the magnet
-// on the sill edge right below it. Built in millimetres inside a 0.001-scaled group.
+// Sensor 68.6 x 27.9 x 12.7 mm, magnet 47.5 x 14.2 x 12.7 mm (as deep as the sensor, as the official renders and photos show; the
+// website's 7.1 mm does not match them): satin grey bases and white caps on ONE continuous wall each (flush hairline splits at the
+// same height, 9.7), R8.3 / R4.7 plan corners, R2.6 front rolls into faces with a 0.3 mm crown. The sensor's alignment notch is a
+// dark 2.9 mm slot up the full grey side facing the magnet, which sits centred below it with a 2.8 mm gap.
+// Built in millimetres inside a 0.001-scaled group.
 export default H => {
   const { THREE, G, add } = H;
   const K = kit(THREE);
   const g = G(), u = add(g, G()); u.scale.setScalar(.001);
-  const grey = 0xa9aaad, white = 0xf2f2f0;
+  const grain = K.noiseTex();
+  const grey = 0xa9aaad, white = 0xe9e9e7;
 
-  /* one two-tone part: plan L x Wd, corner R, back edge rb, split at zs, straight white wall to zr, front roll rf up to D */
+  /* one two-tone part: plan L x Wd, corner R, back edge rb, split at zs, front roll rf, 0.3 mm crown, total depth D */
   const part = (L, Wd, R, D, rb, zs, rf, cut, extra = []) => {
     const ring = (d, z) => K.rr(L - 2 * d, Wd - 2 * d, R - d, { nc: 16, ns: 10 }).map(([x, y]) => [x, y, z]);
-    const prof = [];
+    const prof = [], DF = D - .3;
     for (let i = 0; i <= 5; i++){ const a = i / 5 * Math.PI / 2; prof.push([rb * (1 - Math.sin(a)), rb * (1 - Math.cos(a))]); }
-    for (const z of [...extra, zs, D - rf]) prof.push([0, z]);
-    for (let i = 1; i <= 10; i++){ const a = i / 10 * Math.PI / 2; prof.push([rf * (1 - Math.cos(a)), D - rf + rf * Math.sin(a)]); }
-    const m = K.bandMat({ color: grey, roughness: .6 }, 'z', [[zs, white, .45]], [['z', zs, .2, 0x55585b, .85]], cut);
-    const mesh = new THREE.Mesh(K.skin(prof.map(([d, z]) => ring(d, z)), { start: true, end: [0, 0, D + .04] }), m);
+    for (const z of [...extra, zs, DF - rf]) prof.push([0, z]);
+    for (let i = 1; i <= 12; i++){ const a = i / 12 * Math.PI / 2; prof.push([rf * (1 - Math.cos(a)), DF - rf + rf * Math.sin(a)]); }
+    const rings = prof.map(([d, z]) => ring(d, z)), top = rings[rings.length - 1];
+    for (const s of [.8, .55, .3]) rings.push(top.map(([x, y]) => [x * s, y * s, DF + .3 * (1 - s * s)]));
+    const m = K.bandMat({ color: grey, roughness: .42, clearcoat: .2, clearcoatRoughness: .5, bumpMap: grain, bumpScale: .1 }, 'z',
+      [[zs, white, .5]], [['z', zs, .2, 0x55585b, .85]], cut);
+    const mesh = new THREE.Mesh(K.skin(rings, { start: true, end: [0, 0, D] }), m);
     mesh.castShadow = mesh.receiveShadow = true; return mesh;
   };
 
-  /* sensor, with the U notch (2.5 wide, 1 deep) cut into the bottom (-y) side at mid-length, from z 2.5 up to the cap seam */
-  const NW = 1.25, NB = 2.5 + NW, ZS = 9.7, SW = 27.9;
-  const cut = `vOP.y < -${(SW / 2 - 1).toFixed(3)} && ((abs(vOP.x) < ${NW} && vOP.z > ${NB.toFixed(3)} && vOP.z < ${ZS}) || length(vec2(vOP.x, vOP.z - ${NB.toFixed(3)})) < ${NW})`;
-  add(u, part(68.6, SW, 10, 12.7, .8, ZS, 2.2, cut, [2.5, 6]));
-  const U = new THREE.Shape(); U.moveTo(-NW, ZS); U.lineTo(-NW, NB); U.absarc(0, NB, NW, Math.PI, 2 * Math.PI, false); U.lineTo(NW, ZS); U.lineTo(-NW, ZS);
-  K.pocket(u, U, 1.0, '-y', -SW / 2, 0, 0, 0x9c9da0);
+  /* sensor, with the alignment notch (2.9 wide, 1.3 deep) cut into the bottom (-y) side at mid-length: open at the mounting
+     surface, running up the whole grey side to a rounded end just under the cap seam */
+  const NW = 1.45, ZS = 9.7, ZC = ZS - NW, SW = 27.9;
+  const cut = `vOP.y < -${(SW / 2 - 1).toFixed(3)} && ((abs(vOP.x) < ${NW} && vOP.z < ${ZC.toFixed(3)}) || length(vec2(vOP.x, vOP.z - ${ZC.toFixed(3)})) < ${NW})`;
+  add(u, part(68.6, SW, 8.3, 12.7, .8, ZS, 2.6, cut, [2.5, 6]));
+  const U = new THREE.Shape(); U.moveTo(-NW, -.5); U.lineTo(-NW, ZC); U.absarc(0, ZC, NW, Math.PI, 0, true); U.lineTo(NW, -.5); U.lineTo(-NW, -.5);
+  K.pocket(u, U, 1.3, '-y', -SW / 2, 0, 0, 0x6f7174);
 
-  /* magnet on the sill edge right below (centred on it, 2.8 mm gap), its long side facing the notch */
-  add(u, part(47.5, 14.2, 6, 7.1, .6, 5.2, 1.5, null, [2.5]), 0, -(SW / 2 + 2.8 + 7.1), 0);
+  /* magnet right below (centred on the sensor, 2.8 mm gap), its long side facing the notch */
+  add(u, part(47.5, 14.2, 4.7, 12.7, .6, ZS, 2.6, null, [2.5, 6]), 0, -(SW / 2 + 2.8 + 7.1), 0);
   return g;
 };
 
@@ -57,7 +64,7 @@ function kit(THREE){
      or [x,y,z] for the fan centre. Ring order back -> front, points CCW seen from +z gives outward normals. */
   function skin(rings, o = {}){
     const n = rings[0].length, pos = [], idx = [], uv = [];
-    const put = ([x, y, z]) => { pos.push(x, y, z); const t = o.uv ? o.uv(x, y, z) : [x * .01, y * .01]; uv.push(t[0], t[1]); return pos.length / 3 - 1; };
+    const put = ([x, y, z]) => { pos.push(x, y, z); const t = o.uv ? o.uv(x, y, z) : [(x + z) * .01, (y + .7 * z) * .01]; uv.push(t[0], t[1]); return pos.length / 3 - 1; };
     for (const r of rings) for (const q of r) put(q);
     for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < n; i++){
       const a = k * n + i, b = k * n + (i + 1) % n, c = a + n, d = b + n; idx.push(a, b, c, b, d, c); }
@@ -108,18 +115,22 @@ function kit(THREE){
   function bandsTex(ao){
     const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
     for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
-      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 6.5) * .5 + Math.sin(t * Math.PI * 2 * 13) * .12;
-      let l = 240 + v * 2.5;
+      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 2.5 + .6) * .5 + Math.sin(t * Math.PI * 2 * 5 + 2) * .15;
+      let l = 230 + v * 22;
       if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
-        l *= (1 - .3 * Math.exp(-top / .035) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
+        l *= (1 - .28 * Math.exp(-top / .06) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
       const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }
     x.putImageData(im, 0, 0);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  function noiseTex(){
-    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), im = x.createImageData(64, 64);
-    for (let k = 0; k < im.data.length; k += 4){ const v = 90 + Math.random() * 120; im.data[k] = im.data[k + 1] = im.data[k + 2] = v; im.data[k + 3] = 255; }
-    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+  /* fine bead-blast grain for bumpMap: smoothed noise, tiles every 128 px; at repeat 12 one pixel is about 0.07 mm */
+  function noiseTex(rep = 12){
+    const N = 128, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), im = x.createImageData(N, N);
+    const r = new Float32Array(N * N); for (let i = 0; i < r.length; i++) r[i] = Math.random();
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++){ let v = 0;
+      for (const [a, b, w] of [[0, 0, .4], [1, 0, .15], [-1, 0, .15], [0, 1, .15], [0, -1, .15]]) v += w * r[((j + b + N) % N) * N + (i + a + N) % N];
+      const k = (j * N + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(60 + v * 140); im.data[k + 3] = 255; }
+    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep); return t;
   }
   return { rr, skin, bandMat, pill, pocket, bandsTex, noiseTex };
 }

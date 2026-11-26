@@ -1,11 +1,12 @@
 // Vivint Water Sensor (VS-FLD001): 63.5 mm square puck, 25.4 mm tall, lying on the floor (base at y=0, top toward +y).
-// Four stainless dome feet (probes), a white base with a deep elliptical tuck-under, a REAL recessed groove (1.7 tall, 1.2 deep)
+// Four dark metal dome feet (probes, 5.8 mm), a soft contact shadow, a white base with a deep elliptical tuck-under, a REAL recessed groove (1.7 tall, 1.2 deep)
 // between base and lid, a flush lid with an R3 top roll and an almost flat top. Plan corners R13.5.
 // Built in millimetres inside a 0.001-scaled group; profiles are made with height along z, then stood up (z -> +y).
 export default H => {
   const { THREE, G, add } = H;
   const K = kit(THREE);
   const g = G(), u = add(g, G()); u.scale.setScalar(.001);
+  const grain = K.noiseTex();
 
   const S = 63.5, R = 13.5;
   const ring = (d, h, k = .77) => K.rr(S - 2 * d, S - 2 * d, R - d * k, { nc: 20, ns: 8 }).map(([x, y]) => [x, y, h]);
@@ -15,27 +16,35 @@ export default H => {
   /* base: flat underside (41.5 square, R5) at 2.0, quarter-ellipse tuck (11.0 in, 11.2 up), straight wall, 0.3 chamfer */
   const base = [];
   for (let i = 0; i <= 14; i++){ const a = i / 14 * Math.PI / 2; base.push(ring(11 * (1 - Math.sin(a)), 2 + 11.2 * (1 - Math.cos(a)))); }
-  base.push(ring(0, 14.3), ring(0, 16.9), ring(.12, 17.22), ring(.3, 17.3));
-  const baseM = K.bandMat({ color: white, roughness: .5, sheen: .3, sheenRoughness: .8, sheenColor: 0xffffff }, 'y', [], [['y', 14.3, .1, 0xc9c9c7, .5]]);
+  base.push(ring(0, 14.3), ring(0, 16.8), ring(.2, 17.1), ring(.5, 17.3));   // 0.5 chamfer: the bright ledge under the groove
+  const baseM = K.bandMat({ color: white, roughness: .5, envMapIntensity: .6, bumpMap: grain, bumpScale: .08 }, 'y', [], [['y', 14.3, .1, 0xc9c9c7, .5]]);
   const b = add(u, new THREE.Mesh(up(K.skin(base, { start: [0, 0, 2] })), baseM)); b.castShadow = b.receiveShadow = true;
 
-  /* groove: ledge, rounded inner corners, recessed wall 1.2 in, lid underside */
-  const gr = [ring(.3, 17.3), ring(.85, 17.3), ring(1.12, 17.38), ring(1.2, 17.6), ring(1.2, 18.7), ring(1.12, 18.92), ring(.85, 19.0), ring(.2, 19.0)];
-  add(u, new THREE.Mesh(up(K.skin(gr)), new THREE.MeshPhysicalMaterial({ color: 0xbebebb, roughness: .65 })));
+  /* groove (reads as a dark slit over the bright chamfer ledge): ledge, rounded inner corners, recessed wall 1.2 in, lid underside */
+  const gr = [ring(.5, 17.3), ring(.85, 17.3), ring(1.12, 17.38), ring(1.2, 17.6), ring(1.2, 18.7), ring(1.12, 18.92), ring(.85, 19.0), ring(.2, 19.0)];
+  add(u, new THREE.Mesh(up(K.skin(gr)), new THREE.MeshPhysicalMaterial({ color: 0x8e8e8b, roughness: .8, envMapIntensity: .5 })));
 
   /* lid: flush with the base wall, straight to 22.4, R3 roll into a top with a 0.3 crown */
   const lid = [ring(.2, 19.0), ring(.05, 19.08), ring(0, 19.25), ring(0, 22.4)];
   for (let i = 1; i <= 12; i++){ const a = i / 12 * Math.PI / 2; lid.push(ring(3 * (1 - Math.cos(a)), 22.4 + 2.7 * Math.sin(a), .9)); }
   const top = lid[lid.length - 1];
   for (const s of [.8, .55, .3]) lid.push(top.map(([x, y]) => [x * s, y * s, 25.1 + .3 * (1 - s * s)]));
-  const lm = new THREE.MeshPhysicalMaterial({ color: lidW, roughness: .45, sheen: .3, sheenRoughness: .8, sheenColor: 0xffffff });
+  const lm = new THREE.MeshPhysicalMaterial({ color: lidW, roughness: .48, bumpMap: grain, bumpScale: .08 });
   const l = add(u, new THREE.Mesh(up(K.skin(lid, { end: [0, 0, 25.4] })), lm)); l.castShadow = l.receiveShadow = true;
 
-  /* four brushed-steel dome feet, 7.3 mm across, 2 mm tall */
-  const fr = 3.65, fh = 2, sr = (fr * fr + fh * fh) / (2 * fh), th = Math.acos((sr - fh) / sr);
-  const steel = new THREE.MeshPhysicalMaterial({ color: 0xa7abb0, metalness: .9, roughness: .35 });
+  /* four dull dark metal contact feet, 5.8 mm across: a low 1.6 mm dome on a short stub up to the underside */
+  const fr = 2.9, fh = 1.6, sr = (fr * fr + fh * fh) / (2 * fh), th = Math.acos((sr - fh) / sr);
+  const steel = new THREE.MeshPhysicalMaterial({ color: 0x5d6064, metalness: .6, roughness: .5 });
   for (const x of [-16.7, 16.7]) for (const z of [-16.7, 16.7]){
-    const f = add(u, new THREE.Mesh(new THREE.SphereGeometry(sr, 32, 10, 0, Math.PI * 2, 0, th), steel), x, sr, z); f.rotation.x = Math.PI; }
+    const f = add(u, new THREE.Mesh(new THREE.SphereGeometry(sr, 32, 10, 0, Math.PI * 2, 0, th), steel), x, sr, z); f.rotation.x = Math.PI;
+    add(u, new THREE.Mesh(new THREE.CylinderGeometry(fr, fr, .6, 32, 1, true), steel), x, fh + .25, z); }
+
+  /* soft contact shadow under the belly (the puck floats on dark shadow in every photo) */
+  const sc = document.createElement('canvas'); sc.width = sc.height = 128; const sx = sc.getContext('2d'), gr2 = sx.createRadialGradient(64, 64, 6, 64, 64, 64);
+  gr2.addColorStop(0, 'rgba(0,0,0,.45)'); gr2.addColorStop(.55, 'rgba(0,0,0,.3)'); gr2.addColorStop(1, 'rgba(0,0,0,0)'); sx.fillStyle = gr2; sx.fillRect(0, 0, 128, 128);
+  const shadow = add(u, new THREE.Mesh(new THREE.PlaneGeometry(56, 56), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true,
+    depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 })), 0, .2, 0);
+  shadow.rotation.x = -Math.PI / 2; shadow.renderOrder = -1;
   return g;
 };
 
@@ -64,7 +73,7 @@ function kit(THREE){
      or [x,y,z] for the fan centre. Ring order back -> front, points CCW seen from +z gives outward normals. */
   function skin(rings, o = {}){
     const n = rings[0].length, pos = [], idx = [], uv = [];
-    const put = ([x, y, z]) => { pos.push(x, y, z); const t = o.uv ? o.uv(x, y, z) : [x * .01, y * .01]; uv.push(t[0], t[1]); return pos.length / 3 - 1; };
+    const put = ([x, y, z]) => { pos.push(x, y, z); const t = o.uv ? o.uv(x, y, z) : [(x + z) * .01, (y + .7 * z) * .01]; uv.push(t[0], t[1]); return pos.length / 3 - 1; };
     for (const r of rings) for (const q of r) put(q);
     for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < n; i++){
       const a = k * n + i, b = k * n + (i + 1) % n, c = a + n, d = b + n; idx.push(a, b, c, b, d, c); }
@@ -115,18 +124,22 @@ function kit(THREE){
   function bandsTex(ao){
     const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
     for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
-      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 6.5) * .5 + Math.sin(t * Math.PI * 2 * 13) * .12;
-      let l = 240 + v * 2.5;
+      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 2.5 + .6) * .5 + Math.sin(t * Math.PI * 2 * 5 + 2) * .15;
+      let l = 230 + v * 22;
       if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
-        l *= (1 - .3 * Math.exp(-top / .035) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
+        l *= (1 - .28 * Math.exp(-top / .06) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
       const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }
     x.putImageData(im, 0, 0);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  function noiseTex(){
-    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), im = x.createImageData(64, 64);
-    for (let k = 0; k < im.data.length; k += 4){ const v = 90 + Math.random() * 120; im.data[k] = im.data[k + 1] = im.data[k + 2] = v; im.data[k + 3] = 255; }
-    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+  /* fine bead-blast grain for bumpMap: smoothed noise, tiles every 128 px; at repeat 12 one pixel is about 0.07 mm */
+  function noiseTex(rep = 12){
+    const N = 128, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), im = x.createImageData(N, N);
+    const r = new Float32Array(N * N); for (let i = 0; i < r.length; i++) r[i] = Math.random();
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++){ let v = 0;
+      for (const [a, b, w] of [[0, 0, .4], [1, 0, .15], [-1, 0, .15], [0, 1, .15], [0, -1, .15]]) v += w * r[((j + b + N) % N) * N + (i + a + N) % N];
+      const k = (j * N + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(60 + v * 140); im.data[k + 3] = 255; }
+    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep); return t;
   }
   return { rr, skin, bandMat, pill, pocket, bandsTex, noiseTex };
 }

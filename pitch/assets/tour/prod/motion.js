@@ -1,61 +1,65 @@
 // Vivint Motion Sensor (VS-PIR300): 70 W x 78.5 H x 50 D mm, wall mounted (back at z=0, face +z).
 // Grey body and white front cover share ONE continuous side wall (flush hairline split at z=35.5), R15 squircle corners,
-// top/bottom bowed 1 mm, R6 front roll into a gently crowned face, Fresnel lens recessed 1.5 mm, tone-on-tone wordmark,
+// top/bottom bowed 1 mm, R7-8 front roll into a 2.5 mm crowned face, Fresnel lens recessed 1.5 mm, mounting-plate step at the back, tone-on-tone wordmark,
 // recessed TEST pill on the right side. Built in millimetres inside a 0.001-scaled group.
 export default H => {
   const { THREE, G, add, DEC, decal, printPlane, rslab } = H;
   const K = kit(THREE);
   const g = G(), u = add(g, G()); u.scale.setScalar(.001);
+  const grain = K.noiseTex();                                          // fine bead-blast texture on every moulded surface
 
   const W = 70, HT = 76.5, RC = 17, P = 2.5, BOW = 1;                     // squircle corners read as R15; bow brings H to 78.5
   const ring = (d, z) => K.rr(W - 2 * d, HT - 2 * d, RC - d, { p: P, bow: BOW * (1 - d / 20) }).map(([x, y]) => [x, y, z]);
 
-  /* crown of the front face: 0 (with zero slope) at the edge of the flat, 1.5 mm at the centre */
-  const FX = W / 2 - 6, FY = HT / 2 - 6, FZ = 48.5;
-  const crown = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 1.5 * Math.pow(Math.max(0, 1 - r * r), 1.5); };
+  /* crown of the front face: 0 (with zero slope) at the edge of the flat, 2.5 mm at the centre (front-most z = 50) */
+  const RR = 7, FX = W / 2 - RR, FY = HT / 2 - RR, FZ = 47.5;
+  const crown = (x, y) => { const r = Math.pow(Math.pow(Math.abs(x) / FX, 4) + Math.pow(Math.abs(y) / FY, 4), .25); return 2.5 * Math.pow(Math.max(0, 1 - r * r), 1.5); };
 
-  /* side profile [inset, z]: R1.5 back edge, straight wall, R6 front roll (4.5 mm tall) */
+  /* side profile [inset, z]: mounting plate inset 0.4 (R0.4 at the wall) with a shadow step at z 1.9, straight wall,
+     front roll 7 in x 6 (z 41.5 to 47.5) */
   const prof = [];
-  for (let i = 0; i <= 6; i++){ const a = i / 6 * Math.PI / 2; prof.push([1.5 * (1 - Math.sin(a)), 1.5 * (1 - Math.cos(a))]); }
-  for (const z of [2.0, 9, 17, 26, 35.5, 40, 44]) prof.push([0, z]);
-  for (let i = 1; i <= 12; i++){ const a = i / 12 * Math.PI / 2; prof.push([6 * (1 - Math.cos(a)), 44 + 4.5 * Math.sin(a)]); }
+  for (let i = 0; i <= 4; i++){ const a = i / 4 * Math.PI / 2; prof.push([.4 + .4 * (1 - Math.sin(a)), .4 * (1 - Math.cos(a))]); }
+  prof.push([.4, 1.7], [.75, 1.82], [.75, 1.98], [.2, 2.08], [.04, 2.2], [0, 2.4]);
+  for (const z of [9, 17, 26, 35.5, 38.5, 41.5]) prof.push([0, z]);
+  for (let i = 1; i <= 14; i++){ const a = i / 14 * Math.PI / 2; prof.push([RR * (1 - Math.cos(a)), 41.5 + 6 * Math.sin(a)]); }
   const rings = prof.map(([d, z]) => ring(d, z));
 
   /* face: from the edge of the flat to the lens opening (top R4, bottom R6), then the 1.5 mm recess wall */
   const outer = rings[rings.length - 1];
-  const LX = 55, LY0 = -10.5, LY1 = 27.7, LCY = (LY0 + LY1) / 2;
+  const LX = 54, LY0 = -10.5, LY1 = 27.7, LCY = (LY0 + LY1) / 2;
   const lensO = K.rr(LX, LY1 - LY0, [4, 4, 6, 6], { cy: LCY });
-  const LR = 1.4, lensG = K.rr(LX + 2 * LR, LY1 - LY0 + 2 * LR, [4 + LR, 4 + LR, 6 + LR, 6 + LR], { cy: LCY });   // opening lip rolls R1.4 into the recess
+  const LR = 1.0, lensG = K.rr(LX + 2 * LR, LY1 - LY0 + 2 * LR, [4 + LR, 4 + LR, 6 + LR, 6 + LR], { cy: LCY });   // opening lip rolls R1.4 into the recess
   for (let k = 1; k <= 8; k++){ const t = k / 8;
     rings.push(outer.map(([x, y], i) => { const X = x + (lensG[i][0] - x) * t, Y = y + (lensG[i][1] - y) * t; return [X, Y, FZ + crown(X, Y)]; })); }
   for (let i = 1; i <= 6; i++){ const a = i / 6 * Math.PI / 2, f = Math.sin(a);
     rings.push(lensG.map(([x, y], j) => { const X = x + (lensO[j][0] - x) * f, Y = y + (lensO[j][1] - y) * f, gx = lensG[j][0], gy = lensG[j][1]; return [X, Y, FZ + crown(gx, gy) - LR * (1 - Math.cos(a))]; })); }
   const lip = rings[rings.length - 1];
-  rings.push(lip.map(([x, y, z]) => [x, y, z - .6]));
+  rings.push(lip.map(([x, y, z]) => [x, y, z - .9]));
 
   const grey = 0x9fa0a4, white = 0xf2f2f0;
-  const PILL = { y: 8, z: 13, len: 22, wid: 5.2, gap: .3 };
+  const PILL = { y: 8, z: 14.5, len: 21, wid: 7.5, gap: .35 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 34.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;
-  const bodyM = K.bandMat({ color: grey, roughness: .6 }, 'z',
-    [[35.5, white, .45]], [['z', 2.0, .3, 0x55585b, .8], ['z', 35.5, .3, 0x5b5e61, .85]], cut);
+  const bodyM = K.bandMat({ color: grey, roughness: .6, bumpMap: grain, bumpScale: .15 }, 'z',
+    [[35.5, white, .5]], [['z', 1.9, .3, 0x3e4043, .8], ['z', 35.5, .3, 0x5b5e61, .85]], cut);
   const body = add(u, new THREE.Mesh(K.skin(rings, { start: true }), bodyM));
   body.castShadow = body.receiveShadow = true;
 
-  /* Fresnel lens: frosted lavender-grey, faint vertical facet bands, shade under the top lip; follows the crown 1.5 mm down */
+  /* Fresnel lens: frosted neutral grey (a hint of lavender), broad soft vertical facet bands (about +/-6 %), shade under the top lip; follows the crown 1.5 mm down */
   const lensRings = [];
-  for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27.5) ** 2)]; }));
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9a99a4, roughness: .62, map: K.bandsTex(true), specularIntensity: .15 });
+  for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27) ** 2)]; }));
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa9a8b0, roughness: .62, map: K.bandsTex(true), specularIntensity: .15 });
   add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
 
   /* wordmark, tone-on-tone, flush on the crowned face */
-  add(u, decal(DEC.logo, 36, 9, { color: 0xc6c7c9, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .25);
+  add(u, decal(DEC.logo, 36, 9, { color: 0xbcbdc0, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .25);
 
-  /* TEST pill: dark gap ring pocket (1 mm deep), grey cap 0.6 mm below the side surface, printed TEST reading downward */
-  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.0, 'x', 35, PILL.y, PILL.z, 0x6c6e72);
-  const cap = add(u, rslab(PILL.wid, PILL.len, 1.2, PILL.wid / 2, .45, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55 })), 35 - .6 - .6, PILL.y, PILL.z);
+  /* TEST pill: dark gap ring pocket (1.2 mm deep), softly domed grey cap whose top is 0.5 mm below the side surface,
+     printed TEST reading downward */
+  K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.2, 'x', 35, PILL.y, PILL.z, 0x3c3e41);
+  const cap = add(u, rslab(PILL.wid, PILL.len, 2, PILL.wid / 2, .9, new THREE.MeshPhysicalMaterial({ color: grey, roughness: .55, bumpMap: grain, bumpScale: .15 })), 35 - .5 - 1, PILL.y, PILL.z);
   cap.rotation.y = Math.PI / 2;
-  const tg = add(u, G(), 35 - .6 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
+  const tg = add(u, G(), 35 - .5 + .04, PILL.y, PILL.z); tg.rotation.y = Math.PI / 2;
   const tx = add(tg, printPlane(.014, .006, (x, Pp) => { x.fillStyle = '#6e6f72'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = '400 24px "Vivint Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'; x.letterSpacing = '3px'; x.fillText('TEST', ...Pp(0, 0)); }));
   tx.scale.setScalar(1000); tx.rotation.z = -Math.PI / 2;
@@ -87,7 +91,7 @@ function kit(THREE){
      or [x,y,z] for the fan centre. Ring order back -> front, points CCW seen from +z gives outward normals. */
   function skin(rings, o = {}){
     const n = rings[0].length, pos = [], idx = [], uv = [];
-    const put = ([x, y, z]) => { pos.push(x, y, z); const t = o.uv ? o.uv(x, y, z) : [x * .01, y * .01]; uv.push(t[0], t[1]); return pos.length / 3 - 1; };
+    const put = ([x, y, z]) => { pos.push(x, y, z); const t = o.uv ? o.uv(x, y, z) : [(x + z) * .01, (y + .7 * z) * .01]; uv.push(t[0], t[1]); return pos.length / 3 - 1; };
     for (const r of rings) for (const q of r) put(q);
     for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < n; i++){
       const a = k * n + i, b = k * n + (i + 1) % n, c = a + n, d = b + n; idx.push(a, b, c, b, d, c); }
@@ -138,18 +142,22 @@ function kit(THREE){
   function bandsTex(ao){
     const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d'), im = x.createImageData(512, 256);
     for (let j = 0; j < 256; j++) for (let i = 0; i < 512; i++){
-      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 6.5) * .5 + Math.sin(t * Math.PI * 2 * 13) * .12;
-      let l = 240 + v * 2.5;
+      const t = i / 512, v = Math.sin(t * Math.PI * 2 * 2.5 + .6) * .5 + Math.sin(t * Math.PI * 2 * 5 + 2) * .15;
+      let l = 230 + v * 22;
       if (ao){ const top = j / 256, side = Math.min(t, 1 - t), bot = 1 - top;            // shade under the cover's top lip and along the walls
-        l *= (1 - .3 * Math.exp(-top / .035) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
+        l *= (1 - .28 * Math.exp(-top / .06) - .1 * Math.exp(-top / .3) + .05 * Math.exp(-bot / .25)) * (1 - .12 * Math.exp(-side / .025)) * (1 - .06 * Math.exp(-bot / .03)); }
       const k = (j * 512 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(l); im.data[k + 3] = 255; }
     x.putImageData(im, 0, 0);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  function noiseTex(){
-    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), im = x.createImageData(64, 64);
-    for (let k = 0; k < im.data.length; k += 4){ const v = 90 + Math.random() * 120; im.data[k] = im.data[k + 1] = im.data[k + 2] = v; im.data[k + 3] = 255; }
-    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+  /* fine bead-blast grain for bumpMap: smoothed noise, tiles every 128 px; at repeat 12 one pixel is about 0.07 mm */
+  function noiseTex(rep = 12){
+    const N = 128, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), im = x.createImageData(N, N);
+    const r = new Float32Array(N * N); for (let i = 0; i < r.length; i++) r[i] = Math.random();
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++){ let v = 0;
+      for (const [a, b, w] of [[0, 0, .4], [1, 0, .15], [-1, 0, .15], [0, 1, .15], [0, -1, .15]]) v += w * r[((j + b + N) % N) * N + (i + a + N) % N];
+      const k = (j * N + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = Math.round(60 + v * 140); im.data[k + 3] = 255; }
+    x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep, rep); return t;
   }
   return { rr, skin, bandMat, pill, pocket, bandsTex, noiseTex };
 }

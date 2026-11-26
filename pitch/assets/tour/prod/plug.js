@@ -152,18 +152,18 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
 
   /* 3. receptacle faceplate on the +x end: raised 3 mm, chamfered rim, NEMA 5-15R rotated (slots horizontal, ground toward the wall) */
   { const pp = [[0, 0], [0, 9.7], [.1, 9.85], [1.1, 10.85], [1.2, 11]];   // 1.2 mm 45-degree chamfer                // embedded 8 mm, proud 3 mm
-    const slotProf = [[0, 4.5], [0, 10.6], [.15, 10.85], [.3, 11]];
+    const slotProf = [[0, 8.6], [0, 10.6], [.15, 10.85], [.3, 11]];   // floor just outside the body's end wall (deeper would be hidden by it)
     const U = []; { const r = 3.4, u0 = 4.5, u1 = 8.1; U.push(new THREE.Vector2(u0, -r));
       for (let i = 0; i <= 24; i++) { const t = -Math.PI / 2 + i / 24 * Math.PI; U.push(new THREE.Vector2(u1 + r * Math.cos(t), r * Math.sin(t))); }
       U.push(new THREE.Vector2(u0, r)); }
     const dense = a => { const s = new THREE.Shape(a); return pts(s, 90); };
-    const deep = (k, K, v) => v[2] > 10.95 ? 1 : .08 + .4 * sm(5.2, 10.5, v[2]);   // dark slot walls; the rim ring stays white so the plate face is not tinted
+    const deep = (k, K, v) => v[2] > 10.95 ? 1 : .22 + .4 * sm(8.7, 10.6, v[2]);   // dark slot walls; the rim ring stays white so the plate face is not tinted
     const loops = [{ type: 'outer', pts: pts(rrShape(29, 27, .8), 160), prof: uni(pp) },
       { type: 'pocket', pts: offs(pts(rrShape(8, 3.4, .4), 80), -6.5, 6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: offs(pts(rrShape(8, 3.4, .4), 80), -6.5, -6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: dense(U), prof: uni(slotProf), col: deep }];
     const bm = white.clone(); bm.vertexColors = true; bm.envMapIntensity = .5; const boss = solid(loops, bm, true);
-    boss.rotation.y = Math.PI / 2; add(P, boss, 38.5, .5, 16.5); }
+    boss.rotation.y = Math.PI / 2; add(P, boss, 39.5, .5, 16.5); }
 
   /* 7. printed text: "Max. 330W / Incandescent" upside down under the faceplate; FCC block on the far end */
   const txt = plane(20, 7, 40, (x, Pp) => { x.save(); x.translate(...Pp(0, 0)); x.rotate(Math.PI); x.fillStyle = '#3a3a3a'; x.textAlign = 'center'; x.textBaseline = 'middle';

@@ -132,7 +132,7 @@ body.focus #brand{display:none}
   .chip{width:80px;height:88px}
   .chip img{height:40px}
   .chip .im{height:40px;flex-basis:40px}
-  #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 196px)}   /* above the product rail */
+  #hint{bottom:calc(env(safe-area-inset-bottom,0px) + clamp(196px, 30vh, 256px))}   /* above the product rail */
   body.focus #hint{display:none}
   #seg button{padding:0 14px}
 }
@@ -246,7 +246,7 @@ import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
-const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=20'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
+const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=21'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
   for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; const b=document.getElementById('loadBar'); if(b) b.style.setProperty('--p', Math.min(92,Math.round(92*got/tot))+'%'); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
@@ -435,7 +435,7 @@ M.siding.color.set(0xd9dce1);                // light render; the dusk bake make
 M.conc.color.set(0x9e9e9b);                  // paving / drive at a real concrete albedo (~.35)
 M.grass.color.set(0x5f6b52);                 // lawn albedo ~.12
 /* one window glass everywhere: dark tinted pane that mirrors the dusk sky, with a faint warm glow from the rooms */
-M.glassDark = M.glassLit = phys(0x0c1014, {r:.06, m:.1, x:{emissive:0xffc98f, emissiveIntensity:.07, clearcoat:1, clearcoatRoughness:.04, envMapIntensity:3.2}});
+M.glassDark = M.glassLit = phys(0x0a0e14, {r:.06, m:.1, x:{emissive:0xffc98f, emissiveIntensity:.035, clearcoat:1, clearcoatRoughness:.04, envMapIntensity:2.4}});
 M.frost = phys(0xb9b4aa, {r:.45, x:{emissive:0xffe0bc, emissiveIntensity:.22}});   // frosted door lites
 
 /* ------------------------------------------------------------------ site */
@@ -516,7 +516,7 @@ slab(GR.cx,GR.x1,FL-.02,FL,GR.cz,GR.z1,M.floor);              // floor in front 
 slab(GR.x0-.2,GR.x1+.2,FL-.14,FL,GR.z1,GR.z1+.1,M.cut);       // the floor's cut edge
 /* a tall, dark columnar tree in the fenced side yard, rising behind the fence to about eave height (reference video);
    its leaf cards are one merged mesh, and it hides itself when the camera comes close (see frame()) */
-const TREE = new THREE.Group(); TREE.position.set(7.9,.03,-3.6); scene.add(TREE);
+const TREE = new THREE.Group(); TREE.position.set(8.3,.03,-2.9); scene.add(TREE);
 { const bark = mat(0x2a2622,{r:1});
   const tr = cyl(.13,5.2,bark,10); tr.position.y = 2.6; TREE.add(tr);
   const leafT = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
@@ -669,7 +669,7 @@ function model(name, {pos, rotY=0, scale=1, fit=null, shadow=true, tweak=null}){
 model('velvetsofa', {pos:V(.95,FL,2.7), rotY:Math.PI, fit:{w:2.5}, tweak:o=>o.traverse(m=>{ if(m.isMesh && m.material && m.material.color && /fabric|velvet/i.test(m.material.name)){ m.material.color.set(0x1d6a63); } })});
 model('modern_coffee_table_01', {pos:V(.95,FL,1.4), fit:{w:1.1}});
 model('mid_century_lounge_chair', {pos:V(-1.05,FL,3.25), rotY:Math.PI*.92, tweak:o=>o.traverse(m=>{ if(m.isMesh && m.material && m.material.color){
-  const l = m.material.color.getHSL({}).l; m.material = m.material.clone(); if(l < .35){ m.material.color.set(0x4f7a5c); m.material.map = null; } } })});   // sage-green upholstery
+  if((m.material.metalness||0) > .3) return; m.material = m.material.clone(); m.material.color.set(0x55806a); m.material.map = null; } })});   // sage-green upholstery
 model('potted_plant_04', {pos:V(.75,FL+.94,-4.45), fit:{h:.42}});
 model('potted_plant_01', {pos:V(2.6,FL,-.5), fit:{h:1.35}});
 // dining: round wood table with light Scandinavian chairs, mid-room in front of the island
@@ -1339,14 +1339,14 @@ const PLACE = {
   chime: {pos:V(GR.x1-.02,FL+.32,.2),    view:V(-1,0,0),       d:.7},
   motion:{pos:V(.05,FL+2.72,GR.z0+.01), view:V(0,-.3,1),       d:.72},
   smokeco:{pos:V(-1.05,4.5,GR.z0+.01),  view:V(0,0,1),          d:.9},
-  water: {pos:V(.3,FL+.012,GR.z0+.62), view:V(.05,.78,.62), flat:true, d:.62},
+  water: {pos:V(.3,FL+.012,GR.z0+.62), view:V(.3,.55,.78), flat:true, d:.62},   // 3/4 view, nothing overhead
   fob:   {pos:V(-.9,FL+.945,-4.05),  view:V(.15,.8,.6),  flat:true, s:1.2, d:.5},
   pendant:{pos:V(GR.x1-.035,FL+1.62,-.45), view:V(-1,0,0), s:1.25, d:.82},
   icp:   {pos:V(3.5,FL+2.13,GR.cz-.15), view:V(.25,0,1), stand:true, s:1.1, d:.6},
   fire:  {pos:V(1.52,5.55,GR.z0+.01), view:V(0,0,1),           d:.75},
   keypad:{pos:V(-6.93,FL+1.35,-.32),   view:V(-1,0,0), xray:true, d:.7},
   therm: {pos:V(3.1,FL+1.45,GR.cz+.01), view:V(0,0,1),          d:.66},
-  window:{pos:V(-5.35,FL+1.2,4.035), view:V(0,0,1), s:1.15,     d:.5},
+  window:{pos:V(-5.35,1.2935,4.030), view:V(0,0,1), s:1.15,    d:.5},   // seated on the bottom rail (rail y 1.25-1.31, face z 4.03)
   glass: {pos:V(GR.x1-.01,FL+2.75,1.8), view:V(-1,0,0),        d:.7},
   plug:  {pos:V(4.6,FL+.32,GR.cz+.01), view:V(0,0,1),         d:.65},
   ocp:   {pos:V(6.3,4.3,3.02),       view:V(.3,0,1),            d:.95},
@@ -1392,7 +1392,7 @@ controls.touches = {ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN};
 const HOME = {target:V(-2.4,1.9,0), r:31, phi:1.4, theta:.08, lim:{minD:11, maxD:40, minP:.72, maxP:1.5, minA:-2.4, maxA:2.4}};
 /* portrait screens see less width: frame the whole garage-to-tower front there, centred between the title and the rail */
 const homeView = () => { const a = innerWidth/innerHeight;
-  if(a < .6) return {...HOME, target:V(-1.9,1.2,0), r:47, lim:{...HOME.lim, maxD:56}};    // phone
+  if(a < .6) return {...HOME, target:V(-1.9,.3,0), r:47, lim:{...HOME.lim, maxD:56}};    // phone
   if(a < 1)  return {...HOME, target:V(-2.6,1.5,0), r:36, lim:{...HOME.lim, maxD:48}};    // iPad portrait
   return HOME; };
 const state = { focus:null, fly:null, idleAt:performance.now(), cat:'all' };
@@ -1583,11 +1583,16 @@ function updateSpots(){
     if(p.el.hidden === show) p.el.hidden = !show;
     if(show){ p.el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`; p.el.classList.toggle('mini', !!state.focus); onScr.push({p,x,y}); }
   }
+  /* at overview, a ring that lands on top of another one shrinks to a mini dot (no label), so crowded spots stay tappable */
+  if(!state.focus && !state.fly){ const big = [];
+    for(const s of onScr){ const crowd = big.some(b => Math.hypot(b.x-s.x, b.y-s.y) < 34); s.p.el.classList.toggle('mini', crowd); s.crowd = crowd; if(!crowd) big.push(s); }
+  }
   /* labels: place each on its preferred side, flip if it would collide, drop it if both sides collide */
   if(state.focus || state.fly) return;
   const rects = onScr.map(s => [s.x-20, s.y-20, s.x+20, s.y+20]);
   const hit = r => rects.some(q => r[0]<q[2] && r[2]>q[0] && r[1]<q[3] && r[3]>q[1]);
   for(const s of onScr.sort((a,b)=>a.y-b.y)){
+    if(s.crowd){ s.p.el.classList.add('nolbl'); continue; }
     const w = s.p.lblW || (s.p.lblW = s.p.el.querySelector('.lbl').offsetWidth || 150);
     const R = [s.x+24, s.y-15, s.x+24+w, s.y+15], L = [s.x-24-w, s.y-15, s.x-24, s.y+15];
     const pref = s.p.side==='l' ? [L,'l',R,'r'] : [R,'r',L,'l'];

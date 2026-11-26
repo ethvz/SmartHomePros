@@ -16,6 +16,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-
 input,textarea,select,[contenteditable]:not([contenteditable="false"]),[contenteditable]:not([contenteditable="false"]) *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 img,svg,video,canvas,a{-webkit-user-drag:none;user-drag:none}  .dw-foot .dw-dl { display: none !important; } .dw-foot { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* SmartHomePros Connect: download is in Connect Settings */
   .dw-foot .dw-app { grid-column: 1 / -1; } .dw.short .dw-foot .dw-app span { display: inline; }   /* SmartHomePros Connect */
+  .dw:not(.short) .dw-foot .dw-vid, .dw:not(.short) .dw-foot:has(.dw-vid) .dw-app { grid-column: auto; } .dw.short .dw-foot { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* Video Library beside Switch app */
 </style>
 <script id="appLockJs">(function(){var no=function(e){e.preventDefault()},ed=function(t){return t&&t.closest&&t.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])')};
 ['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,no,{passive:false})});
@@ -1020,7 +1021,7 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .dw-foot .dw-vid svg { width: 18px; height: 18px; }
   @media (hover: hover) { .dw-foot .dw-vid:hover { background: rgba(var(--acr),0.22); } }
   .dw.sm .dw-foot .dw-vid { height: 42px; }
-  .dw.short .dw-foot { grid-template-columns: repeat(5, minmax(0, 1fr)); } .dw.short .dw-foot .dw-vid { grid-column: auto; height: 32px; }
+  .dw.short .dw-foot { grid-template-columns: repeat(5, minmax(0, 1fr)); } .dw.short .dw-foot .dw-vid { grid-column: auto; order: 0; height: 32px; }
   .fsheet.vl .fs-card { left: max(14px, env(safe-area-inset-left)); right: max(14px, env(safe-area-inset-right)); top: max(14px, env(safe-area-inset-top)); bottom: max(14px, env(safe-area-inset-bottom)); width: auto; max-height: none; margin: 0; border-radius: 28px; translate: 0 18px; scale: .985; transition: opacity .25s ease, translate .35s cubic-bezier(.2,.8,.2,1), scale .35s cubic-bezier(.2,.8,.2,1);
     background: radial-gradient(120% 70% at 0% 0%, rgba(var(--acr),0.16), transparent 60%), linear-gradient(150deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02) 45%), rgba(6,9,8,0.94); }
   .fsheet.vl.on .fs-card { translate: 0 0; scale: 1; }
@@ -1030,9 +1031,10 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .fsheet.vl .fs-x { width: 44px; height: 44px; border-radius: 22px; }
   .vl-body { flex: 1; min-height: 0; overflow: auto; padding: 22px 24px 28px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .vl-body::-webkit-scrollbar { display: none; }
+  .vl-body.solo { display: flex; } .vl-body.solo .vl-hero { margin: auto; justify-content: center; }   /* (one video: centred) */
   .vl-hero { display: flex; align-items: center; gap: clamp(22px, 4vw, 54px); width: 100%; padding: 0; border: 0; background: none; color: #fff; text-align: left; font: inherit; cursor: pointer; }
   .vl-pic { position: relative; flex: none; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: #0a0f0e; box-shadow: 0 0 0 1px rgba(255,255,255,0.14), 0 26px 60px rgba(0,0,0,0.55); transition: transform .25s ease; }
-  .vl-hero .vl-pic { height: clamp(260px, calc(100vh - 230px), 560px); }
+  .vl-hero .vl-pic { height: clamp(260px, calc(100vh - 230px), 660px); }
   .vl-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .vl-pic::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55)); }
   .vl-play { position: absolute; left: 50%; top: 50%; z-index: 1; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; display: grid; place-items: center; background: rgba(20,24,23,0.5); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3); }
@@ -1041,7 +1043,6 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .vl-info { min-width: 0; flex: 1; max-width: 480px; }
   .vl-tag { display: inline-flex; align-items: center; height: 26px; padding: 0 12px; border-radius: 13px; background: rgba(var(--acr),0.16); color: rgb(var(--acr)); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
   .vl-info h3 { margin: 14px 0 0; font-size: clamp(30px, 4.4vw, 52px); line-height: 1.02; font-weight: 600; letter-spacing: -.035em; }
-  .vl-info p { margin: 10px 0 0; font-size: 15px; color: rgba(255,255,255,0.6); }
   .vl-go { margin-top: 26px; display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 26px 0 20px; border-radius: 26px; background: rgb(var(--acr)); color: #04140f; font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 10px 30px rgba(var(--acr),0.28); transition: transform .2s ease; }
   .vl-go svg { width: 16px; height: 16px; fill: currentColor; }
   .vl-hero:active .vl-pic, .vl-c:active .vl-pic { transform: scale(.97); } .vl-hero:active .vl-go { transform: scale(.95); }
@@ -3140,16 +3141,16 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
       const el = p.querySelector('video'); el.src = v.src; el.muted = false; el.volume = 1;
       p.querySelector('.vl-px').addEventListener('click', closePlayer);
       el.addEventListener('ended', closePlayer);
-      sh.querySelector('.fs-card').appendChild(p); pl = p;
+      sh.appendChild(p); pl = p;   // (on the sheet itself, not the card: the card's glass would hold it inside its own box)
       requestAnimationFrame(() => p.classList.add('on'));
       const go = el.play(); if (go && go.catch) go.catch(() => {});   // (started by the tap, so sound is allowed)
     }
     function open() {
       if (menuEl) closeMenu(true);
       const [first, ...rest] = VIDEOS;
-      const sh = sheet('<div class="fs-h"><div><div class="fs-eye">Video Library</div><div class="fs-t">Watch</div></div><button type="button" class="fs-x" aria-label="Close">' + XIC + '</button></div>'
-        + '<div class="vl-body">' + (first ? '<button type="button" class="vl-hero" data-i="0" aria-label="Play ' + esc(first.title) + '">' + pic(first, true)
-          + '<div class="vl-info"><span class="vl-tag">' + esc(first.tag || 'Newest') + '</span><h3>' + esc(first.title) + '</h3>' + (first.len ? '<p>' + esc(first.len) + '</p>' : '')
+      const sh = sheet('<div class="fs-h"><div><div class="fs-eye">Fast Recruit</div><div class="fs-t">Video Library</div></div><button type="button" class="fs-x" aria-label="Close">' + XIC + '</button></div>'
+        + '<div class="vl-body' + (rest.length ? '' : ' solo') + '">' + (first ? '<button type="button" class="vl-hero" data-i="0" aria-label="Play ' + esc(first.title) + '">' + pic(first, true)
+          + '<div class="vl-info"><span class="vl-tag">' + esc(first.tag || 'Newest') + '</span><h3>' + esc(first.title) + '</h3>'
           + '<span class="vl-go">' + PLAY + 'Play</span></div></button>' : '')
         + (rest.length ? '<div class="vl-sub">More videos</div><div class="vl-grid">' + rest.map((v, i) => '<button type="button" class="vl-c" data-i="' + (i + 1) + '" aria-label="Play ' + esc(v.title) + '">' + pic(v) + '<b>' + esc(v.title) + '</b>' + (v.len ? '<small>' + esc(v.len) + '</small>' : '') + '</button>').join('') + '</div>' : '')
         + '</div>');
