@@ -33,7 +33,7 @@
   const gvLayout = () => { const box = gv && $('.gvp-ph', gv), im = box && $('.gvp-img', box); if (!im || !pp()) return;
     const w = box.offsetWidth, h = box.offsetHeight; if (!w || !h) return;
     const RX = 1184, RW = 880, IH = 1446, IW = 2064, s = Math.max(w / RW, h / IH);
-    const ox = Math.max(0, Math.min(RW * s - w, (RW * s - w) * 0.55)), oy = Math.max(0, Math.min(IH * s - h, 640 * s - h * 0.42));
+    const ox = Math.max(0, Math.min(RW * s - w, (RW * s - w) * 0.55)), oy = Math.max(0, Math.min(IH * s - h, 610 * s - h * 0.42));
     Object.assign(im.style, { width: IW * s + 'px', height: IH * s + 'px', transform: `translate(${-(RX * s + ox)}px,${-oy}px)` }); };
   const count = el => { const n = +el.dataset.n, pre = el.dataset.pre, suf = el.dataset.suf, t0 = performance.now(), T = 1300;
     const f = t => { const k = Math.min(1, (t - t0) / T), e = 1 - Math.pow(1 - k, 3); el.textContent = pre + Math.round(n * e).toLocaleString('en-US') + suf; if (k < 1) requestAnimationFrame(f); };

@@ -59,11 +59,16 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .xf.on .xf-a{max-height:420px}
 /* ---------- Which sensor goes where? (.sns-w): three compact cards stacked ---------- */
 html.pp #prScroll .sns-w .eb{left:36px!important;top:104px!important}
 html.pp #prScroll .sns-w h2{left:36px!important;right:36px;top:132px!important;font-size:46px!important;line-height:1.02!important}
-html.pp #prScroll .sns-c{left:20px!important;right:20px;width:auto!important;height:calc((var(--H) - 470px)/3)!important;padding:22px 150px 0 26px!important;border-radius:28px}
+html.pp #prScroll .sns-c{left:20px!important;right:20px;width:auto!important;height:calc((var(--H) - 470px)/3)!important;padding:22px 200px 0 26px!important;border-radius:28px}
 html.pp #prScroll .sns-c:nth-of-type(2){top:220px!important}
 html.pp #prScroll .sns-c:nth-of-type(3){top:calc(232px + (var(--H) - 470px)/3)!important}
 html.pp #prScroll .sns-c:nth-of-type(4){top:calc(244px + 2*(var(--H) - 470px)/3)!important}
-html.pp #prScroll .sns-c img{right:24px!important;top:50%!important;width:104px!important;height:120px!important;transform:translateY(-50%)}
+html.pp #prScroll .sns-c{overflow:hidden}
+/* sharp renders (prodA.js cards()), oversized and cut by the card's right edge; they ease in from that edge */
+html.pp #prScroll .sns-c img{right:-56px!important;left:auto!important;top:8%!important;width:250px!important;height:84%!important;object-fit:contain!important;object-position:50% 50%!important;opacity:0;transform:translateX(40px);transition:opacity .5s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+html.pp #prScroll .sns-w[data-vis="1"] .sns-c img{opacity:1;transform:none}
+html.pp #prScroll .sns-w[data-vis="1"] .sns-c:nth-of-type(3) img{transition-delay:.08s}
+html.pp #prScroll .sns-w[data-vis="1"] .sns-c:nth-of-type(4) img{transition-delay:.16s}
 html.pp #prScroll .sns-c h3{width:auto!important;min-height:0!important;font-size:27px!important;margin-top:6px}
 html.pp #prScroll .sns-c h3 br{display:none}
 html.pp #prScroll .sns-c .md{margin-top:12px}
@@ -75,8 +80,14 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .strip{left:0!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .strip.fsx{width:1200px!important;height:var(--H)!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .strip.fsx>.fsp-pane{width:600px!important;height:var(--H)!important}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-ln{display:none!important}
-html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane{display:grid!important;grid-template-columns:1fr 1fr;align-content:start;gap:26px 28px;padding:calc(110px + min(400px,var(--H) - 820px)) 36px 0;box-sizing:border-box}
-html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-im{left:50%!important;top:104px!important;width:auto!important;height:min(380px,calc(var(--H) - 840px))!important;max-width:440px;transform:translateX(-50%)}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane{display:grid!important;grid-template-columns:1fr 1fr;align-content:end;gap:26px 28px;padding:110px 36px 196px;box-sizing:border-box;transform:none!important}
+/* the render is placed by prodA.js bleed(): oversized, cut by the right (Hardware) or left (Specs) screen edge; it eases in from that edge */
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-im{max-width:none;z-index:0;opacity:0;transition:opacity .5s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ppA-br .fsp-im{transform:translateX(60px)}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ppA-bl .fsp-im{transform:translateX(-60px)}
+html.pp :is(#prScroll,#hbScroll,#thScroll) [data-vis="1"] .fsp-pane:is(.ppA-br,.ppA-bl) .fsp-im{opacity:1;transform:none}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane>:not(img){z-index:1}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-note{position:relative!important;left:auto!important;top:auto!important;grid-column:1/-1;width:auto!important;font-size:13px;color:rgba(255,255,255,.45)}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:17px!important;line-height:22px!important;color:rgba(255,255,255,.8)}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co b{font-size:19px!important;line-height:23px!important;margin-bottom:6px}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fst{position:relative!important;left:auto!important;top:auto!important;width:auto!important;grid-column:1/-1}
@@ -111,10 +122,13 @@ html.pp #prScroll .ichv .dbai{top:auto!important;bottom:250px!important;right:30
 /* ---------- Smoke: Which one is right for you? two cards stacked ---------- */
 html.pp #prScroll .smk-w .eb{left:36px!important;top:104px!important}
 html.pp #prScroll .smk-w h2{left:36px!important;right:36px;top:132px!important;font-size:50px!important}
-html.pp #prScroll .smk-c{left:20px!important;right:20px!important;width:auto!important;height:calc((var(--H) - 500px)/2)!important;padding:26px 170px 0 28px!important;box-sizing:border-box}
+html.pp #prScroll .smk-c{left:20px!important;right:20px!important;width:auto!important;height:calc((var(--H) - 500px)/2)!important;padding:26px 220px 0 28px!important;box-sizing:border-box}
 html.pp #prScroll .smk-c:nth-of-type(2){top:262px!important}
 html.pp #prScroll .smk-c:nth-of-type(3){top:calc(278px + (var(--H) - 500px)/2)!important}
-html.pp #prScroll .smk-c img{right:24px!important;left:auto!important;top:50%!important;width:130px!important;height:130px!important;transform:translateY(-50%)}
+html.pp #prScroll .smk-c{overflow:hidden}
+html.pp #prScroll .smk-c img{right:-70px!important;left:auto!important;top:7%!important;width:300px!important;height:86%!important;object-fit:contain!important;object-position:50% 50%!important;opacity:0;transform:translateX(40px);transition:opacity .5s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+html.pp #prScroll .smk-w[data-vis="1"] .smk-c img{opacity:1;transform:none}
+html.pp #prScroll .smk-w[data-vis="1"] .smk-c:nth-of-type(3) img{transition-delay:.1s}
 html.pp #prScroll .smk-c h3{width:auto!important;min-height:0!important;font-size:28px!important}
 html.pp #prScroll .smk-c>p,html.pp #prScroll .smk-c ul{display:none!important}
 html.pp #prScroll .smk-c .go{left:28px!important;bottom:22px!important}
@@ -180,7 +194,7 @@ html.pp #p-hub #hbScroll .hb3pill{top:auto!important;bottom:100px!important;widt
 html.pp #p-hub #hbScroll .hb3pill button{font-size:16px}
 
 /* ---------- Indoor Camera Pro Highlights (.icm): headline, camera render, app phone, feature grid; stacked ---------- */
-html.pp #prScroll .icm .ocm-col{left:20px!important;right:20px!important;width:auto!important;top:96px!important;bottom:20px!important;margin:0!important;justify-content:space-between!important;gap:0!important;pointer-events:none}
+html.pp #prScroll .icm .ocm-col{left:20px!important;right:20px!important;width:auto!important;top:96px!important;bottom:20px!important;margin:0!important;justify-content:space-between!important;gap:0!important;padding-top:0!important;pointer-events:none}
 html.pp #prScroll .icm .ocm-col>*{pointer-events:auto}
 html.pp #prScroll .icm .dbm-h{left:16px!important;min-height:0!important;font-size:38px!important;display:block!important}
 html.pp #prScroll .icm .dbm-h small{font-size:18px!important;margin-top:8px}
@@ -267,10 +281,15 @@ html.pp #prScroll .appemu .ae-copy p{font-size:20px!important}
 html.pp #prScroll .appemu .ae-phone{left:50%!important;top:var(--aey,330px)!important;margin:0!important;transform-origin:50% 0!important;translate:-50% 0;scale:var(--aek,.8)}
 /* Indoor Camera Highlights: full-width feature grid, camera above a smaller phone */
 html.pp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;gap:4px!important;width:auto!important;margin-bottom:var(--ppFoot,86px)}
-html.pp #prScroll .icm .ocm-card{left:0!important;width:600px!important;top:240px!important;height:calc(var(--H) - 870px)!important;-webkit-mask-image:none!important;mask-image:none!important}
-html.pp #prScroll .icm .ocm-card img{left:40px!important;top:0!important;width:520px!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important}
+/* the camera render sits between the headline and the phone, oversized and cut by the right edge (never under the copy);
+   the owner's landscape scale/offset tweaks (layout editor) are dropped here */
+html.pp #prScroll .icm .ocm-card{left:0!important;width:600px!important;top:244px!important;height:calc(var(--H) - 876px)!important;overflow:hidden!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #prScroll .icm .ocm-card img{left:auto!important;right:-120px!important;top:0!important;width:600px!important;height:100%!important;object-fit:contain!important;object-position:50% 50%!important;scale:none!important;translate:none!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.pp #prScroll .icm .ocm-card img.on{transform:none}
+html.pp #prScroll .icm .ocm-card img:not(.on){transform:translateX(50px)}
+html.pp #prScroll .icm.solo .ocm-card img{left:20px!important;right:20px!important;width:560px!important;object-fit:cover!important;border-radius:28px}
 html.pp #prScroll .icm .ocm-phone{left:50%!important;top:calc(var(--H) - 610px)!important;translate:-50% 0;scale:.55;transform-origin:50% 0!important}
-html.pp #prScroll .icm .ocm-phone.port{top:calc(var(--H) - 660px)!important;scale:.36}
+html.pp #prScroll .icm .ocm-phone.port{top:calc(var(--H) - 620px)!important;scale:.33}
 /* the page title hides when the section's own heading already says it (prodA.js sets html.ppA-ngt) */
 html.pp.ppA-ngt #gTitle{opacity:0!important;pointer-events:none}
 @media (min-aspect-ratio:10/19){
@@ -290,6 +309,15 @@ html.pp.ppA-ngt #gTitle{opacity:0!important;pointer-events:none}
   html.pp #prScroll .appemu .ae-copy p{font-size:18px!important}
   html.pp #prScroll .icm .dbm-h{font-size:32px!important}
   html.pp #prScroll .icm .dbm-h small{font-size:16px!important}
-  html.pp #prScroll .icm .ocm-card{top:210px!important;height:calc(var(--H) - 790px)!important}
+  html.pp #prScroll .icm .ocm-card{top:212px!important;height:calc(var(--H) - 784px)!important}
+  html.pp #prScroll .icm .ocm-phone.port{top:calc(var(--H) - 560px)!important;scale:.3}
   html.pp #prScroll .icm .ocm-phone{top:calc(var(--H) - 560px)!important;scale:.5}
+}
+
+/* ---------- pressed states (instant feedback on every tap target; transform only) ---------- */
+html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.sns-c .go,.smk-c .go,.fsp button,.xw-pick button,.xw-go,.smk-tog button,.dwseg button,.hb3pill button,.th-list button,.dbm-list button,.dbai,.hbm):active{transform:scale(.95)}
+html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.xf-q,.xa-tog):active{transform:scale(.98)}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .nxa:active i{transform:scale(.85)}
+@media (prefers-reduced-motion:reduce){
+  html.pp :is(#prScroll,#hbScroll,#thScroll) :is(.fsp-pane .fsp-im,.sns-c img,.smk-c img){transform:none!important;transition:opacity .3s ease!important}
 }

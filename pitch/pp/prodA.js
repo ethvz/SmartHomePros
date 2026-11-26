@@ -98,7 +98,58 @@
     html.classList.toggle('ppA-ngt',on); }
   BOX.forEach(q=>{ const b=$(q); if(b) b.addEventListener('scroll',()=>{ cancelAnimationFrame(title.r); title.r=requestAnimationFrame(title); },{passive:true}); });
 
-  function run(){ strips(); art(); therm(); hub(); appEmu(); title(); }
+
+  /* ---- focal points: landscape photos cropped to the tall screen keep the product in the horizontal centre.
+     fx = where the product sits across the source image (0..1); the object-position is worked out from the box and image shapes. ---- */
+  const FOC={'ph/motion':.57,'ph/glass':.26,'ph/water':.52,'ph/smoke':.70,'ph/pendant':.30,'ph/fob':.38,'ph/keypad':.44,'ph/lock3':.70,
+    'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.30,'ph/firefighter':.55,'ph/therm2':.62,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.52,
+    'gal/lock_0':.40,'gal/lock_1':.27,'gal/lock_2':.27,'gal/lock_3':.53,'gal/lock_4':.40,'gal/lock_5':.55,'gal/lock_6':.52,'gal/lock_7':.52,'gal/lock_8':.28,
+    'gal/therm_0':.50,'gal/therm_1':.80,'gal/therm_2':.42,'gal/therm_3':.57,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
+    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.80,'gal/hub_4':.70,'gal/hub_5':.62,'gal/hub_6':.62,'gal/hub_7':.63,'gal/hub_8':.63,
+    'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.68,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
+  const focKey=el=>{ const u=el.getAttribute('src')||''; const m=u.match(/assets\/((?:ph|gal|p)\/[\w]+)\./); return m&&m[1]; };
+  function focal(){ const pp=isPP();
+    BOX.forEach(q=>{ const b=$(q); if(!b) return;
+      b.querySelectorAll('img,video').forEach(el=>{ const k=focKey(el), fx=k&&FOC[k];
+        if(!pp||fx==null){ if(el.dataset.ppf){ el.style.removeProperty('object-position'); if(el.dataset.ppf!=='-') el.style.objectPosition=el.dataset.ppf; delete el.dataset.ppf; } return; }
+        const nw=el.naturalWidth||el.videoWidth, nh=el.naturalHeight||el.videoHeight, bw=el.offsetWidth, bh=el.offsetHeight;
+        if(!nw||!bw||!bh){ if(!el.__ppfl){ el.__ppfl=1; el.addEventListener(el.tagName==='VIDEO'?'loadedmetadata':'load',later,{once:true}); } return; }
+        const vis=(bw/bh)/(nw/nh); if(vis>=1) return;   /* the box is wider than the photo: nothing is cropped sideways */
+        const x=Math.max(0,Math.min(1,(fx-vis/2)/(1-vis))), v=(x*100).toFixed(1)+'% 50%';
+        if(!el.dataset.ppf) el.dataset.ppf=el.style.objectPosition||'-';
+        if(el.style.getPropertyValue('object-position')!==v||el.style.getPropertyPriority('object-position')!=='important') el.style.setProperty('object-position',v,'important'); }); }); }
+
+  /* ---- Hardware | Specs panes: the copy sits at the bottom (above the pill) and the product render fills the room above it,
+     oversized and cut by the screen edge: Hardware bleeds off the right, Specs off the left. ---- */
+  const setI=(el,p,v)=>{ if(el.style.getPropertyValue(p)!==v) el.style.setProperty(p,v,'important'); };
+  function bleed(){ const pp=isPP();
+    BOX.forEach(q=>{ const b=$(q); if(!b) return;
+      b.querySelectorAll('.strip.fsx>.fsp-pane').forEach((pn,pi)=>{ const ims=[...pn.querySelectorAll(':scope>img.fsp-im')]; if(!ims.length) return;
+        if(!pp){ ims.forEach(im=>{ if(!im.dataset.ppo) return; const o=JSON.parse(im.dataset.ppo); ['left','top','width','height'].forEach(p=>{ im.style.removeProperty(p); im.style[p]=o[p]; });
+            if(o.src&&im.getAttribute('src')!==o.src) im.src=o.src; delete im.dataset.ppo; }); pn.classList.remove('ppA-bl','ppA-br'); return; }
+        ims.forEach(im=>{ if(!im.dataset.ppo) im.dataset.ppo=JSON.stringify({left:im.style.left,top:im.style.top,width:im.style.width,height:im.style.height,src:im.getAttribute('src')});
+          /* the Firefighter side view is a photo on a grey wall: use the clean render instead */
+          if(/fs\/fire_s\./.test(im.getAttribute('src'))) im.src=im.getAttribute('src').replace('fire_s.','fire_f.'); });
+        const O=ims.map(im=>JSON.parse(im.dataset.ppo)), R=O.map(o=>[parseFloat(o.left),parseFloat(o.top),parseFloat(o.width),parseFloat(o.height)]);
+        if(R.some(r=>r.some(isNaN))) return;
+        const gx=Math.min(...R.map(r=>r[0])), gy=Math.min(...R.map(r=>r[1])), gw=Math.max(...R.map(r=>r[0]+r[2]))-gx, gh=Math.max(...R.map(r=>r[1]+r[3]))-gy;
+        const H=pn.offsetHeight, txt=[...pn.children].filter(c=>!c.matches('img,svg')&&c.offsetHeight), tTop=txt.length?Math.min(...txt.map(c=>c.offsetTop)):H-200;
+        const T=100, free=Math.max(160,tTop-30-T);
+        /* a render may not be blown up past ~1.15x its own pixels */
+        let cap=9; ims.forEach((im,i)=>{ if(im.naturalWidth) cap=Math.min(cap,im.naturalWidth*1.15/R[i][2]); else if(!im.__ppl){ im.__ppl=1; im.addEventListener('load',later,{once:true}); } });
+        const k=Math.min(760/gw,free/gh,cap), w=gw*k, h=gh*k, right=pi%2===0;
+        const L=right?600-w*.74:-w*.26, Y=T+(free-h)/2;
+        ims.forEach((im,i)=>{ const r=R[i]; setI(im,'left',(L+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); });
+        const want=right?'ppA-br':'ppA-bl'; if(!pn.classList.contains(want)){ pn.classList.remove('ppA-bl','ppA-br'); pn.classList.add(want); } }); }); }
+
+  /* ---- "Which one" cards: sharp, large renders that bleed off the card's right edge ---- */
+  const CARDI={motion:'fs/motion.webp',glass:'fs/glass_f.webp',window:'fs/window_f.webp',smokeco:'fs/smokeco_f.webp',fire:'fs/fire_f.webp'};
+  function cards(){ const pp=isPP(), b=$('#prScroll'); if(!b) return;
+    b.querySelectorAll('.sns-c>img,.smk-c>img').forEach(im=>{ const u=im.getAttribute('src')||'', m=u.match(/assets\/cat\/(\w+)\.webp/);
+      if(pp&&m&&CARDI[m[1]]){ im.dataset.ppc=u; im.src='assets/'+CARDI[m[1]]+'?v=208'; }
+      else if(!pp&&im.dataset.ppc){ im.src=im.dataset.ppc; delete im.dataset.ppc; } }); }
+
+  function run(){ strips(); art(); therm(); hub(); appEmu(); focal(); bleed(); cards(); title(); }
   window.__ppA=run;
   let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); }catch(e){ window.__ppAerr=String(e&&e.stack||e); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });

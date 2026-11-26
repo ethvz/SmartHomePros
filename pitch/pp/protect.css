@@ -55,8 +55,8 @@ html.pp .ppx .hot{pointer-events:auto;transition:transform .12s cubic-bezier(.2,
 html.pp .ppx .hot:active{transform:scale(.95);background:rgba(255,255,255,.08)}
 
 /* ---------- Verify a rep: portrait crop of the photo, copy at the bottom over a scrim ---------- */
-html.pp #vrBg img{width:100vw;height:100vh;min-height:0;object-position:60% 30%;transform-origin:60% 30%}
-html.pp #vrBg .sc{background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.72) 32%,rgba(0,0,0,0) 60%),linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,0) 16%)}
+html.pp #vrBg img{width:100vw;height:100vh;min-height:0;object-position:53% 30%;transform-origin:53% 30%}
+html.pp #vrBg .sc{background:linear-gradient(0deg,rgba(0,0,0,.9) 0%,rgba(0,0,0,.72) 32%,rgba(0,0,0,0) 60%),linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.3) 9%,rgba(0,0,0,0) 18%)}
 html.pp #p-verify .vr-txt{left:40px;right:40px;width:auto;bottom:112px}
 html.pp #p-verify h1{font-size:74px}
 html.pp #p-verify p{font-size:22px;max-width:none;margin:20px 0 30px}
@@ -214,7 +214,25 @@ html.pp #p-nrg .ppw>.ng-src{font-size:13px;line-height:1.4}
 }
 
 /* ---------- round 2: oversized products bleed off the right edge and ease in from it (monitoring emergencies) ---------- */
-html.pp #p-monitoring .ppc.bl{overflow:visible}
 @keyframes ppBl{from{opacity:0;transform:translate3d(70px,0,0) scale(1.04)}to{opacity:1;transform:none}}
 html.pp #p-monitoring.on .ppc.bl{animation:ppBl .7s cubic-bezier(.22,1,.36,1) backwards}
 @media (prefers-reduced-motion:reduce){html.pp #p-monitoring.on .ppc.bl{animation:none}}
+/* monitoring: the next-section arrow sits in its own strip between the sub-tab buttons and the footer */
+html.pp #monScroll>.mtab>.nxa{top:auto!important;bottom:calc(var(--ppFoot,76px) + 4px)!important;left:50%!important;width:180px!important;height:48px!important;margin-left:-90px!important}
+html.pp #monScroll>.mtab>.nxa i{top:8px!important}
+html.pp #monScroll>.mtab>.nxa.ov{display:block}
+
+/* ---------- round 2: Protection "more protection" card: copy on the left, an oversized camera bleeding off the right edge ---------- */
+.ppBleed{display:none}
+html.pp .ptab{overflow:hidden;background:radial-gradient(120% 90% at 100% 55%,rgba(5,229,175,.16),rgba(5,229,175,0) 60%),#1c1c1c!important}
+html.pp .ptab .ppBleed,html.pp .cvMorph .ppBleed{display:block;position:absolute;right:-15%;top:50%;width:64%;height:auto;max-width:none;transform:translateY(-50%) rotate(-8deg);pointer-events:none;filter:drop-shadow(0 18px 30px rgba(0,0,0,.55))}
+html.pp #p-protection.on .ptab .ppBleed{animation:ppPtIn .8s .2s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes ppPtIn{from{opacity:0;transform:translate3d(60px,-50%,0) rotate(-2deg)}to{opacity:1;transform:translateY(-50%) rotate(-8deg)}}
+html.pp .ptab>svg:first-child,html.pp .cvMorph>svg:first-child{left:40px!important;margin-left:0!important;top:calc(50% - 120px)!important}
+html.pp .ptab>svg:nth-of-type(2),html.pp .cvMorph>svg:nth-of-type(2){left:40px!important;margin-left:0!important;bottom:auto!important;top:calc(50% + 76px)!important;width:56px;height:56px}
+html.pp .ptab .lbl,html.pp .cvMorph .lbl{text-align:left!important;padding:0 0 0 40px!important;right:44%!important;font-size:40px!important;line-height:1.08!important}
+@media (min-aspect-ratio:1/2){
+  html.pp .ptab>svg:first-child{top:calc(50% - 92px)!important}html.pp .ptab>svg:nth-of-type(2){top:calc(50% + 50px)!important;width:48px;height:48px}
+  html.pp .ptab .lbl{font-size:32px!important}
+}
+@media (prefers-reduced-motion:reduce){html.pp #p-protection.on .ptab .ppBleed{animation:none}}

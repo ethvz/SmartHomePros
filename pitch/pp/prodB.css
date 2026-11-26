@@ -44,7 +44,9 @@ html.pp #cmPP h2{position:absolute;left:30px;top:36px;font-size:56px;font-weight
 html.pp #cmPP .cmR{position:absolute;display:flex}
 html.pp #cmPP .cmC{flex:none;background-repeat:no-repeat;position:relative;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
 html.pp #cmPP .cmC.hot{cursor:pointer;-webkit-tap-highlight-color:transparent}
-html.pp #cmPP .cmC.hot:active{transform:scale(.97);background-color:transparent;filter:brightness(.92)}
+html.pp #cmPP .cmC.hot{background:#fff;overflow:hidden}
+html.pp #cmPP .cmC i{position:absolute;background-repeat:no-repeat;pointer-events:none}
+html.pp #cmPP .cmC.hot:active{transform:scale(.97);filter:brightness(.92)}
 html.pp #p-compat.on #cmPP .cmR{animation:ppUp .6s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i)*55ms + .05s)}
 html.pp #p-compat.on #cmPP h2{animation:ppUp .6s cubic-bezier(.2,.8,.2,1) backwards}
 @keyframes ppUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
@@ -274,21 +276,7 @@ html.pp #ocScroll>.dbm .ocm-cap.dbm-cap{left:auto!important;right:20px}
 /* the page title would repeat each of these pages' own heading */
 html.pp #screen:has(:is(#p-ocp,#p-dbcp,#p-ai,#p-compat,#p-whatsnew,#p-preview,#p-birdseye).on) #gTitle{display:none!important}
 
-/* hero gallery: each landscape photo is cropped round its product, not the middle */
-html.pp #ocScroll .hgl figure:nth-child(1) img{object-position:67% 50%}
-html.pp #ocScroll .hgl figure:nth-child(2) img{object-position:86% 50%}
-html.pp #ocScroll .hgl figure:nth-child(3) img{object-position:30% 50%}
-html.pp #ocScroll .hgl figure:nth-child(4) img{object-position:75% 50%}
-html.pp #ocScroll .hgl figure:nth-child(5) img{object-position:12% 50%}
-html.pp #ocScroll .hgl figure:nth-child(6) img{object-position:77% 50%}
-html.pp #ocScroll .hgl figure:nth-child(7) img{object-position:30% 50%}
-html.pp #dbScroll .hgl figure:nth-child(1) img{object-position:53% 50%}
-html.pp #dbScroll .hgl figure:nth-child(2) img{object-position:75% 50%}
-html.pp #dbScroll .hgl figure:nth-child(3) img{object-position:65% 50%}
-html.pp #dbScroll .hgl figure:nth-child(4) img{object-position:79% 50%}
-html.pp #dbScroll .hgl figure:nth-child(5) img{object-position:63% 50%}
-html.pp #dbScroll .hgl figure:nth-child(6) img{object-position:38% 50%}
-html.pp #dbScroll .hgl figure:nth-child(7) img{object-position:80% 50%}
+/* hero gallery photos + DBCP hero video: object-position is set per picture by prodB.js (galFocus) so the product is centred */
 
 /* 360 spin: the canvas keeps its landscape shape (so the frame is drawn whole) and is scaled down; only the far edges crop */
 html.pp :is(#ocScroll,#dbScroll)>.hum .hum-st canvas{width:1376px!important;height:1032px!important;transform-origin:0 0;transform:translate(calc((600px - 1376px * .62) / 2),calc((var(--H) - var(--pf) - 1032px * .62) / 2)) scale(.62)}
@@ -339,3 +327,41 @@ html.pp #ocHist .fcol .sm img{aspect-ratio:4/3}
   html.pp :is(#ocScroll,#dbScroll) .xw-why{top:690px!important}
   html.pp :is(#ocScroll,#dbScroll) .xw-why div{height:52px}
 }
+
+/* ===================== round 2 polish ===================== */
+/* Smart Actions: oversized product peeking in from the right edge beside the headline (slides in when the page arrives) */
+.ppBleed{display:none}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=act] .ppBleed{display:block;position:absolute;z-index:0;width:auto;pointer-events:none;opacity:0;translate:70px 0;transition:opacity .7s ease .12s,translate .9s cubic-bezier(.22,1,.36,1) .12s;filter:drop-shadow(0 24px 40px rgba(0,0,0,.6))}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=act][data-vis="1"] .ppBleed{opacity:1;translate:0 0}
+html.pp #ocScroll .ppBleed.oc{left:392px;top:22px;height:300px}
+html.pp #dbScroll .ppBleed.db{left:468px;top:30px;height:390px}
+html.pp :is(#ocScroll,#dbScroll) .xa-list{z-index:1}
+
+/* OCP hero: the camera is oversized and runs off the right edge (its face stays whole, the mount is cut) */
+html.pp #ocScroll .och-prod{left:150px!important;width:620px!important;top:262px!important;height:calc(var(--H) - 262px - var(--pf) - 244px)!important}
+html.pp #ocScroll .och-glow{left:40px!important;top:calc(262px + (var(--H) - 506px - var(--pf)) / 2 - 360px)!important}
+html.pp #ocScroll .och-prod img{transition:opacity .45s ease,translate .9s cubic-bezier(.22,1,.36,1)}
+html.pp #p-ocp:not(.on) #ocScroll .och-prod img{translate:60px 0}
+
+/* OCP Highlights */
+/* 24/7: the SD-card render slides further off the left edge so the storage caption has its own space */
+html.pp #ocScroll .ocm-card img[data-im="ocm/sd2"]{left:-150px!important}
+html.pp #ocScroll>.dbm .ocm-cap.dbm-cap.on{max-width:232px}
+/* Spotlight: the small render is enlarged to the same presence as the others */
+html.pp #ocScroll .ocm-card img[data-im="ocm/spotv"]{scale:1.6!important;transform-origin:50% 42%}
+/* side-view renders: oversized, peeking in from the right edge */
+html.pp #ocScroll .ocm-card img:is([data-im="och/c1"],[data-im="och/c0"]){scale:1.45!important;translate:26% 8%!important}
+
+/* OCP Compare: our camera bigger, running off the right edge */
+html.pp #ocScroll .ocpk .me img{left:384px!important;top:-18px!important;height:300px!important}
+
+/* DBCP Highlights, 24/7: the storage caption stacks in the product column (it used to cover the phone screen) */
+html.pp #dbScroll #dbmCap{left:calc(var(--cl) + 2px)!important;right:10px!important;width:auto!important;top:calc(var(--mt) + 4px)!important;flex-direction:column!important;align-items:flex-start!important;gap:14px!important}
+html.pp #dbScroll #dbmCap>i{display:none!important}
+html.pp #dbScroll .dbm-card img[data-fv=sdz]{object-position:50% 100%!important}
+/* Spotlight tab plays a clip (.ocm-sv) of the small render: enlarge it too */
+html.pp #ocScroll .ocm-svw{overflow:hidden}
+html.pp #ocScroll .ocm-sv{scale:1.55;transform-origin:50% 40%}
+/* OCP rival wells a little wider so wide cameras (Nest, Blink, Eufy) reach the same size as the tall ones */
+html.pp #ocScroll .ocpk .dbwell{width:108px!important}
+html.pp #ocScroll .ocpk .dbcard{gap:8px!important}

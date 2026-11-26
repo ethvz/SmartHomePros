@@ -44,39 +44,57 @@
       paths += `<path d="${d}" stroke="url(#aiG${i})"/>`; }
     const svg = w.querySelector('.aiRing'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = `<defs>${defs}</defs><g fill="none" stroke-width="5" stroke-linecap="round">${paths}</g>`;
     /* centre: the "Vivint AI Technologies" swirl, cut from the artwork (centre 687,480, radius ~275) */
-    const Dc = Math.min(2 * rx + (H < 1080 ? -20 : 10), 2 * ry - 2 * R), kc = Dc / 550, c = w.querySelector('.aiC');
+    /* sized so the "Vivint AI Technologies" words sit between the two side columns of bubbles, never under them */
+    const Dc = Math.min(2 * (rx - R) + 40, 2 * ry - 2 * R), kc = Dc / 550, c = w.querySelector('.aiC');
     Object.assign(c.style, { left: (cx - Dc / 2) + 'px', top: (cy - Dc / 2) + 'px', width: Dc + 'px', height: Dc + 'px', backgroundImage: `url(${IMG})`,
       backgroundSize: `${1376 * kc}px ${964 * kc}px`, backgroundPosition: `${-(687 - 275) * kc}px ${-(480 - 275) * kc}px` });
   }
 
-  /* ---------- Compatibility: the landscape grid image cut into its brand cards and stacked ---------- */
-  /* crop rects in the 2064x1446 artwork: [x, y, w, h, data-cm] */
-  const CM = { vivint: [45, 210, 1975, 477], gig: [45, 715, 1100, 217, '2gig'], dsc: [45, 960, 1100, 217, 'dsc'], hon: [45, 1204, 1100, 217, 'honeywell'],
-    adt: [1173, 715, 847, 217, 'adt'], ring: [1173, 963, 847, 217, 'ring'], ss: [1173, 1204, 340, 217, 'simplisafe'], xf: [1538, 1204, 482, 217, 'simplisafe'] };
+  /* ---------- Compatibility: the landscape grid image cut into brand cards, stacked, every device drawn at ONE scale ---------- */
+  /* the Vivint card is cut whole; each other card is cut into its logo and its row of devices (artwork px, 2064x1446),
+     re-centred on a white card as wide as the screen, so a panel is the same size whichever brand card it sits in */
+  const CMV = [45, 210, 1975, 477];
+  const CMS = { gig: { y: [715, 931], lg: [56, 186], dv: [186, 1112], cm: '2gig' }, dsc: { y: [960, 1180], lg: [56, 186], dv: [186, 1115], cm: 'dsc' },
+    hon: { y: [1204, 1420], lg: [56, 186], dv: [186, 1106], cm: 'honeywell' }, adt: { y: [715, 931], lg: [1184, 1314], dv: [1322, 1910], cm: 'adt' },
+    ring: { y: [965, 1180], lg: [1184, 1314], dv: [1375, 1915], cm: 'ring' }, ss: { y: [1206, 1420], dv: [1190, 1495], cm: 'simplisafe' },
+    xf: { y: [1206, 1420], dv: [1550, 2004], cm: 'simplisafe' } };
   const ROWS = [['vivint'], ['gig'], ['dsc'], ['hon'], ['adt'], ['ring'], ['ss', 'xf']];
   const CIMG = 'assets/compat_grid.webp?v=176';
   function cmBuild() {
     const sec = Q('#p-compat'); if (!sec || Q('#cmPP')) return;
     const w = D.createElement('div'); w.id = 'cmPP';
-    w.innerHTML = '<h2>Compatibility</h2>' + ROWS.map((r, i) => `<div class="cmR" style="--i:${i}">` + r.map(k => `<div class="cmC${CM[k][4] ? ' hot' : ''}" data-k="${k}"${CM[k][4] ? ` data-cm="${CM[k][4]}"` : ''}></div>`).join('') + '</div>').join('');
+    w.innerHTML = '<h2>Compatibility</h2>' + ROWS.map((r, i) => `<div class="cmR" style="--i:${i}">` + r.map(k => k === 'vivint' ? '<div class="cmC cmV" data-k="vivint"></div>'
+      : `<div class="cmC hot" data-k="${k}" data-cm="${CMS[k].cm}">${CMS[k].lg ? '<i class="cmL"></i>' : ''}<i class="cmD"></i></div>`).join('') + '</div>').join('');
     sec.appendChild(w);
   }
   function cmLayout() {
     const w = Q('#cmPP'); if (!w || !isPP()) return;
-    const H = avail(), top = H < 1080 ? 112 : 138, gap = H < 1080 ? 10 : 14, maxW = 568;
+    const H = avail(), top = H < 1080 ? 112 : 138, maxW = 568, LG = 140, PAD = 14;
     w.style.height = H + 'px';
-    /* natural heights at full width, then one scale so everything fits between the title and the footer */
-    const rowH = r => { const tw = r.reduce((a, k) => a + CM[k][2], 0) + (r.length - 1) * 30; return maxW * CM[r[0]][3] / tw; };
-    const sum = ROWS.reduce((a, r) => a + rowH(r), 0), f = Math.min(1, (H - top - 24 - gap * (ROWS.length - 1)) / sum), RW = maxW * f;
-    let y = top;
-    w.querySelectorAll('.cmR').forEach((row, i) => { const r = ROWS[i], h = rowH(r) * f, tw = r.reduce((a, k) => a + CM[k][2], 0) + (r.length - 1) * 30, s = RW / tw;
-      Object.assign(row.style, { top: y + 'px', left: (600 - RW) / 2 + 'px', width: RW + 'px', height: h + 'px', gap: 30 * s + 'px' });
-      row.querySelectorAll('.cmC').forEach(c => { const [x0, y0, cw, ch] = CM[c.dataset.k], k = h / ch;
-        Object.assign(c.style, { width: cw * k + 'px', height: h + 'px', borderRadius: 34 * k + 'px', backgroundImage: `url(${CIMG})`,
-          backgroundSize: `${2064 * k}px ${1446 * k}px`, backgroundPosition: `${-x0 * k}px ${-y0 * k}px` }); });
+    /* one device scale for every small card, set by the widest card (logo column + devices) */
+    let s = maxW / (LG + Math.max(...['gig', 'dsc', 'hon', 'adt', 'ring'].map(k => CMS[k].dv[1] - CMS[k].dv[0])) + PAD), sv = maxW / CMV[2];
+    const hs = () => 208 * s, gap0 = H < 1080 ? 10 : 14;
+    const need = CMV[3] * sv + 6 * hs() + 6 * gap0, room = H - top - 20, g = Math.min(1, room / need);
+    s *= g; sv *= g; const RW = maxW * g, gap = Math.min(gap0 + (g === 1 ? (room - need) / 7 : 0), 24), set = (el, o) => Object.assign(el.style, o);
+    let y = top + (g === 1 ? Math.max(0, room - need - 6 * (gap - gap0)) / 3 : 0);
+    w.querySelectorAll('.cmR').forEach((row, i) => {
+      const r = ROWS[i], h = r[0] === 'vivint' ? CMV[3] * sv : hs();
+      set(row, { top: y + 'px', left: (600 - RW) / 2 + 'px', width: RW + 'px', height: h + 'px', gap: gap + 'px' });
+      const tot = r.reduce((a, k) => a + (k === 'vivint' ? 1 : CMS[k].dv[1] - CMS[k].dv[0]), 0);
+      row.querySelectorAll('.cmC').forEach(c => {
+        const k = c.dataset.k;
+        if (k === 'vivint') { const [x0, y0] = CMV;
+          return set(c, { width: RW + 'px', height: h + 'px', borderRadius: 34 * sv + 'px', backgroundImage: `url(${CIMG})`, backgroundSize: `${2064 * sv}px ${1446 * sv}px`, backgroundPosition: `${-x0 * sv}px ${-y0 * sv}px` }); }
+        const m = CMS[k], cw = r.length > 1 ? (RW - gap * (r.length - 1)) * (m.dv[1] - m.dv[0]) / tot : RW, y0 = m.y[0] + 4, ch = (m.y[1] - m.y[0] - 8) * s;
+        set(c, { width: cw + 'px', height: h + 'px', borderRadius: 34 * s + 'px' });
+        const crop = (el, x0, x1, left) => set(el, { left: left + 'px', top: (h - ch) / 2 + 'px', width: (x1 - x0) * s + 'px', height: ch + 'px', backgroundImage: `url(${CIMG})`,
+          backgroundSize: `${2064 * s}px ${1446 * s}px`, backgroundPosition: `${-x0 * s}px ${-y0 * s}px` });
+        const lg = c.querySelector(".cmL"), L = m.lg ? LG * s : 0;
+        if (lg) crop(lg, m.lg[0], m.lg[1], 10 * s);
+        crop(c.querySelector(".cmD"), m.dv[0], m.dv[1], L + (cw - L - (m.dv[1] - m.dv[0]) * s) / 2);
+      });
       y += h + gap; });
   }
-
 
   /* ---------- OCP / DBCP Highlights: media band between the title and the 2-column list ---------- */
   function featLayout() {
@@ -149,8 +167,51 @@
     if (!t.src && v.currentSrc) t.src = v.currentSrc;
   }
 
-  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); arloTwin(); return; } aiLayout(); cmLayout(); featLayout(); histFit(); arloTwin(); }
-  function boot() { aiBuild(); cmBuild(); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
+  /* ---------- focal points: every hero gallery photo (and the DBCP hero video) is cropped so the product sits in the
+     horizontal centre of the upright screen. FOC = the product's x centre as a fraction of each source picture ---------- */
+  const FOC = { ocp: [.59, .75, .33, .70, .24, .66, .335], dbcp: [.585, .67, .60, .69, .60, .41, .71] };
+  function focusOne(el, f, nw, nh) {
+    if (!isPP()) { if (el.style.objectPosition) el.style.removeProperty('object-position'); return; }
+    const Fw = 600, Fh = window.SH || 1230; if (!nw || !nh || f == null) return;
+    const k = Math.max(Fw / nw, Fh / nh), Wi = nw * k; if (Wi - Fw < 1) return;
+    const v = (Math.max(0, Math.min(1, (f * Wi - Fw / 2) / (Wi - Fw))) * 100).toFixed(1) + '% 50%';
+    if (el.style.objectPosition !== v) el.style.objectPosition = v;
+  }
+  function galFocus() {
+    [['#ocScroll', 'ocp'], ['#dbScroll', 'dbcp']].forEach(([q, k]) => { const box = Q(q); if (!box) return;
+      box.querySelectorAll('.hgl figure img').forEach((im, i) => {
+        if (!im.__ppf) { im.__ppf = 1; im.addEventListener('load', () => focusOne(im, FOC[k][i], im.naturalWidth, im.naturalHeight)); }
+        focusOne(im, FOC[k][i], im.naturalWidth, im.naturalHeight); }); });
+    const v = Q('#dbHv'); if (v) { if (!v.__ppf) { v.__ppf = 1; v.addEventListener('loadedmetadata', galFocus); } focusOne(v, .6, v.videoWidth || 1376, v.videoHeight || 1032); }
+  }
+
+  /* ---------- Compare: rival products drawn at one visual size (equal area) rather than each squeezed to its well ---------- */
+  function wellFit() {
+    D.querySelectorAll('#ocScroll .dbwell img,#dbScroll .dbwell img').forEach(im => {
+      if (!im.__ppw) { im.__ppw = 1; im.addEventListener('load', wellFit); }
+      const props = ['width', 'height', 'left', 'top'];
+      if (!isPP()) { props.forEach(p => im.style.getPropertyValue(p) && im.style.removeProperty(p)); return; }
+      const w = im.parentNode, W = w.offsetWidth, H = w.offsetHeight, a = im.naturalWidth / im.naturalHeight; if (!W || !H || !a) return;
+      const C = Math.min(W, H) * (W < H ? 1.08 : .92);        /* sqrt(area) every product gets, then shrunk to fit the well if needed */
+      let pw = C * Math.sqrt(a), ph = C / Math.sqrt(a); const f = Math.min(1, W * 1.08 / pw, H / ph); pw *= f; ph *= f;
+      const v = { width: pw.toFixed(1) + 'px', height: ph.toFixed(1) + 'px', left: ((W - pw) / 2).toFixed(1) + 'px', top: ((H - ph) / 2).toFixed(1) + 'px' };
+      props.forEach(p => { if (im.style.getPropertyValue(p) !== v[p]) im.style.setProperty(p, v[p], 'important'); });
+    });
+  }
+
+  /* ---------- Smart Actions: an oversized product render peeks in from the right edge beside the headline ---------- */
+  function actBleed() {
+    [['#ocScroll', 'assets/och/c0.webp?v=87', 'oc'], ['#dbScroll', 'assets/db/dbcp_a1.webp?v=55', 'db']].forEach(([q, src, k]) => {
+      const sec = Q(q + '>[data-t=act]'); if (!sec || sec.querySelector('.ppBleed')) return;
+      const im = D.createElement('img'); im.className = 'ppBleed ' + k; im.alt = ''; im.decoding = 'async'; im.src = src; im.draggable = false;
+      sec.insertBefore(im, sec.firstChild); });
+  }
+
+  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); arloTwin(); galFocus(); wellFit(); return; } aiLayout(); cmLayout(); featLayout(); histFit(); arloTwin(); galFocus(); wellFit(); }
+  function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ppo) return; el.__ppo = 1;
+    /* the wells only have a size once their page is shown: re-fit then (writes only to the images, never to the observed page) */
+    new MutationObserver(() => { if (isPP() && el.classList.contains('on')) requestAnimationFrame(wellFit); }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
+  function boot() { aiBuild(); cmBuild(); actBleed(); secWatch(); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);

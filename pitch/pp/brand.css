@@ -35,7 +35,15 @@ html.pp #p-about .rec2 .top h3{margin-top:0!important;font-size:22px}
 html.pp #p-about .rec2 .logos{left:18px;right:18px;top:84px!important;bottom:16px;gap:10px;
   grid-template-columns:repeat(3,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
 html.pp #p-about .nrgt .nl{left:22px;top:22px;width:96px}
-html.pp #p-about .ab:nth-child(8)>img:not(.bg){width:auto!important;height:calc(100% - 20px)!important;top:10px!important}
+/* yard-sign tile: the sign oversized, peeking in from the top-right corner (its post clears the caption) */
+html.pp #p-about .ab:nth-child(8){overflow:hidden}
+/* sized from the tile height (--r4) so the disc is half off the right edge at every screen height; the caption keeps the left */
+html.pp #p-about .ab:nth-child(8)>img:not(.bg){width:auto!important;height:calc(var(--r4)*1.6)!important;top:calc(var(--r4)*.06)!important;left:auto!important;right:calc(var(--r4)*-.445)!important;transform:none!important}
+html.pp #p-about .ab:nth-child(8) .arr{display:none}
+html.pp #p-about .ab:nth-child(8) .bx{right:calc(var(--r4)*.44 + 6px)}
+html.pp #p-about .ab:nth-child(8) h3{font-size:21px;letter-spacing:-.4px}
+/* truck tile: the whole Vivint logo and the installer in frame */
+html.pp #p-about .ab:nth-child(9)>img.bg{object-position:15% 50%!important}
 
 /* ================= GIVES BACK: photo + live stats instead of the landscape art ================= */
 html.pp #p-gives{background:#000}
@@ -98,12 +106,15 @@ html.pp #p-map .usm-t span{font-size:50px;letter-spacing:4px}
 html.pp #p-sign .sgn-sc{left:0!important;width:100%!important;height:100%!important}
 html.pp #p-sign .sgn-s{height:var(--H)!important}
 html.pp #p-sign .sgn-s:first-child>img:first-child{object-position:0 0!important;transform-origin:0 0;transform:scale(3.4);filter:blur(10px) brightness(.8) saturate(1.15)}
-html.pp #p-sign .sgn-s>img.sgn-pp{display:block;inset:auto!important;left:20px!important;right:20px!important;top:calc(var(--bt) + 10px)!important;
-  width:456px!important;left:40px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 0!important;
+html.pp #p-sign .sgn-s>img.sgn-pp{display:block;inset:auto!important;top:calc(var(--bt) + 10px)!important;
+  width:456px!important;left:72px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 0!important;
   filter:drop-shadow(0 26px 34px rgba(0,0,0,.45))}
 html.pp #p-sign.on .sgn-pp{animation:sgnUp .9s cubic-bezier(.22,1,.36,1) backwards}
 @keyframes sgnUp{from{opacity:0;transform:translateY(60px)}}
-html.pp #p-sign .sgn-s:nth-child(2) img{object-position:24% 60%!important}
+/* sign in the yard: the photo enlarged a little so the sign sits centred across, lower third (image bottom = screen bottom) */
+html.pp #p-sign .sgn-s:nth-child(2)::after{content:'';position:absolute;left:0;right:0;top:0;height:22%;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,0));pointer-events:none}
+html.pp #p-sign .sgn-s:nth-child(2) img{inset:auto!important;object-fit:fill!important;max-width:none!important;
+  height:calc(var(--H,1230px)*1.3)!important;width:calc(var(--H,1230px)*1.856)!important;top:calc(var(--H,1230px)*-.3)!important;left:calc(300px - var(--H,1230px)*.5735)!important}
 html.pp #p-sign .sgn-dots{left:16px;padding:12px 9px;border-radius:14px;background:rgba(0,0,0,.32);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 
 /* ================= VIDEOS: 2-column library ================= */

@@ -10,6 +10,13 @@
     qa(':scope>:not(.ng-bg)', nrg).forEach(el => w.appendChild(el)); nrg.appendChild(w);
   }
 
+  /* Protection: an oversized Outdoor Camera Pro peeks into the "more protection" card from its right edge (hidden off phone-portrait) */
+  const ptab = q('#p-protection .ptab');
+  if (ptab && !q('.ppBleed', ptab)) {
+    const im = document.createElement('img'); im.className = 'ppBleed'; im.alt = ''; im.draggable = false; im.decoding = 'async';
+    im.src = 'assets/cat/ocp.webp?v=176'; ptab.appendChild(im);
+  }
+
   /* ---- crop composer: a landscape slide (1376 x 964, text baked in) is re-cut into stacked crops that fill the upright screen.
      A spec is a list of rows; a row is a list of crops [x, y, w, h, tw] in slide coordinates, tw = width on the stage.
      Rows are stacked and centred in the space between the title (top) and the footer (bottom); everything shrinks
@@ -47,7 +54,7 @@
 
   function layout(host) {
     const H = window.SH || 1032, ppx = host.querySelector(':scope>.ppx'); if (!ppx) return;
-    const { TOP, BOT } = insets();
+    const { TOP } = insets(), BOT = insets().BOT + (host.classList.contains('mtab') ? 44 : 0); /* monitoring: a strip for the next-section arrow */
     qa(':scope>.ppg', ppx).forEach(g => {
       const sp = SPEC[g.dataset.k], src = sp.rows || sp, hots = g._hots || [];
       const nav = src.length > 1 && (src[src.length - 1] === S1 || src[src.length - 1] === S3) ? src[src.length - 1].map(c => c.slice()) : null;

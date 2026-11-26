@@ -26,7 +26,12 @@ html.pp .pk-tx .pk-fine{display:none}
 html.pp .pk-dev{grid-column:1/-1;grid-row:3;align-self:stretch;min-height:0;padding:0;gap:8px;align-items:center;justify-content:center}
 html.pp .pk-line{width:max-content;gap:18px}
 /* short phones: the two-row Pro and Max kits get the extra height */
-@media (min-aspect-ratio:1/2){html.pp #p-packages .pk2-r{flex-grow:.82}html.pp #p-packages .pk2-r:nth-child(n+3){flex-grow:1.36}}
+
+
+/* short phones: a slimmer header row leaves more height for the products */
+@media (min-aspect-ratio:1/2){html.pp #p-packages .pk2{gap:9px}html.pp #p-packages .pk2-r{padding:8px 16px 6px 10px;column-gap:12px;grid-template-columns:90px minmax(0,1fr) auto}
+  html.pp .pk-hub{width:90px;height:60px}html.pp .pk-tx h3{font-size:24px}html.pp .pk-tx .in{font-size:16px;margin-top:2px}
+  html.pp .pk-tx .mo{font-size:31px}html.pp .pk-tx .mo small{font-size:13px;margin-top:3px}}
 
 /* ===== Comparisons: same table, narrow brand columns with upright names ===== */
 html.pp #p-comparisons h2{left:24px;top:calc(var(--sT) + 6px);font-size:58px}
@@ -95,13 +100,18 @@ html.pp #p-moves .mcard{--mT:calc(var(--sT) + 92px);--ch:calc((var(--H) - var(--
 html.pp #p-moves .mcard:nth-of-type(1){top:var(--mT)}
 html.pp #p-moves .mcard:nth-of-type(2){top:calc(var(--mT) + var(--ch) + 14px)}
 html.pp #p-moves .mcard:nth-of-type(3){top:calc(var(--mT) + var(--ch) * 2 + 28px)}
-html.pp #p-moves .mcard img{display:block;width:100%;height:calc(var(--ch) - 162px);border-radius:20px!important;object-position:50% 55%}
-html.pp #p-moves .mcard h3{font-size:25px;line-height:29px;margin:12px 12px 6px}
-html.pp #p-moves .mcard p{font-size:17px;line-height:23px;margin:0 12px}
-html.pp #p-moves .mcard .price{left:auto;right:22px;top:22px;bottom:auto;height:46px;width:auto;padding:0 20px;font-size:20px;font-weight:600;background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-html.pp #p-moves .mcard small{margin:4px 12px 0;font-size:14px}
+/* card = photo (takes whatever height the copy leaves) / title + price pill / copy; the pill no longer sits on the products */
+html.pp #p-moves .mcard{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:minmax(0,1fr) auto auto auto;column-gap:12px;padding-bottom:16px;box-sizing:border-box}
+html.pp #p-moves .mcard img{grid-column:1/-1;display:block;width:100%;height:100%;min-height:0;border-radius:20px!important;object-position:50% 55%}
+html.pp #p-moves .mcard:nth-of-type(1) img{object-position:50% 62%}
+html.pp #p-moves .mcard:nth-of-type(3) img{object-position:50% 88%}
+html.pp #p-moves .mcard h3 br{display:none}
+html.pp #p-moves .mcard h3{grid-column:1;grid-row:2;font-size:25px;line-height:29px;margin:12px 0 6px 12px}
+html.pp #p-moves .mcard p{grid-column:1/-1;font-size:17px;line-height:23px;margin:0 12px}
+html.pp #p-moves .mcard .price{position:static!important;grid-column:2;grid-row:2;align-self:center;margin:6px 10px 0 0;height:44px;width:auto;padding:0 18px;font-size:19px;font-weight:600;color:var(--vg,#05e5af);background:rgba(5,229,175,.1);box-shadow:inset 0 0 0 1px rgba(5,229,175,.28)}
+html.pp #p-moves .mcard small{grid-column:1/-1;margin:4px 12px 0;font-size:14px}
 /* short phones: two lines of copy, no footnote, so the photo keeps its size */
-@media (min-aspect-ratio:1/2){html.pp #p-moves .mcard img{height:calc(var(--ch) - 136px)}html.pp #p-moves .mcard p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}html.pp #p-moves .mcard small{display:none}}
+@media (min-aspect-ratio:1/2){html.pp #p-moves .mcard p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}html.pp #p-moves .mcard small{display:none}}
 
 /* ===== Social: the four phones as a 2 x 2 grid of tappable tiles (crops of the same picture) ===== */
 html.pp #p-social>img{display:none}
