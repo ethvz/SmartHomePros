@@ -36,6 +36,7 @@
   ];
 
   /* ---------- small helpers ---------- */
+  function toTop() { var el = document.querySelector('.app'); try { (el && el.scrollHeight > el.clientHeight ? el : window).scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { if (el) el.scrollTop = 0; scrollTo(0, 0); } }
   var toastEl = null;
   function toast(msg) {
     if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'shpn-toast'; toastEl.setAttribute('role', 'status'); document.body.appendChild(toastEl); }
@@ -77,7 +78,7 @@
         e.stopPropagation();
         if (a.ext) { setTimeout(close, 250); return; }   /* the link opens Pulse outside the app */
         e.preventDefault();
-        if (on) { close(); if (APP === 'home') try { scrollTo({ top: 0, behavior: 'smooth' }); } catch (x) { scrollTo(0, 0); } return; }
+        if (on) { close(); if (APP === 'home') toTop(); return; }
         if (a.soon) { el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope'); toast(a.soon + ' is coming soon'); return; }
         if (a.k === 'pitch' || a.k === 'recruit') try { localStorage.setItem('shpc_last', a.k); } catch (x) {}
         leave(a.url, el);
@@ -139,7 +140,7 @@
     card.appendChild(selector());
     var lb = document.createElement('div'); lb.className = 'shpn-lb'; lb.textContent = 'On this page'; card.appendChild(lb);
     var g = document.createElement('div'); g.className = 'shpn-g'; card.appendChild(g);
-    var items = [{ k: 'top', n: 'Apps', go: function () { scrollTo({ top: 0, behavior: 'smooth' }); } }];
+    var items = [{ k: 'top', n: 'Apps', go: toTop }];
     [].forEach.call(document.querySelectorAll('.more .sec[data-k][data-n]'), function (sec) {
       items.push({ k: sec.dataset.k, n: sec.dataset.n, go: function () { var m = document.querySelector('.more'); if (m && m.classList) m.classList.add('open'); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
     });
@@ -237,8 +238,13 @@
       makeCorner(frMenu, frHome, 'Fast Recruit home'); frWatch();
       var d0 = document.querySelector('.dw'); if (d0) frDecorate(d0);
     } else {
-      makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); try { scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { scrollTo(0, 0); } }, 'Smart Home Pros: back to top');
+      makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); toTop(); }, 'Smart Home Pros: back to top');
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && dw && dw.classList.contains('on')) shpClose(); });
+      /* scrolled: frosted corner (and on an upright iPhone, a dark strip behind the status bar + corner); class written only on change */
+      var strip = document.createElement('div'); strip.className = 'shpn-strip'; strip.setAttribute('aria-hidden', 'true'); document.body.appendChild(strip);
+      var app = document.querySelector('.app'), sq = 0, scr = function () { sq = 0; var on = Math.max(window.scrollY || 0, app ? app.scrollTop : 0) > 8; if (H.classList.contains('shpn-scrolled') !== on) H.classList.toggle('shpn-scrolled', on); };
+      var onS = function () { if (!sq) sq = requestAnimationFrame(scr); };
+      addEventListener('scroll', onS, { passive: true }); if (app) app.addEventListener('scroll', onS, { passive: true }); scr();
       /* the SHP page's Settings sheet: hide the corner while it is up (attribute writes only when the state differs) */
       var st = document.querySelector('.sheet');
       if (st) { var sync = function () { var on = st.classList.contains('on'); if (st.__shpn !== on) { st.__shpn = on; sheet(on); } };

@@ -54,6 +54,9 @@
     hb.addEventListener('pointerdown', () => { hb.classList.add('pressed'); setTimeout(() => hb.classList.remove('pressed'), 180); }, { passive: true });
   }
 
+  /* ---- top corner shade: content scrolling under the burger + logo (top left) never fights them ---- */
+  if (!$('#ppTopShade')) { const sh = document.createElement('div'); sh.id = 'ppTopShade'; sh.setAttribute('aria-hidden', 'true'); st.appendChild(sh); }
+
   /* ---- section nav: along the footer instead of a side rail ---- */
   let busy = false;
   function navMode() {

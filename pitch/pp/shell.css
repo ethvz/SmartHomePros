@@ -190,3 +190,11 @@ html.pp #allTiles .ht img.cp.big{top:40%!important;height:60%!important}
 html.pp #stage #cmPP{top:48px}
 html.pp #stage #p-whatsnew h2{top:calc(var(--ppNavT) + 4px)}
 html.pp #stage #p-whatsnew .wnl{top:calc(var(--ppNavT) + 92px)}
+/* a soft dark band behind the top corner so section content scrolling under it stays out of its way (pp/shell.js adds the element) */
+#ppTopShade{display:none}
+html.pp #ppTopShade{display:block;position:absolute;left:0;right:0;top:0;height:calc(var(--ppNavT) + 16px);z-index:19;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.5) 55%,rgba(0,0,0,0) 100%)}
+/* the Home page's pinned title overlay (#lpT, its eyebrow): right of the top corner */
+html.pp #lpT{transform:translate(220px,7px)}
+/* short phones: these headings start in the corner band; nudge them below it */
+@media (max-height:700px){ html.pp #p-history .hy2-h,html.pp #p-videos .vl2-h{margin-top:30px!important} }
