@@ -23,7 +23,7 @@ RISE = K * 3.3                                 # 1.4 m: run 3.3 m (half the 6.6 
 DECK = YS + FA + RISE                          # 8.15: hip deck and gable ridge
 KG = RISE / GH                                 # gable pitch so its ridge meets the deck
 IX0, IX1, IZ0 = -2.3, 5.3, -6.8                # great room inside
-CORE = (2.9, 5.5, -7.0, -2.6)                  # solid core behind the shelf wall (x0,x1,z0,z1)
+CORE = (2.9, 5.5, -7.0, -1.0)                  # solid core; its street-facing white wall holds the oak shelf niches
 def U(x): return YS + KG * (GH - abs(x - GC))  # gable underside height at x
 
 def B(x, y, z): return Vector((x, -z, y))      # three -> blender
@@ -80,9 +80,12 @@ box('pad', -14.6,9.4, -.35,.03, -8.4,PZ1, 'conc')
 box('drive', -14.2,-6.5, .03,.045, 4.0,8.7, 'conc')
 box('stoop', -4.65,-3.1, .03,.13, 4.0,5.1, 'conc'); box('step', -4.65,-3.1, .03,.08, 5.1,5.45, 'conc')
 box('walk', -4.5,-3.25, .03,.05, 5.45,PZ1, 'conc')
-box('bed', -6.5,-4.65, .03,.06, 4.0,5.15, 'mulch'); box('bedR', -3.1,6.5, .03,.055, 4.12,4.75, 'gravel')
-box('lawnL', -6.5,-4.5, .03,.06, 5.15,PZ1, 'grass'); box('lawnF', -3.25,9.4, .03,.06, 4.75,PZ1, 'grass')
-box('lawnS', 6.5,9.4, .03,.06, -8.4,4.75, 'grass')
+box('bed', -6.5,-4.65, .03,.06, 4.0,5.15, 'mulch')
+box('lawnL', -6.5,-4.5, .03,.06, 5.15,PZ1, 'grass'); box('lawnF', -3.25,9.4, .03,.06, 4.12,PZ1, 'grass')
+box('lawnS', 6.5,9.4, .03,.06, -8.4,4.12, 'grass')
+box('lawnB', -14.2,6.5, .03,.06, -8.4,BZ0-.05, 'grass')                 # back garden
+box('lawnW', -14.2,-10.1, .03,.06, BZ0-.05,4.0, 'grass')                # side garden by the garage
+box('lawnG', -10.1,BX0, .03,.06, BZ0-.05,-2.6, 'grass')
 box('plinth', BX0-.05,BX1+.05, .03,FL-.025, BZ0-.05,BZ1+.02, 'plinth')
 box('gslab', -9.9,BX0, .03,.06, -2.6,4.0, 'plinth')
 
@@ -111,15 +114,14 @@ cuts += [cutter(a,b,lo,hi,BZ0-.1,BZ0+.3) for a,b,lo,hi in WB] + [cutter(BX0-.1,B
 boolean(entry, cuts)
 
 # ---------------- great room: back wall with the gable triangle (clerestories), right wall, solid core with shelf niches
-CL = [(GC-.9+i*.6) for i in range(4)]                                 # four square clerestories, high on the back gable
+CL = [(GC-.9+i*.6) for i in range(4)]                                 # four portrait clerestories on the back gable wall
+CLY = (5.5, 6.18)
 KWIN = (-1.0, .2, FL+1.12, FL+2.25)                                  # window over the sink
 back = prism('gr_back', [(GX0,.03),(CORE[0]+.01,.03),(CORE[0]+.01,YS),(GX1,YS),(GX1,U(GX1)),(GC,U(GC)),(GX0,U(GX0))], 'z', BZ0, IZ0, 'stucco')
-boolean(back, [cutter(KWIN[0],KWIN[1],KWIN[2],KWIN[3],BZ0-.1,IZ0+.1)] + [cutter(c-.225,c+.225,6.58,7.03,BZ0-.1,IZ0+.1) for c in CL])
+boolean(back, [cutter(KWIN[0],KWIN[1],KWIN[2],KWIN[3],BZ0-.1,IZ0+.1)] + [cutter(c-.2,c+.2,CLY[0],CLY[1],BZ0-.1,IZ0+.1) for c in CL])
 right = box('gr_right', IX1, BX1, .03, YS, CORE[3], BZ1, 'stucco')
-WR = [(-2.1,-.7, 4.7,5.95), (-2.1,-.7, FL+1.1,FL+2.3)]          # right side (z ranges), behind the tower
-boolean(right, [cutter(IX1-.1,BX1+.1,lo,hi,a,b) for a,b,lo,hi in WR])
 core = box('core', CORE[0], CORE[1], .03, YS, CORE[2], CORE[3], 'stucco')
-NICHE = [(3.55, 5.05, FL+.95, FL+1.35), (3.55, 5.05, FL+1.75, FL+2.15), (3.55, 5.05, FL+2.55, FL+2.95)]
+NICHE = [(3.35, 5.15, FL+.75+.45*i, FL+1.05+.45*i) for i in range(4)]   # four wide oak-lined niches
 WC = [(3.6,4.85, 4.7,5.95), (3.6,4.85, FL+1.1,FL+2.3)]
 WCS = [(-5.6,-4.3, 4.7,5.95), (-5.6,-4.3, FL+1.1,FL+2.3)]       # core's right side
 boolean(core, [cutter(a,b,lo,hi,CORE[3]-.32,CORE[3]+.1) for a,b,lo,hi in NICHE] + [cutter(a,b,lo,hi,BZ0-.1,BZ0+.3) for a,b,lo,hi in WC]
@@ -138,17 +140,20 @@ vault = prism('cut', [(IX0,YS-.3),(GX1-.2,YS-.3),(GX1-.2,U(GX1-.2)),(GC,U(GC)),(
 backcut = prism('cut', [(GX0,YS-.3),(GX1,YS-.3),(GX1,U(GX1)),(GC,U(GC)),(GX0,U(GX0))], 'z', Z0-.2, IZ0+.01, 'trim')   # the back wall supplies the gable triangle
 boolean(roof, [vault, backcut])
 # porch: dark lean-to roof across the entry block, on two slim brackets
-PZ0, PZE, PY0 = BZ1, BZ1+1.45, 4.35
-pk = .5; py1 = PY0 - (PZE-PZ0)*pk; pt = .16
-prism('porch_roof', [(PZ0, PY0), (PZE, py1), (PZE, py1+pt), (PZ0, PY0+pt*1.1)], 'x', BX0+.02, EX1+.2, 'roof')
-box('porch_fascia', BX0+.02, EX1+.2, py1-.04, py1+pt+.01, PZE, PZE+.03, 'fascia')
+PZ0, PZE, PY0 = BZ1, BZ1+1.5, 4.3
+PX0 = BX0-.8                                   # the porch roof runs on past the entry block toward the garage
+pk = .32; py1 = PY0 - (PZE-PZ0)*pk; pt = .16
+prism('porch_roof', [(PZ0, PY0), (PZE, py1), (PZE, py1+pt), (PZ0, PY0+pt*1.1)], 'x', PX0, EX1+.2, 'roof')
+box('porch_fascia', PX0, EX1+.2, py1-.04, py1+pt+.01, PZE, PZE+.03, 'fascia')
+box('porch_gutter', PX0, EX1+.2, py1-.06, py1+.08, PZE+.03, PZE+.16, 'fascia')
+box('porch_pipe', PX0+.06, PX0+.14, .05, py1, PZE+.04, PZE+.12, 'fascia')
 for bx in (BX0+.3, EX1-.1):
     prism('brk', [(PZ0, PY0-.9), (PZ0, PY0-.05), (PZE-.25, py1+.08), (PZE-.35, py1-.02)], 'x', bx-.035, bx+.035, 'fascia')
 # downpipes
 for x, y1 in ((BX0+.08, gy(BX0)+.1), (EX1-.1, YS)):
     box('pipe', x-.04, x+.04, .05, y1, BZ1+.02, BZ1+.1, 'fascia')
 # ---------------- dark board-clad tower at the right front corner, fence behind it
-TW = (BX1, BX1+1.0, .4, 3.0)
+TW = (BX1, BX1+1.6, .4, 3.0)
 box('tower', TW[0], TW[1], .03, YS, TW[2], TW[3], 'batten')
 box('tower_cap', TW[0]-.02, TW[1]+.06, YS, YS+.12, TW[2]-.06, TW[3]+.06, 'fascia')
 bm = bmesh.new(); x = BX1+.03
@@ -180,10 +185,9 @@ window('wg', 'z+', BZ1, *WG, False, mv=(.5,), mh=(.3,))
 for i,(a,b,lo,hi) in enumerate(WB): window('wb%d'%i, 'z-', BZ0, a,b,lo,hi, i < 2, mv=(.5,))
 for i,(a,b,lo,hi) in enumerate(WS): window('ws%d'%i, 'x-', BX0, a,b,lo,hi, False, mv=(.5,))
 for i,(a,b,lo,hi) in enumerate(WC): window('wc%d'%i, 'z-', BZ0, a,b,lo,hi, True, mv=(.5,))
-for i,(a,b,lo,hi) in enumerate(WR): window('wr%d'%i, 'x+', BX1, a,b,lo,hi, True, mv=(.5,), depth=.2)
 for i,(a,b,lo,hi) in enumerate(WCS): window('wcs%d'%i, 'x+', BX1, a,b,lo,hi, i == 1, mv=(.5,))
 window('wk', 'z-', BZ0, *KWIN, True, mv=(.5,), depth=.2)
-for i,c in enumerate(CL): window('cl%d'%i, 'z-', BZ0, c-.225, c+.225, 6.58, 7.03, False, depth=.2)
+for i,c in enumerate(CL): window('cl%d'%i, 'z-', BZ0, c-.2, c+.2, CLY[0], CLY[1], False, depth=.2)
 window('gw', 'x-', GXL, -1.4, .2, 1.2, 2.2, False, mv=(.5,), depth=.2)
 
 # tidy: every face gets the right material (great room inside painted, cut faces white, roof underside / edges)

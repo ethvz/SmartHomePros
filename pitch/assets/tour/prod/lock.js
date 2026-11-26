@@ -20,8 +20,8 @@ export default H => {
   const gapM = new THREE.MeshStandardMaterial({ color: 0x070707, roughness: .9 });
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xeeeeec, roughness: .5, sheen: .6, sheenRoughness: .5, sheenColor: 0xffffff, clearcoat: .15, clearcoatRoughness: .5,
     emissive: 0xf4f8f2, emissiveIntensity: .05 });
-  const rimM = new THREE.MeshPhysicalMaterial({ color: 0xa4a6a6, roughness: .5, sheen: .4, sheenColor: 0xffffff });
-  const keyS = splitMat(rimM, keyM, 'z', mm(1.33), 1e-6, 0xa4a6a6), btnS = splitMat(rimM, keyM, 'z', mm(.88), 1e-6, 0xa4a6a6);
+  const rimM = new THREE.MeshPhysicalMaterial({ color: 0x8a8c8c, roughness: .55 });
+  const keyS = splitMat(rimM, keyM, 'z', mm(1.33), 1e-6, 0x8a8c8c), btnS = splitMat(rimM, keyM, 'z', mm(.88), 1e-6, 0x8a8c8c);
   const plugM = new THREE.MeshPhysicalMaterial({ color: 0x18181a, roughness: .45, metalness: .2, envMapIntensity: .5 });
   const softA = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 2, 32, 32, 31);
     gr.addColorStop(0, '#fff'); gr.addColorStop(.45, '#aaa'); gr.addColorStop(1, '#000'); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
@@ -86,7 +86,7 @@ export default H => {
   add(ex, rslab(mm(70.6), mm(109.5), mm(11), mm(1.5), mm(1.0), powder), 0, 0, mm(1.5 + 5.5));      // flat escutcheon
 
   // Kwikset logo button (raised 1.0 mm, frosted white, in a 0.4 mm dark gap)
-  add(ex, rslab(mm(19.1), mm(10.3), mm(.2), mm(2.6), mm(.05), gapM), 0, mm(41.8), PF + mm(.02));
+  add(ex, rslab(mm(19.3), mm(10.5), mm(.2), mm(2.7), mm(.05), gapM), 0, mm(41.8), PF + mm(.02));
   const kb = add(ex, chamKey(mm(18.3), mm(9.5), mm(2.2), mm(.45), mm(1.0), mm(.45), mm(.1), btnS), 0, mm(41.8), PF);
   add(ex, conform(printPlane(mm(16), mm(7), (x, P) => { x.fillStyle = '#121212'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = 'italic 900 35px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, mm(.1))); x.scale(1.0, 1); x.fillText('Kwikset', 0, 0);
@@ -97,7 +97,7 @@ export default H => {
   const KW = mm(6.8), KH = mm(11.6), KR = mm(2.0);
   for (let r = 0; r < 2; r++) for (let c = 0; c < 5; c++) {
     const x = mm((c - 2) * 10.45), y = mm(r ? 11.9 : 27.2), digit = String((r * 5 + c + 1) % 10);
-    add(ex, rslab(KW + mm(.8), KH + mm(.8), mm(.2), KR + mm(.4), mm(.05), gapM), x, y, PF + mm(.02));
+    add(ex, rslab(KW + mm(1.0), KH + mm(1.0), mm(.2), KR + mm(.5), mm(.05), gapM), x, y, PF + mm(.02));
     const k = add(ex, chamKey(KW, KH, KR, mm(.85), mm(.9), mm(.5), mm(.15), keyS), x, y, PF);
     add(ex, conform(printPlane(mm(6), mm(7), (cx, P) => { cx.fillStyle = '#141414'; cx.textAlign = 'center'; cx.textBaseline = 'alphabetic';
       cx.font = '700 66px ' + FONT; cx.fillText(digit, ...P(0, mm(-2.3))); }), (px, py) => k.userData.zf(inset(px, py, KW, KH, KR))), x, y, PF);
@@ -128,9 +128,10 @@ export default H => {
     { const [px, py] = P(0, mm(-2.6)); x.beginPath(); x.arc(px, py, 27, 0, Math.PI * 2); x.fill(); }   // round hole
     R(.9, -6.6, 1.5, 1.4, .2); x.fill();                                // jog at the bottom of the slot
     R(-4.5, -3.0, .9, 2.4, .45); x.fill();                               // SmartKey re-key tool hole
-    x.strokeStyle = '#5a5a5a'; x.lineWidth = 2.5;                       // bright metal edges inside the slot and round hole
-    { const [px, py] = P(0, mm(-2.6)); x.beginPath(); x.arc(px, py, 27, Math.PI * .62, Math.PI * 2.38); x.stroke(); }
-    R(0, 1.6, 1.3, 2.8, .2); x.stroke(); R(0, -7.6, 1.3, 1.6, .2); x.stroke(); R(0, 4.2, 2.4, 2.4, .25); x.stroke(); }),
+    { const [px, py] = P(0, mm(-2.6)); x.fillStyle = '#3c3c3c'; x.beginPath();   // the pin: a grey crescent on the right inside the solid black hole
+      x.arc(px, py, 26, -Math.PI / 3, Math.PI / 3); x.arc(px + 4, py, 18, Math.PI / 3, -Math.PI / 3, true); x.closePath(); x.fill(); }
+    x.strokeStyle = '#2a2a2a'; x.lineWidth = 1; R(0, 1.6, 1.3, 2.8, .2); x.stroke(); R(0, -7.6, 1.3, 1.6, .2); x.stroke();
+    x.strokeStyle = '#5a5a5a'; x.lineWidth = 2.2; R(0, 4.2, 2.4, 2.4, .25); x.stroke(); }),
     0, ROSE_Y, mm(31.78));
   kw.material.roughness = 1; kw.material.envMapIntensity = 0;   // the keyway is a hole: no sheen on it
 
@@ -158,7 +159,7 @@ export default H => {
       x.font = 'italic 800 64px "Helvetica Neue", Helvetica, Arial, sans-serif'; x.save(); x.translate(...P(0, 0)); x.scale(1.05, 1); x.fillText('Kwikset', 0, 0); x.restore(); });
     logo.material.emissive = new THREE.Color(0xffffff); logo.material.emissiveIntensity = .35;   // printed white reads even on the dark door at night
     add(inn, conform(logo, px => crownX(px)), 0, mm(46.0), CZ + HZ); }
-  for (const sx of [-1, 1]) add(inn, rslab(mm(5.0), mm(145.5), mm(.9), mm(.6), mm(.4), glossM), sx * mm(31.6), CY, mm(21.6));   // side rails with bright eased edges
+  for (const sx of [-1, 1]) add(inn, rslab(mm(5.0), mm(145.5), mm(.9), mm(.6), mm(.44), glossM), sx * mm(31.6), CY, mm(21.6));   // side rails with bright eased edges
   // matte lower panel (a touch prouder than the cover), hairline seam under the cover
   const panTop = mm(39.2), panBot = mm(-27.0), PZ = mm(24.2);
   add(inn, rslab(mm(57.8), panTop - panBot, mm(3.4), mm(1.2), mm(.9), powder), 0, (panTop + panBot) / 2, PZ - mm(1.7));

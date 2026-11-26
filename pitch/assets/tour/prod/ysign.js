@@ -105,7 +105,7 @@ export default H => { const { THREE, G, add, rbox } = H;
   /* post (buried 60 mm) and cap */
   const postM = new THREE.MeshPhysicalMaterial({ color: 0xedede9, roughness: .6, clearcoat: .1, clearcoatRoughness: .6 });
   add(S, rbox(19, 805.5, 19, 1, postM), 0, (745.5 - 60) / 2, 0);
-  const capM = new THREE.MeshPhysicalMaterial({ color: 0x040405, roughness: .4, clearcoat: .2, clearcoatRoughness: .3, envMapIntensity: .45 });
+  const capM = new THREE.MeshPhysicalMaterial({ color: 0x060708, roughness: .3, clearcoat: .2, clearcoatRoughness: .3, envMapIntensity: .8 });
   add(S, rbox(22.5, 32, 22.5, 1.0, capM), 0, 744 + 16, 0); add(S, rbox(23.2, 1.6, 23.2, .6, capM), 0, 744 + .8, 0);   // cap with its flared bottom lip
   const grime = plane(19, 90, 6, (x) => { const gr = x.createLinearGradient(0, 0, 0, 540); gr.addColorStop(0, 'rgba(120,120,115,.22)'); gr.addColorStop(1, 'rgba(120,120,115,0)');
     x.fillStyle = gr; x.fillRect(0, 0, 114, 540); for (let i = 0; i < 9; i++) { x.fillStyle = 'rgba(110,110,105,.12)'; x.fillRect(10 + i * 11 % 90, 20 + i * 37 % 200, 3 + i % 3, 18 + i * 7 % 30); } }, { r: .6 });
@@ -153,6 +153,7 @@ export default H => { const { THREE, G, add, rbox } = H;
   const face = new THREE.MeshPhysicalMaterial({ map: art, color: 0xb0b0b0, roughness: .42, envMapIntensity: .3, specularIntensity: .45, clearcoat: .1, clearcoatRoughness: .4, toneMapped: false, bumpMap: peel, bumpScale: .25 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
   for (const y of [131, -133]) add(S, new THREE.Mesh(new THREE.CircleGeometry(2.3, 24), new THREE.MeshStandardMaterial({ color: 0x2f3a33, roughness: .9 })), 0, yC + y, 9.52);   // shadowed post behind the holes
+  for (const y of [131, -133]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(1.98, 1.98, 1.02, 24, 1, true), new THREE.MeshStandardMaterial({ color: 0x20262a, roughness: .8, side: THREE.DoubleSide })); w.rotation.x = Math.PI / 2; add(S, w, 0, yC + y, zB + .5); }   // dark punched hole walls
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
   return g;
 };

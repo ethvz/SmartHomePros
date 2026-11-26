@@ -11,7 +11,7 @@ export default H => {
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
   const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.05, specularIntensity:1, envMapIntensity:1.2, clearcoat:1, clearcoatRoughness:.02});
-  const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.18, metalness:0, clearcoat:.3, clearcoatRoughness:.2, specularIntensity:.6, envMapIntensity:.7});
+  const satinK = new THREE.MeshPhysicalMaterial({color:0x0e0e0f, roughness:.5, metalness:0, specularIntensity:.4, envMapIntensity:.15, side:THREE.DoubleSide});   // satin ring: rougher / duller than the glass
   const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:3, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
 
@@ -26,10 +26,15 @@ export default H => {
     const cad = add(g, G());
     for(const p of OCPM.parts){
       const k = OCPM.parts.indexOf(p);
-      if(k === 0 || p.g === 2) continue;                     // inner chassis (its tab pokes out below) and the CAD collar (replaced below)
+      if(k === 0 || k === 1 || p.g === 2) continue;          // inner chassis (its tab pokes out below), the wall-plate clip (stands proud at the top) and the CAD collar (replaced below)
       const geo = new THREE.BufferGeometry();
       const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
+      if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front
+        let x = pos[3*i], y = pos[3*i+1], z = pos[3*i+2];
+        if(z < .0128){ x = Math.max(-.0353, Math.min(.0353, x)); y = Math.max(-.0495, Math.min(.0456, y)); }   // the CAD's wider back flange pulled in to the front shell's outline
+        if(y > .036 && z > .021 && z < .04){ const dy = y - .036, dz = z - .021, L = Math.hypot(dy, dz); if(L > .010){ y = .036 + dy*.010/L; z = .021 + dz*.010/L; } }   // top-front corner R10
+        pos[3*i] = x; pos[3*i+1] = y; pos[3*i+2] = z; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
       let I = p.i32 ? new Uint32Array(OCPM.buf, p.i, p.ni) : new Uint16Array(OCPM.buf, p.i, p.ni);
@@ -46,36 +51,36 @@ export default H => {
     add(M, H.rslab(77, 99, 29, 10, 4, mountW), 0, 0, 14.5);
     add(M, H.rslab(71, 42, 1, 7, .4, grilleMat(0xc4c6c8,[60,36])), 0, -28, 29.1);
   }
-  // wall-plate layer (z 0 -> 7): a rim with exactly the shell's outline at z = 7 (76.2 x 96.3, R10), so plate and shell are flush
-  // with only the hairline parting line; open toward the wall (the back cavity below)
-  { const s = rrShape(76.2, 96.3, 10); s.holes.push(rrShape(70.2, 90.3, 7));
-    const wp = add(M, ext(s, 6.85, .35, mountW), 0, -1.55, 0); g.userData.wallPlate = wp; }
+  // wall-plate layer (z 0 -> 7): a rim with exactly the front shell's outline (71 x 95.5, R10), so plate and shell are one flush
+  // surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
+  { const s = rrShape(70.6, 95.1, 10); s.holes.push(rrShape(64.6, 89.1, 7));
+    const wp = add(M, ext(s, 6.85, .35, mountW), 0, -1.95, 0); g.userData.wallPlate = wp; }
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
-  { const s = H.rr4(76.2, 48, [0, 0, 10, 10], 0, -25.7); s.holes.push(H.rr4(73.8, 46.6, [0, 0, 8.8, 8.8], 0, -25.6));
+  { const s = H.rr4(70.6, 48, [0, 0, 10, 10], 0, -25.5); s.holes.push(H.rr4(68.2, 46.6, [0, 0, 8.8, 8.8], 0, -25.4));
     add(M, ext(s, 9.3, .3, mountW), 0, 0, 7.05); }
   // back of the mount (open toward the wall, ocp_back_1 / detail_back): floor 15 mm in, thin centre plate (face 6 mm off the wall),
   // four tall U-shaped screw towers with real keyholes, channel walls, the brass insert tube standing 4 mm proud, cable slot
   { const inner = new THREE.MeshPhysicalMaterial({color:0xd6d7d8, roughness:.6, side:THREE.DoubleSide});
     const dark = mat(0x2e3032, {r:.85});
-    add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 15.5);                      // cavity floor
+    add(M, H.rslab(66, 90, 1, 7, .3, inner), 0, -1.75, 15.5);                      // cavity floor
     const plateM = new THREE.MeshPhysicalMaterial({color:0xe7e8e9, roughness:.55, side:THREE.DoubleSide});
     add(M, H.rslab(42, 58, 2, 3, .5, plateM), 0, 11, 7);                               // centre plate, face at z = 6
     add(M, H.rslab(38, 54, 9, 3, .5, inner), 0, 11, 11.5);                             // its supports down to the floor
     const keyhole = (cx, cy) => { const p = new THREE.Path(), a0 = Math.atan2(-1.561, 1.25);
       p.moveTo(cx + 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - .061); p.absarc(cx, cy + 1.5, 2, a0, Math.PI - a0, false); p.lineTo(cx - 1.25, cy - 3.6); p.lineTo(cx + 1.25, cy - 3.6); return p; };
-    for(const [bx, by] of [[-27, 30], [27, 26], [-27, -5], [27, -9]]){
-      const sg = Math.sign(bx), sh = H.rr4(13, 11.5, sg < 0 ? [5.75, 0, 0, 5.75] : [0, 5.75, 5.75, 0], bx + sg*2.5, by);
+    for(const [bx, by] of [[-25, 30], [25, 26], [-25, -5], [25, -9]]){
+      const sg = Math.sign(bx), sh = H.rr4(12, 11.5, sg < 0 ? [5.75, 0, 0, 5.75] : [0, 5.75, 5.75, 0], bx + sg*2, by);
       sh.holes.push(keyhole(bx, by));
       add(M, ext(sh, 13.2, .5, inner), 0, 0, 2);                                      // tower: z 2 -> 15.2, walls run out to the rim
       add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2, 2, .2, 20), dark)), bx, by + 1.5, 9); }
-    for(const rx of [-21.5, -16.5, 16.5, 21.5]) add(M, H.rslab(1.8, 58, 12, .8, .4, inner), rx, 10, 9.3);   // channel walls
+    for(const rx of [-22.5, 22.5]) add(M, H.rslab(1.8, 58, 12, .8, .4, inner), rx, 10, 9.3);   // channel walls
     const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.28, metalness:.9});
     const tube = new THREE.LatheGeometry([[2,0],[2,3.5],[2.4,4],[3.6,4],[4,3.6],[4,0]].map(([r,y]) => new THREE.Vector2(r, y)), 48);
     { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 6); t.rotation.x = -Math.PI/2; }   // brass tube OD 8 / ID 4, 4 mm proud of the plate
     add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2, 2, .1, 24), dark)), 0, 6, 4.5);
     { const sl = add(M, H.rslab(3.5, 9, .2, 1.75, .05, dark), -6, -6, 5.9); sl.rotation.z = Math.PI/2; } }
   // microphone pinhole on the +x side, just above the grille, near the 7 mm seam
-  { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.12, -3, 13); ph.rotation.z = Math.PI/2; }
+  { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 35.52, -3, 13); ph.rotation.z = Math.PI/2; }
 
   // ---------------------------------------------------------------- dimpled locking collar (white, golf-ball dimples, real step at the root)
   {

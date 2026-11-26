@@ -33,7 +33,7 @@ try:   # Metal GPU when available (minutes instead of tens of minutes)
 except Exception as e: print('gpu', e)
 print('device', cy.device); cy.samples = SAMPLES; cy.use_denoising = False
 cy.max_bounces = 4; cy.diffuse_bounces = 3; cy.glossy_bounces = 1; cy.transmission_bounces = 2
-sc.render.bake.margin = 3; sc.render.bake.use_clear = True
+sc.render.bake.margin = 6; sc.render.bake.use_clear = True
 lm = bpy.data.images.new('lm', SIZE, SIZE, float_buffer=True, alpha=False)
 ls = bpy.data.images.new('ls', 2048, 2048, float_buffer=True, alpha=False)
 targets = [o for o in sc.objects if o.type=='MESH' and o not in shell and len(o.data.uv_layers) >= 2 and o.name.startswith('bk_')]
@@ -56,7 +56,7 @@ bpy.ops.object.select_all(action='DESELECT')
 for o in targets + stargets: o.select_set(True)
 bpy.context.view_layer.objects.active = targets[0]
 t0 = time.time()
-bpy.ops.object.bake(type='DIFFUSE', pass_filter={'DIRECT','INDIRECT'}, use_clear=True, margin=3)
+bpy.ops.object.bake(type='DIFFUSE', pass_filter={'DIRECT','INDIRECT'}, use_clear=True, margin=6)
 print('bake s', round(time.time()-t0))
 lm.filepath_raw = os.path.join(W, 'bake/lm_all.exr'); lm.file_format = 'OPEN_EXR'; lm.save()
 ls.filepath_raw = os.path.join(W, 'bake/shell_all.exr'); ls.file_format = 'OPEN_EXR'; ls.save()

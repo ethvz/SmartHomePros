@@ -11,9 +11,16 @@ bpy.ops.object.select_all(action='DESELECT')
 for o in objs: o.select_set(True)
 C.view_layer.objects.active = objs[0]
 bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
-bpy.ops.uv.smart_project(angle_limit=1.15, island_margin=.004, area_weight=0.0, correct_aspect=True, scale_to_bounds=False)
+bpy.ops.uv.smart_project(angle_limit=1.15, island_margin=.01, area_weight=0.0, correct_aspect=True, scale_to_bounds=False)
 bpy.ops.object.mode_set(mode='OBJECT')
 for o in objs: o.data.uv_layers.active = o.data.uv_layers['UVMap']   # UVMap stays TEXCOORD_0
+# one object (one draw call per material in the app): glass first gets an LM layer too so the join keeps both UV sets
+for o in SC.objects:
+    if o.type=='MESH' and 'LM' not in o.data.uv_layers: o.data.uv_layers.new(name='LM')
+bpy.ops.object.select_all(action='DESELECT')
+ms = [o for o in SC.objects if o.type=='MESH']
+for o in ms: o.select_set(True)
+C.view_layer.objects.active = ms[0]; bpy.ops.object.join(); ms[0].name = 'house'
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(W, 'shell_lm.blend'))
 bpy.ops.export_scene.gltf(filepath=os.path.join(W, 'house.glb'), export_format='GLB', export_materials='EXPORT', export_cameras=False, export_lights=False, export_image_format='NONE', export_texcoords=True, export_normals=True, export_apply=True)
 print('ok')

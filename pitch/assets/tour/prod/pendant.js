@@ -109,7 +109,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 4.5, st = 8, out = [];
     const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);
     for (const u of T) { const t = u * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
-    for (const u of T) { const t = u * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
+    for (const u of T) { const t = u * Math.PI / 2, d = rf * Math.pow(1 - Math.cos(t), 1.4); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }   // G2-ish blend into the face
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
   const dishP = [[-2.7, D - 4.1], [-2.7, D - 3.5], [-1.9, D - 2.45], [-1.0, D - 1.25], [-.3, D - .4], [-.08, D - .15], [.15, D - .03], [.4, D]];   // crisp ~53-degree cone, 3.5 mm deep, 0.4 mm rim fillet
@@ -121,8 +121,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
   const btnM = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .6, clearcoat: .05 });
-  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 4.2);
-  add(B, new THREE.Mesh(new THREE.RingGeometry(5.98, 6.32, 96), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .9 })), 0, -6.5, D - 4.05);
+  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.05, .68], [.1, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 4.2);
+  add(B, new THREE.Mesh(new THREE.RingGeometry(6.0, 6.22, 96), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .9 })), 0, -6.5, D - 4.05);
 
   /* 3. pry notch on the back-cover seam, bottom centre */
   const notch = plane(7, 1.6, 60, (x, Pp) => { const [a, b] = Pp(-3, .5), [c, d] = Pp(3, -.5), gr = x.createLinearGradient(0, b, 0, d);
@@ -132,8 +132,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* 7. debossed "vivint" on the cap (tone on tone) */
   const logo = plane(30, 10, 40, () => {});
   logo.material.roughness = .55; add(B, logo, 0, 11.4, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 24 * 40, 4,
-    'rgba(30,30,30,.6)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 20.5 * 40, 4,
+    'rgba(30,30,30,.85)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
 
   if ((/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search))) return g;   // product-photo studio views: the pendant alone
   /* hook on the wall */

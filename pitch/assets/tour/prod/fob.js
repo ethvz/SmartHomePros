@@ -106,8 +106,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   if (!bare) { F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001; }
 
   /* 1-3. shell */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0x7a7a78, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
-  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x28292b, rB: .5, w: .4, col: 0x141414, k: 1 }, { ax: 'y', at: -11.15, w: .35, col: 0xf4f4f2, k: .6 },
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0x727270, roughness: .55, envMapIntensity: .5 });
+  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x28292b, rB: .6, w: 0 }, { ax: 'y', at: -10.9, w: .4, col: 0x1e1e1f, k: 1 }, { ax: 'y', at: -11.2, w: .2, col: 0xf4f4f2, k: .2 },
     { ax: 'z', at: 3, w: .25, col: 0x303132, k: .6 }]);
   const pocketP = []; pocketP.push([0, 9.6], [0, 10.5]); for (let i = 1; i <= 6; i++) { const t = i / 6 * Math.PI / 2; pocketP.push([.5 * (1 - Math.cos(t)), 10.5 + .5 * Math.sin(t)]); }
   const keysY = [20.1, 10.2, .2];
@@ -119,11 +119,11 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* 4-6. keys (recessed 0.3 mm), legends, red dots */
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0x252628, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
-  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#8e8f90';
+  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#626365';
     x.font = '300 140px "Helvetica Neue", Helvetica, Arial, sans-serif';
     const fit = (s, x0, x1, y) => { const m = x.measureText(s).width, [a, b] = Pp(x0, y), [c] = Pp(x1, y); x.save(); x.translate(a, b); x.scale((c - a) / m, 1); x.fillText(s, 0, 4); x.restore(); };
     fit('DISARM', -5.6, 5.5, 20.1 - 10.2); fit('STAY', -3.9, 3.0, 0); fit('AWAY', -4.6, 3.6, .2 - 10.2);
-    x.fillStyle = '#6e1416'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .7 });
+    x.fillStyle = '#6e1416'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .8, x: { envMapIntensity: .3 } });
   add(F, leg, 0, 10.2, D - .3 + .02);
 
   /* 7. debossed logo on the grey end */

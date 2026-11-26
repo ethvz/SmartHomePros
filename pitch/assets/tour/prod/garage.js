@@ -37,9 +37,9 @@ export default H => {
   const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9a9e9e, roughness: .15, transmission: .85, thickness: mm(2.5), ior: 1.45, clearcoat: .6, clearcoatRoughness: .1 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xf4f6f6, roughness: .02, transmission: .97, thickness: mm(2.5), ior: 1.49, clearcoat: .6, clearcoatRoughness: .1 });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x6a6a64, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe6c65a, roughness: .35, emissive: 0xffe08a, emissiveIntensity: .25, clearcoat: .6 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe6c65a, roughness: .35, emissive: 0xffe08a, emissiveIntensity: .45, clearcoat: .6 });
   const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xe8e6dc, roughness: .5 });
   const btnM = white.clone(), outlineM = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
@@ -62,16 +62,22 @@ export default H => {
   const FK = 16;
   for (let k = 1; k <= FK; k++) { const s = k / FK, e = s; rings.push(outer.map(([ox, oy], i) => { const x = ox + (inner[i][0] - ox) * e, y = oy + (inner[i][1] - oy) * e; return [mm(x), mm(y), mm(dome(x, y))]; })); }
   // light well: a shallow soft dish (1.5 mm), then a sharp rounded-square hole 25 x 25 (r 6) with near-vertical walls down to the floor
-  const HW = 25, HR = 6, ZF = ZE - 6;
+  const HW = 25, HR = 6, ZF = ZE - 8, DD = 2.2;
   const inHole = (x, y) => { const qx = Math.abs(x - PC[0]) - (HW / 2 - HR), qy = Math.abs(y - PC[1]) - (HW / 2 - HR); return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - HR; };
   const hole = inner.map(([ix, iy]) => { const dx = ix - PC[0], dy = iy - PC[1]; let lo = 0, hi = 1; for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; inHole(PC[0] + dx * m, PC[1] + dy * m) < 0 ? lo = m : hi = m; } return [PC[0] + dx * lo, PC[1] + dy * lo]; });
   const top = inner.map(([x, y]) => dome(x, y));
-  for (let k = 1; k <= 8; k++) { const t = k / 8, dep = 1.5 * (1 - Math.cos(t * Math.PI / 2)) ** .9;   // dish: tangent to the face, steepening toward the hole
+  for (let k = 1; k <= 8; k++) { const t = k / 8, dep = DD * (1 - Math.cos(t * Math.PI / 2)) ** .9;   // dish: tangent to the face, steepening toward the hole
     rings.push(inner.map(([x, y], i) => [mm(x + (hole[i][0] - x) * t), mm(y + (hole[i][1] - y) * t), mm(top[i] - dep)])); }
-  for (const [s2, dz] of [[.996, .12], [.992, .3], [.99, 2.5], [.99, 5.5], [.985, 5.85], [.97, 6]])   // crisp edge, vertical wall, small floor round
-    rings.push(hole.map(([x, y], i) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(Math.max(ZF, top[i] - 1.5 - dz))]));
+  const nBody = rings.length;                                                                // rings so far: shell, face and dish (up to the hole edge)
+  for (const [s2, dz] of [[.996, .12], [.992, .3], [.99, 3], [.99, 6.6], [.985, 7.0], [.97, 7.4]])   // crisp edge, vertical wall, small floor round
+    rings.push(hole.map(([x, y], i) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(Math.max(ZF, top[i] - DD - dz))]));
   for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
-  add(g, ringMesh(rings, bodyM, true, true));
+  add(g, ringMesh(rings.slice(0, nBody), bodyM, false, true));
+  { // hole walls and floor: same white plastic, darkened toward the floor (baked ambient occlusion) like the shadowed well in the photos
+    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .45, vertexColors: true }), true, false);
+    const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
+    for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), f = .2 + .8 * t ** 2.2; col.push(f, f, f * .99); }
+    wm.geometry.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); add(g, wm); }
 
   /* ---------- LED board, 12 separate SMD packages, clear lens ---------- */
   const lc = [0, mm(PC[1])], faceC = dome(0, PC[1]);
@@ -79,7 +85,7 @@ export default H => {
   for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const x = mm((c - 1.5) * 3.9), y = lc[1] + mm((1 - r) * 4.6);
     add(g, H.rslab(mm(3.0), mm(3.4), mm(.5), mm(.25), mm(.1), ledFrameM), x, y, mm(ZF + .85));
     add(g, H.rslab(mm(2.2), mm(2.6), mm(.2), mm(.2), mm(.05), ledM), x, y, mm(ZF + 1.06)); }
-  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.3), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(faceC - 2.5 - 1.25)); }
+  { const lens = H.rslab(mm(24), mm(24), mm(2.5), mm(5.5), mm(.3), lensM); lens.castShadow = false; add(g, lens, lc[0], lc[1], mm(faceC - 4 - 1.25)); }
 
   /* ---------- printing (conformed to the dome) ---------- */
   const printAt = (cx, cy, w, h, draw) => add(g, conform(printPlane(mm(w), mm(h), draw), (px, py) => mm(dome(cx + px * 1000, cy + py * 1000))), mm(cx), mm(cy), 0);

@@ -40,18 +40,19 @@ export default H => {
   const white = new THREE.MeshPhysicalMaterial({ color: 0xeeeeed, roughness: .45, clearcoat: .1, clearcoatRoughness: .5 });
   const body = splitMat(grey, white, 'z', mm(10.5), mm(.2), 0x8e8e8c);
   const faceM = white.clone();
-  const keyM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f3, roughness: .4, sheen: .3, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
+  const keyM = new THREE.MeshPhysicalMaterial({ color: 0xefefee, roughness: .3, clearcoat: .25, sheen: 0, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
   const hair = new THREE.MeshStandardMaterial({ color: 0x7a7a7a, roughness: .7 }), hairL = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7 });
-  const ringM = new THREE.MeshStandardMaterial({ color: 0x161617, emissive: 0x363738, roughness: .9, envMapIntensity: .15, side: THREE.DoubleSide });   // translucent grey ring: an even tone from every angle
+  const ringM = new THREE.MeshStandardMaterial({ color: 0x161617, emissive: 0x56585a, roughness: .9, envMapIntensity: .15, side: THREE.DoubleSide });   // translucent grey ring: an even tone from every angle
   const lensM = new THREE.MeshPhysicalMaterial({ color: 0x6a6c6e, roughness: .6 });
-  const lightM = new THREE.MeshPhysicalMaterial({ color: 0xc4c6c3, roughness: .7, emissive: 0x83f4b8, emissiveIntensity: 0 });
+  const lightM = new THREE.MeshPhysicalMaterial({ color: 0xd2d4d1, roughness: .7, emissive: 0x83f4b8, emissiveIntensity: 0 });
   const holeM = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .9 });
 
   /* ---------- body ---------- */
   const W = 80.0, Hh = 150.1, FZ = mm(16.0), rings = [];
   const ring = (d, r, z) => rrPts(mm(W - 2 * d), mm(Hh - 2 * d), mm(r)).map(([x, y]) => [x, y, mm(z)]);
   for (let i = 0; i <= 5; i++) { const a = i / 5 * Math.PI / 2; const d = 1.5 * (1 - Math.sin(a)); rings.push(ring(d, 14.3 - d, 1.5 * (1 - Math.cos(a)))); }
-  for (let i = 1; i <= 10; i++) { const t = i / 10, d = 2.1 * t; rings.push(ring(d, 14.3 - 2.1 * t, 1.5 + 9.0 * t)); }
+  for (let i = 1; i <= 6; i++) { const t = i / 6, d = .3 * t; rings.push(ring(d, 14.3 - d, 1.5 + 6.5 * t)); }          // grey sides, nearly vertical
+  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = .3 + 1.8 * (1 - Math.cos(a)); rings.push(ring(d, 14.3 - d, 8 + 2.5 * Math.sin(a))); }   // convex grey shoulder turning to face forward at the split
   rings.push(ring(2.1, 12.2, 11.8), ring(2.1, 12.2, 13.0));
   for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 2.1 + 3 * (1 - Math.cos(a)); rings.push(ring(d, 12.2 - 3 * (1 - Math.cos(a)), 13.0 + 3 * Math.sin(a))); }
   add(g, ringMesh(rings, body, false, true));
@@ -65,8 +66,8 @@ export default H => {
   const keyAt = (x, y, w, h, r, label, font, dy = 0) => {
     const ol = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(rrPts(mm(w + .7), mm(h + .7), mm(r + .35)).map(([a, b]) => new THREE.Vector2(a, b)))), hair);
     add(g, ol, mm(x), mm(y), FZ + mm(.03));
-    const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.5), mm(.5), mm(.6), keyM), mm(x), mm(y), FZ);
-    if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#4d4d4d'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.5), mm(.5), mm(1.0), keyM), mm(x), mm(y), FZ);
+    if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#262626'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
       c.font = font; c.fillText(label, ...P(0, mm(dy))); }), (px, py) => k.userData.zf(inset(px + 0, py, mm(w), mm(h), mm(r)))), mm(x), mm(y), FZ);
     return k; };
   keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '400 44px ' + FONT, -1.65);
@@ -76,7 +77,7 @@ export default H => {
   keyAt(CX[0], RY[3], D, D, D / 2, 'Clear', '400 44px ' + FONT, -1.5);
   keyAt(CX[1], RY[3], D, D, D / 2, '0', '400 64px ' + FONT, -2.25);
   { // tactile dot above the 5
-    const zf = (D / 2 - 3.0); const kz = (mm(.5) + mm(.6) * (1 - (1 - Math.min(1, (mm(zf) - mm(.5)) / (mm(D / 2) - mm(.5)))) ** 2));
+    const zf = (D / 2 - 3.0); const kz = (mm(.5) + mm(1.0) * (1 - (1 - Math.min(1, (mm(zf) - mm(.5)) / (mm(D / 2) - mm(.5)))) ** 2));
     const dot = new THREE.Mesh(new THREE.SphereGeometry(mm(.4), 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), keyM); dot.rotation.x = Math.PI / 2; dot.scale.set(1, .75, 1);
     add(g, dot, mm(CX[1]), mm(RY[1] + 3.0), FZ + kz - mm(.02)); }
   // motion lens, flush (0.2 mm proud), frosted grey
@@ -93,7 +94,7 @@ export default H => {
     (c, P) => { const [x, y] = P(0, 0); c.beginPath(); c.moveTo(x, y + 23);                                                // flame with inner flame
       c.bezierCurveTo(x - 22, y + 22, x - 20, y - 2, x - 6, y - 23); c.bezierCurveTo(x - 4, y - 10, x + 4, y - 9, x + 8, y - 16); c.bezierCurveTo(x + 22, y - 1, x + 21, y + 22, x, y + 23); c.stroke();
       c.beginPath(); c.moveTo(x, y + 21); c.bezierCurveTo(x - 9, y + 20, x - 8, y + 8, x - 1, y + 1); c.bezierCurveTo(x + 1, y + 7, x + 6, y + 8, x + 6, y + 12); c.bezierCurveTo(x + 8, y + 17, x + 5, y + 21, x, y + 21); c.stroke(); }];
-  const dish = r => -.6 - .4 * (1 - Math.min(1, (r / 5.7)) ** 2);
+  const dish = r => -.6 - .6 * (1 - Math.min(1, (r / 5.7)) ** 2);
   EX.forEach((x, i) => {
     add(g, lathe([[ER, .02], [ER - .15, -.04], [6.05, -.6], [6.0, -.72]], ringM), mm(x), mm(EY), FZ);              // matte grey conical bezel, meets the button
     const prof = [[6.0, -.72], [5.92, -.63], [5.75, -.6]]; for (let k = 1; k <= 10; k++) { const r = 5.7 * (1 - k / 10); prof.push([r, dish(r)]); }
@@ -103,15 +104,15 @@ export default H => {
   });
 
   /* ---------- printing on the face ---------- */
-  add(g, printPlane(mm(20), mm(6), (c, P) => { c.fillStyle = '#8a8a8a'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  add(g, printPlane(mm(20), mm(6), (c, P) => { c.fillStyle = '#6a6a6a'; c.textAlign = 'center'; c.textBaseline = 'middle';
     c.font = '700 40px ' + FONT; const w = c.measureText('vivint').width; c.save(); c.translate(...P(0, 0)); c.scale(125 / w, 125 / w * .95); c.fillText('vivint', 0, 0); c.restore(); }),
     0, mm(-67.6), FZ + mm(.03));
 
   /* ---------- downcast light (bottom face) and buzzer holes (right side) ---------- */
   { const sh = new THREE.Shape(rrPts(mm(40), mm(2), mm(1)).map(([a, b]) => new THREE.Vector2(a, b)));
     const geo = new THREE.ExtrudeGeometry(sh, { depth: mm(.2), bevelEnabled: false });
-    const m = new THREE.Mesh(geo, lightM); m.rotation.x = Math.PI / 2 - .23; add(g, m, 0, mm(-74.23 + .05 + .2), mm(5)); }
-  for (let k = -1; k <= 1; k++) { const h = new THREE.Mesh(new THREE.CylinderGeometry(mm(.5), mm(.5), mm(.6), 20), holeM); h.scale.set(1.6, 1, 1); h.rotation.z = Math.PI / 2; h.rotation.y = -.23;
-    add(g, h, mm(39.18 - .25), mm(-3 + k * 2.8), mm(5)); }
+    const m = new THREE.Mesh(geo, lightM); m.rotation.x = Math.PI / 2 - .046; add(g, m, 0, mm(-74.89 - .02 + .2), mm(5)); }   // on the underside surface (inset 0.16 mm at z 5), 0.02 mm proud
+  for (let k = -1; k <= 1; k++) { const h = new THREE.Mesh(new THREE.CylinderGeometry(mm(.5), mm(.5), mm(.6), 20), holeM); h.scale.set(1.6, 1, 1); h.rotation.z = Math.PI / 2; h.rotation.y = -.046;
+    add(g, h, mm(39.84 - .25), mm(-3 + k * 2.8), mm(5)); }
   return g;
 };

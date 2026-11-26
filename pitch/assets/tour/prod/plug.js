@@ -103,7 +103,7 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   const g = G(), Q = new URLSearchParams(location.search), bare = (/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search)), nocord = bare || Q.has('nocord');
   const P = G(); P.scale.setScalar(.001); P.position.y = .006; g.add(P);                  // body sits a little above the plate centre (upper receptacle)
   const W = 96, HH = 53, D = 38, R = 6, crown = .6;
-  const white = new THREE.MeshPhysicalMaterial({ color: 0xe9e8e6, roughness: .45, clearcoat: .06, clearcoatRoughness: .5 });
+  const white = new THREE.MeshPhysicalMaterial({ color: 0xe9e8e6, roughness: .5, clearcoat: .04, clearcoatRoughness: .5, envMapIntensity: .6 });
 
   /* 1-2. housing + collar: one shell, hairline at x = +36 */
   const hx = W / 2 - R, hy = HH / 2 - R;
@@ -121,8 +121,12 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
     const bx = x + nx * w, by = y + ny * w;
     for (let j = 1; j <= 16; j++) { const f = 1 - .97 * Math.pow(j / 16, .8); out.push([bx * f, by * f, D + crown * (1 - f * f)]); }
     return out; };
-  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .45, col: 0x7d7d7b, k: 1 }, { ax: 'x', at: 36.4, w: .4, col: 0xffffff, k: .5 }]);
-  add(P, solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat));
+  const shellMat = lineMat(white, [{ ax: 'x', at: 36, w: .45, col: 0x7d7d7b, k: 1, mask: 'vOP.z < 37.2' }, { ax: 'x', at: 36.4, w: .4, col: 0xffffff, k: .5, mask: 'vOP.z < 37.2' }]);
+  { const sh = solid([{ type: 'outer', pts: pts(rr4(W, HH, [4.5, 6, 6, 4.5]), 1100), prof: shellProf, fan: [0, 0, D + crown] }], shellMat);
+    // the 12 mm outlet-end collar: its front is one big elliptical round (12 mm along x, 8 mm deep) starting at the x = +36 seam
+    const pa = sh.geometry.attributes.position, Zc = x => D + crown - 8 + 8 * Math.sqrt(Math.max(0, 1 - ((x - 36) / 12.2) ** 2));
+    for (let i = 0; i < pa.count; i++) { const x = pa.getX(i); if (x > 36) { const z = pa.getZ(i), c = Zc(x); if (z > c) pa.setZ(i, c - .0 + (z - c) * 0); } }
+    sh.geometry.computeVertexNormals(); add(P, sh); }
   const zTop = D + crown;
 
   /* 4. flush button: hairline ring only.  5. LED glowing through the shell */
@@ -149,23 +153,23 @@ export default H => { const { THREE, G, add, rslab, rrShape, rr4 } = H;
   /* 3. receptacle faceplate on the +x end: raised 3 mm, chamfered rim, NEMA 5-15R rotated (slots horizontal, ground toward the wall) */
   { const pp = [[0, 0], [0, 9.7], [.1, 9.85], [1.1, 10.85], [1.2, 11]];   // 1.2 mm 45-degree chamfer                // embedded 8 mm, proud 3 mm
     const slotProf = [[0, 4.5], [0, 10.6], [.15, 10.85], [.3, 11]];
-    const U = []; { const r = 3.4, u0 = 5.6, u1 = 9.2; U.push(new THREE.Vector2(u0, -r));
+    const U = []; { const r = 3.4, u0 = 4.5, u1 = 8.1; U.push(new THREE.Vector2(u0, -r));
       for (let i = 0; i <= 24; i++) { const t = -Math.PI / 2 + i / 24 * Math.PI; U.push(new THREE.Vector2(u1 + r * Math.cos(t), r * Math.sin(t))); }
       U.push(new THREE.Vector2(u0, r)); }
     const dense = a => { const s = new THREE.Shape(a); return pts(s, 90); };
-    const deep = (k, K, v) => .08 + .55 * sm(5.2, 10.7, v[2]) + .37 * sm(10.6, 11, v[2]);
-    const loops = [{ type: 'outer', pts: pts(rrShape(35, 27, .8), 160), prof: uni(pp) },
-      { type: 'pocket', pts: offs(pts(rrShape(8.5, 3.4, .4), 80), -7.5, 6.35), prof: uni(slotProf), col: deep },
-      { type: 'pocket', pts: offs(pts(rrShape(9, 3.4, .4), 80), -7.5, -6.35), prof: uni(slotProf), col: deep },
+    const deep = (k, K, v) => v[2] > 10.95 ? 1 : .08 + .4 * sm(5.2, 10.5, v[2]);   // dark slot walls; the rim ring stays white so the plate face is not tinted
+    const loops = [{ type: 'outer', pts: pts(rrShape(29, 27, .8), 160), prof: uni(pp) },
+      { type: 'pocket', pts: offs(pts(rrShape(8, 3.4, .4), 80), -6.5, 6.35), prof: uni(slotProf), col: deep },
+      { type: 'pocket', pts: offs(pts(rrShape(8, 3.4, .4), 80), -6.5, -6.35), prof: uni(slotProf), col: deep },
       { type: 'pocket', pts: dense(U), prof: uni(slotProf), col: deep }];
-    const boss = solid(loops, white.clone(), true); boss.material.vertexColors = true;
-    boss.rotation.y = Math.PI / 2; add(P, boss, 38.5, .5, 19.5); }
+    const bm = white.clone(); bm.vertexColors = true; bm.envMapIntensity = .5; const boss = solid(loops, bm, true);
+    boss.rotation.y = Math.PI / 2; add(P, boss, 38.5, .5, 16.5); }
 
   /* 7. printed text: "Max. 330W / Incandescent" upside down under the faceplate; FCC block on the far end */
   const txt = plane(20, 7, 40, (x, Pp) => { x.save(); x.translate(...Pp(0, 0)); x.rotate(Math.PI); x.fillStyle = '#3a3a3a'; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.font = '700 120px "Helvetica Neue Condensed", "HelveticaNeue-CondensedBold", "Arial Narrow", "Helvetica Neue", Arial, sans-serif';
     x.fillText('Max. 330W', 0, -62); x.fillText('Incandescent', 0, 62); x.restore(); }, { r: .5 });
-  txt.rotation.y = Math.PI / 2; txt.scale.x = .92; add(P, txt, W / 2 + .03, -17.6, 19);
+  txt.rotation.y = Math.PI / 2; txt.scale.x = .92; add(P, txt, W / 2 + .03, -17.6, 16.5);
   const fcc = plane(40, 26, 20, (x) => { x.save(); x.translate(400, 260); x.rotate(-Math.PI / 2); x.fillStyle = 'rgba(30,30,30,.85)'; x.font = '500 25px "Helvetica Neue", Arial, sans-serif';
     const L = ['This device complies with Part 15 of the FCC Rules.', 'Operation is subject to the following two', 'conditions: (1) this device may not cause',
       'harmful interference, and (2) this device must', 'accept any interference received, including', 'interference that may cause undesired', 'operation.', 'FCC ID: XQH-LPM1   IC: 9863B-LPM1', 'Made in China'];

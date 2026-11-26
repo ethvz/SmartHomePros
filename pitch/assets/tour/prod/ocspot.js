@@ -20,7 +20,7 @@ export default H => {
   const zF = 91, yT = -85, yB = -152, lean = 13, S = .12, wing = V2(66, 47).normalize(), cW = wing.x*50 + wing.y*zF;
   const yc = (yT + yB)/2, ry = (yT - yB)/2;
   const zBack = y => 8 + 18*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));
-  const Wb = 76.2, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -40;
+  const Wb = 70.6, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -40;
 
   // sheared group for everything that sits on / is the bar: y' = y - S*(z - 20)
   const SG = new THREE.Group(); M.add(SG); SG.matrixAutoUpdate = false;
@@ -37,7 +37,19 @@ export default H => {
     const j = ext(s, Wb, 3, white); j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
     // thin tongue lying on the sloped bar top: plan rounded rectangle, R10 front corners, 4 mm thick (a real step), to z = 74
     const t = ext(rr4(Wb, zTg - Ro + 2, [10, 10, 0, 0], 0, (zTg + Ro - 2)/2), tT, 1.2, white);
-    t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yT + tT, 0); SG.add(t); t.castShadow = t.receiveShadow = true;
+    t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yT + tT, 0);
+    { const Pt = t.geometry.attributes.position;                // taper: 4 mm thick, thinning to 2 mm over the last 15 mm
+      for(let i=0;i<Pt.count;i++){ const z = Pt.getZ(i); if(z > zTg - 15){ const f = 1 - .5*(z - (zTg - 15))/15; Pt.setY(i, yT + (Pt.getY(i) - yT)*f); } }
+      t.geometry.computeVertexNormals(); }
+    SG.add(t); t.castShadow = t.receiveShadow = true;
+    // R10-ish fillet where the outer bend meets the saddle on the bar's back (no ledge from behind)
+    { const bend = th => [Ro + Ro*Math.cos(th), yTg + Ro + Ro*Math.sin(th)], sad = y => zBack(y) - 2.5;
+      let thc = Math.PI; for(let th = Math.PI; th < 1.5*Math.PI; th += .002){ const [z, y] = bend(th), yu = y + S*(z - 20); if(z >= sad(yu)){ thc = th; break; } }
+      const Pc = bend(thc), A = bend(thc - 10/Ro), ycU = Pc[1] + S*(Pc[0] - 20), yb = ycU - 10, Bp = [sad(yb), yb - S*(sad(yb) - 20)];
+      const fs = new THREE.Shape(); fs.moveTo(A[0], A[1]);
+      for(let i=1;i<=12;i++){ const t2 = i/12, a = (1-t2)*(1-t2), b = 2*t2*(1-t2), c = t2*t2; fs.lineTo(a*A[0] + b*(Pc[0] - 3) + c*Bp[0], a*A[1] + b*(Pc[1] - 3) + c*Bp[1]); }
+      fs.lineTo(Pc[0] + 2, Pc[1] + 1); fs.lineTo(A[0], A[1]);
+      const fm = ext(fs, Wb, 1.5, white); fm.geometry.rotateY(-Math.PI/2); fm.geometry.translate(Wb/2, 0, 0); M.add(fm); }
   }
 
   // ---------------------------------------------------------------- light bar housing
@@ -82,8 +94,8 @@ export default H => {
 
   // ---------------------------------------------------------------- LED faces: white reflector plate 1 mm behind the window with 3 real
   // capsule recesses (2.5 deep, darker walls, grey floor) x 2 clear TIR domes with a faceted core
-  const lensM = new THREE.MeshPhysicalMaterial({color:0xffffff, transmission:.9, ior:1.49, thickness:3, roughness:.02, clearcoat:1, clearcoatRoughness:.02, envMapIntensity:1.4});
-  const coreM = new THREE.MeshPhysicalMaterial({color:0x55595d, roughness:.08, metalness:.3, flatShading:true, clearcoat:1});
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x7c8288, roughness:.03, metalness:.1, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.88, specularIntensity:1, envMapIntensity:1.8});   // clear grey glass
+  const coreM = new THREE.MeshPhysicalMaterial({color:0x2e3134, roughness:.08, metalness:.3, flatShading:true, clearcoat:1});
   const die = mat(0xefe9da, {r:.4, x:{emissive:0x2a2822}});
   const domeGeo = new THREE.SphereGeometry(5.1, 40, 16, 0, Math.PI*2, 0, Math.PI/2); domeGeo.scale(1, .56, 1);
   const coneGeo = new THREE.ConeGeometry(3.2, 2.4, 8, 1, true);
