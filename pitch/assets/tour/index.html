@@ -141,18 +141,24 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 .ld-prod{transition:opacity .2s,transform .5s cubic-bezier(.3,1.8,.5,1)}
 .ld-dev{fill:#1a2120;stroke:#fff;stroke-width:.8}
 .ld-led{fill:var(--vg)}
-.ld-ring{fill:none;stroke:var(--vg);stroke-width:1.2;opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+.ld-ring{fill:none;stroke:var(--vg);stroke-width:1.6;opacity:0;transform-box:fill-box;transform-origin:50% 50%}
 .ld-prod.on .ld-ring{animation:ldRing .9s ease-out .15s}
 .fin .ld-prod .ld-ring{animation:ldRing 1s ease-out}
 @keyframes ldRing{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(2.2)}}
 .ld-glint{fill:none;stroke:var(--vg);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22 100;stroke-dashoffset:22;opacity:0}
-.fin .ld-glint{animation:ldGlint .8s cubic-bezier(.4,0,.2,1) forwards}
+.fin .ld-glint{animation:ldGlint .55s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes ldGlint{0%{opacity:1;stroke-dashoffset:22}85%{opacity:1}100%{opacity:0;stroke-dashoffset:-100}}
-#loadMsg{min-height:1.3em;transition:opacity .4s}
-.fin #loadMsg,.fin #loadBar{opacity:0}
+#loading #loadMsg{min-height:1.3em;max-width:min(86vw,420px);padding:0 16px;box-sizing:border-box;text-align:center;line-height:1.4;transition:opacity .4s}
+.fin #loadMsg,.fin #loadBar,.fail #loadBar{opacity:0}
+/* paused (Fast Pitch hid the tour) or failed: everything stops; failed also dims the house and offers Try again */
+#loading.paused #ldHouse,#loading.fail #ldHouse{animation-play-state:paused}
+#loading.fail .ld-wrap{opacity:.3}
+#ldRetry{padding:11px 22px;border-radius:22px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--fg);font:600 14px/1 var(--f-body);cursor:pointer;transition:transform 80ms var(--ease),background-color 150ms}
+#ldRetry:active{transform:scale(.97);background:rgba(255,255,255,.14)}
+#ldRetry[aria-busy="true"]{cursor:progress}
 #loadBar{display:block;width:120px;height:2px;border-radius:2px;overflow:hidden;background:rgba(255,255,255,.1);transition:opacity .4s}
 #loadBar b{display:block;height:100%;background:var(--vg);transform-origin:0 50%;transform:scaleX(0);transition:transform .12s linear}
-@media (prefers-reduced-motion:reduce){ #ldHouse{animation:none} .ld-p,.ld-slab,.ld-roof,.ld-win,.ld-door,.ld-prod{transform:none;transition:opacity .4s} .ld-ring,.ld-glint{animation:none!important} }
+@media (prefers-reduced-motion:reduce){ #ldHouse{animation:none} #loading.done .ld-wrap{transform:none}.ld-p,.ld-slab,.ld-roof,.ld-win,.ld-door,.ld-prod{transform:none;transition:opacity .4s} .ld-ring,.ld-glint{animation:none!important} }
 
 /* narrow / portrait phone: card becomes a bottom sheet */
 /* soft shade behind the title so it stays readable over a bright sky */
@@ -347,22 +353,26 @@ body.focus #cFeats.on .feat{animation:none!important}
   var R = [
     [.02,'slab', box(0,6,0,4.5,-.35,0)],
     [.09,'slab', box(6,9.4,1.2,4.5,-.35,0)],
-    [.17,'wall', box(0,6,0,4.5,0,3.2)],
-    [.29,'wall', box(6,9.4,1.2,4.5,0,2.4)],
-    [.38,'win',  [['g', fy(4.5,.7,1.9,1.3,2.4)]]],
-    [.43,'win',  [['g', fy(4.5,3.9,5.1,1.3,2.4)]]],
-    [.48,'door', [['d', fy(4.5,2.5,3.4,0,2.2)]]],
-    [.54,'door', [['gd', fy(4.5,6.5,8.9,0,1.9)], ['ln', fy(4.5,6.5,8.9,.63,.64)], ['ln', fy(4.5,6.5,8.9,1.26,1.27)]]],
-    [.59,'win',  [['g', fx(9.4,2.3,3.5,1.0,1.7)]]],
-    [.63,'win',  [['g', fx(6,.35,1.0,1.3,2.4)]]],
-    [.67,'wall', [['s', [[6,0,3.2],[6,4.5,3.2],[6,2.25,4.9]]]]],
-    [.71,'roof', [['rb', [[-.25,-.3,3.2],[6.25,-.3,3.2],[6.25,2.25,4.9],[-.25,2.25,4.9]]]]],
-    [.76,'roof', [['rf', [[-.25,2.25,4.9],[6.25,2.25,4.9],[6.25,4.8,3.2],[-.25,4.8,3.2]]]]],
+    [.15,'wall', box(0,6,0,4.5,0,2.8)],          /* ground floor */
+    [.24,'wall', box(6,9.4,1.2,4.5,0,2.4)],      /* garage */
+    [.32,'wall', box(0,6,0,4.5,2.8,5.4)],        /* upper floor (two storeys, like the real house) */
+    [.39,'win',  [['g', fy(4.5,.7,1.9,1.1,2.2)]]],
+    [.43,'win',  [['g', fy(4.5,3.9,5.1,1.1,2.2)]]],
+    [.47,'door', [['d', fy(4.5,2.5,3.4,0,2.1)]]],
+    [.51,'door', [['gd', fy(4.5,6.5,8.9,0,1.9)], ['ln', fy(4.5,6.5,8.9,.63,.64)], ['ln', fy(4.5,6.5,8.9,1.26,1.27)]]],
+    [.55,'win',  [['g', fy(4.5,.7,1.9,3.6,4.7)]]],
+    [.575,'win', [['g', fy(4.5,2.4,3.6,3.6,4.7)]]],
+    [.60,'win',  [['g', fy(4.5,3.9,5.1,3.6,4.7)]]],
+    [.62,'win',  [['g', fx(9.4,2.3,3.5,1.0,1.7)]]],
+    [.64,'win',  [['g', fx(6,.35,1.0,1.1,2.2)], ['g', fx(6,1.6,3.0,3.6,4.7)]]],
+    [.67,'wall', [['s', [[6,0,5.4],[6,4.5,5.4],[6,2.25,7.1]]]]],
+    [.71,'roof', [['rb', [[-.25,-.3,5.4],[6.25,-.3,5.4],[6.25,2.25,7.1],[-.25,2.25,7.1]]]]],
+    [.76,'roof', [['rf', [[-.25,2.25,7.1],[6.25,2.25,7.1],[6.25,4.8,5.4],[-.25,4.8,5.4]]]]],
     [.80,'roof', [['rb', [[6.25,1.0,2.4],[9.65,1.0,2.4],[9.65,2.85,3.15],[6.25,2.85,3.15]]], ['s', [[9.4,1.2,2.4],[9.4,4.5,2.4],[9.4,2.85,3.15]]]]],
     [.84,'roof', [['rf', [[6.25,2.85,3.15],[9.65,2.85,3.15],[9.65,4.7,2.4],[6.25,4.7,2.4]]]]],
-    [.89,'prod', [3.75,4.5,1.15]],   /* doorbell camera */
-    [.93,'prod', [9.25,4.5,2.05]],   /* outdoor camera on the garage corner */
-    [.965,'prod',[.15,4.5,2.85]]     /* floodlight camera on the house corner */
+    [.89,'prod', [3.75,4.5,1.1]],    /* doorbell camera */
+    [.93,'prod', [9.2,4.5,1.95]],    /* outdoor camera on the garage corner */
+    [.965,'prod',[.2,4.5,2.5]]       /* floodlight camera on the house corner */
   ];
   function el(n,a,p){ var e = document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); if(p) p.appendChild(e); return e; }
   var ghost = el('g',{'class':'ld-ghost'},svg), build = el('g',{},svg), parts = [];
@@ -370,42 +380,66 @@ body.focus #cFeats.on .feat{animation:none!important}
   R.forEach(function(r){
     var g = el('g',{'class':'ld-p ld-'+r[1]},build);
     if(r[1]==='prod'){ var q = P(r[2][0],r[2][1],r[2][2]);
-      el('circle',{cx:q[0],cy:q[1],r:9,'class':'ld-ring'},g); el('rect',{x:q[0]-3.2,y:q[1]-4.5,width:6.4,height:9,rx:3,'class':'ld-dev'},g);
-      el('circle',{cx:q[0],cy:+q[1]-1,r:1.5,'class':'ld-led'},g);
+      el('circle',{cx:q[0],cy:q[1],r:14,'class':'ld-ring'},g); el('rect',{x:q[0]-5,y:q[1]-7,width:10,height:14,rx:4.5,'class':'ld-dev'},g);
+      el('circle',{cx:q[0],cy:+q[1]-1.6,r:2.3,'class':'ld-led'},g);
     } else r[2].forEach(function(f){ var pts = poly(f[1]); el('polygon',{points:pts,'class':'ld-'+f[0]},g); if(f[0]!=='ln') el('polygon',{points:pts},ghost); });
     parts.push([r[0],g]);
   });
   /* the green glint that runs along the rooflines when everything is in */
-  el('polyline',{points:poly([[-.25,4.8,3.2],[-.25,2.25,4.9],[6.25,2.25,4.9],[6.25,4.8,3.2]]),'class':'ld-glint',pathLength:100},svg);
+  el('polyline',{points:poly([[-.25,4.8,5.4],[-.25,2.25,7.1],[6.25,2.25,7.1],[6.25,4.8,5.4]]),'class':'ld-glint',pathLength:100},svg);
   el('polyline',{points:poly([[6.25,2.85,3.15],[9.65,2.85,3.15],[9.65,4.7,2.4]]),'class':'ld-glint',pathLength:100,style:'animation-delay:.18s'},svg);
   /* viewBox from the lot and the ridge, fixed so it never jumps */
-  var a = P(-1,6.2,-.36), b = P(10.6,-1,-.36), top = P(-.25,2.25,4.9), bot = P(10.6,6.2,-.36);
+  var a = P(-1,6.2,-.36), b = P(10.6,-1,-.36), top = P(-.25,2.25,7.1), bot = P(10.6,6.2,-.36);
   svg.setAttribute('viewBox', (+a[0]-6)+' '+(+top[1]-14)+' '+(b[0]-a[0]+12)+' '+(bot[1]-top[1]+22));
   var msg = document.getElementById('loadMsg'), bar = document.getElementById('loadBar'), barI = bar && bar.firstElementChild;
   var WORDS = ['Building the house…','Pouring the foundation','Raising the walls','Setting the roof','Installing Vivint'], said = WORDS[0];
   var BASE = [.03,.55,.82], CAP = [.55,.82,.975], TAU = [14,10,2.6];
-  var stage = 0, real = 0, creep = 0, shown = 0, fin = null, finT = 0, timer = 0, gone = false;
+  var FAIL = 'The 3D home could not load. Connect to the internet once, then tap Download for Offline in the menu.';
+  /* failed: 0 ok, 1 stalled (15 s with no progress; undone if progress resumes), 2 hard (pack.jpg missing: stays) */
+  var stage = 0, real = 0, creep = 0, shown = 0, fin = null, finT = 0, timer = 0, gone = false, failed = 0, paused = false, retry = null;
+  var lastAdv = Date.now(), lastTick = lastAdv;
   function word(w){ if(!msg || w===said || WORDS.indexOf(msg.textContent)<0) return; msg.textContent = said = w; }
+  function cur(){ return shown < .15 ? WORDS[1] : shown < .67 ? WORDS[2] : shown < .87 ? WORDS[3] : WORDS[4]; }
+  function run(){ if(!timer && !gone && !paused && !failed){ lastTick = Date.now(); timer = setInterval(tick, 50); } }
+  function halt(){ clearInterval(timer); timer = 0; }
+  function fail(hard){
+    if(gone || failed === 2) return; failed = hard ? 2 : 1; halt(); L.classList.add('fail');
+    if(msg) msg.textContent = said = FAIL;
+    if(!retry){ retry = document.createElement('button'); retry.id = 'ldRetry'; retry.type = 'button'; retry.textContent = 'Try again';
+      retry.addEventListener('click', function(){ retry.setAttribute('aria-busy','true'); retry.textContent = 'Loading…'; location.reload(); }); L.appendChild(retry); }
+  }
+  function unfail(){ if(failed !== 1) return; failed = 0; L.classList.remove('fail'); if(retry){ retry.remove(); retry = null; } if(msg) msg.textContent = said = cur(); run(); }
   function tick(){
     if(gone) return;
-    var dt = .05;
+    var now = Date.now(), dt = .05;
+    if(now - lastTick > 1500) lastAdv += now - lastTick;   /* main thread was busy building the scene: that is progress too */
+    lastTick = now;
+    if(!fin && window.__ldHold == null && now - lastAdv > 15000){ fail(false); return; }
     if(fin){ real = 1; creep = 1; } else creep += (CAP[stage] - creep) * (1 - Math.exp(-dt / TAU[stage]));
     var eff = window.__ldHold != null ? window.__ldHold : Math.max(real, creep);
     var k = fin ? .22 : .1, d = (eff - shown) * k; shown += Math.max(-.02, Math.min(fin ? .08 : .025, d));
     if(window.__ldHold != null) shown = eff;
     for(var i=0;i<parts.length;i++){ var on = shown >= parts[i][0]; if(on !== !!parts[i][2]){ parts[i][2] = on; parts[i][1].classList.toggle('on', on); } }
     if(barI) barI.style.transform = 'scaleX(' + shown.toFixed(3) + ')';
-    word(shown < .17 ? WORDS[1] : shown < .67 ? WORDS[2] : shown < .87 ? WORDS[3] : WORDS[4]);
-    if(fin && shown > .995 && !finT){ L.classList.add('fin'); finT = setTimeout(function(){ var f = fin; fin = function(){}; f(); setTimeout(stop, 900); }, 700); }
+    word(cur());
+    if(fin && shown > .995 && !finT){ L.classList.add('fin'); finT = setTimeout(function(){ var f = fin; fin = function(){}; f(); setTimeout(stop, 900); }, 450); }
   }
-  function stop(){ if(gone) return; gone = true; clearInterval(timer); svg.textContent = ''; svg.remove(); if(bar) bar.remove(); }
-  timer = setInterval(tick, 50);
+  function stop(){ if(gone) return; gone = true; halt(); svg.textContent = ''; svg.remove(); if(bar) bar.remove(); if(retry) retry.remove(); }
+  run();
   window.__ld = {
-    p: function(s, f){ if(fin) return; if(s > stage){ stage = s; creep = Math.max(creep, BASE[s]); }
-      if(s === stage) real = Math.max(real, BASE[s] + (CAP[s] - BASE[s]) * Math.max(0, Math.min(1, f || 0))); },
-    finish: function(cb){ if(gone){ cb(); return; } if(!fin) fin = cb; },
+    p: function(s, f){ if(fin || failed === 2) return; var r0 = real, s0 = stage;
+      if(s > stage){ stage = s; creep = Math.max(creep, BASE[s]); }
+      if(s === stage) real = Math.max(real, BASE[s] + (CAP[s] - BASE[s]) * Math.max(0, Math.min(1, f || 0)));
+      if(real > r0 + 1e-4 || stage > s0){ lastAdv = Date.now(); if(failed === 1) unfail(); } },
+    finish: function(cb){ if(failed === 2) return; if(gone){ cb(); return; } if(failed === 1) unfail(); if(!fin) fin = cb; },
+    fail: function(){ fail(true); },
     get shown(){ return shown; }
   };
+  /* Fast Pitch pauses the tour when it is off screen: stop the timer and the bob, and don't count the pause as a stall */
+  addEventListener('message', function(e){ var d = e.data; if(!d || !d.fpTourCtl || d.fpTourCtl === 'cat' || gone) return;
+    paused = d.fpTourCtl === 'pause'; L.classList.toggle('paused', paused);
+    if(paused) halt(); else { lastAdv = Date.now(); run(); } });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) lastAdv = Math.max(lastAdv, Date.now() - 5000); });
   /* safety: if the overlay is hidden some other way, stop anyway */
   new MutationObserver(function(){ if(L.classList.contains('done') && !gone) setTimeout(stop, 900); }).observe(L, {attributes:true, attributeFilter:['class']});
 })();</script>
@@ -414,19 +448,20 @@ body.focus #cFeats.on .feat{animation:none!important}
 {"imports":{"three":"./three.bundle.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}
 </script>
 <script>
-// Shows a readable message if the 3D library can't load (not downloaded yet and offline).
-window.__failT = setTimeout(()=>{ if(!window.__booted){ const m=document.getElementById('loadMsg'); if(m) m.textContent='The 3D home could not load. Connect to the internet once, then tap Download for Offline in the menu.'; } }, 15000);
+// Shows a readable message if the 3D library can't load (not downloaded yet and offline). The loader (#ldJs) does this itself,
+// progress-based (15 s with no progress), so this only runs if it is missing.
+window.__failT = setTimeout(()=>{ if(!window.__booted && !window.__ld){ const m=document.getElementById('loadMsg'); if(m) m.textContent='The 3D home could not load. Connect to the internet once, then tap Download for Offline in the menu.'; } }, 15000);
 </script>
 <script type="module">
 import * as THREE from 'three';
 /* three.js r165 + the addons the tour uses, bundled locally so the tour works offline */
 import { OrbitControls, RoundedBoxGeometry, RoomEnvironment, GLTFLoader, MeshoptDecoder } from 'three';
 /* textures, decals and the sky come in one bundle (pack.jpg) so Fast Pitch stays under its file limit */
-const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=22'); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
+const __PK = await (async()=>{ try{ const r=await fetch('pack.jpg?v=22'); if(!r.ok) throw new Error('pack '+r.status); const tot=+r.headers.get('content-length')||9e6, rd=r.body.getReader(), parts=[]; let got=0;
   for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; window.__ld&&__ld.p(0,got/tot); }
   const u8=new Uint8Array(got); let o=0; for(const p of parts){ u8.set(p,o); o+=p.length; } const buf=u8.buffer; const n=new DataView(buf).getUint32(0,true);
   const idx=JSON.parse(new TextDecoder().decode(new Uint8Array(buf,4,n))), base=4+n, m={};
-  for(const k in idx){ const [o2,l,t]=idx[k]; m[k]=URL.createObjectURL(new Blob([new Uint8Array(buf,base+o2,l)],{type:t})); } return m; }catch(e){ return {}; } })();
+  for(const k in idx){ const [o2,l,t]=idx[k]; m[k]=URL.createObjectURL(new Blob([new Uint8Array(buf,base+o2,l)],{type:t})); } return m; }catch(e){ window.__ld&&__ld.fail(); return {}; } })();   /* no pack: the loader shows the failure + Try again and never reveals the bare scene */
 const PK = p => __PK[p] || p;
 /* Smart Hub Pro 2 mesh (quantised, from CAD): header json + int16 positions, int8 normals, indices */
 const HUB = await (async()=>{ try{ if(!__PK['mdl/hub.bin']) return null; const buf=await (await fetch(__PK['mdl/hub.bin'])).arrayBuffer(); const n=new DataView(buf).getUint32(0,true);

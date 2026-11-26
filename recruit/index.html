@@ -115,12 +115,17 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   .board .rv { opacity: 0; transform: translateY(38px); transition: opacity .9s cubic-bezier(.2,.75,.2,1), transform 1.05s cubic-bezier(.2,.75,.2,1); transition-delay: var(--rvd, 0ms); }
   .board .rv.rv-in { opacity: 1; transform: none; }
   /* side-rail fast scroller (frDock): dark pill with a bulge, green circle under the finger, dock-style magnify */
-  .board nav.frscrub { touch-action: none; }
-  .board nav.frscrub > div { opacity: 0; transition: opacity .2s ease; }
-  .board nav.frscrub .scrubBg { position: absolute; left: 0; top: 0; pointer-events: none; z-index: -1; overflow: visible; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); }
-  .board nav .scrubDot { position: absolute; left: 6px; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%; background: rgba(5,229,175,.24); box-shadow: 0 0 0 1px rgba(5,229,175,.35), 0 0 24px rgba(5,229,175,.25); pointer-events: none; z-index: -1; }
+  .board nav.frscrub, #phdr .ph-prog.frscrub { touch-action: none; }
+  .board nav.frscrub > div, #phdr .ph-prog.frscrub > i { opacity: 0; transition: opacity .2s ease; }
+  .frscrub > .scrubBg { position: absolute; left: 0; top: 0; pointer-events: none; z-index: -1; overflow: visible; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); }
+  .scrubDot { position: absolute; left: 6px; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%; background: rgba(5,229,175,.24); box-shadow: 0 0 0 1px rgba(5,229,175,.35), 0 0 24px rgba(5,229,175,.25); pointer-events: none; z-index: -1; }
+  #phdr .ph-prog .scrubDot { z-index: 0; }
+  #phdr .ph-prog.frscrub { z-index: 2; isolation: isolate; }
+  #phdr .ph-prog.frscrub b { z-index: 1; }
   .board nav.frscrub a { transform-origin: 36px 50%; }
-  .board nav.frsettle a { transition: translate .3s cubic-bezier(.22,.9,.2,1), scale .3s cubic-bezier(.22,.9,.2,1); }
+  .board nav.frsettle a, #phdr .ph-prog.frsettle b { transition: translate .3s cubic-bezier(.22,.9,.2,1), scale .3s cubic-bezier(.22,.9,.2,1); }
+  /* the header dots: the whole line is a grip for the scrubber (a tap between dots does nothing) */
+  #phdr .ph-prog::before { content: ''; position: absolute; left: -12px; width: calc(100% + 24px); top: -20px; height: 40px; pointer-events: auto; }
   /* pinned section backgrounds: one fixed layer of section photos behind the scrolling page (setupPin) */
   .pinbg { position: absolute; left: 0; top: 0; z-index: 0; isolation: isolate; width: var(--FW, 1466px); height: var(--H, 1024px); overflow: hidden; pointer-events: none; background: #000; }
   .pinbg > .pbsec { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background: #000; opacity: 0; visibility: hidden; transform: scale(1.05);
@@ -1239,8 +1244,8 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 // Phones: skip the live glass blur (it's what runs the Claude app out of memory, especially when zoomed in).
 try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim === 'phone' : Math.min(screen.width, screen.height) < 600) document.documentElement.classList.add('lite'); } catch (e) {}
 </script>
-<link rel="stylesheet" href="../nav/shpnav.css?v=ae05d976">
-<script src="../nav/shpnav.js?v=ae05d976" defer></script>
+<link rel="stylesheet" href="../nav/shpnav.css?v=0eb6c6a2">
+<script src="../nav/shpnav.js?v=0eb6c6a2" defer></script>
 </head>
 <body>
 <div id="stage"><div id="viewport"><div id="frame"></div></div></div>
@@ -3236,7 +3241,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
           if (bs.length === n) { pg.querySelector('i:not(.f)').style.width = w + 'px'; bs.forEach((b, i) => { b.style.left = (i * step).toFixed(1) + 'px'; }); }   // (same page shape: the line slides to its new length)
           else pg.innerHTML = '<i style="width:' + w + 'px"></i><i class="f"></i>' + st.map((x, i) => '<b data-i="' + i + '" style="left:' + (i * step).toFixed(1) + 'px"></b>').join('');
           pg.querySelectorAll('b').forEach((b, i) => b.classList.toggle('ph', !!as[i] && PHS.has((as[i].getAttribute('href') || '').replace('#sec-', ''))));
-          if (!pg.__click) { pg.__click = 1; pg.addEventListener('click', e => { const b = e.target.closest('b'); if (!b) return; e.stopPropagation(); const CL = current && current.layer, a = CL && [...CL.querySelectorAll('.board nav a')].filter(x => !CL._keep || CL._keep.has((x.getAttribute('href') || '').slice(5))).sort((p, q) => (parseFloat(p.style.top) || 0) - (parseFloat(q.style.top) || 0))[+b.dataset.i]; if (a) a.click(); }); } }
+          if (!pg.__click) { try { phDock(pg); } catch (e) {} pg.__click = 1; pg.addEventListener('click', e => { const b = e.target.closest('b'); if (!b) return; e.stopPropagation(); const CL = current && current.layer, a = CL && [...CL.querySelectorAll('.board nav a')].filter(x => !CL._keep || CL._keep.has((x.getAttribute('href') || '').slice(5))).sort((p, q) => (parseFloat(p.style.top) || 0) - (parseFloat(q.style.top) || 0))[+b.dataset.i]; if (a) a.click(); }); } }
         // green fill: where the page's own (vertical) fill ends, mapped between the dots on either side
         const fillEl = [...nav.querySelectorAll(':scope > div')].find(d => /box-shadow/.test(d.getAttribute('style') || '')), fy = L._fperm && L.__fxfy != null ? L.__fxfy : fillEl ? parseFloat(fillEl.style.top) + parseFloat(fillEl.style.height) : 0;   // (a reordered Custom flow: where you really are)
         let fx = 0; for (let i = 0; i < n; i++) { if (fy >= st[i].y) fx = i * step; if (i < n - 1 && fy > st[i].y && fy < st[i + 1].y) { fx = (i + (fy - st[i].y) / (st[i + 1].y - st[i].y)) * step; break; } }
@@ -4167,46 +4172,51 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
 
   // ---------------- side rail fast scroller (same as Fast Pitch's fpDock) ----------------
   // Press and hold (or just drag) on a page's section rail: a green circle rides exactly under the finger, the page flies
-  // through its sections to match, and the rail magnifies like the macOS Dock on a dark pill with a soft bulge on its right
+  // through its sections to match, and the rail magnifies like the macOS Dock on a dark pill with a soft bulge on its outer
   // edge. Letting go settles on the nearest section. A tap is still just a tap (the dock wakes once the finger moves 6px).
-  function frDock(layer) {
-    const sc = scrollerOf(layer), rail = layer.querySelector('.board nav'); if (!sc || !rail || rail.__dock) return; rail.__dock = 1;
-    let S = null, A = 0, raf = 0, lastEnd = 0; const FL = 1, PW = 72;   // PW: the pill's width around the dot column (design px)
-    const css = document.createElement('style'); document.head.appendChild(css); (layer._off = layer._off || []).push(() => css.remove());
-    const items = () => [...rail.querySelectorAll('a[href^="#sec-"]')];
-    const active = () => { if (!layer.isConnected || (current && current.layer !== layer)) return false; const r = rail.getBoundingClientRect(), g = getComputedStyle(rail);
-      return r.height > 40 && g.visibility !== 'hidden' && parseFloat(g.opacity) > 0.5 && FR.get('ui') === 'none'; };
-    const local = e => { const r = rail.getBoundingClientRect(), k = r.height / (rail.offsetHeight || 1) || 1; return (e.clientY - r.top) / k; };
-    const mid = b => b.offsetTop + b.offsetHeight / 2;
-    const G = 6, RMAX = 41, RMIN = 22;
-    const geo = () => { const W = PW, k = A / 26, r = RMIN + (RMAX - RMIN) * k; return { W, k, r, cx: G + r, cy: S && S.ly !== undefined ? S.ly : rail.offsetHeight / 2 }; };
+  // Used for the side rail (iPad, and the opened section menu on iPhone) and for the iPhone header's sideways progress dots.
+  // o: rail, items() (elements on the rail, in order), link(el) (its section link), sel(i) (CSS selector of item i), ax ('y' rail
+  //    standing up / 'x' lying down: the pill then bulges downwards), c0 (centre of the dots across the rail), s (size), mag
+  //    (how much the dots grow), layer() (the page it scrolls), active()
+  function dock(o) {
+    const rail = o.rail; if (!rail || rail.__dock) return; rail.__dock = 1;
+    const X = o.ax === 'x', s = o.s || 1; let S = null, A = 0, raf = 0, lastEnd = 0, sc = null;
+    const css = document.createElement('style'); document.head.appendChild(css);
+    const along = e => X ? e.clientX : e.clientY;
+    const local = e => { const r = rail.getBoundingClientRect(), L = X ? rail.offsetWidth : rail.offsetHeight, k = (X ? r.width : r.height) / (L || 1) || 1; return (along(e) - (X ? r.left : r.top)) / k; };
+    const mid = b => X ? b.offsetLeft + b.offsetWidth / 2 : b.offsetTop + b.offsetHeight / 2;
+    const G = 6 * s, RMAX = 41 * s, RMIN = 22 * s, PW = 72 * s;
+    const geo = () => { const W = PW, k = A / 26, r = RMIN + (RMAX - RMIN) * k; return { W, k, r, cx: G + r, cy: S && S.ly !== undefined ? S.ly : 0 }; };
     const smax = (a, b, k) => { const m = Math.max(a, b); return m + k * Math.log(Math.exp((a - m) / k) + Math.exp((b - m) / k)); };
-    // the pill runs from just above the first dot to just below the last one
-    const span = () => { const its = items(); if (!its.length) return [0, rail.offsetHeight]; return [its[0].offsetTop - 8, its[its.length - 1].offsetTop + its[its.length - 1].offsetHeight + 8]; };
-    function draw() { const [t0, t1] = span(), Hh = t1 - t0, { W, k, r, cx } = geo(), cy = geo().cy - t0, R = Math.min(W / 2, 34), Rg = r + G; let svg = rail.querySelector(':scope > .scrubBg');
+    const span = () => { const its = o.items(); if (!its.length) return [0, 1]; return [mid(its[0]) - (PW / 2 - G), mid(its[its.length - 1]) + (PW / 2 - G)]; };
+    function draw() { const [t0, t1] = span(), Hh = t1 - t0, { W, k, r, cx } = geo(), cy = geo().cy - t0, R = Math.min(W / 2, 34 * s), Rg = r + G; let svg = rail.querySelector(':scope > .scrubBg');
       if (!svg) { svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'scrubBg'); svg.innerHTML = '<path fill="#1c1c1c" stroke="rgba(255,255,255,.08)" stroke-width="1"/>'; rail.prepend(svg); }
-      const pad = 90; svg.style.left = '0px'; svg.setAttribute('width', W + pad); svg.setAttribute('height', Hh + 80); svg.setAttribute('viewBox', `0 -40 ${W + pad} ${Hh + 80}`); svg.style.top = (t0 - 40) + 'px';
-      const edge = y => { const dy = y - cy, c = Math.abs(dy) < Rg ? cx + Math.sqrt(Rg * Rg - dy * dy) : cx - Rg, sh = W + (cx + Rg - W) * .55 * Math.exp(-Math.pow(dy / (Rg * 1.35), 2)); return smax(W, smax(c, sh, 5), 6) - W; };
+      const pad = 90 * s, e0 = 40 * s; svg.setAttribute('width', W + pad); svg.setAttribute('height', Hh + 2 * e0); svg.setAttribute('viewBox', `0 ${-e0} ${W + pad} ${Hh + 2 * e0}`);
+      if (X) { svg.style.left = (t0 - e0) + 'px'; svg.style.top = (o.c0 - W / 2) + 'px'; svg.style.transformOrigin = '0 0'; svg.style.transform = 'matrix(0,1,1,0,0,0)'; }
+      else { svg.style.left = (o.c0 - W / 2) + 'px'; svg.style.top = (t0 - e0) + 'px'; }
+      const edge = y => { const dy = y - cy, c = Math.abs(dy) < Rg ? cx + Math.sqrt(Rg * Rg - dy * dy) : cx - Rg, sh = W + (cx + Rg - W) * .55 * Math.exp(-Math.pow(dy / (Rg * 1.35), 2)); return smax(W, smax(c, sh, 5 * s), 6 * s) - W; };
       const eT = Math.max(0, Rg - cy) * Math.min(1, k * 1.4), eB = Math.max(0, cy + Rg - Hh) * Math.min(1, k * 1.4), pts = [];
       const arc = (ax, ay, a0, a1) => { for (let i = 0; i <= 16; i++) { const t = a0 + (a1 - a0) * i / 16; pts.push([ax + R * Math.cos(t), ay + R * Math.sin(t)]); } };
       arc(W - R, R, -Math.PI / 2, 0); for (let y = R + 2; y < Hh - R; y += 2) pts.push([W, y]); arc(W - R, Hh - R, 0, Math.PI / 2); arc(R, Hh - R, Math.PI / 2, Math.PI); arc(R, R, Math.PI, Math.PI * 1.5);
       const d = pts.map(([x, y], i) => { const yy = y - eT * Math.max(0, 1 - y / (Rg * 2.2)) + eB * Math.max(0, 1 - (Hh - y) / (Rg * 2.2)), w = Math.max(0, x - W / 2) / (W / 2); return `${i ? 'L' : 'M'} ${(x + edge(yy) * w * w).toFixed(2)} ${yy.toFixed(2)}`; }).join(' ') + ' Z';
       svg.firstChild.setAttribute('d', d); }
     // dock magnify: dots near the finger grow and are pulled to the circle's centre; neighbours part to make room
-    // (written as one small stylesheet: the page re-draws its rail items while it scrolls, which would wipe inline styles)
-    function magnify() { const { W, k, r, cx, cy } = geo(), its = items(), sp = its.length > 1 ? (its[its.length - 1].offsetTop - its[0].offsetTop) / (its.length - 1) : 52, sg = sp * .58, sq = sp * .46;
-      let out = ''; its.forEach((b, i) => { if (b.dataset.fdi !== String(i)) b.dataset.fdi = String(i); const c = mid(b), dd = cy - c, g = S ? Math.exp(-Math.pow(dd / sg, 2)) : 0, scl = 1 + .5 * g * k, pull = dd * Math.exp(-Math.pow(dd / sq, 2)), push = Math.tanh(-dd / 60) * 16 * k * (1 - g);
-        if (S) out += `.board nav.frscrub a[data-fdi="${i}"]{translate:${(FL * (cx - 36) * g).toFixed(1)}px ${(pull * k + push).toFixed(1)}px !important;scale:${scl.toFixed(3)} !important}` + (g > .5 ? `.board nav.frscrub a[data-fdi="${i}"] span{color:#fff !important}` : '');
-      });
+    // (one small stylesheet: the page re-draws its rail while it scrolls, which would wipe inline styles)
+    function magnify() { const { W, k, r, cx, cy } = geo(), its = o.items(), sp = its.length > 1 ? (mid(its[its.length - 1]) - mid(its[0])) / (its.length - 1) : 52 * s, sg = sp * .58, sq = sp * .46, M = o.mag || .5;
+      let out = ''; its.forEach((b, i) => { const c = mid(b), dd = cy - c, g = S ? Math.exp(-Math.pow(dd / sg, 2)) : 0, scl = 1 + M * g * k, pull = dd * Math.exp(-Math.pow(dd / sq, 2)), push = Math.tanh(-dd / (60 * s)) * 16 * s * k * (1 - g);
+        const ac = ((cx - W / 2) * g).toFixed(1), al = (pull * k + push).toFixed(1);
+        if (S) out += `${o.sel(i)}{translate:${X ? al + 'px ' + ac : ac + 'px ' + al}px !important;scale:${scl.toFixed(3)} !important}` + (g > .5 ? `${o.sel(i)} span{color:#fff !important}` : ''); });
       if (css.textContent !== out) css.textContent = out;
-      const dot = S && S.dot; if (dot) { const D = 2 * r; dot.style.width = dot.style.height = D + 'px'; dot.style.marginTop = (-r) + 'px'; dot.style.borderRadius = r + 'px'; dot.style.left = G + 'px'; dot.style.top = cy + 'px'; } }
+      const dot = S && S.dot; if (dot) { const D = 2 * r; dot.style.width = dot.style.height = D + 'px'; dot.style.borderRadius = r + 'px';
+        if (X) { dot.style.marginLeft = (-r) + 'px'; dot.style.marginTop = '0px'; dot.style.top = (o.c0 - W / 2 + G) + 'px'; dot.style.left = cy + 'px'; }
+        else { dot.style.marginTop = (-r) + 'px'; dot.style.left = (o.c0 - W / 2 + G) + 'px'; dot.style.top = cy + 'px'; } } }
     function animA(to, done) { cancelAnimationFrame(raf); const a0 = A, t0 = performance.now();
       const step = now => { const k = Math.min(1, (now - t0) / 260), e = 1 - Math.pow(1 - k, 3); A = a0 + (to - a0) * e; draw(); magnify(); if (k < 1) raf = requestAnimationFrame(step); else if (done) done(); };
       raf = requestAnimationFrame(step); }
     // where each section starts, in the scroller's own units (phones draw the scroller at screen size, iPads inside the scaled page)
-    function begin(e) { const its = items(), r0 = sc.getBoundingClientRect(), u = sc.offsetHeight / (r0.height || 1), map = [];
-      its.forEach(b => { const sec = sc.querySelector((b.getAttribute('href') || '').replace(/[^#\w-]/g, '')); if (!sec || !sec.offsetHeight) return;
-        map.push({ b, c: mid(b), top: Math.max(0, Math.min(sc.scrollHeight - sc.clientHeight, sc.scrollTop + (sec.getBoundingClientRect().top - r0.top) * u)) }); });
+    function begin(e) { const L = o.layer(); sc = scrollerOf(L); if (!sc) { S = null; return; } const r0 = sc.getBoundingClientRect(), u = sc.offsetHeight / (r0.height || 1), map = [];
+      o.items().forEach(b => { const a = o.link(b), sec = a && sc.querySelector((a.getAttribute('href') || '').replace(/[^#\w-]/g, '')); if (!sec || !sec.offsetHeight) return;
+        map.push({ b, a, c: mid(b), top: Math.max(0, Math.min(sc.scrollHeight - sc.clientHeight, sc.scrollTop + (sec.getBoundingClientRect().top - r0.top) * u)) }); });
       if (map.length < 2) { S = null; return; }
       S.on = true; S.map = map; start(e); }
     function start(e) { rail.classList.add('frscrub'); sc.__scrub = true; try { if (e.pointerId != null) rail.setPointerCapture(e.pointerId); } catch (_) {}
@@ -4218,18 +4228,19 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
       const y = a.top + (b.top - a.top) * t, near = t < .5 ? a : b; if (S.near && S.near !== near) { try { haptic('select'); } catch (_) {} } S.near = near;
       sc.style.scrollBehavior = 'auto'; sc.scrollTop = y; sc.style.scrollBehavior = '';
       if (!first && !S.rq) S.rq = requestAnimationFrame(() => { if (S) { S.rq = 0; draw(); magnify(); } }); }
-    function end() { const s = S; S = null; if (!s || !s.on) return; lastEnd = Date.now(); const near = s.near;
-      s.dot.style.transition = 'top .3s cubic-bezier(.22,.9,.2,1), width .3s, height .3s, margin-top .3s, left .3s, opacity .25s .2s'; s.dot.style.top = near.c + 'px'; const w0 = 28; s.dot.style.width = s.dot.style.height = w0 + 'px'; s.dot.style.marginTop = (-w0 / 2) + 'px'; s.dot.style.left = (36 - w0 / 2) + 'px'; s.dot.style.opacity = '0';
-      rail.classList.add('frsettle');
-      S = { ly: near.c, dot: null, fin: 1 }; animA(0, () => { S = null; rail.classList.remove('frscrub', 'frsettle'); css.textContent = ''; const g = rail.querySelector(':scope > .scrubBg'); if (g) g.remove(); s.dot.remove(); });
-      sc.__scrub = false; near.b.click(); }
-    // a tap is just a tap; the dock wakes the moment the finger starts to drag. Moves are read from both pointer and touch
-    // events at window level, so iPad Safari can't swallow them on the way to the rail.
-    const mv = e => { if (!S || S.fin) return; if (!S.on) { S.ev = e; if (Math.abs(e.clientY - S.y0) > 6) begin(e); return; } update(e); };
-    const pd = e => { if (!active() || S && !S.fin) return; S = { on: false, y0: e.clientY, ev: e, pid: e.pointerId }; };
-    const ts = e => { if (S && !S.fin || !active()) return; const t = e.touches[0]; S = { on: false, y0: t.clientY, ev: { clientY: t.clientY }, pid: null }; };
+    function end() { const st = S; S = null; if (!st || !st.on) return; lastEnd = Date.now(); const near = st.near, w0 = 28 * s, d = st.dot;
+      d.style.transition = 'top .3s cubic-bezier(.22,.9,.2,1), left .3s cubic-bezier(.22,.9,.2,1), width .3s, height .3s, margin .3s, opacity .25s .2s'; d.style.width = d.style.height = w0 + 'px';
+      if (X) { d.style.left = near.c + 'px'; d.style.marginLeft = (-w0 / 2) + 'px'; d.style.top = (o.c0 - w0 / 2) + 'px'; } else { d.style.top = near.c + 'px'; d.style.marginTop = (-w0 / 2) + 'px'; d.style.left = (o.c0 - w0 / 2) + 'px'; }
+      d.style.opacity = '0'; rail.classList.add('frsettle');
+      S = { ly: near.c, dot: null, fin: 1 }; animA(0, () => { S = null; rail.classList.remove('frscrub', 'frsettle'); css.textContent = ''; const g = rail.querySelector(':scope > .scrubBg'); if (g) g.remove(); d.remove(); });
+      sc.__scrub = false; near.a.click(); }
+    // moves are read from both pointer and touch events at window level, so iPad Safari can't swallow them on the way to the rail
+    const p0 = e => X ? e.clientX : e.clientY;
+    const mv = e => { if (!S || S.fin) return; if (!S.on) { S.ev = e; if (Math.abs(p0(e) - S.y0) > 6) begin(e); return; } update(e); };
+    const pd = e => { if (!o.active() || S && !S.fin) return; S = { on: false, y0: p0(e), ev: e, pid: e.pointerId }; };
+    const ts = e => { if (S && !S.fin || !o.active()) return; const t = e.touches[0]; S = { on: false, y0: p0(t), ev: { clientX: t.clientX, clientY: t.clientY }, pid: null }; };
     const pm = e => { if (S && (S.pid == null || S.pid === e.pointerId)) mv(e); };
-    const tm = e => { if (!S) return; const t = e.touches[0]; mv({ clientY: t.clientY, pointerId: S.pid }); if (S && S.on) e.preventDefault(); };
+    const tm = e => { if (!S) return; const t = e.touches[0]; mv({ clientX: t.clientX, clientY: t.clientY, pointerId: S.pid }); if (S && S.on) e.preventDefault(); };
     const up = () => { if (!S || S.fin) return; if (S.on) end(); else S = null; };
     const pu = e => { if (S && (S.pid == null || S.pid === e.pointerId)) up(); };
     const pc = e => { if (S && S.on && S.pid != null) return; if (S && !S.on) S = null; };
@@ -4237,7 +4248,25 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     rail.addEventListener('pointerdown', pd); rail.addEventListener('touchstart', ts, { passive: true }); rail.addEventListener('touchmove', tm, { passive: false });
     rail.addEventListener('touchend', up); rail.addEventListener('touchcancel', up);
     addEventListener('pointermove', pm, { capture: true, passive: true }); addEventListener('pointerup', pu, true); addEventListener('pointercancel', pc, true); addEventListener('click', ck, true);
-    layer._off.push(() => { removeEventListener('pointermove', pm, { capture: true }); removeEventListener('pointerup', pu, true); removeEventListener('pointercancel', pc, true); removeEventListener('click', ck, true); sc.__scrub = false; });
+    return () => { removeEventListener('pointermove', pm, { capture: true }); removeEventListener('pointerup', pu, true); removeEventListener('pointercancel', pc, true); removeEventListener('click', ck, true); css.remove(); if (sc) sc.__scrub = false; };
+  }
+  // the page's own side rail (its section links)
+  function frDock(layer) {
+    const rail = layer.querySelector('.board nav'); if (!rail || rail.__dock) return;
+    const its = () => [...rail.querySelectorAll('a[href^="#sec-"]')].filter(a => a.offsetHeight);
+    const off = dock({ rail, ax: 'y', c0: 36, s: 1, layer: () => layer,
+      items: () => { const L = its(); L.forEach((a, i) => { if (a.dataset.fdi !== String(i)) a.dataset.fdi = String(i); }); return L; },
+      link: a => a, sel: i => `.board nav.frscrub a[data-fdi="${i}"]`,
+      active: () => { if (!layer.isConnected || (current && current.layer !== layer)) return false; const r = rail.getBoundingClientRect(), g = getComputedStyle(rail);
+        return r.height > 40 && g.visibility !== 'hidden' && parseFloat(g.opacity) > 0.5 && FR.get('ui') === 'none'; } });
+    if (off) (layer._off = layer._off || []).push(off);
+  }
+  // iPhone upright: the header's sideways progress dots (one per section) work the same way, lying down
+  function phDock(pg) {
+    const links = () => { const CL = current && current.layer; return CL ? [...CL.querySelectorAll('.board nav a')].filter(x => !CL._keep || CL._keep.has((x.getAttribute('href') || '').slice(5))).sort((p, q) => (parseFloat(p.style.top) || 0) - (parseFloat(q.style.top) || 0)) : []; };
+    dock({ rail: pg, ax: 'x', c0: 0, s: 0.56, mag: 1.1, layer: () => current && current.layer,
+      items: () => [...pg.querySelectorAll('b')], link: b => links()[+b.dataset.i], sel: i => `#phdr .ph-prog.frscrub b[data-i="${i}"]`,
+      active: () => pphOn() && !pg.hidden && !!phdr && !phdr.classList.contains('idle') && !phdr.classList.contains('navopen') && FR.get('ui') === 'none' });
   }
 
   // ---------------- springy section snapping ----------------

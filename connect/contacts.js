@@ -115,14 +115,14 @@ var VCF = {"sales-support":"BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:-//Smart Home P
 
   /* ---- open / close ---- */
   function open(from) {
-    opener = from || null; el.classList.add('on'); el.setAttribute('aria-hidden', 'false'); ls.scrollTop = 0;
+    opener = from || null; el.classList.add('on'); if (window.SHPNav && SHPNav.sheet) SHPNav.sheet(true); else document.documentElement.classList.add('shp-sheet'); el.setAttribute('aria-hidden', 'false'); ls.scrollTop = 0;
     requestAnimationFrame(thumb);
     setTimeout(function () { (matchMedia('(hover: hover)').matches ? inp : $('.mc-x')).focus({ preventScroll: true }); }, 80);
   }
   function close() {
     if (!el.classList.contains('on')) return;
     if (document.activeElement === inp) inp.blur();
-    el.classList.remove('on'); el.setAttribute('aria-hidden', 'true'); pn.style.transform = ''; pn.style.transition = ''; $('.mc-scrim').style.opacity = '';
+    el.classList.remove('on'); if (window.SHPNav && SHPNav.sheet) SHPNav.sheet(false); else document.documentElement.classList.remove('shp-sheet'); el.setAttribute('aria-hidden', 'true'); pn.style.transform = ''; pn.style.transition = ''; $('.mc-scrim').style.opacity = '';
     if (opener) opener.focus({ preventScroll: true });
   }
   window.shpcContacts = { open: open, close: close };
