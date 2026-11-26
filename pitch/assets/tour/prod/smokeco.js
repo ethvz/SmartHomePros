@@ -14,13 +14,14 @@ export default H => {
 
   /* ---------- face surface: dome + scoop (mm) */
   // ZB: body side 3 mm taller than the spec sheet (photos show a deeper body); LIFT: chamber/cage/cap raised to the photos' proportions.
-  // Face annulus RL..RF: a bold R4 lip rolls from r 48.5 down into the chamber well at r 44.5 (photo), then the gentle dome out to RF.
-  const RL = 44.5, LR = 4, DL = 43.5, RF = 67, LIFT = 7, ZB = 3;
+  // Face annulus RL..RF: a rounded R2.5 lip rolls from r 45.5 (where the pads begin, photo) down into the chamber well at r 43, then the
+  // gentle dome out to RF.
+  const RL = 43, LR = 2.5, DL = 43, RF = 67, LIFT = 7, ZB = 3;
   const lipD = r => r >= RL + LR ? 0 : LR - Math.sqrt(Math.max(0, LR * LR - (RL + LR - r) ** 2));
   const faceZ = r => ZB + 36.3 + 2.4 * (1 - Math.min(1, Math.max(0, (r - DL) / (RF - DL))) ** 2) - lipD(r);
-  const SC = { x: -50, y: 0, R: 13.5, d: 3.5 };       // half-moon scoop at 9 o'clock (crisp outer arc)
+  const SC = { x: -48.5, y: 0, R: 13.5, d: 3.5 };       // half-moon scoop at 9 o'clock (crisp outer arc)
   const surfZ = (x, y) => { const r = Math.hypot(x, y); let z = faceZ(Math.max(r, RL));
-    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) z -= SC.d * (1 - q) ** .25; return z; };
+    const q = ((x - SC.x) ** 2 + (y - SC.y) ** 2) / SC.R ** 2; if (q < 1) { const ed = SC.R * (1 - Math.sqrt(q)), w = Math.min(1, ed / .8); z -= SC.d * (1 - q) ** .35 * w * w * (3 - 2 * w); } return z; };   // 0.8 mm rounded rim
 
   /* ---------- body lathe: back, base seam, straight side, fillet into the face */
   const prof = [V2(0, 0), V2(69.6, 0), V2(70.7, .25), V2(71, 1), V2(71, 2.85), V2(70.7, 2.9), V2(70.7, 3.1), V2(71, 3.15)];
@@ -40,24 +41,27 @@ export default H => {
     C.forEach(([cu, cv, a0], i) => { const r = R[i]; for (let k = 0; k <= 10; k++) { const a = a0 + k / 10 * Math.PI / 2;
       const u = cu + r * Math.cos(a), v = cv + r * Math.sin(a); out.push([u * c - v * s, u * s + v * c]); } });
     return out; };
-  // sounder D at 3 o'clock: a circular segment (flat side inward at r 51.2, 24 mm chord, 5.2 mm deep, photo), corners eased
-  const dPts = (() => { const u0 = 51.2, h = 5.2, c = 12, R = (c * c + h * h) / (2 * h), uc = u0 + h - R, a = Math.asin(c / R), out = [], e = .9;
+  // sounder D at 3 o'clock: a circular segment (flat side inward at r 51.3, 24 mm chord, 7.3 mm deep, photo), corners eased
+  const dPts = (() => { const u0 = 51.3, h = 7.3, c = 12, R = (c * c + h * h) / (2 * h), uc = u0 + h - R, a = Math.asin(c / R), out = [], e = .9;
     for (let i = 0; i <= 40; i++) { const t = -a + (2 * a) * i / 40; out.push([uc + R * Math.cos(t), R * Math.sin(t)]); }
     const end = out[out.length - 1]; out.push([u0 + e * .4, c - e]); out.push([u0, c - e * 1.6]); out.push([u0, -c + e * 1.6]); out.push([u0 + e * .4, -c + e]);
     return out; })();
+  // bend a (u radial, v tangential) outline round the centre so its inner and outer sides are concentric arcs (photo slots are curved)
+  const bend = (pts, phi, um) => pts.map(([x0, y0]) => { const c = Math.cos(phi * D2R), s = Math.sin(phi * D2R), u = x0 * c + y0 * s, v = -x0 * s + y0 * c, a = phi * D2R + v / um;
+    return [u * Math.cos(a), u * Math.sin(a)]; });
   const holes = [
-    { pts: rrPts(44.6, 49.3, -11.7, 11.7, [1.2, 1.2, 1.2, 1.2], 0), phi: 0, u: [44.6, 49.3], v: 11.7 },
-    { pts: dPts, phi: 0, u: [51.2, 56.4], v: 12, d: 1 },
-    { pts: rrPts(46.6, 51.2, -12, 12, [1.2, 1.2, 1.2, 1.2], 180), phi: 180, u: [46.6, 51.2], v: 12 },
+    { pts: bend(rrPts(44.2, 50.2, -11.7, 11.7, [1.2, 1.2, 1.2, 1.2], 0), 0, 47.2), phi: 0, u: [44.2, 50.2], v: 11.7 },
+    { pts: bend(dPts, 0, 51.3), phi: 0, u: [51.3, 58.6], v: 12, d: 1 },
+    { pts: bend(rrPts(44, 50.4, -12.5, 12.5, [1.2, 1.2, 1.2, 1.2], 180), 180, 47.2), phi: 180, u: [44, 50.4], v: 12.5 },
   ];
 
   /* ---------- canvases: printed map + hole mask, planar over the 142 mm disc */
   const SZ = 142, N = 2048, k = N / SZ, P = (x, y) => [N / 2 + x * k, N / 2 - y * k];
   const cv = document.createElement('canvas'); cv.width = cv.height = N; const x = cv.getContext('2d');
-  const mk = document.createElement('canvas'); mk.width = mk.height = 1024; const m = mk.getContext('2d');
-  x.fillStyle = '#f4f4f2'; x.fillRect(0, 0, N, N); m.fillStyle = '#fff'; m.fillRect(0, 0, 1024, 1024);
-  const pathPts = (c, pts, sc) => { c.beginPath(); pts.forEach(([px, py], i) => { const X = 512 + px * sc, Y = 512 - py * sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.closePath(); };
-  m.fillStyle = '#000'; for (const h of holes) { pathPts(m, h.pts, 1024 / SZ); m.fill(); }
+  const MK = 2048, mk = document.createElement('canvas'); mk.width = mk.height = MK; const m = mk.getContext('2d');   // hole mask (anti-aliased via alphaToCoverage; 2048 keeps iPad memory sane)
+  x.fillStyle = '#f4f4f2'; x.fillRect(0, 0, N, N); m.fillStyle = '#fff'; m.fillRect(0, 0, MK, MK);
+  const pathPts = (c, pts, sc) => { c.beginPath(); pts.forEach(([px, py], i) => { const X = MK / 2 + px * sc, Y = MK / 2 - py * sc; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }); c.closePath(); };
+  m.fillStyle = '#000'; for (const h of holes) { pathPts(m, h.pts, MK / SZ); m.fill(); }
   // polar "quarter-tab" pad: r0..r1, a0..a1 (deg), corner radii [r0a0, r1a0, r1a1, r0a1] (mm)
   const polarPad = (r0, r1, a0, a1, R) => { const pts = [], seg = (fn, n) => { for (let i = 0; i <= n; i++) pts.push(fn(i / n)); };
     const pol = (r, a) => [r * Math.cos(a * D2R), r * Math.sin(a * D2R)];
@@ -87,14 +91,14 @@ export default H => {
   const drawPts = (pts) => { x.beginPath(); pts.forEach(([px, py], i) => i ? x.lineTo(...P(px, py)) : x.moveTo(...P(px, py))); x.closePath(); };
   const pad = (pts, fill) => { drawPts(pts); x.fillStyle = fill; x.fill(); x.lineWidth = .32 * k; x.strokeStyle = '#2a2a2a'; x.stroke(); };
   // CO pad (big round corner outer / away from the LED), LED window, FIRE pad (mirror); they start right where the lip rolls over (photo)
-  const coPts = polarPad(48.2, 58.6, 124.6, 138.6, [1.2, 1.4, 7, 1.2]);
-  const fiPts = polarPad(48.2, 58.6, 100.8, 115.2, [1.2, 7, 1.4, 1.2]);
+  const coPts = polarPad(45.5, 59.3, 124.6, 138.6, [1.2, 1.4, 7, 1.2]);
+  const fiPts = polarPad(45.5, 59.3, 100.8, 115.2, [1.2, 7, 1.4, 1.2]);
   pad(coPts, '#45474a'); pad(fiPts, '#45474a');
-  const ledPts = polarPad(49.6, 57.6, 116.8, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
-  x.fillStyle = '#626567'; drawPts(polarPad(51.4, 55.8, 118.1, 121.5, [.8, .8, .8, .8])); x.fill();
+  const ledPts = polarPad(47.8, 55.9, 116.8, 122.8, [1.4, 1.4, 1.4, 1.4]); pad(ledPts, '#46494b');
+  x.fillStyle = '#626567'; drawPts(polarPad(49.5, 54, 118.1, 121.5, [.8, .8, .8, .8])); x.fill();
   // soft sheen on the smoked pads (lighter toward their outer edge) and a thin darker lip on the side away from the light (glossy insert edge)
   for (const pts of [coPts, fiPts, ledPts]) { x.save(); drawPts(pts); x.clip();
-    const [gx0, gy0] = P(0, 0); const gr = x.createRadialGradient(gx0, gy0, 48 * k, gx0, gy0, 59 * k);
+    const [gx0, gy0] = P(0, 0); const gr = x.createRadialGradient(gx0, gy0, 45.5 * k, gx0, gy0, 59.3 * k);
     gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,.10)'); x.fillStyle = gr; x.fillRect(0, 0, N, N);
     x.translate(0, -.3 * k); drawPts(pts); x.lineWidth = .6 * k; x.strokeStyle = 'rgba(20,20,22,.55)'; x.stroke(); x.restore(); }
   // printed text: straight lines tangent to the circle, letters' tops toward the centre, condensed caps
@@ -133,7 +137,7 @@ export default H => {
   const mapT = tex(cv); mapT.colorSpace = THREE.SRGBColorSpace; const maskT = tex(mk);
 
   /* ---------- face grid r = RL..RF, z from surfZ, planar UVs, analytic-ish normals */
-  { const NR = 110, NA = 540, pos = [], nor = [], uv = [], idx = [], e = .05;
+  { const NR = 120, NA = 1440, pos = [], nor = [], uv = [], idx = [], e = .05;
     for (let i = 0; i <= NR; i++) { const r = RL + (RF - RL) * (i / NR) ** 1.6;
       for (let j = 0; j <= NA; j++) { const a = j / NA * Math.PI * 2, X = r * Math.cos(a), Y = r * Math.sin(a), Z = surfZ(X, Y);
         pos.push(X, Y, Z); uv.push(X / SZ + .5, Y / SZ + .5);
@@ -142,28 +146,43 @@ export default H => {
     for (let i = 0; i < NR; i++) for (let j = 0; j < NA; j++) { const a = i * (NA + 1) + j, b = a + 1, c = a + NA + 1, d = c + 1; idx.push(a, d, b, a, c, d); }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx);
-    const fm = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: mapT, alphaMap: maskT, alphaTest: .5, roughness: .26, clearcoat: .55, clearcoatRoughness: .18, side: THREE.DoubleSide });
+    const fm = new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: mapT, alphaMap: maskT, alphaTest: .5, roughness: .26, clearcoat: .55, clearcoatRoughness: .18, side: THREE.DoubleSide, alphaToCoverage: true });
     add(g, new THREE.Mesh(geo, fm)); }
 
-  /* ---------- sounder openings: dark walls, floor and fins */
-  for (const h of holes) { const pts = h.pts, n = pts.length, cz = surfZ(...pts[0]) - 5.2, pos = [], idx = [];
-    for (let i = 0; i < n; i++) { const [X, Y] = pts[i]; pos.push(X, Y, surfZ(X, Y) + .05, X, Y, cz); }
+  /* ---------- sounder openings: 0.6 mm rounded white rim, dark wall, near-black floor and two deep fins */
+  const wallM = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .8, side: THREE.DoubleSide });
+  for (const h of holes) { const pts = h.pts, n = pts.length; let ar = 0;
+    for (let i = 0; i < n; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % n]; ar += x1 * y2 - x2 * y1; }
+    const sg = ar > 0 ? 1 : -1, inn = pts.map((p, i) => { const a = pts[(i + n - 1) % n], b = pts[(i + 1) % n]; let tx = b[0] - a[0], ty = b[1] - a[1]; const l = Math.hypot(tx, ty) || 1;
+      return [-ty / l * sg, tx / l * sg]; });                // inward unit normal per point
+    const cz = surfZ(...pts[0]) - 5.2, rimPts = [], rp = [], ri = [], RIM = .6, NS = 4;
+    for (let i = 0; i < n; i++) { const [X, Y] = pts[i], [nx, ny] = inn[i], z0 = surfZ(X, Y);
+      rp.push(X - nx * .2, Y - ny * .2, z0 - .04);            // tucked under the face edge, so the anti-aliased hole edge only ever shows the rim
+      for (let k2 = 0; k2 <= NS; k2++) { const t = k2 / NS * Math.PI / 2; rp.push(X + nx * RIM * Math.sin(t), Y + ny * RIM * Math.sin(t), z0 - .01 - RIM * (1 - Math.cos(t))); }
+      rimPts.push([X + nx * RIM, Y + ny * RIM, z0 - RIM]); }
+    for (let i = 0; i < n; i++) { const a = i * (NS + 2), b = ((i + 1) % n) * (NS + 2); for (let k2 = 0; k2 <= NS; k2++) ri.push(a + k2, a + k2 + 1, b + k2, b + k2, a + k2 + 1, b + k2 + 1); }
+    const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rp, 3)); rg.setIndex(ri); rg.computeVertexNormals();
+    add(g, new THREE.Mesh(rg, new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .26, clearcoat: .55, clearcoatRoughness: .18, side: THREE.DoubleSide })));
+    const pos = [], idx = [];
+    for (const [X, Y, Z] of rimPts) pos.push(X, Y, Z, X, Y, cz);
     for (let i = 0; i < n; i++) { const a = 2 * i, b = 2 * ((i + 1) % n); idx.push(a, a + 1, b, b, a + 1, b + 1); }
     const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); wg.setIndex(idx); wg.computeVertexNormals();
-    add(g, new THREE.Mesh(wg, new THREE.MeshStandardMaterial({ color: 0x161616, roughness: .85, side: THREE.DoubleSide })));
-    const fl = add(g, new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(pts.map(p => V2(p[0], p[1])))), dark)); fl.position.z = cz;
-    const c = Math.cos(h.phi * D2R), s = Math.sin(h.phi * D2R), um = (h.u[0] + h.u[1]) / 2, ul = h.u[1] - h.u[0] - .4;
-    for (const f of [-.5, 0, .5]) { const v = f * h.v * (h.d ? .7 : 1), X = um * c - v * s, Y = um * s + v * c, top = surfZ(X, Y) - 3;
+    add(g, new THREE.Mesh(wg, wallM));
+    const fl = add(g, new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(rimPts.map(p => V2(p[0], p[1])))), dark)); fl.position.z = cz;
+    const c = Math.cos(h.phi * D2R), s = Math.sin(h.phi * D2R), um = (h.u[0] + h.u[1]) / 2, ul = h.u[1] - h.u[0] - 1.6;
+    for (const f of [-.5, .5]) { const v = f * h.v * (h.d ? .6 : 1), X = um * c - v * s, Y = um * s + v * c, top = surfZ(X, Y) - 4.2;
       const b = add(g, new THREE.Mesh(new THREE.BoxGeometry(ul, 1.6, 2.2), fin), X, Y, top - 1.1); b.rotation.z = h.phi * D2R; } }
 
+  // the cup inside the lip is shaded grey in the photos (no AO in the renderer, so it is baked into the colour)
+  const cupM = new THREE.MeshPhysicalMaterial({ color: 0xd6d6d6, roughness: .32, clearcoat: .4, clearcoatRoughness: .25 });
   /* ---------- well lip, well wall + floor (dark below), insect mesh band, chamber rings, dark interior */
   { const f = faceZ(RL), lp = [V2(30, 33.6 + ZB), V2(43.6, 33.6 + ZB), V2(44.3, 33.9 + ZB), V2(RL, Math.min(f, 34.6 + ZB)), V2(RL, f + .02)].reverse();   // well wall under the lip
-    const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), white)); lip.rotation.x = Math.PI / 2; }
+    const lip = add(g, new THREE.Mesh(new THREE.LatheGeometry(lp, 180), cupM)); lip.rotation.x = Math.PI / 2; }
   { // fine square-weave mesh, with the light grey tabs behind it at each spoke gap
-    const W = 4096, Hh = 208, c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
-    const circ = 2 * Math.PI * 40.5, pxmm = W / circ; y.fillStyle = '#2c2d2e'; y.fillRect(0, 0, W, Hh);
-    for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 9 * pxmm); }
-    y.strokeStyle = 'rgba(125,126,128,.9)'; y.lineWidth = .14 * pxmm; const pitch = .4 * pxmm;
+    const W = 8192, circ = 2 * Math.PI * 40.5, pxmm = W / circ, Hh = Math.round(9 * pxmm), c = document.createElement('canvas'); c.width = W; c.height = Hh; const y = c.getContext('2d');
+    y.fillStyle = '#4a4b4c'; y.fillRect(0, 0, W, Hh);
+    for (let i = 0; i < 6; i++) { const u = ((i * 60 + 0) / 360) * W; y.fillStyle = '#7a7a7a'; y.fillRect(u - 1.5 * pxmm, Hh * .14, 3 * pxmm, 6 * pxmm); }
+    y.strokeStyle = 'rgba(110,111,112,.6)'; y.lineWidth = .14 * pxmm; const pitch = .5 * pxmm;   // >= 8 px pitch: no moire with mipmaps
     for (let u = 0; u < W; u += pitch) { y.beginPath(); y.moveTo(u, 0); y.lineTo(u, Hh); y.stroke(); }
     for (let v = 0; v < Hh; v += pitch) { y.beginPath(); y.moveTo(0, v); y.lineTo(W, v); y.stroke(); }
     const t = tex(c); t.colorSpace = THREE.SRGBColorSpace;
@@ -171,12 +190,12 @@ export default H => {
     // cylinder UV u starts at +z (pre-rotation) i.e. -y here; rotate so the tabs sit at 0, 60, 120 ... degrees
     const mesh = add(g, new THREE.Mesh(mg, new THREE.MeshStandardMaterial({ map: t, roughness: .75, metalness: .1 }))); mesh.rotation.z = -Math.PI / 2; }
   // chamber: base ring A (r 37-43), stepped ring, ring B pulled in to r 31.5 with its top 1 mm under the cap (only a thin shadow line
-  // straight on); the dark insect-mesh disc inside it shows only at an angle
-  { const cp = [V2(41.6, 44.2), V2(43.1, 44.5), V2(43.1, 44.9), V2(42.6, 45.3), V2(37, 45.3), V2(36.6, 46.6), V2(36.4, 46), V2(36.4, 45.6), V2(36.2, 46), V2(35.5, 46.1),
-      V2(32.2, 46.4), V2(31.7, 46.8), V2(31.5, 47.4), V2(31.5, 50.6), V2(31.3, 51.3), V2(31, 51.5), V2(30.6, 51.3), V2(30.4, 50.7), V2(30.35, 50)];
-    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 5 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
-    const mc = document.createElement('canvas'); mc.width = mc.height = 256; const mx = mc.getContext('2d'); mx.fillStyle = '#4a4c4e'; mx.fillRect(0, 0, 256, 256);
-    mx.strokeStyle = 'rgba(25,26,27,.8)'; mx.lineWidth = 1.2; for (let i = 0; i < 256; i += 4) { mx.beginPath(); mx.moveTo(i, 0); mx.lineTo(i, 256); mx.moveTo(0, i); mx.lineTo(256, i); mx.stroke(); }
+  // straight on); the grey insect-mesh disc inside it (#9a9c9e, so the slot reads as shade, not a black line) shows only at an angle
+  { const cp = [V2(41.2, 44.2), V2(42.6, 44.5), V2(42.6, 44.9), V2(42.2, 45.3), V2(37, 45.3), V2(36.6, 46.6), V2(36.4, 46), V2(36.4, 45.6), V2(36.2, 46), V2(35.5, 46.1),
+      V2(32.2, 46.4), V2(31.7, 46.8), V2(31.5, 47.4), V2(31.5, 50.6), V2(31.3, 51.3), V2(31, 51.5), V2(30.6, 51.3), V2(30.4, 50.7), V2(30.35, 50)];   // ring B top 1 mm under the cap
+    const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 5 ? LIFT : 0))), 180), cupM)); ch.rotation.x = Math.PI / 2;
+    const mc = document.createElement('canvas'); mc.width = mc.height = 256; const mx = mc.getContext('2d'); mx.fillStyle = '#9a9c9e'; mx.fillRect(0, 0, 256, 256);
+    mx.strokeStyle = 'rgba(70,71,72,.6)'; mx.lineWidth = 1.2; for (let i = 0; i < 256; i += 4) { mx.beginPath(); mx.moveTo(i, 0); mx.lineTo(i, 256); mx.moveTo(0, i); mx.lineTo(256, i); mx.stroke(); }
     const mt = tex(mc); mt.colorSpace = THREE.SRGBColorSpace; mt.wrapS = mt.wrapT = THREE.RepeatWrapping; mt.repeat.set(3, 3);
     const dk = [V2(30.35, 50), V2(30, 49.2), V2(0, 49.2)];
     const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + ZB + LIFT)), 120), new THREE.MeshStandardMaterial({ map: mt, roughness: .8 }))); di.rotation.x = Math.PI / 2; }
@@ -192,17 +211,22 @@ export default H => {
   // each spoke leaves the cap's side wall below its top (inner end buried in the cap) and drops in one convex arc to its foot on the lip;
   // nothing stands outside the cap at cap height. Chunky strap: 4.5-4.8 mm radial.
   { const s = new THREE.Shape(); const f0 = faceZ(44.6) - 1.5, f1 = faceZ(49.6) - 1.2;
-    s.moveTo(27, 62); s.lineTo(36, 62); s.bezierCurveTo(43, 62, 44.6, 58, 44.6, f0 + 4); s.lineTo(44.6, f0); s.lineTo(49.6, f1); s.lineTo(49.6, f1 + 2);
-    s.bezierCurveTo(49.6, 61, 40, 66, 27, 66); s.lineTo(27, 62);
+    // one even bowl in side view: the outer edge runs diagonally from the foot to the cap side, meeting it ~1.5 mm under the cap face
+    s.moveTo(27, 65); s.bezierCurveTo(37, 64.5, 44.6, 60, 44.6, f0 + 3); s.lineTo(44.6, f0); s.lineTo(49.6, f1);
+    s.bezierCurveTo(48.5, f1 + 7, 38, 67.8, 27, 69.5); s.lineTo(27, 65);
     const bv = .9, W0 = 9.6;
     const sg = new THREE.ExtrudeGeometry(s, { depth: W0 - 2 * bv, bevelEnabled: true, bevelThickness: bv, bevelSize: bv, bevelOffset: -bv, bevelSegments: 4, curveSegments: 20 });
     sg.translate(0, 0, -(W0 - 2 * bv) / 2);
     const p = sg.attributes.position;                       // taper: 9.6 mm wide at the foot -> ~7 mm at the cap (photo front: 8-8.8 at r 45)
     for (let i = 0; i < p.count; i++) { const r = p.getX(i), t = Math.min(1, Math.max(0, (r - 27) / (49.6 - 27))); p.setZ(i, p.getZ(i) * (.72 + .28 * t)); }
     sg.computeVertexNormals();
+    { const nn = sg.attributes.normal, col = [];             // side walls (normal across the strap) 0.85: the straps read as solid
+      for (let i = 0; i < nn.count; i++) { const v = Math.abs(nn.getZ(i)) > .7 ? .85 : 1; col.push(v, v, v); }
+      sg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); }
+    const spM = white.clone(); spM.vertexColors = true;
     for (const a of [90, 30, -30, -90, 150, 210]) { const c = Math.cos(a * D2R), sn = Math.sin(a * D2R);
       const M = new THREE.Matrix4().makeBasis(new THREE.Vector3(c, sn, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(sn, -c, 0));
-      const sp = add(g, new THREE.Mesh(sg, white)); sp.applyMatrix4(M); } }
+      const sp = add(g, new THREE.Mesh(sg, spM)); sp.applyMatrix4(M); } }
 
   outer.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return outer;

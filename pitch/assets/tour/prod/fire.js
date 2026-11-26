@@ -27,22 +27,29 @@ export default H => {
   const RY = Y - 8.75, RH = 1.35, RL = X - 4.4 - RH;     // rib: capsule centre line y, half height, half length
   const hf = (x, y) => {                                  // height of the front surface (inside the outline)
     let z = ZF;
-    // top strip: set back 0.8; between 7.4 and 3.6 mm below the top it also tips back 0.4 toward the bottom; R0.4-ish crease at Y-3.6
-    const u = Y - 3.6 - y, slope = .25 / 3.8, sp = .4 * Math.log1p(Math.exp(u / .4));          // softplus: a rounded crease
-    const strip = ZF - .8 - slope * Math.min(sp, 3.8 + .4);
-    z += (strip - ZF) * ss(Y - 7.4 - .35, Y - 7.4 + .35, y);
-    // rib: half-round, 0.6 proud
-    // rib: round-topped, 0.6 proud; its upper side is a half-round, its lower side runs out gently (no dark line under it, photo)
-    const dx = Math.max(0, Math.abs(x) - RL), dr = Math.hypot(dx, y > RY ? y - RY : (y - RY) / 2);
-    if (dr < RH) z = Math.max(z, ZF + .6 * (y > RY ? Math.sqrt(1 - (dr / RH) ** 2) : Math.cos(dr / RH * Math.PI / 2) ** 2 * .5 + .5 * Math.sqrt(1 - (dr / RH) ** 2)));
+    // above the rib the face curves gently back (catching more light toward the top), then a soft R0.4 step 3.1 mm below the top (photo; review said 3.6) sets
+    // the top strip back 0.8 mm: the step faces up and is the photo's highlight line; the strip itself keeps tipping back to the top edge
+    const t = y - (Y - 7.4);
+    if (t > 0) z -= t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3);
+    z -= .8 * ss(Y - 3.1 - .28, Y - 3.1 + .28, y);
+    // rib: round-topped, 0.6 proud; its upper side is a half-round, its lower side stays full then drops steeply (only a hairline shade under it, photo)
+    const dx = Math.max(0, Math.abs(x) - RL), dr = Math.hypot(dx, y - RY);
+    if (dr < RH) z = Math.max(z, ZF + .6 * Math.sqrt(1 - (dr / RH) ** (y > RY ? 2 : 6)));
     // edge roll-off
     // a ~24 deg flat (faces the light like the photo's bright side strips), soft inner crease
-    const { d } = near(x, y); if (d < BS) { const q = (BS - Math.max(0, d)) / BS; z -= BT * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1); }
+    // per edge: 2 mm on the sides, bottom and chamfers; a tight 0.8 mm round on the top edge and notch (photo); the deepest drop wins, so it stays continuous
+    let drop = 0;
+    for (let i = 0; i < OP.length; i++) { const [x1, y1] = OP[i], [x2, y2] = OP[(i + 1) % OP.length], dx2 = x2 - x1, dy2 = y2 - y1;
+      const tt = Math.max(0, Math.min(1, ((x - x1) * dx2 + (y - y1) * dy2) / (dx2 * dx2 + dy2 * dy2))), dd = Math.hypot(x - x1 - tt * dx2, y - y1 - tt * dy2);
+      const top = y1 > Y - 1 && y2 > Y - 1, bs = top ? .8 : BS, bt = top ? .6 : BT;
+      if (dd < bs) { const q = (bs - dd) / bs; drop = Math.max(drop, bt * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1)); } }
+    z -= drop;
     return z; };
 
   // rear solid (z 0..20) and the plate body (z 8 .. ZF-BT) behind the front surface
   add(g, ext(shape(), 20, .5, white));
-  const body = () => add(g, ext(shape(), ZF - BT - 8 + .02, .3, pm), 0, 0, 8);
+  const ZB = 19.5;                                        // plate body front (well behind the set-back top strip); a skirt closes up to the front surface
+  const body = () => add(g, ext(shape(), ZB - 8, .3, pm), 0, 0, 8);
 
   // pinhole mask (4 mm square round the hole), front surface material with the faint parting line 38 mm below the top
   const mask = (() => { const N = 128, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d');
@@ -64,7 +71,16 @@ export default H => {
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const a = j * (nx + 1) + i, b = a + 1, c = a + nx + 1, d = c + 1; idx.push(a, b, d, a, d, c); }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx);
-    const face = add(g, new THREE.Mesh(geo, pm)); face.userData.noSelfShadow = true; }
+    const face = add(g, new THREE.Mesh(geo, pm)); face.userData.noSelfShadow = true;
+    // skirt: the outline's side wall from the body front up to the front surface's edge
+    const sp = [], si = []; let n = 0;
+    for (let i = 0; i < OP.length; i++) { const [x1, y1] = OP[i], [x2, y2] = OP[(i + 1) % OP.length], L = Math.hypot(x2 - x1, y2 - y1), m = Math.max(1, Math.ceil(L / .2));
+      const nx2 = (y2 - y1) / L, ny2 = -(x2 - x1) / L;   // outward normal (CCW outline)
+      for (let k2 = 0; k2 <= m; k2++) { const x = x1 + (x2 - x1) * k2 / m, y = y1 + (y2 - y1) * k2 / m;
+        sp.push(x, y, hf(x - nx2 * 1e-3, y - ny2 * 1e-3), x, y, ZB - .3);
+        if (k2) { const a = n - 2, b = n; si.push(a, a + 1, b, b, a + 1, b + 1); } n += 2; } }
+    const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); sg.setIndex(si); sg.computeVertexNormals();
+    add(g, new THREE.Mesh(sg, new THREE.MeshPhysicalMaterial({ color: 0xa6a6ad, roughness: .3, clearcoat: .45, clearcoatRoughness: .25, side: THREE.DoubleSide }))); }
 
   // pinhole: shallow countersink (dia 2.6, 0.15 deep) into a dark brown 2.0 mm bore (photo), 27.8 mm below the top
   { const V2 = (r, z) => new THREE.Vector2(r, z);

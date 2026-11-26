@@ -57,7 +57,7 @@ export default H => {
   // wall-plate layer (z 0 -> 7): a 3 mm rim with exactly the shell's outline (77 x 95.1, R10), rounded R1 at the wall, so plate and
   // shell are one flush surface with only the hairline parting line at z = 7; open toward the wall (the back cavity below)
   { const s = rrShape(77, 98.5, 10); s.holes.push(rrShape(71, 92.5, 7));
-    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -.5, 0);   // top y 48.75 = the shell's own top g.userData.wallPlate = wp; }
+    const wp = add(M, ext(s, 6.85, 1, mountW), 0, -.5, 0); g.userData.wallPlate = wp; }   // top y 48.75 = the shell's own top
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
   { const s = H.rr4(77, 48, [3, 3, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [1.8, 1.8, 8.8, 8.8], 0, -25.4));
     add(M, ext(s, 8.95, .3, mountW), 0, 0, 7.05);             // ends exactly at the grille's back edge (z 16)
