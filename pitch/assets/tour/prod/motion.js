@@ -43,7 +43,7 @@ export default H => {
   /* Fresnel lens: frosted lavender-grey, faint vertical facet bands, shade under the top lip; follows the crown 1.5 mm down */
   const lensRings = [];
   for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27.5) ** 2)]; }));
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9c9aa6, roughness: .66, map: K.bandsTex(true), specularIntensity: .15 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9593a0, roughness: .66, map: K.bandsTex(true), specularIntensity: .15 });
   add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
 
   /* wordmark, tone-on-tone, flush on the crowned face */

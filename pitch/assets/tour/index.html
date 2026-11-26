@@ -1607,11 +1607,11 @@ window.__tour = { focus:k=>focus(byKey[k]), overview, state, camera, controls, s
 /* dev studio: ?studio=<product>&az=<deg>&el=<deg>[&fill=<0..1>] shows one product alone on a light backdrop, lit like a
    product shot, from that angle (az 0 = straight at its face, + = from its right). Used to render review sheets. */
 if(/[?&]studio=/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(() => new Promise(r => setTimeout(r, 700))).then(() => {   // after the intro overview() has started
-  const Q = new URLSearchParams(location.search), k = Q.get('studio'), az = +(Q.get('az')||0)*Math.PI/180, el = +(Q.get('el')||0)*Math.PI/180, fill = +(Q.get('fill')||.62);
+  const Q = new URLSearchParams(location.search), k = Q.get('studio'), az = +(Q.get('az')||0)*Math.PI/180, el = +(Q.get('el')||0)*Math.PI/180, fill = +(Q.get('fill')||.62), fov = +(Q.get('fov')||0), roll = +(Q.get('roll')||0)*Math.PI/180, bg = Q.get('bg');   // fov: match a photo's lens (deg, vertical); roll: tilt the camera; bg: backdrop hex
   document.body.classList.add('studio'); const st = document.createElement('style');
   st.textContent = 'body.studio > *:not(canvas){display:none!important} body.studio canvas{display:block!important}'; document.head.appendChild(st);
   for(const o of scene.children) o.visible = false;
-  scene.background = new THREE.Color(0xf1f1f0); scene.environmentIntensity = .85;
+  scene.background = new THREE.Color(bg ? parseInt(bg, 16) : 0xf1f1f0); if(fov){ camera.fov = fov; camera.updateProjectionMatrix(); } scene.environmentIntensity = .85;
   const g = new THREE.Group(); scene.add(g);
   const m = MODELS[k](); const box = new THREE.Box3().setFromObject(m), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
   m.position.sub(c); g.add(m);
@@ -1621,7 +1621,9 @@ if(/[?&]studio=/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).t
   g.add(new THREE.HemisphereLight(0xffffff, 0xb9b9b9, .55));
   state.focus = null; state.fly = null; state.idleAt = Infinity; controls.autoRotate = false; controls.enableDamping = false; openLimits();
   const R = Math.max(sz.x, sz.y, sz.z) * .5 / Math.tan(THREE.MathUtils.degToRad(camera.fov/2)) / fill * 1.15;
-  controls.target.set(0,0,0); camera.position.set(Math.sin(az)*Math.cos(el)*R, Math.sin(el)*R, Math.cos(az)*Math.cos(el)*R); camera.lookAt(0,0,0); controls.update();
+  const T = new THREE.Vector3(+(Q.get('tx')||0)*sz.x, +(Q.get('ty')||0)*sz.y, +(Q.get('tz')||0)*sz.z);   // tx/ty/tz: aim at a point offset from the centre (fractions of the product's size), for close-up crops
+  controls.target.copy(T); camera.position.set(Math.sin(az)*Math.cos(el)*R, Math.sin(el)*R, Math.cos(az)*Math.cos(el)*R).add(T); camera.lookAt(T); controls.update();
+  if(roll){ const r0 = roll; const o = renderer.render.bind(renderer); renderer.render = (sc, cam) => { cam.rotateZ(r0); o(sc, cam); cam.rotateZ(-r0); }; }
   if(Q.has('grid')){                                   // review sheet: six views in one image (front, 3/4 left, 3/4 right, right side, top, back)
     const V6 = [[0,0],[-40,15],[40,15],[90,0],[0,75],[180,10]].map(([a,e]) => { const c = camera.clone(), A = a*Math.PI/180, E = e*Math.PI/180;
       c.position.set(Math.sin(A)*Math.cos(E)*R, Math.sin(E)*R, Math.cos(A)*Math.cos(E)*R); c.up.set(0,1,0); c.lookAt(0,0,0); c.aspect = 1; c.near = R*.05; c.far = R*20; c.clearViewOffset(); c.updateProjectionMatrix(); return c; });

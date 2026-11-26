@@ -109,9 +109,9 @@ html.pp #prScroll .ichv .dbai{top:auto!important;bottom:250px!important;right:30
 /* ---------- Smoke: Which one is right for you? two cards stacked ---------- */
 html.pp #prScroll .smk-w .eb{left:36px!important;top:104px!important}
 html.pp #prScroll .smk-w h2{left:36px!important;right:36px;top:132px!important;font-size:50px!important}
-html.pp #prScroll .smk-c{left:20px!important;right:20px!important;width:auto!important;height:calc((var(--H) - 460px)/2)!important;padding:26px 170px 0 28px!important;box-sizing:border-box}
-html.pp #prScroll .smk-c:nth-of-type(2){top:220px!important}
-html.pp #prScroll .smk-c:nth-of-type(3){top:calc(236px + (var(--H) - 460px)/2)!important}
+html.pp #prScroll .smk-c{left:20px!important;right:20px!important;width:auto!important;height:calc((var(--H) - 500px)/2)!important;padding:26px 170px 0 28px!important;box-sizing:border-box}
+html.pp #prScroll .smk-c:nth-of-type(2){top:262px!important}
+html.pp #prScroll .smk-c:nth-of-type(3){top:calc(278px + (var(--H) - 500px)/2)!important}
 html.pp #prScroll .smk-c img{right:24px!important;left:auto!important;top:50%!important;width:130px!important;height:130px!important;transform:translateY(-50%)}
 html.pp #prScroll .smk-c h3{width:auto!important;min-height:0!important;font-size:28px!important}
 html.pp #prScroll .smk-c>p,html.pp #prScroll .smk-c ul{display:none!important}
@@ -141,7 +141,6 @@ html.pp #hbScroll .hbh-top p{font-size:22px!important;line-height:1.35}
 html.pp #thScroll .thc .th-media{left:50%!important;top:96px!important;transform:translateX(-50%) scale(var(--thk,.7))!important;transform-origin:50% 0!important}
 html.pp #thScroll .thc .thc-col{left:20px!important;right:20px!important;width:auto!important;top:calc(116px + 700px*var(--thk,.7))!important;bottom:auto!important;justify-content:flex-start}
 html.pp #thScroll .thc .thc-col h2{left:16px!important;height:auto!important;font-size:38px!important;display:block}
-html.pp #thScroll .thc .thc-col h2 br{display:none}
 html.pp #thScroll .thc .thc-col .sub{left:16px!important;width:auto!important;height:auto!important;min-height:0;font-size:18px!important;margin:8px 0 16px}
 html.pp #thScroll .thc #thfL{width:auto!important;display:grid;grid-template-columns:1fr 1fr;gap:6px}
 html.pp #thScroll .thc .th-list button{height:60px;font-size:16.5px;padding:0 14px;gap:10px;border-radius:30px;line-height:1.1}

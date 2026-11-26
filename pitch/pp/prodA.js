@@ -18,7 +18,7 @@
      the artwork is wrapped in .ppart and scaled to the upright width around its region of interest; the tiles that pick
      what it shows (.lvt / .lvl) are lifted into .ppctl below it at full size, so they stay readable and easy to tap. ---- */
   /* region of interest in artwork px [x,y,w,h] by product:section (default: the whole picture) */
-  const ROI={'lock:lock':[150,150,1110,520],'lock:colors':[120,170,1150,420],'garage:gphone':[224,36,448,900],'app:phone':[90,60,700,840],'garage:garage':[0,0,1376,964],'app:hero':[0,0,1376,964]};
+  const ROI={'lock:lock':[40,130,1300,560],'lock:colors':[90,160,1210,440],'garage:gphone':[224,36,448,900],'app:phone':[90,60,700,840],'garage:garage':[0,0,1376,964],'app:hero':[0,0,1376,964]};
   const ART='img.full,video.ovid,.hl,.tip,.xf-ghost';
   function artSecs(){ const b=$('#prScroll'); return b?[...b.children].filter(s=>s.classList.contains('psec')&&(s.querySelector(':scope>img.full')||s.querySelector(':scope>.ppart>img.full'))):[]; }
   function art(){ const pp=isPP(), H=window.SH||1032, id=(typeof PR!=='undefined'&&PR&&PR.id)||'';
@@ -30,7 +30,6 @@
       if(!c){ c=document.createElement('div'); c.className='ppctl'; sec.appendChild(c); }
       const hl=w.querySelector('.hl'), tiles=hl?[...hl.querySelectorAll(':scope>.lvt,:scope>.lvl')]:[];
       if(tiles.length){ c.innerHTML=''; tiles.forEach(x=>c.appendChild(x)); }
-      if(hl) hl.querySelectorAll(':scope>.lvmask').forEach(x=>x.hidden=true);
       const n=c.querySelectorAll('.lvt').length, list=c.querySelector('.lvl');
       c.dataset.n=n; const rows=list?0:n>4?2:n?(n===4?2:1):0, ctlH=list?list.children.length*64:rows*112+(rows?(rows-1)*12:0);
       const r=ROI[id+':'+sec.dataset.t]||[0,0,1376,964], top0=104, bot=170, gap=ctlH?28:0;

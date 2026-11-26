@@ -97,7 +97,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   /* ---- end helpers ---- */
   const g = G(), W = 29, L = 64, D = 11, lift = 4.0;                        // ring end lifted 4 mm by the ring wire under it
   const F = G(); F.scale.setScalar(.001); g.add(F);
-  F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001;
+  const bare = /[?&]bare/.test(location.search);                          // bare: the fob alone, upright (face +z) for photo matching
+  if (!bare) { F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001; }
 
   /* 1-3. shell */
   const grey = new THREE.MeshPhysicalMaterial({ color: 0xbdbdbb, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
@@ -125,7 +126,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 640, 240, 12.8 * 80, 5.5,
     'rgba(40,40,40,.45)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
 
-  if (/[?&]bare/.test(location.search)) return g;
+  if (bare) return g;
   /* 9. split ring (two coils of flat steel wire) through the slot and under the ring end, leaning over; two house keys on it */
   const steel = new THREE.MeshPhysicalMaterial({ color: 0xcfd1d3, roughness: .2, metalness: 1, clearcoat: .3 });
   const steelD = steel.clone(); steelD.side = THREE.DoubleSide;

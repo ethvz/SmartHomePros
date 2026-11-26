@@ -95,7 +95,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
     x.drawImage(T, 0, 0);
   }
   /* ---- end helpers ---- */
-  const g = G(), Q = new URLSearchParams(location.search), nocord = Q.has('nocord');
+  const g = G(), Q = new URLSearchParams(location.search), bare = Q.has('bare'), nocord = bare || Q.has('nocord');
   const P = G(); P.scale.setScalar(.001); P.position.y = .006; g.add(P);                  // body sits a little above the plate centre (upper receptacle)
   const W = 96, HH = 53, D = 38, R = 6, crown = .6;
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f0ee, roughness: .45, clearcoat: .08, clearcoatRoughness: .5, sheen: .25, sheenRoughness: .8, sheenColor: 0xffffff });
@@ -161,6 +161,7 @@ export default H => { const { THREE, G, add, rslab, rrShape } = H;
 
   /* 8. prongs (into the receptacle, hidden in the wall) */
   const steel = new THREE.MeshStandardMaterial({ color: 0xc9c3b4, roughness: .3, metalness: 1 });
+  if (bare) return g;
   for (const x of [-6.35, 6.35]) add(P, new THREE.Mesh(new THREE.BoxGeometry(1.5, 6.3, 15.9), steel), x, 7, -7.9);
   add(P, new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 15.9, 20), steel), 0, -5, -7.9).rotation.x = Math.PI / 2;
 

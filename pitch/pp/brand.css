@@ -99,7 +99,7 @@ html.pp #p-sign .sgn-sc{left:0!important;width:100%!important;height:100%!import
 html.pp #p-sign .sgn-s{height:var(--H)!important}
 html.pp #p-sign .sgn-s:first-child>img:first-child{object-position:0 0!important;transform-origin:0 0;transform:scale(3.4);filter:blur(10px) brightness(.8) saturate(1.15)}
 html.pp #p-sign .sgn-s>img.sgn-pp{display:block;inset:auto!important;left:20px!important;right:20px!important;top:calc(var(--bt) + 10px)!important;
-  width:540px!important;left:30px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 0!important;
+  width:456px!important;left:40px!important;height:calc(var(--U) - var(--bt) - 10px)!important;object-fit:contain!important;object-position:50% 0!important;
   filter:drop-shadow(0 26px 34px rgba(0,0,0,.45))}
 html.pp #p-sign.on .sgn-pp{animation:sgnUp .9s cubic-bezier(.22,1,.36,1) backwards}
 @keyframes sgnUp{from{opacity:0;transform:translateY(60px)}}
