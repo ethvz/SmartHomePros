@@ -149,12 +149,17 @@
   /* Keypad and Vivint App: their landscape tiles run off the bottom edge (cut off in a small upright tile).
      Add the whole product (the same kind of cut-out the other tiles use) + a live name; CSS shows them only in pp */
   function wholeTiles() {
-    $$('#allTiles .ht[data-k=keypad], #allTiles .ht[data-k=app], .hcat .ht[data-k=keypad], .hcat .ht[data-k=app]').forEach(t => {
-      if (t.querySelector(':scope>.ppalt')) return;
+    $$('#allTiles .ht[data-k], .hcat .ht[data-k]').forEach(t => {
       const k = t.dataset.k;
-      t.insertAdjacentHTML('beforeend', '<img class="cp ppalt" src="assets/cat/' + k + '.webp?v=176" alt="" draggable="false"><div class="cl ppalt">' + BIGN[k] + '</div>');
+      if (!WHOLE[k] || t.querySelector(':scope>.ppalt')) return;
+      t.insertAdjacentHTML('beforeend', '<img class="cp ppalt pp-' + k + '" src="assets/cat/' + k + '.webp?v=176" alt="" draggable="false"><div class="cl ppalt">' + BIGN[k] + '</div>');
     });
+    /* short names on the small All-grid tiles (pp only, via CSS attr()) */
+    $$('#allTiles .ht[data-k] > .cl:not(.ppalt)').forEach(c => { const n = SHORT[c.parentNode.dataset.k]; if (n && c.dataset.pps !== n) c.dataset.pps = n; });
   }
+  /* tiles shown as the whole cut-out product in pp (their landscape artwork bleeds off an edge, or carries a baked name) */
+  const WHOLE = { keypad: 1, app: 1, ocp: 1, ocspot: 1 };
+  const SHORT = { therm: 'Thermostat', glass: 'Glass Break', window: 'Door/Window' };
 
   function all() { setGeo(); ppHome(); navMode(); tourInset(); bigLabels(); wholeTiles(); }
   addEventListener('resize', () => { all(); setTimeout(all, 320); });

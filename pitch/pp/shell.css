@@ -126,21 +126,26 @@ html.pp #homeTrack{height:calc(var(--H) - var(--ppHomeFoot))!important}
 html.pp #p-home .hpane{height:calc(var(--H) - var(--ppHomeFoot))!important}
 html.pp #homeAll .hall-h{left:20px;right:20px;top:16px;height:auto}
 html.pp #homeAll .hall-h h1{display:none}
-html.pp #allTiles .ht .cl{font-size:15px;line-height:1.15;bottom:6%;padding:0 4px}
+html.pp #allTiles .ht .cl{font-size:16px;line-height:1.12;bottom:6%;padding:0 4px}
+html.pp #allTiles .ht .cl[data-pps]{font-size:0!important}
+html.pp #allTiles .ht .cl[data-pps]::after{content:attr(data-pps);font-size:16px}
+/* small tiles: the product sits a little higher so a two-line name never touches it */
+html.pp #allTiles .ht img.cp:not(.big):not(.pp-ocp):not(.pp-ocspot){top:41%!important;height:54%!important}
 /* category panes: header up top, then a grid that fills the rest (the landscape rows of 5 would be needle-thin upright).
    The rows are flattened (display:contents) so the tiles can re-grid; the flip animation measures tiles, so it follows. */
 html.pp #homeTrack .hcat{display:grid!important;padding:50px 16px 10px!important;gap:12px!important}
 html.pp .hcat .hrow{display:contents!important}
 html.pp .hcat .ht{min-height:0;flex:none!important}
-html.pp .hcat .ht .cl{font-size:15px;line-height:1.15;padding:0 4px}
+html.pp .hcat .ht .cl{font-size:16px;line-height:1.15;padding:0 4px}
 /* Sensors: Hub | Keypad | App, then 3 rows of 3 */
-html.pp .hcat[data-c=sensors]{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:1.2fr 1fr 1fr 1fr}
+html.pp .hcat[data-c=sensors]{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:.95fr 1fr 1fr 1fr}
 html.pp .hcat[data-c=sensors] .ht{grid-column:span 4}
 html.pp .hcat[data-c=sensors] .ht[data-k=shp2]{grid-column:span 6}
 html.pp .hcat[data-c=sensors] .ht:is([data-k=keypad],[data-k=app]){grid-column:span 3}
-/* the Hub's alarm screen: oversized, running off the tile's sides and bottom (the red screen stays whole and centred) */
+/* the Hub's alarm screen: the device sized from the tile height, its frame top just under the name, centred,
+   running off the tile's bottom (the artwork ends there) */
 html.pp .hcat[data-c=sensors] .ht[data-k=shp2]{overflow:hidden}
-html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:contain!important;object-position:50% 100%!important;inset:auto!important;left:-30%!important;top:auto!important;bottom:0!important;width:160%!important;height:calc(100% - 44px)!important;max-width:none!important}
+html.pp .hcat[data-c=sensors] .ht[data-k=shp2] img[src*="scr.webp"]{object-fit:fill!important;inset:auto!important;top:40px!important;bottom:auto!important;height:calc(100% - 40px)!important;width:auto!important;max-width:none!important;left:50%!important;transform:translateX(-50%)!important}
 /* Smart Home: the Hub across the top, then Lock | Garage, Thermostat | Plug */
 html.pp .hcat[data-c=smart]{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr}
 html.pp .hcat[data-c=smart] .ht[data-k=shp2]{grid-column:span 2}
@@ -166,6 +171,9 @@ html.pp .ht:has(>.ppcl.top)>img:not(.ppalt){top:32px!important;bottom:0!importan
 html.pp .ht>.ppalt{display:block}
 html.pp .ht:has(>img.ppalt)>img:not(.ppalt),html.pp .ht:has(>img.ppalt)>.ppcl{display:none!important}
 html.pp #allTiles .ht>img.ppalt{transform:translate(-50%,-50%)}
+/* the two outdoor cameras: whole product fitted above the name (head and mount both in view at every tile height) */
+html.pp .ht>img.ppalt:is(.pp-ocp,.pp-ocspot){top:45%!important;height:70%!important;max-width:84%!important;transform:translate(-50%,-50%)!important}
+html.pp .ht>img.ppalt.pp-ocp{-webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,#000 82%,transparent 100%)}
 html.pp #allTiles .ht[data-k=shp2]::after{font-size:15px!important;color:rgba(255,255,255,.62)!important}
 /* 3D Home: the frame fills the upright screen; the footer floats over it */
 html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}
