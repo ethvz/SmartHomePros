@@ -44,7 +44,7 @@ export default H => {
   const hb = dish[dish.length - 1].map(([x, y, z]) => [x, y, z]);
   const zf = dz(0, 0);
   dish.push(hb.map(([x, y]) => [x, y, zf - .15]), hb.map(([x, y]) => [x, y, zf - .8]));
-  const wm = new THREE.MeshPhysicalMaterial({ color: white, roughness: .45, sheen: .3, sheenRoughness: .8, sheenColor: 0xffffff });
+  const wm = new THREE.MeshPhysicalMaterial({ color: white, roughness: .38, sheen: .15, sheenRoughness: .8, sheenColor: 0xffffff });
   add(u, new THREE.Mesh(K.skin(dish), wm));
   const bore = [hb.map(([x, y]) => [x, y, zf - .8]), hb.map(([x, y]) => [x, y, zf - 1.6])];
   add(u, new THREE.Mesh(K.skin(bore), new THREE.MeshStandardMaterial({ color: 0x2a2b2c, roughness: .8 })));

@@ -26,8 +26,7 @@ export default H => {
     const j = ext(s, Wb, 3, white); j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
     // tongue: plan rounded rectangle (R8 front corners) 77 wide, lying on the bar top: underside y = -87, top y = -80, forward to z = 62
     const t = ext(rr4(Wb, 62-22, [8, 8, 0, 0], 0, (62+22)/2), tT, 1.5, white);   // shape (x, z), extruded along +y after rotation
-    t.geometry.rotateX(-Math.PI/2);                           // shape y -> -z ... fix sign below
-    t.geometry.scale(1, 1, -1); t.geometry.translate(0, yTg, 0); M.add(t); t.castShadow = t.receiveShadow = true;
+    t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yTg + tT, 0);   // shape y -> z, extrusion -> down from y = -80 to -87 M.add(t); t.castShadow = t.receiveShadow = true;
   }
 
   // ---------------------------------------------------------------- light bar housing
@@ -36,7 +35,7 @@ export default H => {
   const yT = -87, yB = -147, lean = 12, wing = V2(66, 26).normalize(), cW = wing.x*61 + wing.y*84;
   const zBack = y => 22 - 14*Math.sqrt(Math.max(0, 1 - ((y+117)/30)**2));
   const lines = (d, y) => [ [wing.x, wing.y, cW - d], [0, 1, 84 - d], [-wing.x, wing.y, cW - d], [0, -1, -zBack(y)] ];   // CCW by normal angle
-  const RC = [4, 15, 15, 4];                                  // corner radii after each line: front-left R4, left-back R15, back-right R15, right-front R4
+  const RC = [4, 4, 10, 10];                                  // corner radii after each line: right-front R4, front-left R4, left-back R10, back-right R10
   const nC = 10, nE = 14;
   const outline = (d, y) => {                                 // rounded convex polygon from half-planes n.p <= c, fixed topology
     const L = lines(d, y), P = [];
@@ -71,12 +70,10 @@ export default H => {
   const ledIn = mat(0x55585b, {r:.3});
   const slant = Math.hypot(yT - yB, lean), dv = V2(lean, yT - yB).normalize();     // down-the-face direction: (inward lean, down)
   // faces: horizontal outward normal, top-edge centre point (x, z), usable width, column offsets
-  const wingLen = Math.hypot(26, 66), faces = [
-    { n: V2(0, 1), p: V2(0, 84), w: 122 - 2*4 + 1, cols: [-25, 0, 25] },
-    { n: V2(wing.x, wing.y), p: V2(74 - 1.5*wing.y, 51 + 1.5*wing.x*0), w: wingLen - 10, cols: [-18, 0, 18] },
-    { n: V2(-wing.x, wing.y), p: V2(-74 + 1.5*wing.y, 51), w: wingLen - 10, cols: [-18, 0, 18] } ];
-  faces[1].p = V2(61, 84).add(V2(87, 18)).multiplyScalar(.5).addScaledVector(V2(-66, 26).normalize().multiplyScalar(-1), 0);
-  faces[2].p = V2(-61, 84).add(V2(-87, 18)).multiplyScalar(.5);
+  const sW = 29, faces = [                                    // wings: plate centred 29 mm back along the wing from the front corner
+    { n: V2(0, 1), p: V2(0, 84), w: 118, cols: [-25, 0, 25] },
+    { n: V2(wing.x, wing.y), p: V2(61 + wing.y*sW, 84 - wing.x*sW), w: 52, cols: [-18, 0, 18] },
+    { n: V2(-wing.x, wing.y), p: V2(-61 - wing.y*sW, 84 - wing.x*sW), w: 52, cols: [-18, 0, 18] } ];
   const hW = (wY0 - wY1), vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;               // window height, slanted distance to its middle
   for(const F of faces){
     const f = new THREE.Group(); M.add(f);
@@ -97,11 +94,8 @@ export default H => {
 
   // ---------------------------------------------------------------- clear wraparound window (recessed 0.8) with a smoky edge band
   { const chainAt = (d, y) => {                               // the front + wing part of the outline (right wing end -> left wing end)
-      const P = outline(d, y), s0 = nC + 1 + nE - 1;          // arc 0 (right-front), edge, arc 1 (front-left), edge ... keep wing->front->wing
-      const out = [];
-      const rightWing = []; { const A = P.slice(3*(nC+nE), 4*(nC+nE)); }   // edge before arc 0 is the right wing (from back-right arc)
-      const ring = P.concat(P);
-      const start = 3*(nC+nE) + nC + 1 + 3, end = 4*(nC+nE) + (nC+nE) + nE - 4;   // from 3 points into the right wing ... to 3 points before the left wing end
+      const P = outline(d, y), B = nC + nE, out = [], ring = P.concat(P);   // blocks: arc k + edge along line k+1
+      const start = 3*B + nC + 2, end = 6*B - 2;              // right wing (just inside its rear end) -> front -> left wing
       for(let i=start;i<=end;i++) out.push(ring[i]);
       return out; };
     const glass = new THREE.MeshPhysicalMaterial({color:0xffffff, roughness:.05, metalness:0, transparent:true, opacity:.18, clearcoat:1, clearcoatRoughness:.03, side:THREE.DoubleSide, depthWrite:false});
@@ -116,8 +110,8 @@ export default H => {
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below)
-  { const yP = -99, zP = zBack(yP) - .2, ang = Math.atan2(-(zBack(yP-1) - zBack(yP+1)), 2);
-    const p = add(M, H.rslab(70, 22, 1.2, 3, .3, greyP), 0, yP, zP); p.rotation.x = Math.PI - ang;
+  { const yP = -99, th = .33, zP = zBack(yP);
+    const p = add(M, H.rslab(70, 22, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
     for(const sx of [-30, 30]){ const c = add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, .3, 32), mat(0xd9dadb,{r:.45}))), sx, 0, .65); } }
   return g;
 };

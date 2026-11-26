@@ -151,7 +151,7 @@ export default H => {
   const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = 30*Math.PI/180;
   const aT = .62, Th = V3(0, cyB - Rbt*Math.sin(aT), czB - Rbt*Math.cos(aT));              // neck target on the slot floor (head-local)
   const nT = V3(0, -Math.sin(aT), -Math.cos(aT)); Th.addScaledVector(nT, -2);
-  const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 7 + 2, Tm = B.clone().addScaledVector(u, Dn);
+  const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 4 + 2, Tm = B.clone().addScaledVector(u, Dn);
   head.rotation.x = tilt; head.updateMatrix();
   const Gp = Tm.clone().sub(Th.clone().applyEuler(head.rotation));
   add(M, head, Gp.x, Gp.y, Gp.z);

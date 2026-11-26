@@ -36,14 +36,14 @@ export default H => {
   const FONT = '"Vivint Sans", "Circular Std", "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
   /* ---------- materials ---------- */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0xbdbdba, roughness: .6, clearcoat: .05 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0xa3a3a0, roughness: .62, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xeeeeed, roughness: .45, clearcoat: .1, clearcoatRoughness: .5 });
   const body = splitMat(grey, white, 'z', mm(19), mm(.25), 0x8c8c8a);
   const faceM = white.clone();
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f3, roughness: .5, sheen: .5, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
   const hair = new THREE.MeshStandardMaterial({ color: 0xa9a9a9, roughness: .7 });
   const ringM = new THREE.MeshPhysicalMaterial({ color: 0x505152, roughness: .45, clearcoat: .3, clearcoatRoughness: .4, side: THREE.DoubleSide });
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xbfc2c3, roughness: .75, sheen: .3, sheenColor: 0xffffff });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa9abab, roughness: .75, sheen: .3, sheenColor: 0xffffff });
   const lightM = new THREE.MeshPhysicalMaterial({ color: 0xdcdedb, roughness: .4, emissive: 0x83f4b8, emissiveIntensity: .0 });
   const holeM = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .9 });
 
@@ -66,15 +66,15 @@ export default H => {
     const ol = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(rrPts(mm(w + .5), mm(h + .5), mm(r + .25)).map(([a, b]) => new THREE.Vector2(a, b))), hair);
     add(g, ol, mm(x), mm(y), FZ + mm(.02));
     const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.45), mm(.45), mm(.35), keyM), mm(x), mm(y), FZ);
-    if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#4d4d4d'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#404040'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
       c.font = font; c.fillText(label, ...P(0, mm(dy))); }), (px, py) => k.userData.zf(inset(px + 0, py, mm(w), mm(h), mm(r)))), mm(x), mm(y), FZ);
     return k; };
-  keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '400 46px ' + FONT, -1.65);
-  keyAt(16.7, 56.6, 23.4, 14.3, 7.15, 'Away', '400 46px ' + FONT, -1.65);
+  keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '500 46px ' + FONT, -1.65);
+  keyAt(16.7, 56.6, 23.4, 14.3, 7.15, 'Away', '500 46px ' + FONT, -1.65);
   const CX = [-21.1, 0, 21.1], RY = [35.4, 14.3, -6.8, -27.9], D = 14.35;
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) keyAt(CX[c], RY[r], D, D, D / 2, String(r * 3 + c + 1), '300 64px ' + FONT, -2.25);
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) keyAt(CX[c], RY[r], D, D, D / 2, String(r * 3 + c + 1), '400 64px ' + FONT, -2.25);
   keyAt(CX[0], RY[3], D, D, D / 2, 'Clear', '400 37px ' + FONT, -1.35);
-  keyAt(CX[1], RY[3], D, D, D / 2, '0', '300 64px ' + FONT, -2.25);
+  keyAt(CX[1], RY[3], D, D, D / 2, '0', '400 64px ' + FONT, -2.25);
   { // tactile dot above the 5
     const zf = (D / 2 - 3.0); const kz = (mm(.45) + mm(.35) * (1 - (1 - Math.min(1, (mm(zf) - mm(.45)) / (mm(D / 2) - mm(.45)))) ** 2));
     const dot = new THREE.Mesh(new THREE.SphereGeometry(mm(.4), 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), keyM); dot.rotation.x = Math.PI / 2; dot.scale.set(1, .75, 1);
@@ -98,13 +98,13 @@ export default H => {
     add(g, lathe([[ER, .02], [ER - .15, -.05], [6.15, -1.0], [6.15, -2.6]], ringM), mm(x), mm(EY), FZ);            // dark conical bezel
     const prof = [[6.1, -2.6], [6.1, -1.2], [6.0, -1.03], [5.75, -1.0]]; for (let k = 1; k <= 10; k++) { const r = 5.7 * (1 - k / 10); prof.push([r, dish(r)]); }
     add(g, lathe(prof, keyM), mm(x), mm(EY), FZ);                                                                       // concave white button
-    add(g, conform(printPlane(mm(7), mm(7), (c, P) => { c.strokeStyle = '#4a4a4a'; c.lineWidth = 3.5; c.lineJoin = c.lineCap = 'round'; icons[i](c, P); }),
+    add(g, conform(printPlane(mm(7), mm(7), (c, P) => { c.strokeStyle = '#4a4a4a'; c.lineWidth = 4; c.lineJoin = c.lineCap = 'round'; icons[i](c, P); }),
       (px, py) => mm(dish(Math.hypot(px, py) * 1000))), mm(x), mm(EY), FZ);
   });
 
   /* ---------- printing on the face ---------- */
-  add(g, printPlane(mm(20), mm(6), (c, P) => { c.fillStyle = '#8e8e8e'; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.font = '600 40px ' + FONT; const w = c.measureText('vivint').width; c.save(); c.translate(...P(0, 0)); c.scale(105 / w, 105 / w * .95); c.fillText('vivint', 0, 0); c.restore(); }),
+  add(g, printPlane(mm(20), mm(6), (c, P) => { c.fillStyle = '#8a8a8a'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = '700 40px ' + FONT; const w = c.measureText('vivint').width; c.save(); c.translate(...P(0, 0)); c.scale(125 / w, 125 / w * .95); c.fillText('vivint', 0, 0); c.restore(); }),
     0, mm(-67.6), FZ + mm(.03));
 
   /* ---------- downcast light (bottom face) and buzzer holes (right side) ---------- */
