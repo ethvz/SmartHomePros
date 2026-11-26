@@ -45,8 +45,9 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   const uni = P => (x, y, nx, ny) => P.map(([d, z]) => [x + nx * d, y + ny * d, z]);
   /* side profile: depth D, back round rb, front round rf (as [inset, z] back -> front) */
   const rrP = (D, rb, rf, st = 7) => { const a = [];
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2; a.push([rb * (1 - Math.sin(t)), rb * (1 - Math.cos(t))]); }
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2; a.push([rf * (1 - Math.cos(t)), D - rf + rf * Math.sin(t)]); }
+    const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);   // fine first/last steps: tangent joins to the caps
+    for (const u of T) { const t = u * Math.PI / 2; a.push([rb * (1 - Math.sin(t)), rb * (1 - Math.cos(t))]); }
+    for (const u of T) { const t = u * Math.PI / 2; a.push([rf * (1 - Math.cos(t)), D - rf + rf * Math.sin(t)]); }
     return a; };
   const pts = (shape, n) => shape.getSpacedPoints(n);
   const offs = (P, dx, dy) => P.map(q => new THREE.Vector2(q.x + dx, q.y + dy));

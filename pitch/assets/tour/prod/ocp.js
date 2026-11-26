@@ -10,7 +10,7 @@ export default H => {
   const shellW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.46, clearcoat:.18, clearcoatRoughness:.45, sheen:.35, sheenRoughness:.7, sheenColor:0xffffff});
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
-  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.05, clearcoat:.5, clearcoatRoughness:.02, specularIntensity:.25, envMapIntensity:.25});
+  const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.08, specularIntensity:.3, envMapIntensity:.3});
   const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.3, metalness:0, clearcoat:.4, clearcoatRoughness:.25, specularIntensity:.5, envMapIntensity:.4});
   const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
@@ -52,25 +52,26 @@ export default H => {
   // insert, 4 screw bosses with keyhole slots, side ribs, cable slot (ocp_back_1)
   { const inner = new THREE.MeshPhysicalMaterial({color:0xd9dadb, roughness:.6, side:THREE.DoubleSide});
     const dark = mat(0x3c3e40, {r:.8});
-    add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 6.5);                       // cavity floor
-    add(M, H.rslab(40, 54, 4, 4, .8, inner), 0, 10, 4.5);                              // raised centre plate (toward the wall)
-    for(const [bx, by] of [[-26, 27], [26, 27], [-26, -4], [26, -4]]){
-      const b = add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.6, 4.5, 32), inner)), bx, by, 4.25);
-      const k = new THREE.Shape(); k.absarc(0, 1.2, 1.9, 0, Math.PI*2); const kh = add(M, new THREE.Mesh(new THREE.ShapeGeometry(k, 24), dark), bx, by, 1.98); kh.rotation.y = Math.PI;
-      add(M, H.rslab(1.6, 4, .2, .8, .05, dark), bx, by - 1.6, 1.9); }
-    for(const rx of [-17, 17]) add(M, H.rslab(2, 62, 4, 1, .4, inner), rx, 8, 4.5);   // ribs beside the centre plate
-    const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.35, metalness:.9});
-    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 2.4, 32), brass)), 0, 8, 1.4);
-    { const h = add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, .1, 24), dark)), 0, 8, .17); }
-    { const sl = add(M, H.rslab(3.5, 8, .2, 1.75, .05, dark), 0, -6, 2.4); sl.rotation.z = Math.PI/2; } }
+    add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 9.5);                       // cavity floor, ~9 mm in from the wall
+    const plateM = new THREE.MeshPhysicalMaterial({color:0xcdcecf, roughness:.55, side:THREE.DoubleSide});
+    add(M, H.rslab(44, 60, 6.5, 3, .6, plateM), 0, 11, 6.25);                          // raised centre plate (face 3 mm off the wall)
+    for(const [bx, by] of [[-27, 30], [27, 26], [-27, -5], [27, -9]]){                 // screw towers with round holes
+      add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.9, 7.5, 32), inner)), bx, by, 5.25);
+      add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, .2, 24), dark)), bx, by, 1.45); }
+    for(const rx of [-21, 21]) add(M, H.rslab(3, 56, 7, 1, .5, inner), rx, 10, 5.5);   // channels beside the centre plate
+    const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.3, metalness:.9});
+    const tube = new THREE.LatheGeometry([[2.4,0],[2.4,2.2],[2.8,2.7],[3.9,2.7],[4.2,2.4],[4.2,0]].map(([r,y]) => new THREE.Vector2(r, y)), 40);
+    { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 3); t.rotation.x = -Math.PI/2; }   // brass insert tube standing 2.6 mm off the plate toward the wall
+    add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, .1, 24), dark)), 0, 6, 1.5);
+    { const sl = add(M, H.rslab(3.5, 9, .2, 1.75, .05, dark), -6, -6, 2.95); sl.rotation.z = Math.PI/2; } }
   // microphone pinhole on the +x side, just above the grille, near the 7 mm seam
   { const ph = add(M, new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .4, 16), dimK), 38.45, -3, 15); ph.rotation.z = Math.PI/2; }
 
   // ---------------------------------------------------------------- dimpled locking collar (white, golf-ball dimples, real step at the root)
   {
-    const zRoot = 27, zA = 29.8, zB = 44.2, zF = C.zf, R = C.r, bore = 12.1;
+    const zRoot = 27, zA = 31.6, zB = 44.3, zF = C.zf, R = C.r, bore = 12.1;
     // lathe: plain root band, dark shadow groove, (textured band added separately), plain front band, R1.5 front edge, front face, bore
-    const prof = [[R-.2, zRoot], [R, zRoot+.2], [R, 29.2], [R-.35, 29.35], [R-.35, 29.65], [R, zA]];
+    const prof = [[R-.2, zRoot], [R, zRoot+.2], [R, 31], [R-.35, 31.15], [R-.35, 31.45], [R, zA]];
     const L1 = new THREE.LatheGeometry(prof.map(([r,z]) => new THREE.Vector2(r, z)), 96);
     const front = [[R, zB], [R, zF-1.5]]; for(let i=1;i<=6;i++){ const a = i/6*Math.PI/2; front.push([R-1.5+1.5*Math.cos(a), zF-1.5+1.5*Math.sin(a)]); }
     front.push([bore+.8, zF], [bore+.1, zF-.4], [bore, zF-1.2], [bore, zF-6]);
@@ -80,7 +81,7 @@ export default H => {
     // the bore floor in shadow
     add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(bore, bore, .2, 48), mat(0x6c6e70,{r:.8}))), C.x, C.y, zF-6);
     // dimpled band: 54 dimples round x 8 staggered rows at 1.8 pitch, as a bump + shade texture
-    const N = 54, rows = 8, pxP = 20, Wc = N*pxP, Hc = Math.round(rows*1.8/(2*Math.PI*R/N)*pxP);
+    const N = 54, rows = 7, pxP = 20, Wc = N*pxP, Hc = Math.round(rows*1.8/(2*Math.PI*R/N)*pxP);
     const cv = document.createElement('canvas'); cv.width = Wc; cv.height = Hc; const x = cv.getContext('2d');
     const cv2 = document.createElement('canvas'); cv2.width = Wc; cv2.height = Hc; const x2 = cv2.getContext('2d');
     x.fillStyle = '#fff'; x.fillRect(0,0,Wc,Hc); x2.fillStyle = '#fff'; x2.fillRect(0,0,Wc,Hc);
@@ -148,9 +149,7 @@ export default H => {
     hg.computeVertexNormals(); }
   const head = G();
   const shell = add(head, new THREE.Mesh(hg, [bezelK, shellW])); shell.castShadow = shell.receiveShadow = true;
-  // flat exit pad where the neck leaves through the underside of the head (ocp_bottom_1): 20 x 13, 0.2 proud of the curve
-  { const a = .62, P = V3(0, cyB - Rbt*Math.sin(a), czB - Rbt*Math.cos(a)), n = V3(0, -Math.sin(a), -Math.cos(a));
-    const pad = add(head, H.rslab(20, 13, 1.2, 4, .4, shellW), ...P.clone().addScaledVector(n, -.4).toArray()); pad.rotation.x = Math.PI - a; }
+
 
   // light ring (flush, 75 -> 70, R10/R7, hairline gaps) and the front glass (70 x 70 R7, holes for the lens and the light sensor)
   { const s = rrShape(74.7, 74.7, 13.85); s.holes.push(rrShape(70.3, 70.3, 11.15));
@@ -171,7 +170,7 @@ export default H => {
   add(head, decal(DEC.logo, 26, 6.5, {color:0xd8d8d8, r:.45}), 0, -1.7-.43, .03);   // wordmark 15 mm above the lens centre (detail_lens)
 
   // ---------------------------------------------------------------- ball, neck and pose
-  const B = V3(0, C.y, 48.5), rBall = 11.5, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
+  const B = V3(0, C.y, 49.5), rBall = 12.2, up = 15*Math.PI/180, tilt = +(new URLSearchParams(location.search).get('ocppitch') || 30)*Math.PI/180;   // studio-only ?ocppitch= to match posed photos
   const aT = .62, Th = V3(0, cyB - Rbt*Math.sin(aT), czB - Rbt*Math.cos(aT));              // neck target on the slot floor (head-local)
   const nT = V3(0, -Math.sin(aT), -Math.cos(aT)); Th.addScaledVector(nT, -2);
   const u = V3(0, Math.sin(up), Math.cos(up)), Dn = rBall + 8 + 2, Tm = B.clone().addScaledVector(u, Dn);
@@ -181,11 +180,19 @@ export default H => {
   const piv = add(M, G(), B.x, B.y, B.z), qy = +(new URLSearchParams(location.search).get('ocpyaw') || 0);
   piv.rotation.y = qy*Math.PI/180;
   add(piv, head, Gp.x - B.x, Gp.y - B.y, Gp.z - B.z);
+  // the neck runs straight out of the ball along the collar axis (detail_sidejoint, side_2) into the slot on the head's
+  // lower back: find where that line meets the head shell, then sink the neck 2 mm into the slot
+  const hInv = new THREE.Quaternion().setFromEuler(head.rotation).invert(), toHead = P => P.clone().sub(Gp).applyQuaternion(hInv);
+  let tHit = 30; for(let t = 0; t < 60; t += .1){ const h = toHead(B.clone().add(V3(0, 0, t))); if(h.z <= 0 && h.z >= Zb && h.y >= sec(h.z).yB){ tHit = t; break; } }
+  const Ln = tHit + 2, hitH = toHead(B.clone().add(V3(0, 0, tHit)));
+  { // flat exit pad round the neck where it leaves the slot (ocp_bottom_1): 20 x 14, tangent to the shell there
+    const nrm = hitH.z < czB ? V3(0, hitH.y - cyB, hitH.z - czB).normalize() : V3(0, 0, -1), a = Math.atan2(-nrm.y, -nrm.z);
+    const pad = add(head, H.rslab(19, 13, 1.2, 4, .5, shellW), ...hitH.clone().addScaledVector(nrm, -.5).toArray()); pad.rotation.x = Math.PI - a; }
   const ballM = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.38, clearcoat:.25, clearcoatRoughness:.35, sheen:.3, sheenColor:0xffffff});
   add(M, new THREE.Mesh(new THREE.SphereGeometry(rBall, 48, 32), ballM), B.x, B.y, B.z).castShadow = true;
-  { const L = Dn + 2.5, pr = [[.01,5.5],[9.75,5.5],[9.1,7.5],[8.4,8.7],[7.9,9.5],[7.6,10.2],[7.5,11],[7.5,Dn-5.5],[7.9,Dn-3.8],[9.6,Dn-1.2],[10,Dn-.6],[10,L],[.01,L]];   // flared trapezoid foot into the slot
+  { const L = Ln + .5, pr = [[.01,5.5],[10.4,5.5],[9.6,7.8],[8.7,9.2],[8.1,10.1],[7.7,10.9],[7.5,11.8],[7.5,Ln-5],[7.9,Ln-3.5],[9.4,Ln-1.4],[9.8,Ln-.8],[9.8,L],[.01,L]];   // flared trapezoid foot into the slot
     const nk = add(piv, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,y]) => new THREE.Vector2(r, y)), 56), ballM), 0, 0, 0);
-    nk.quaternion.setFromUnitVectors(V3(0,1,0), u); nk.castShadow = true; }
+    nk.quaternion.setFromUnitVectors(V3(0,1,0), V3(0,0,1)); nk.castShadow = true; }
   g.userData.headPose = { ball: B.clone().multiplyScalar(.001), glass: Gp.clone().multiplyScalar(.001) };
   return g;
 };

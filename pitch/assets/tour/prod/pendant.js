@@ -44,8 +44,9 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   const uni = P => (x, y, nx, ny) => P.map(([d, z]) => [x + nx * d, y + ny * d, z]);
   /* side profile: depth D, back round rb, front round rf (as [inset, z] back -> front) */
   const rrP = (D, rb, rf, st = 7) => { const a = [];
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2; a.push([rb * (1 - Math.sin(t)), rb * (1 - Math.cos(t))]); }
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2; a.push([rf * (1 - Math.cos(t)), D - rf + rf * Math.sin(t)]); }
+    const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);   // fine first/last steps: tangent joins to the caps
+    for (const u of T) { const t = u * Math.PI / 2; a.push([rb * (1 - Math.sin(t)), rb * (1 - Math.cos(t))]); }
+    for (const u of T) { const t = u * Math.PI / 2; a.push([rf * (1 - Math.cos(t)), D - rf + rf * Math.sin(t)]); }
     return a; };
   const pts = (shape, n) => shape.getSpacedPoints(n);
   const offs = (P, dx, dy) => P.map(q => new THREE.Vector2(q.x + dx, q.y + dy));
@@ -105,16 +106,17 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
   const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6 });
   const shell = lineMat(body, [{ ax: 'y', at: 10, B: 0x6e6e6c, rB: .55, w: .3, col: 0x6c6c6a, k: .9 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
-  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5 + 1.7 * u, st = 8, out = [];
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
-    for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
+  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5, st = 8, out = [];
+    const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);
+    for (const u of T) { const t = u * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
+    for (const u of T) { const t = u * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
   const dishP = [[-2.82, 9.6], [-2.82, 10.5], [-1.8, 11.19], [-.95, 11.8], [-.45, 12.14], [-.08, 12.36], [.3, 12.46], [.65, 12.495], [1.0, 12.5]].map(([d, z]) => [d, D - (12.5 - z) * 1.15]);   // 2.3 mm deep cone
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
     { type: 'pocket', pts: circ(0, -6.5, 9, 120), prof: uni(dishP), col: (k, K, v) => (.7 + .3 * sm(D - 2.4, D - .2, v[2])) * (1 - .3 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
-    { type: 'hole', pts: circ(0, 18.5, 3.2, 72), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
+    { type: 'hole', pts: circ(0, 18.2, 3.2, 72), prof: uni(rrP(D, 1.5, 1.5, 9)) }];
   shell.vertexColors = true; add(B, solid(loops, shell, true));
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */

@@ -99,16 +99,16 @@ export default H => { const { THREE, G, add, rbox, DEC } = H;
   }
   /* ---- end helpers ---- */
   const g = G(), S = G(); S.scale.setScalar(.001); g.add(S);
-  const Rd = 152.5, yC = 800, zB = 9.55, T = 1;
+  const Rd = 152.5, yC = 580, zB = 9.55, T = 1;
 
   /* post (buried 60 mm) and cap */
   const postM = new THREE.MeshPhysicalMaterial({ color: 0xedede9, roughness: .6, clearcoat: .1, clearcoatRoughness: .6 });
-  add(S, rbox(19, 1025.5, 19, 1, postM), 0, (965.5 - 60) / 2, 0);
+  add(S, rbox(19, 805.5, 19, 1, postM), 0, (745.5 - 60) / 2, 0);
   const capM = new THREE.MeshPhysicalMaterial({ color: 0x050506, roughness: .5, clearcoat: .1, clearcoatRoughness: .5, envMapIntensity: .25 });
-  add(S, rbox(22.5, 32, 22.5, 1.25, capM), 0, 964 + 16, 0);
+  add(S, rbox(22.5, 32, 22.5, 1.25, capM), 0, 744 + 16, 0);
   const grime = plane(19, 90, 6, (x) => { const gr = x.createLinearGradient(0, 0, 0, 540); gr.addColorStop(0, 'rgba(120,120,115,.22)'); gr.addColorStop(1, 'rgba(120,120,115,0)');
     x.fillStyle = gr; x.fillRect(0, 0, 114, 540); for (let i = 0; i < 9; i++) { x.fillStyle = 'rgba(110,110,105,.12)'; x.fillRect(10 + i * 11 % 90, 20 + i * 37 % 200, 3 + i % 3, 18 + i * 7 % 30); } }, { r: .6 });
-  for (const s of [1, -1]) { const p = grime.clone(); p.rotation.y = s > 0 ? 0 : Math.PI; add(S, p, 0, 965.5 - 45, s * 9.52); }
+  for (const s of [1, -1]) { const p = grime.clone(); p.rotation.y = s > 0 ? 0 : Math.PI; add(S, p, 0, 745.5 - 45, s * 9.52); }
 
   /* sign disc: real holes, white edge, artwork on both faces (back reads correctly from behind) */
   const sh = new THREE.Shape(); sh.absarc(0, 0, Rd, 0, Math.PI * 2, false);

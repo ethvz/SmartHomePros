@@ -254,12 +254,15 @@ html.pp #p-hub #hbCmp .hbt>:nth-child(7n+1){position:sticky;left:0;z-index:2;bac
 html.pp #p-hub #hbScroll #hbCmp .hbt .c{min-height:70px!important;font-size:16px!important}
 html.pp #p-hub #hbScroll #hbCmp .hbt .rl{font-size:17px!important}
 html.pp #p-hub #hbScroll #hbHist .hbt .c{min-height:38px!important}
+html.pp #p-hub #hbScroll #hbOut .hbt .c{min-height:72px!important;font-size:16px!important}
+html.pp #p-hub #hbScroll #hbOut .hbt .c small{font-size:14px!important}
+html.pp #p-hub #hbScroll #hbOut .hbt .rl{font-size:17px!important}
+html.pp #p-hub #hbScroll #hbOut .hbt .hd img{height:64px!important}
 html.pp #p-hub #hbCmp .hbt .well{height:90px!important}
 html.pp #p-hub #hbCmp .hbt .well img{width:96px!important;height:84px!important}
 /* Vivint App "App" section: copy on top, the live phone centred and scaled below it (--aek from prodA.js) */
 html.pp #prScroll .appemu .ae-copy{left:36px!important;right:36px!important;width:auto!important;top:100px!important;transform:none!important}
 html.pp #prScroll .appemu .ae-copy h2{font-size:46px!important;margin-bottom:12px}
-html.pp #prScroll .appemu .ae-copy h2 br{display:none}
 html.pp #prScroll .appemu .ae-copy p{font-size:20px!important}
 html.pp #prScroll .appemu .ae-phone{left:50%!important;top:var(--aey,330px)!important;margin:0!important;transform-origin:50% 0!important;translate:-50% 0;scale:var(--aek,.8)}
 /* Indoor Camera Highlights: full-width feature grid, camera above a smaller phone */
@@ -280,6 +283,7 @@ html.pp.ppA-ngt #gTitle{opacity:0!important;pointer-events:none}
   html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:34px!important}
   html.pp #p-hub #hbScroll #hbCmp .hbt .c{min-height:50px!important;font-size:14px!important}
   html.pp #p-hub #hbScroll #hbHist .hbt .c{min-height:28px!important}
+  html.pp #p-hub #hbScroll #hbOut .hbt .c{min-height:56px!important;font-size:15px!important}
   html.pp #p-hub #hbCmp .hbt .well{height:64px!important}
   html.pp #p-hub #hbCmp .hbt .well img{width:72px!important;height:60px!important}
   html.pp #prScroll .appemu .ae-copy h2{font-size:38px!important}

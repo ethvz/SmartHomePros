@@ -498,7 +498,7 @@ const DOOR = [-4.35, -3.4];
   slab(a+.12,a+.24,FL+.3,FL+2.1,3.9,3.905,M.glassLit,d); slab(a+.12,a+.24,FL+.3,FL+2.1,3.835,3.84,M.glassDark,d);
   for(let i=0;i<5;i++) slab(a+.42,b-.12,FL+.42+i*.38,FL+.62+i*.38,3.9,3.906,M.glassLit,d);   // stacked glass lites (reference door)
   slab(a-.08,a,FL,FL+2.43,3.78,4.04,M.trim,d); slab(b,b+.08,FL,FL+2.43,3.78,4.04,M.trim,d); slab(a-.08,b+.08,FL+2.35,FL+2.43,3.78,4.04,M.trim,d);
-  for(const [z,dz] of [[3.92,.04],[3.82,-.04]]){ const l = new THREE.Mesh(new RoundedBoxGeometry(.13,.022,.03,3,.008), M.blackM); l.position.set(b-.2,FL+1.0,z+dz/2); d.add(l); } }
+  /* door levers: drawn by the Smart Lock model (prod/lock.js), one on each side of the door */ }
 /* wall lantern beside the door */
 { const g = new THREE.Group(); g.position.set(-4.78,FL+2.05,4.0); scene.add(g);
   const bk = rbox(.1,.3,.06,.01,M.blackM); bk.position.z = .03; g.add(bk);
