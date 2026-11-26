@@ -72,15 +72,16 @@ export default H => {
       return .95 + .018*Math.sin(3*u + 1.3) * Math.cos(2*v + .4) + .013*Math.sin(5*u + 2*v + 2.1) + .01*Math.cos(4*v - 3*u + .7) + .008*Math.sin(7*v + 1.1); };
     x.fillStyle = '#3c3c3c'; x.fillRect(0, 0, N, N);
     for(let r=-1;r<=rows;r++) for(let q=0;q<cols;q++){
-      const cx = q*cw + cw/2, cy = r*rh + rh/2, h = heather(cx, cy);
+      const cx = q*cw + cw/2, cy = r*rh + rh/2 + (q%2)*rh/2, h = heather(cx, cy), tint = rnd() < .06;   // quincunx: odd columns half a row down
       for(const side of [-1, 1]){                                                                  // two interlocking loops per stitch, nearly vertical
-        const roll = rnd(); let v = 200 + rnd()*14; if(roll < .04) v = 172 + rnd()*12; else if(roll > .94) v = 236 + rnd()*14; v *= h; const tint = rnd() < .06;
+        const roll = rnd(); let v = 200 + rnd()*14; if(roll < .04) v = 172 + rnd()*12; else if(roll > .94) v = 236 + rnd()*14; v *= h;
         x.save(); x.translate(cx + side*cw*.2 + (rnd() - .5)*2*.08*N/T, cy); x.rotate(side*.25);
-        const gr = x.createLinearGradient(-cw*.23, 0, cw*.23, 0), C = tint ? [154/200*v, 164/200*v, 180/200*v] : [v, v, v], e = `rgb(${C[0]*.8|0},${C[1]*.8|0},${C[2]*.8|0})`, m = `rgb(${C[0]|0},${C[1]|0},${C[2]|0})`;
+        const gr = x.createLinearGradient(-cw*.23, 0, cw*.23, 0), C = tint ? [(v + 154/200*v)/2, (v + 164/200*v)/2, (v + 180/200*v)/2] : [v, v, v], e = `rgb(${C[0]*.8|0},${C[1]*.8|0},${C[2]*.8|0})`, m = `rgb(${C[0]|0},${C[1]|0},${C[2]|0})`;
         gr.addColorStop(0, e); gr.addColorStop(.5, m); gr.addColorStop(1, e);
-        x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.24, rh*.55, 0, 0, TAU); x.fill(); x.restore(); }
-      { x.fillStyle = '#3a3a3a'; x.beginPath(); x.ellipse(q*cw, cy + rh/2 + (q%2)*rh/2, cw*.14, rh*.4, 0, 0, TAU); x.fill(); }   // staggered, irregular slit pores   // see-through slit pore between columns (0.25 x 0.45 mm)
+        x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.3, rh*.55, 0, 0, TAU); x.fill(); x.restore(); }
     }
+    x.fillStyle = '#3a3a3a';                                                                        // a pore at every site, staggered with the stitches (drawn last so no loop covers it)
+    for(let r=-1;r<=rows;r++) for(let q=0;q<=cols;q++){ x.beginPath(); x.ellipse(q*cw, r*rh + rh + (q%2)*rh/2, cw*.22, rh*.3, 0, 0, TAU); x.fill(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/T, 1/T); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
     const fab = new THREE.MeshPhysicalMaterial({color:0xc2c2c2, map:t, bumpMap:bt, bumpScale:1.5, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});

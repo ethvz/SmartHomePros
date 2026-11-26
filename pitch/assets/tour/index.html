@@ -671,7 +671,7 @@ const plate = (x,py,z,ry) => { const g = new THREE.Group(); g.position.set(x,py-
     if(ry2 < 0){ for(const sx of [-.0065,.0065]){ const s = new THREE.Mesh(new THREE.BoxGeometry(.0022,.0075,.002), OUTLET_M.slot); s.position.set(sx,ry2+.004,.0115); g.add(s); }
       const h = new THREE.Mesh(new THREE.CylinderGeometry(.0025,.0025,.002,12), OUTLET_M.slot); h.rotation.x = Math.PI/2; h.position.set(0,ry2-.007,.0115); g.add(h); } }
   return g; };
-plate(GR.x1,FL+.32,.2,-Math.PI/2); plate(4.6,FL+.32,GR.cz,0);   // chime (right wall) and Smart Plug (shelf wall): same y as their PLACE entries
+const OUTLETS = {chime:plate(GR.x1,FL+.32,.2,-Math.PI/2), plug:plate(4.6,FL+.32,GR.cz,0)};   // chime (right wall), Smart Plug (shelf wall); re-seated under each product once it is placed
 { const sa = new THREE.Group(); sa.position.set(1.15,5.55,KZ+.01); sa.rotation.y = 0; scene.add(sa);
   const b = cyl(.075,.035,M.cab,40); b.rotation.x = Math.PI/2; b.position.z = .018; sa.add(b);
   const d = new THREE.Mesh(new THREE.SphereGeometry(.05,32,12,0,Math.PI*2,0,Math.PI/2), M.cab); d.rotation.x = Math.PI/2; d.position.z = .035; d.scale.y = .35; sa.add(d); }
@@ -1449,6 +1449,18 @@ for(const p of PRODUCTS){
   p.feats = FEATS[p.k] || [];
 }
 const byKey = Object.fromEntries(PRODUCTS.map(p=>[p.k,p]));
+/* seat each outlet plate on its plug-in product: same scale as the product (drawn larger than life), centred on it across the
+   wall, and low enough that the LOWER receptacle shows fully, ~25 mm (scaled) below the product's bottom edge */
+for(const [k,o] of Object.entries(OUTLETS)){ const p = byKey[k]; if(!p) continue;
+  const s = p.s ?? S, b = new THREE.Box3(), mb = new THREE.Box3();
+  let big = null, bigV = 0, sz = new THREE.Vector3();
+  p.model.traverse(m => { if(!m.isMesh) return; mb.setFromObject(m); if(mb.max.y - mb.min.y >= .2) return;   // body only: skip the plug's lamp cord
+    b.union(mb); mb.getSize(sz); const v = sz.x*sz.y*sz.z; if(v > bigV){ bigV = v; big = mb.clone(); } });
+  const c = (big || b).getCenter(new THREE.Vector3());   // centre across the wall on the main body (not a side plug block)
+  o.scale.setScalar(s);
+  const lowRec = b.min.y - .025*s - .0145*s;          // centre of the lower receptacle
+  o.position.y = lowRec + .019*s;                     // plate centre (receptacles sit at +/-19 mm)
+  if(Math.abs(p.view.x) > .5) o.position.z = c.z; else o.position.x = c.x; }
 
 /* ------------------------------------------------------------------ camera rig */
 const controls = new OrbitControls(camera, canvas);
@@ -1480,9 +1492,9 @@ const sheetMQ = matchMedia('(max-width:760px), (max-aspect-ratio:1/1)');
 function fitDist(p){
   if(!p.R){   // the product's solid body only: glows, wall washes and light cards would inflate it
     const b = new THREE.Box3(), t = new THREE.Box3(); p.model.updateWorldMatrix(true, true);
-    p.model.traverse(o => { const m = o.material; if(!o.isMesh || !o.visible || !o.geometry || (Array.isArray(m) ? m.every(x=>x.transparent) : m && (m.transparent || m.blending !== THREE.NormalBlending))) return;
+    p.model.traverse(o => { const m = o.material; if(!o.isMesh || !o.visible || !o.geometry || (Array.isArray(m) ? m.every(x=>x.transparent) : m && (m.transparent || m.blending !== THREE.NormalBlending)) || o.geometry.type==='TubeGeometry' || /cord|cable/i.test(o.name)) return;   // a lamp cord isn't the product
       o.geometry.computeBoundingBox && !o.geometry.boundingBox && o.geometry.computeBoundingBox(); t.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); b.union(t); });
-    p.R = b.isEmpty() ? p.d*.25 : b.getBoundingSphere(new THREE.Sphere()).radius; }
+    if(b.isEmpty()){ p.R = p.d*.25; p.bc = p.center.clone(); } else { const sp = b.getBoundingSphere(new THREE.Sphere()); p.R = sp.radius; p.bc = sp.center; } }
   const W = innerWidth, H = innerHeight, phone = W <= 520, sheet = sheetMQ.matches;
   const cf = document.getElementById('cFeats').getBoundingClientRect(), freeH = cf.height || H*.55;
   const fv = sheet ? (phone ? .62 : .68) : .9, fw = sheet ? (phone ? 1.05 : .72) : .44;   // the bounding sphere runs past the visible face, so these exceed the look   // share of free height / of screen width
@@ -1494,10 +1506,12 @@ function focusPose(p){
   const s = new THREE.Spherical().setFromVector3(p.view);
   const base = {phi:s.phi, theta:s.theta};
   s.radius = fitDist(p);   /* close up: the product fills the middle of the free space, its benefits float around it */ s.phi = THREE.MathUtils.clamp(s.phi-.16, .25, 1.75); if(!p.flat) s.theta += .3;
-  const pos = p.center.clone().add(new THREE.Vector3().setFromSpherical(s));
+  fitDist(p); const tgt = (p.bc || p.center).clone();   // aim at the product's body
+  if(p.k==='chime'){ tgt.y -= (p.R||p.d*.25)*.55; s.radius *= 1.18; }   // show the outlet below it too
+  const pos = tgt.clone().add(new THREE.Vector3().setFromSpherical(s));
   const lim = {minD:Math.min(p.d*.3, s.radius*.5), maxD:Math.max(p.d*2.6, s.radius*2), minP:Math.max(.12, base.phi-1.05), maxP:Math.min(p.flat?1.35:2.25, base.phi+.95)};
   if(!p.flat){ lim.minA = wrap(base.theta-1.2); lim.maxA = wrap(base.theta+1.2); }
-  return {pos, target:p.center.clone(), lim};
+  return {pos, target:tgt, lim};
 }
 const easeIO = t => t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
 function flyTo(pose, {dur=1.4, lim, done}={}){

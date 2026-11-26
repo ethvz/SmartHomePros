@@ -145,7 +145,7 @@ export default H => {
     const lip = add(g, sweep(P, [[.3, 14.2], [.95, 14.2]], gm, (mx, my) => my > -W/2 + 3, colFn)); lip.material = gm.clone(); lip.material.opacity = .35; lip.castShadow = lip.receiveShadow = false;
     // soft fan on the wall below
     const c = document.createElement('canvas'), CW = 512, CH = 236; c.width = CW; c.height = CH; const x = c.getContext('2d'), id = x.createImageData(CW, CH);
-    const stops = [[0, .55], [.3, .3], [.65, .1], [1, 0]], I = yn => { for(let i=1;i<stops.length;i++) if(yn <= stops[i][0]){ const [a0, v0] = stops[i-1], [a1, v1] = stops[i], t = (yn - a0)/(a1 - a0); return v0 + (v1 - v0)*t*t*(3 - 2*t); } return 0; };
+    const stops = [[0, .45], [.3, .25], [.65, .08], [1, 0]], I = yn => { for(let i=1;i<stops.length;i++) if(yn <= stops[i][0]){ const [a0, v0] = stops[i-1], [a1, v1] = stops[i], t = (yn - a0)/(a1 - a0); return v0 + (v1 - v0)*t*t*(3 - 2*t); } return 0; };
     for(let py=0;py<CH;py++){ const yn = py/(CH-1), w = .55 + .7*yn, iv = I(yn);                 // soft downcast cone: widens as it falls, fades with distance
       for(let px=0;px<CW;px++){ const xn = (px/(CW-1))*2 - 1, h = Math.exp(-2.1*(xn/w)**2)*(1 - xn**8), o = (py*CW + px)*4;
         id.data[o] = id.data[o+1] = id.data[o+2] = 255; id.data[o+3] = Math.round(255*iv*h*(xn*xn < 1 ? 1 : 0)); } }
