@@ -6,7 +6,6 @@
   const top0 = () => sv('--ippT', 96), foot = () => sv('--ippFoot', 84);
   const setP = (el, k, v) => { if (el && el.style.getPropertyValue(k) !== v) el.style.setProperty(k, v); };
   const setI = (el, k, v) => { if (el && (el.style.getPropertyValue(k) !== v || el.style.getPropertyPriority(k) !== 'important')) el.style.setProperty(k, v, 'important'); };
-  const unset = (el, ...ks) => ks.forEach(k => { if (el && el.style.getPropertyValue(k)) el.style.removeProperty(k); });
 
   /* ---------- 360 spin: the landscape frame scaled to cover the upright screen ---------- */
   function spinFit() { const v = ((window.SH || 1485) / 1032).toFixed(4); ['#ocScroll', '#dbScroll'].forEach(q => setP(Q(q), '--spk', v)); }
