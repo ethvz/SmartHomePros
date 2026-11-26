@@ -120,7 +120,7 @@
     'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.23,'ph/firefighter':.55,'ph/therm2':.71,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.47,
     'gal/lock_0':.40,'gal/lock_1':.27,'gal/lock_2':.27,'gal/lock_3':.53,'gal/lock_4':.40,'gal/lock_5':.55,'gal/lock_6':.52,'gal/lock_7':.52,'gal/lock_8':.28,
     'gal/therm_0':.50,'gal/therm_1':.83,'gal/therm_2':.42,'gal/therm_3':.66,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
-    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.76,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
+    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.83,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
     'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.73,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
   const ZH={'ph/plug3':.72,'ph/firefighter':.74,'ph/water':.8,'ph/lock3':.66,'ph/chime3':.72,'ph/dws_surf':.76,'ph/dws_rec':.76,'gal/hub_0':.64,'gal/hub_5':.74,'gal/hub_7':.7};
   const focKey=el=>{ const u=el.getAttribute('src')||''; const m=u.match(/assets\/((?:ph|gal|p)\/[\w]+)\./); return m&&m[1]; };
