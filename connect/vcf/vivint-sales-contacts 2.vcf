@@ -1,0 +1,115 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint Sales Contacts;;;;
+FN:Vivint Sales Contacts
+ORG:Vivint Smart Home
+item1.TEL;type=VOICE:+18883245771
+item1.X-ABLabel:Sales Support
+item2.TEL;type=CELL:+18015099080
+item2.X-ABLabel:1Stop (text only)
+item3.EMAIL;type=INTERNET;type=WORK:1stop@vivint.com
+item3.X-ABLabel:1Stop
+item4.TEL;type=VOICE:+18007102961
+item4.X-ABLabel:Fortiva Retail Credit
+item5.TEL;type=VOICE:+18772750177
+item5.X-ABLabel:Customer Loyalty
+item6.TEL;type=VOICE:+18002165232
+item6.X-ABLabel:Customer Care
+item7.TEL;type=VOICE:+18336380930
+item7.X-ABLabel:Add Payment
+item8.TEL;type=VOICE:+18443640945
+item8.X-ABLabel:Insurance
+item9.TEL;type=VOICE:+18012216828
+item9.X-ABLabel:Special Accounts
+item10.EMAIL;type=INTERNET;type=WORK:specialaccounts@vivint.com
+item10.X-ABLabel:Special Accounts
+item11.TEL;type=VOICE:+18774791670
+item11.X-ABLabel:Employee Licensing
+item12.EMAIL;type=INTERNET;type=WORK:employeelicensing@vivint.com
+item12.X-ABLabel:Employee Licensing
+item13.TEL;type=VOICE:+18447376900
+item13.X-ABLabel:Citizens One
+item14.TEL;type=VOICE:+18448567254
+item14.X-ABLabel:Buyouts
+item15.TEL;type=CELL:+14352222010
+item15.X-ABLabel:Buyouts (text only)
+item16.EMAIL;type=INTERNET;type=WORK:buyout@vivint.com
+item16.X-ABLabel:Buyouts
+item17.TEL;type=VOICE:+18553688568
+item17.X-ABLabel:Military Customers
+item18.TEL;type=VOICE:+18016554357
+item18.X-ABLabel:Service Desk
+item19.TEL;type=VOICE:+18012297780
+item19.X-ABLabel:Front Desk
+item20.TEL;type=VOICE:+18002366808
+item20.X-ABLabel:SOS
+item21.TEL;type=CELL:+18018234406
+item21.X-ABLabel:SOS (text only)
+item22.EMAIL;type=INTERNET;type=WORK:sos@vivint.com
+item22.X-ABLabel:SOS
+item23.TEL;type=VOICE:+18557753645
+item23.X-ABLabel:Strategic Business Development (SBD)
+item24.TEL;type=CELL:+14354667224
+item24.X-ABLabel:Genie Bar (text only)
+item25.TEL;type=VOICE:+18883469202
+item25.X-ABLabel:Collections
+item26.TEL;type=CELL:+14355006426
+item26.X-ABLabel:State Licensing (text only)
+item27.TEL;type=CELL:+13854127939
+item27.X-ABLabel:Training (text only)
+item28.EMAIL;type=INTERNET;type=WORK:pay@vivint.com
+item28.X-ABLabel:Pay
+item29.EMAIL;type=INTERNET;type=WORK:housing@vivint.com
+item29.X-ABLabel:Housing
+item30.EMAIL;type=INTERNET;type=WORK:amigosupport@vivint.com
+item30.X-ABLabel:Amigo
+item31.EMAIL;type=INTERNET;type=WORK:salesassets@vivint.com
+item31.X-ABLabel:Assets
+item32.EMAIL;type=INTERNET;type=WORK:customersupport@vivint.com
+item32.X-ABLabel:Customer Support
+item33.EMAIL;type=INTERNET;type=WORK:familyandfriends@vivint.com
+item33.X-ABLabel:Friends & Family
+item34.EMAIL;type=INTERNET;type=WORK:EmployeeOffer@vivint.com
+item34.X-ABLabel:Friends & Family
+item35.EMAIL;type=INTERNET;type=WORK:claimresolution@vivint.com
+item35.X-ABLabel:Claims / Damages
+item36.EMAIL;type=INTERNET;type=WORK:repbackends@vivint.com
+item36.X-ABLabel:Backends
+item37.EMAIL;type=INTERNET;type=WORK:retention@vivint.com
+item37.X-ABLabel:Retention
+item38.EMAIL;type=INTERNET;type=WORK:dthrecruiting@vivint.com
+item38.X-ABLabel:Campus Recruiting
+item39.EMAIL;type=INTERNET;type=WORK:legal@vivint.com
+item39.X-ABLabel:Legal
+item40.EMAIL;type=INTERNET;type=WORK:incentives@vivint.com
+item40.X-ABLabel:Incentives
+item41.EMAIL;type=INTERNET;type=WORK:EnergyCommissions@vivint.com
+item41.X-ABLabel:Energy Commissions
+item42.EMAIL;type=INTERNET;type=WORK:vivintgivesback@vivint.com
+item42.X-ABLabel:Vivint Gives Back
+item43.EMAIL;type=INTERNET;type=WORK:moves@vivint.com
+item43.X-ABLabel:Moves
+item44.EMAIL;type=INTERNET;type=WORK:accountarbitration@vivint.com
+item44.X-ABLabel:Arbitrations
+item45.EMAIL;type=INTERNET;type=WORK:travel@vivint.com
+item45.X-ABLabel:Travel
+item46.EMAIL;type=INTERNET;type=WORK:qrfinbox@vivint.com
+item46.X-ABLabel:QRF Inbox
+item47.EMAIL;type=INTERNET;type=WORK:reptaxdocs@vivint.com
+item47.X-ABLabel:Tax Help
+item48.EMAIL;type=INTERNET;type=WORK:reppay@vivint.com
+item48.X-ABLabel:Rep Pay
+item49.EMAIL;type=INTERNET;type=WORK:MyHR@vivint.com
+item49.X-ABLabel:HR
+item50.EMAIL;type=INTERNET;type=WORK:acadvocates@vivint.com
+item50.X-ABLabel:Account Creations
+item51.EMAIL;type=INTERNET;type=WORK:opportunities@vivint.com
+item51.X-ABLabel:Opportunities
+item52.EMAIL;type=INTERNET;type=WORK:screening@vivint.com
+item52.X-ABLabel:Screening
+item53.EMAIL;type=INTERNET;type=WORK:dthmanualonboarding@vivint.com
+item53.X-ABLabel:Manual Onboarding
+item54.EMAIL;type=INTERNET;type=WORK:citypermits@vivint.com
+item54.X-ABLabel:City Permitting
+END:VCARD

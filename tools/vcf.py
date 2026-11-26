@@ -82,7 +82,7 @@ def main():
         if c.get('star'):
             row['s'] = 1
         rows.append(row)
-    vcf[ALL] = card('Vivint Sales Contacts', 'Vivint Smart Home', every)
+    vcf[ALL] = card('Vivint Sales Contacts', 'Vivint', every)
     for s, t in vcf.items():
         with open(os.path.join(OUT, s + '.vcf'), 'w', encoding='utf-8', newline='') as fh:
             fh.write(t)

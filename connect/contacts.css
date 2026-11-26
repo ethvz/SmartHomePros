@@ -1,10 +1,11 @@
 /* SHP page: "More contacts" button (Who to call heading) + full-screen contacts sheet (connect/contacts.js) */
 #secCalls h2 { flex-wrap: wrap; align-items: center; row-gap: 6px; }
 #secCalls h2 small { margin-top: 3px; }
+@media (max-width: 380px) { .mcb .s { display: none; } }
 .mcb { margin-left: auto; align-self: center; height: 40px; padding: 0 15px 0 12px; border: 0; border-radius: 20px; display: inline-flex; align-items: center; gap: 7px; font-size: 14.5px; font-weight: 500; letter-spacing: 0; color: rgb(var(--g)); background: rgba(var(--g), .13); box-shadow: inset 0 0 0 1px rgba(var(--g), .28); cursor: pointer; white-space: nowrap; transition: background .2s, transform .15s cubic-bezier(.2,.8,.2,1); position: relative; }
 .mcb::after { content: ''; position: absolute; inset: -4px 0; } /* 48px tall touch target */
 .mcb svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.mcb:hover { background: rgba(var(--g), .2); } .mcb:active { transform: scale(.95); background: rgba(var(--g), .26); transition-duration: .08s; }
+@media (hover: hover) { .mcb:hover { background: rgba(var(--g), .2); } } .mcb:active { transform: scale(.95); background: rgba(var(--g), .26); transition-duration: .08s; }
 
 .mc { position: fixed; inset: 0; z-index: 45; visibility: hidden; pointer-events: none; transition: visibility 0s .5s; }
 .mc.on { visibility: visible; pointer-events: auto; transition-delay: 0s; }
@@ -35,7 +36,7 @@
 .mc-all.go { background: rgb(var(--y)); }
 .mc-x { flex: none; width: 44px; height: 44px; border: 0; padding: 0; border-radius: 50%; background: rgba(255,255,255,.1); display: grid; place-items: center; cursor: pointer; transition: background .2s, transform .15s cubic-bezier(.2,.8,.2,1); }
 .mc-x svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
-.mc-x:hover { background: rgba(255,255,255,.18); } .mc-x:active { transform: scale(.9); transition-duration: .08s; }
+@media (hover: hover) { .mc-x:hover { background: rgba(255,255,255,.18); } } .mc-x:active { transform: scale(.9); transition-duration: .08s; }
 
 .mc-bar { margin-top: 14px; }
 .mc-q { position: relative; display: flex; align-items: center; height: 46px; border-radius: 14px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); transition: box-shadow .2s, background .2s; }
@@ -55,9 +56,9 @@
 .mc-th { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 10px; background: rgb(var(--g)); transition: transform .4s cubic-bezier(.2,.8,.2,1), width .4s cubic-bezier(.2,.8,.2,1); }
 @media (min-width: 700px) { .mc-bar { display: flex; gap: 10px; } .mc-q { flex: 1; } .mc-hd { display: grid; grid-template-columns: 1fr auto; column-gap: 10px; align-items: end; } .mc-top { grid-column: 1 / -1; } .mc-f { margin-top: 14px; width: 330px; } }
 
-.mc-ls { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 6px calc(env(safe-area-inset-right) + 16px) calc(env(safe-area-inset-bottom) + 84px) calc(env(safe-area-inset-left) + 16px); scrollbar-width: none; } /* bottom room: the shared menu button floats over the bottom corner */
+.mc-ls { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 6px calc(env(safe-area-inset-right) + 16px) calc(env(safe-area-inset-bottom) + 24px) calc(env(safe-area-inset-left) + 16px); scrollbar-width: none; } 
 .mc-ls::-webkit-scrollbar { display: none; }
-@media (min-width: 700px) and (min-height: 560px) { .mc-ls { padding: 6px clamp(18px, 3vmin, 30px) 80px; } }
+@media (min-width: 700px) and (min-height: 560px) { .mc-ls { padding: 6px clamp(18px, 3vmin, 30px) clamp(18px, 3vmin, 30px); } }
 .mc-gr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-items: start; }
 @media (min-width: 640px) { .mc-gr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1060px) { .mc-gr { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -68,10 +69,9 @@
 @keyframes mcIn { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
 .mc-c.star { background: linear-gradient(135deg, rgba(var(--g), .16), rgba(var(--g), .05)); box-shadow: inset 0 0 0 1px rgba(var(--g), .3); }
 /* header row: the whole card toggles; this button is the keyboard / screen-reader handle */
-.mc-h { width: 100%; min-height: 46px; padding: 0 2px 0 4px; border: 0; background: none; display: flex; align-items: center; gap: 8px; color: #fff; text-align: left; cursor: pointer; }
+.mc-h { width: 100%; height: 52px; padding: 0 2px 0 4px; border: 0; background: none; display: flex; align-items: center; gap: 8px; color: #fff; text-align: left; cursor: pointer; }
 .mc-h h3 { flex: 1; min-width: 0; margin: 0; font-size: 17.5px; font-weight: 700; letter-spacing: -.01em; display: flex; align-items: center; gap: 7px; }
-.mc-h h3 span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mc-c.open .mc-h h3 span { white-space: normal; padding: 4px 0; }
+.mc-h h3 span { min-width: 0; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; } /* 2 lines fit the fixed 52px header: every card stays the same height */
 .mc-h h3 svg { width: 17px; height: 17px; flex: none; fill: rgb(var(--g)); stroke: none; }
 .mc-h > svg { width: 30px; height: 30px; flex: none; padding: 6px; border-radius: 50%; background: rgba(255,255,255,.07); fill: none; stroke: rgba(255,255,255,.7); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s cubic-bezier(.2,.8,.2,1), background .2s; }
 .mc-c.open .mc-h > svg { transform: rotate(180deg); background: rgba(var(--g), .18); stroke: rgb(var(--g)); }
@@ -97,7 +97,7 @@
 .mc-as { display: grid; gap: 6px; padding-top: 0; transition: padding-top .36s cubic-bezier(.2,.8,.2,1); }
 .mc-c.open .mc-as { padding-top: 8px; }
 .mc-a { min-height: 50px; padding: 6px 12px 6px 6px; border-radius: 14px; display: flex; align-items: center; gap: 11px; color: #fff; text-decoration: none; background: rgba(255,255,255,.06); transition: background .2s, transform .15s cubic-bezier(.2,.8,.2,1); }
-.mc-a:hover { background: rgba(255,255,255,.1); } .mc-a:active { transform: scale(.975); background: rgba(255,255,255,.13); transition-duration: .08s; }
+@media (hover: hover) { .mc-a:hover { background: rgba(255,255,255,.1); } } .mc-a:active { transform: scale(.975); background: rgba(255,255,255,.13); transition-duration: .08s; }
 .mc-a i { width: 38px; height: 38px; flex: none; border-radius: 11px; display: grid; place-items: center; }
 .mc-a i svg { width: 19px; height: 19px; fill: none; stroke: #000; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
 .mc-a.k-c i { background: rgb(var(--g)); }

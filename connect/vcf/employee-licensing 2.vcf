@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Employee Licensing;;;;
+FN:Vivint – Employee Licensing
+ORG:Vivint
+item1.TEL;type=VOICE:+18774791670
+item1.X-ABLabel:Call
+item2.EMAIL;type=INTERNET;type=WORK:employeelicensing@vivint.com
+item2.X-ABLabel:Email
+END:VCARD

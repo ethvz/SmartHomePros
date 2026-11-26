@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Friends & Family;;;;
+FN:Vivint – Friends & Family
+ORG:Vivint
+item1.EMAIL;type=INTERNET;type=WORK:familyandfriends@vivint.com
+item1.X-ABLabel:Email
+item2.EMAIL;type=INTERNET;type=WORK:EmployeeOffer@vivint.com
+item2.X-ABLabel:Email
+END:VCARD

@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Smart Home Pros//Contacts//EN
+N:Vivint – Claims / Damages;;;;
+FN:Vivint – Claims / Damages
+ORG:Vivint
+item1.EMAIL;type=INTERNET;type=WORK:claimresolution@vivint.com
+item1.X-ABLabel:Email
+END:VCARD

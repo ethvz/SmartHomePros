@@ -3,7 +3,7 @@ VERSION:3.0
 PRODID:-//Smart Home Pros//Contacts//EN
 N:Vivint Sales Contacts;;;;
 FN:Vivint Sales Contacts
-ORG:Vivint Smart Home
+ORG:Vivint
 item1.TEL;type=VOICE:+18883245771
 item1.X-ABLabel:Sales Support
 item2.TEL;type=CELL:+18015099080

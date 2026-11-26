@@ -576,7 +576,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 .more .grab { margin-bottom: max(6px, calc(clamp(64px, 9vh, 92px) - 14px - clamp(16px, 2.6vmin, 26px))); }
 /* Conveyour: the presenter (40% across the square clip) centred in the tile at any tile shape */
 .card.book .ph { background: #1a1410; container-type: size; }
-.card.book .ph .pv { --s: max(124cqw, 100cqh); inset: auto; width: var(--s); height: var(--s); left: calc(50cqw - .405 * var(--s)); top: clamp(100cqh - var(--s), 40cqh - .36 * var(--s), 0px); }
+.card.book .ph .pv { --s: max(124cqw, 130cqh);   /* 130%: the clip's name caption drops below the tile, clear of the title */ inset: auto; width: var(--s); height: var(--s); left: calc(50cqw - .405 * var(--s)); top: clamp(100cqh - var(--s), 40cqh - .36 * var(--s), 0px); }
 /* iPad portrait: the landscape layout (four tall tiles in a row), not the phone's 2x2 */
 @media (orientation: portrait) and (min-width: 700px) {
   .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; height: clamp(300px, 29vh, 410px); }
@@ -644,7 +644,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
     <button class="grab" aria-label="Show more"></button>
     <div class="in">
       <div class="sec" data-k="links" data-n="Quick links" id="secLinks"><h2>Quick links</h2><div class="links"></div></div>
-      <div class="sec" data-k="calls" data-n="Who to call" id="secCalls"><h2>Who to call <small>All hours MST</small><button class="mcb" type="button" data-more-contacts aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></svg>More contacts</button></h2><div class="calls"></div></div>
+      <div class="sec" data-k="calls" data-n="Who to call" id="secCalls"><h2>Who to call <small>All hours MST</small><button class="mcb" type="button" data-more-contacts aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></svg>More<span class="s"> contacts</span></button></h2><div class="calls"></div></div>
       <div class="sec" data-k="cal" data-n="Calendar" id="secCal">
         <div class="calhd"><h2>Calendar</h2><div class="seg" role="tablist" aria-label="Calendar view"><i class="th"></i><button role="tab" data-v="day">Day</button><button role="tab" data-v="week">Week</button><button role="tab" data-v="month">Month</button></div></div>
         <div class="calbar"><div class="ttl" aria-live="polite"></div><button class="tdy">Today</button><button class="cnav pv" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="cnav nx" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
