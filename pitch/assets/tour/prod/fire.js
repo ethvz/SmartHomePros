@@ -3,7 +3,7 @@
 // depth and a shallow 9 x 0.5 mm notch centred in the top edge (photo). Rear solid + plate body share the outline; the front is ONE
 // height-field surface over that outline (so every change is flush): 2 mm side/edge roll-offs running unbroken round the chamfers, the
 // face at z 24.6; inside the side bands (4.4 mm in) a top strip set back 0.8 mm through a soft step 3.1 mm below the top (the photo's
-// highlight line), and a rounded rib 7.4-10.1 mm below the top, 0.35 proud with R0.6 corners (the photo's bright band). One countersunk pinhole.
+// highlight line), and a rib 7.4-10.1 mm below the top: a low lip and an up-facing ramp (the photo's bright band). One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
@@ -24,8 +24,7 @@ export default H => {
   const PH = Y - 27.8, ZF = 24.6;                         // pinhole 27.8 mm below the top; face plane
   const BS = 2, BT = .9;                                  // edge roll-off: 2 mm wide, 0.9 mm deep (elliptical)
   const ss = (a, b, t) => { t = Math.max(0, Math.min(1, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
-  const RY = Y - 8.75, RH = 1.35, RW = X - 4.4, RR = .6;  // rib: centre y, half height, half length (ends 4.4 mm in), corner radius
-  const hf = (x, y) => {                                  // height of the front surface (inside the outline)
+    const hf = (x, y) => {                                  // height of the front surface (inside the outline)
     let z = ZF, drop = 0, dside = 1e9;
     // per edge roll-off: a ~24 deg flat with a soft inner crease, 2 mm on the sides, bottom and chamfers; a tight 0.8 mm round on the top
     // edge and notch (photo); the deepest drop wins, so it stays continuous. dside = distance to the sides/chamfers (not the top).
@@ -34,16 +33,15 @@ export default H => {
       const top = y1 > Y - 1 && y2 > Y - 1, bs = top ? .8 : BS, bt = top ? .6 : BT;
       if (!top) dside = Math.min(dside, dd);
       if (dd < bs) { const q = (bs - dd) / bs; drop = Math.max(drop, bt * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1)); } }
-    // the top detail sits INSIDE the side bands (4.4 mm in, following the chamfers), so the bands and chamfers run unbroken to the top:
-    // above the rib the face curves gently back, then a soft step 3.1 mm below the top sets the strip back 0.8 mm (the step faces up: the
-    // photo's highlight line) and the strip keeps tipping back to the top edge
-    const w = ss(4.4 - .35, 4.4 + .35, dside), t = y - (Y - 7.4);
-    if (t > 0) z -= w * (t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3));
-    z -= w * .8 * ss(Y - 3.1 - .28, Y - 3.1 + .28, y);
-    // rib: rounded rectangle (R0.6 corners), 0.35 proud, smoothstep profile = R~0.5 base fillet and round top, so no dark line under it
-    { const qx = Math.abs(x) - (RW - RR), qy = Math.abs(y - RY) - (RH - RR), sd = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - RR;
-      const fw = .9 + 1.3 * ss(RY + .2, RY - .6, y);         // lower side: a longer, gentler fillet (photo: no shade line under the band)
-      if (sd < 0) z = Math.max(z, ZF + .35 * ss(0, fw, -sd)); }
+    // the top detail sits INSIDE the side bands (4.4 mm in, following the chamfers), so the bands and chamfers run unbroken to the top.
+    // Rib (photo's bright band, 7.4-10.1 mm below the top): a low rounded lip at its foot, then a ~25 deg up-facing ramp back 0.7 mm; above
+    // it the face curves gently back, then a soft step 3.1 mm below the top sets the strip back a further 0.5 mm (the step faces up: the
+    // photo's highlight line) and the strip keeps tipping back to the top edge.
+    const w = ss(4.4 - .6, 4.4 + .6, dside), t = y - (Y - 7.4);
+    let P = .06 * ss(Y - 10.4, Y - 9.6, y) - .7 * ss(Y - 9.7, Y - 7.4, y);
+    if (t > 0) P -= t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3);
+    P -= .5 * ss(Y - 3.1 - .22, Y - 3.1 + .22, y);
+    z += w * P;
     z -= drop;
     return z; };
 

@@ -37,6 +37,10 @@ export default H => {
     const j = ext(s, Wb, 3, white);
     j.geometry.rotateY(-Math.PI/2); j.geometry.translate(Wb/2, 0, 0); M.add(j); j.castShadow = j.receiveShadow = true;
     add(M, H.rslab(Wb, 14, 7, 3, 1, white), 0, -49.5 - 4, 3.5);   // transition block under the mount: R1 wall-side edges like the plate, so no notch where band and mount meet
+    { const f7 = new THREE.Shape(), r7 = 7; f7.moveTo(Tb - .5, -49.4); f7.lineTo(Tb + r7, -49.4);   // R7 concave fillet: band front meets the mount's bottom end
+      for(let k=1;k<=10;k++){ const a = Math.PI/2*k/10; f7.lineTo(Tb + r7 - r7*Math.sin(a), -49.4 - r7 + r7*Math.cos(a)); }
+      f7.lineTo(Tb - .5, -49.4 - r7); f7.lineTo(Tb - .5, -49.4);
+      const fm7 = ext(f7, Wb, 1, white); fm7.geometry.rotateY(-Math.PI/2); fm7.geometry.translate(Wb/2, 0, 0); M.add(fm7); }
     // thin tongue lying on the sloped bar top: plan rounded rectangle, R10 front corners, 4 mm thick (a real step), to z = 74
     const t = ext(rr4(Wb, zTg - Ro + 2, [10, 10, 0, 0], 0, (zTg + Ro - 2)/2), tT, 1.2, white);
     t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yT + tT, 0);
@@ -151,9 +155,21 @@ export default H => {
     const U = []; for(let i=0;i<=K;i++){ const v = i/K; U.push(.5 - .5*Math.cos(v*Math.PI)); }
     const span = s => { const t = yTopAt(s), b = 2*yMid - t; return [t, (t + yMid)/2, yMid, (b + yMid)/2, b]; };
     sheet(span, dGlass, glass, U).renderOrder = 2;
-    sheet(s => { const t = yTopAt(s); return [t, t - 2]; }, dGlass - .05, smoke, U);
-    sheet(s => { const b = 2*yMid - yTopAt(s); return [b + 2, b]; }, dGlass - .05, smoke, U);
-    const eW = 2/Ltot; for(const [v0, v1] of [[0, eW], [1 - eW, 1]]){ const cols = []; for(let i=0;i<=6;i++) cols.push(v0 + (v1 - v0)*i/6); sheet(span, dGlass - .05, smoke, cols); }
+    { // smoky cut edge: one closed 2 mm ribbon swept round the window outline (straight runs, R10 corners, vertical ends)
+      const L2 = [], push = (a, y) => { const q = L2[L2.length - 1]; if(!q || Math.hypot(q[0] - a, q[1] - y) > 1e-3) L2.push([a, y]); };
+      const Ks = 160, vv = i => .5 - .5*Math.cos(Math.PI*i/Ks), bot = s2 => 2*yMid - yTopAt(s2);
+      for(let i=0;i<=Ks;i++){ const v = vv(i); push(v*Ltot, yTopAt(Math.min(v, 1 - v)*Ltot)); }      // top, left -> right
+      { const t1 = yTopAt(0), b1 = bot(0); for(let k=1;k<8;k++) push(Ltot, t1 + (b1 - t1)*k/8); }    // right end, down
+      for(let i=Ks;i>=0;i--){ const v = vv(i); push(v*Ltot, bot(Math.min(v, 1 - v)*Ltot)); }        // bottom, right -> left
+      { const t1 = yTopAt(0), b1 = bot(0); for(let k=1;k<8;k++) push(0, b1 + (t1 - b1)*k/8); }       // left end, up
+      const n2 = L2.length, map = (sa, y) => { const C = chainAt(LA(y, dGlass - .05), y), Ly = sample(C, 1)[2]; const [x, z] = sample(C, .5 + (sa/Ltot - .5)*Ltot/Ly); return [x, y, z]; };
+      const pos = [], idx = [];
+      for(let i=0;i<n2;i++){ const a = L2[(i - 1 + n2) % n2], b = L2[(i + 1) % n2], tx = b[0] - a[0], ty = b[1] - a[1], tl = Math.hypot(tx, ty) || 1;
+        const nx = ty/tl, ny = -tx/tl, P = L2[i];                                            // inward normal of the clockwise loop
+        pos.push(...map(P[0], P[1]), ...map(P[0] + 2*nx, P[1] + 2*ny)); }
+      for(let i=0;i<n2;i++){ const o = 2*i, o2 = 2*((i + 1) % n2); idx.push(o, o2, o + 1, o2, o2 + 1, o + 1); }
+      const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
+      SG.add(new THREE.Mesh(ge, smoke)); }
   }
 
   // ---------------------------------------------------------------- saddle: the band's foot wraps 2.5 mm thick over the bar's rounded upper
