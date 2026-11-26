@@ -85,3 +85,64 @@ html.ipp #p-military::after{bottom:calc(var(--ipB) + 20px)}
 html.ipp .ipmon{position:absolute;left:72px;right:72px;top:calc(var(--ipT) + 8px);color:#fff;z-index:1}
 html.ipp .ipmon h2{margin:0;font-size:64px;line-height:1.04;font-weight:600;letter-spacing:-1.6px;max-width:760px}
 html.ipp #p-monitoring.on .ipmon>*{animation:fadeUp .8s var(--ease) backwards}
+
+/* ---------- Playback: toggle across the top, the day bar under it, the feature list fills the rest ---------- */
+html.ipp .pbx{padding:calc(var(--ipT) - 12px) 72px 0;bottom:calc(var(--ipB) + 20px);display:flex;flex-direction:column;box-sizing:border-box}
+html.ipp #p-playback .pbx.full{position:absolute!important;inset:0 0 calc(var(--ipB) + 20px) 0!important;width:auto!important;height:auto!important;object-fit:initial}
+html.ipp .pbx-tog{width:100%;height:72px;margin-top:28px;flex:none}
+html.ipp .pbx-tog button{font-size:19px;transition:color .3s,transform .12s}
+html.ipp .pbx-tog button:active{transform:scale(.96)}
+html.ipp .pbx-tog em{font-size:11.5px}
+html.ipp .pbx-l{position:relative;left:auto;top:auto;width:auto;margin-top:36px;flex:none;display:grid;grid-template-columns:auto 1fr;column-gap:28px;align-items:end}
+html.ipp .pbx-c{margin:0 0 14px;height:auto}
+html.ipp .pbx-bar{grid-column:1/-1;width:100%!important;margin-top:30px}
+html.ipp .pbx-t,html.ipp .pbx-k{grid-column:1/-1}
+html.ipp .pbx-r{position:relative;left:auto;top:auto;width:auto;flex:1;min-height:0;margin-top:30px;padding:8px 30px;display:flex;flex-direction:column}
+html.ipp .pbx-row{flex:1;min-height:0;font-size:18px;gap:18px}
+html.ipp .pbx-row .tx small{font-size:13.5px}
+html.ipp .pbx-row .vl{font-size:18px}
+html.ipp .pbx-row[data-ai]:active{background:rgba(255,255,255,.06)}
+
+/* ---------- PSA: header, key facts and section buttons across the top; the agreement scrolls below at a readable width ---------- */
+html.ipp .psa2{flex-direction:column}
+html.ipp .psa-side{width:auto;padding:calc(var(--ipT) - 8px) 72px 0;flex:none}
+html.ipp .psa-side .t2{font-size:48px;letter-spacing:-1.2px}
+html.ipp .psa-side .t2 br{display:none}
+html.ipp .psa-key{grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
+html.ipp .psa-key div{padding:16px 16px 14px;transition:transform .12s}
+html.ipp .psa-key div:active{transform:scale(.97)}
+html.ipp .psa-key b{font-size:28px}
+html.ipp .psa-key span{font-size:13.5px}
+html.ipp .psa-disc{font-size:13.5px;margin-top:12px}
+html.ipp .psa-nav{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+html.ipp .psa-nav button{height:56px;text-align:center;font-size:16px;background:#141414;border-radius:16px;transition:background .25s,color .25s,transform .12s}
+html.ipp .psa-nav button:active{transform:scale(.97)}
+html.ipp .psa-nav button.on{background:#262628}
+html.ipp .psa-doc{flex:1;min-height:0;margin-top:16px;padding:20px 72px calc(var(--ipB) + 80px);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 20px,#000 calc(100% - var(--ipB) - 60px),transparent calc(100% - var(--ipB) + 10px));mask-image:linear-gradient(180deg,transparent 0,#000 20px,#000 calc(100% - var(--ipB) - 60px),transparent calc(100% - var(--ipB) + 10px))}
+html.ipp .psa-pg{max-width:none;padding:56px 64px 44px;font-size:15px}
+html.ipp .psa-pg .fl div{font-size:11.5px}
+html.ipp .psa-pg .eq div{font-size:14px}
+
+/* ---------- NRG: photos stacked (top / bottom); headline, the #153 card, then the three facts as wide cards ---------- */
+html.ipp #p-nrg .ng-bg{left:0;width:1032px}
+html.ipp #p-nrg .ng-p1{left:0;width:100%;height:56%;object-position:55% 40%}
+html.ipp #p-nrg .ng-p2{left:0;right:auto;top:auto;bottom:0;width:100%;height:54%;object-position:60% 50%}
+html.ipp #p-nrg .ng-seam{left:0;width:100%;top:38%;bottom:auto;height:24%;background:linear-gradient(180deg,transparent,#000 50%,transparent)}
+html.ipp #p-nrg .ng-sc{background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,.3) 24%,rgba(0,0,0,.42) 70%,#000)}
+html.ipp #p-nrg{--nT:calc(var(--ipT) + 200px);--nF:150px;--nS:calc(var(--H) - var(--ipB) - 66px)}
+html.ipp #p-nrg .ng-h{left:72px;top:calc(var(--ipT) + 20px)}
+html.ipp #p-nrg .ng-logo{right:72px;left:auto;top:calc(var(--ipT) + 14px);width:176px}
+html.ipp #p-nrg .ng-card{left:72px;top:var(--nT);width:888px;height:calc(var(--nS) - 3*var(--nF) - 3*16px - 20px - var(--nT));padding:36px 40px}
+html.ipp #p-nrg .ng-card p{max-width:760px}
+html.ipp #p-nrg .ng-chips{left:40px;right:auto;width:520px}
+html.ipp #p-nrg .ng-f{left:72px!important;width:888px;height:var(--nF);padding:26px 32px}
+html.ipp #p-nrg .ng-f.d3{top:calc(var(--nS) - 3*var(--nF) - 32px)!important}
+html.ipp #p-nrg .ng-f.d4{top:calc(var(--nS) - 2*var(--nF) - 16px)!important}
+html.ipp #p-nrg .ng-f.d5{top:calc(var(--nS) - var(--nF))!important}
+html.ipp #p-nrg .ng-row{gap:30px}
+html.ipp #p-nrg .ng-big{min-width:190px}
+html.ipp #p-nrg .ng-src{left:72px;width:888px;top:calc(var(--nS) + 14px)}
+@media (min-aspect-ratio:37/50){
+  html.ipp #p-nrg .ng-hero{margin:14px 0 14px}html.ipp #p-nrg .ng-hero b{font-size:96px}
+  html.ipp #p-nrg{--nF:138px}html.ipp #p-nrg .ng-f{padding:22px 32px}
+}
