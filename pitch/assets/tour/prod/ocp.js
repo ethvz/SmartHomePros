@@ -11,8 +11,8 @@ export default H => {
   const mountW = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.62, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const bezelK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.1, clearcoat:1, clearcoatRoughness:.04, specularIntensity:1});
   const glassK = new THREE.MeshPhysicalMaterial({color:0x000000, roughness:.08, specularIntensity:.3, envMapIntensity:.3});
-  const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.3, metalness:0, clearcoat:.4, clearcoatRoughness:.25, specularIntensity:.5, envMapIntensity:.4});
-  const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
+  const satinK = new THREE.MeshPhysicalMaterial({color:0x0b0b0c, roughness:.3, metalness:0, clearcoat:.3, clearcoatRoughness:.25, specularIntensity:.3, envMapIntensity:.2});
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x0a0c12, roughness:.03, metalness:.2, clearcoat:1, clearcoatRoughness:0, envMapIntensity:2.2, iridescence:.25, iridescenceIOR:1.5, iridescenceThicknessRange:[200,320]});
   const dimK = mat(0x1e1e1f, {r:.35});
 
   // ---------------------------------------------------------------- mount (engineering CAD), decoded exactly like the inline model
@@ -53,12 +53,13 @@ export default H => {
   { const inner = new THREE.MeshPhysicalMaterial({color:0xd9dadb, roughness:.6, side:THREE.DoubleSide});
     const dark = mat(0x3c3e40, {r:.8});
     add(M, H.rslab(71.5, 93.5, 1, 7, .3, inner), 0, -.3, 9.5);                       // cavity floor, ~9 mm in from the wall
-    const plateM = new THREE.MeshPhysicalMaterial({color:0xcdcecf, roughness:.55, side:THREE.DoubleSide});
+    const plateM = new THREE.MeshPhysicalMaterial({color:0xe6e7e8, roughness:.55, side:THREE.DoubleSide});
     add(M, H.rslab(44, 60, 6.5, 3, .6, plateM), 0, 11, 6.25);                          // raised centre plate (face 3 mm off the wall)
     for(const [bx, by] of [[-27, 30], [27, 26], [-27, -5], [27, -9]]){                 // screw towers with round holes
       add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.9, 7.5, 32), inner)), bx, by, 5.25);
+      add(M, H.rslab(8.5, 10.5, 7.5, 2, .6, inner), bx + Math.sign(bx)*4.5, by, 5.25);    // U-shaped tower: walls back to the rim
       add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, .2, 24), dark)), bx, by, 1.45); }
-    for(const rx of [-21, 21]) add(M, H.rslab(3, 56, 7, 1, .5, inner), rx, 10, 5.5);   // channels beside the centre plate
+    for(const rx of [-21, -15.5, 15.5, 21]) add(M, H.rslab(2.2, 58, 6.5, 1, .4, inner), rx, 10, 5.75);   // channel walls beside the centre plate
     const brass = new THREE.MeshPhysicalMaterial({color:0xc9a866, roughness:.3, metalness:.9});
     const tube = new THREE.LatheGeometry([[2.4,0],[2.4,2.2],[2.8,2.7],[3.9,2.7],[4.2,2.4],[4.2,0]].map(([r,y]) => new THREE.Vector2(r, y)), 40);
     { const t = add(M, new THREE.Mesh(tube, brass), 0, 6, 3); t.rotation.x = -Math.PI/2; }   // brass insert tube standing 2.6 mm off the plate toward the wall
@@ -161,7 +162,9 @@ export default H => {
   { const pr = [[6.7,-2.7],[6.95,-2.3],[8.8,-.3],[9.5,.24],[10.05,.3],[10.35,.12],[10.4,-1.3]];   // lens bezel Ø20.8, opening Ø14 (detail_lens)
     const b = add(head, new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,z]) => new THREE.Vector2(r, z)), 72), satinK), 0, -17, 0); b.rotation.x = Math.PI/2;
     add(head, dome(6.9, 1.9, lensM), 0, -17, -2.5);   // one big glossy dark lens dome
-    add(head, H.torus(4.6, .1, mat(0x1c1f26,{r:.2,m:.5})), 0, -17, -1.15); }
+    add(head, H.torus(4.6, .1, mat(0x1c1f26,{r:.2,m:.5})), 0, -17, -1.15);
+    add(head, H.torus(2.6, .14, mat(0x8d9299,{r:.15,m:.9})), 0, -17, -.75);   // inner element rim catching light
+    add(head, dome(1.9, .5, new THREE.MeshPhysicalMaterial({color:0x101522, roughness:.02, metalness:.4, clearcoat:1, envMapIntensity:2})), 0, -17, -.72); }
   // light / IR sensor (recessed 0.3), mic pinholes, wordmark
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.65, .4, 32), mat(0x1e1e1f,{r:.4}))), 0, -30.5, -.5);
   add(head, H.torus(1.2, .14, mat(0x3a3b3d,{r:.3,m:.4})), 0, -30.5, -.3);

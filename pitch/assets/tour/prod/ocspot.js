@@ -11,7 +11,7 @@ export default H => {
   const white = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.6, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const barW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.5, clearcoat:.15, clearcoatRoughness:.45, sheen:.3, sheenRoughness:.7, sheenColor:0xffffff});
   const refl = new THREE.MeshPhysicalMaterial({color:0xf4f4f4, roughness:.75, sheen:.2, sheenColor:0xffffff});
-  const reflDeep = new THREE.MeshPhysicalMaterial({color:0xd9dadc, roughness:.7});
+  const reflDeep = new THREE.MeshPhysicalMaterial({color:0xf2f2f3, roughness:.75});
   const greyP = mat(0xbec0c2, {r:.55});
 
   // ---------------------------------------------------------------- bracket: vertical band + J bend (side profile extruded across 77 mm)
@@ -49,7 +49,7 @@ export default H => {
     return P; };
   const NP = 4*(nC+1+nE-1);
   const leanAt = y => lean*(yT - y)/(yT - yB);
-  const wY0 = yT - 2.6, wY1 = yB + 2.6, band = 7;                      // window band: housing sits 7 mm back, behind the reflector plates
+  const wY0 = yT - 2.6, wY1 = yB + 2.6, band = 2.4;                    // window band: the matte reflector sits 2.4 mm behind the flush window
   const levels = [];
   for(let i=0;i<=6;i++){ const a = i/6*Math.PI/2; levels.push([yT - 1.5 + 1.5*Math.cos(a), 1.5 - 1.5*Math.sin(a), 0]); }    // top edge R1.5 (no lip)
   levels.push([wY0+.3, 0, 0], [wY0+.15, .3, 0], [wY0, band, 1]);
@@ -66,64 +66,77 @@ export default H => {
   bg.setIndex([...idxA, ...idxB]); bg.addGroup(0, idxA.length, 0); bg.addGroup(idxA.length, idxB.length, 1); bg.computeVertexNormals();
   const bar = new THREE.Mesh(bg, [barW, reflDeep]); bar.castShadow = bar.receiveShadow = true; M.add(bar);
 
-  // ---------------------------------------------------------------- LED faces: reflector plate with 3 capsule recesses x 2 LED domes, per face
-  const ledM = new THREE.MeshPhysicalMaterial({color:0x6f7275, roughness:.05, metalness:.1, clearcoat:1, clearcoatRoughness:.03, transmission:.0, sheen:.2});
-  const ledIn = mat(0x55585b, {r:.3});
+  // ---------------------------------------------------------------- LED faces: the housing's window band is the matte reflector, 2.4 mm behind
+  // the flush window; per face 3 vertical capsule recesses (shaded inset) x 2 faceted TIR lenses
+  const lensC = new THREE.MeshPhysicalMaterial({color:0x8c9094, roughness:.04, metalness:.1, clearcoat:1, clearcoatRoughness:.02, flatShading:true, transparent:true, opacity:.85, envMapIntensity:1.5});
+  const lensCore = new THREE.MeshPhysicalMaterial({color:0x3d4044, roughness:.1, metalness:.3, flatShading:true, clearcoat:1, envMapIntensity:1.4});
+  const die = mat(0xe9e4d6, {r:.4, x:{emissive:0x2a2822}});
+  const capTex = (() => { const c = document.createElement('canvas'); c.width = 128; c.height = 384; const x = c.getContext('2d');
+    x.fillStyle = '#a9acaf'; x.fillRect(0, 0, 128, 384);
+    for(let k=14;k>=0;k--){ const v = Math.round(0xa9 + (0xec - 0xa9)*(1 - k/14)); x.fillStyle = `rgb(${v},${v},${v+1})`;   // soft shadowed walls -> lit floor
+      x.beginPath(); x.roundRect(k*2.2, k*2.2, 128 - k*4.4, 384 - k*4.4, 64 - k*2.2); x.fill(); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const capM = new THREE.MeshStandardMaterial({map:capTex, transparent:true, roughness:.8, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2});
+  const capShape = (() => { const sh = new THREE.Shape(); sh.absarc(0, 12, 6, 0, Math.PI, false); sh.absarc(0, -12, 6, Math.PI, 2*Math.PI, false); sh.closePath(); return sh; })();
+  const capGeo = new THREE.ShapeGeometry(capShape, 16); { const uv = capGeo.attributes.uv, P = capGeo.attributes.position; for(let i=0;i<uv.count;i++) uv.setXY(i, (P.getX(i)+6)/12, (P.getY(i)+18)/36); }
+  const tirGeo = new THREE.SphereGeometry(5.2, 10, 4, 0, Math.PI*2, 0, Math.PI/2);  tirGeo.scale(1, .55, 1);   // faceted dome
+  const coneGeo = new THREE.ConeGeometry(3.1, 2.2, 8, 1, true);
   const slant = Math.hypot(yT - yB, lean), dv = V2(lean, yT - yB).normalize();     // down-the-face direction: (inward lean, down)
-  // faces: horizontal outward normal, top-edge centre point (x, z), usable width, column offsets
-  const sW = 32, faces = [                                    // wings: plate centred 29 mm back along the wing from the front corner
-    { n: V2(0, 1), p: V2(0, zF), w: 94, cols: [-28, 0, 28] },
-    { n: V2(wing.x, wing.y), p: V2(50 + wing.y*sW, zF - wing.x*sW), w: 58, cols: [-18, 0, 18] },
-    { n: V2(-wing.x, wing.y), p: V2(-50 - wing.y*sW, zF - wing.x*sW), w: 58, cols: [-18, 0, 18] } ];
-  const hW = (wY0 - wY1), vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;               // window height, slanted distance to its middle
+  const sW = 32, faces = [
+    { n: V2(0, 1), p: V2(0, zF), cols: [-28, 0, 28] },
+    { n: V2(wing.x, wing.y), p: V2(50 + wing.y*sW, zF - wing.x*sW), cols: [-18, 0, 18] },
+    { n: V2(-wing.x, wing.y), p: V2(-50 - wing.y*sW, zF - wing.x*sW), cols: [-18, 0, 18] } ];
+  const vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;
   for(const F of faces){
     const f = new THREE.Group(); M.add(f);
-    // face frame: x = along the face (to the viewer's right), y = up the face, z = out of the face
     const t = new THREE.Vector3(F.n.y, 0, -F.n.x), nh = new THREE.Vector3(F.n.x, 0, F.n.y);
-    const down = nh.clone().multiplyScalar(-dv.x).add(new THREE.Vector3(0, -dv.y, 0)).normalize();   // down the leaning face
+    const down = nh.clone().multiplyScalar(-dv.x).add(new THREE.Vector3(0, -dv.y, 0)).normalize();
     const up = down.clone().negate(), out = new THREE.Vector3().crossVectors(t, up).normalize();
     f.matrix.makeBasis(t, up, out); f.matrix.setPosition(new THREE.Vector3(F.p.x, yT, F.p.y).addScaledVector(down, vMid)); f.matrixAutoUpdate = false;
-    const insetR = 2.2;                                       // reflector surface ~2 mm behind the flush outer window
-    const plate = new THREE.Shape(); { const w = F.w/2, h = hW/2; plate.moveTo(-w, -h); plate.lineTo(w, -h); plate.lineTo(w, h); plate.lineTo(-w, h); plate.lineTo(-w, -h); }
-    for(const cx of F.cols){ const p = new THREE.Path(); p.absarc(cx, 12, 6, 0, Math.PI, false); p.absarc(cx, -12, 6, Math.PI, 2*Math.PI, false); p.closePath(); plate.holes.push(p); }
-    const pm = ext(plate, 2.5, .5, refl); add(f, pm, 0, 0, -insetR - 2.5); pm.castShadow = false; pm.receiveShadow = true;
-    for(const cx of F.cols) for(const cy of [-12, 12]){
-      add(f, H.dome(5.2, 2.8, ledM), cx, cy, -insetR - 2.5 - .5);   // TIR lens ~10.4 mm (detail_sidebar)
-      add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, .2, 20), ledIn)), cx, cy, -insetR - 2.5 + .9);
-    }
+    const zr = -band*dv.y;                                     // reflector (housing band) surface along the face normal
+    for(const cx of F.cols){
+      add(f, new THREE.Mesh(capGeo, capM), cx, 0, zr + .03);
+      for(const cy of [-12, 12]){
+        const l = add(f, new THREE.Mesh(tirGeo, lensC), cx, cy, zr - .4); l.rotation.x = Math.PI/2;
+        const cn = add(f, new THREE.Mesh(coneGeo, lensCore), cx, cy, zr + .4); cn.rotation.x = -Math.PI/2;
+        add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, .2, 12), die)), cx, cy, zr - .5); } }
   }
 
-  // ---------------------------------------------------------------- clear wraparound window (recessed 0.8) with a smoky edge band
+  // ---------------------------------------------------------------- clear wraparound window, flush, with rounded corners and a smoky cut edge all round
   { const chainAt = (d, y) => {                               // the front + wing part of the outline (right wing end -> left wing end)
-      const P = outline(d, y), B = nC + nE, out = [], ring = P.concat(P);   // blocks: arc k + edge along line k+1
-      const start = 3*B + nC + 2, end = 6*B - 2;              // right wing (just inside its rear end) -> front -> left wing
+      const P = outline(d, y), B = nC + nE, out = [], ring = P.concat(P);
+      const start = 3*B + nC + 1, end = 6*B - 1;
       for(let i=start;i<=end;i++) out.push(ring[i]);
       return out; };
+    const sample = (C, u) => { const L = [0]; for(let i=1;i<C.length;i++) L.push(L[i-1] + Math.hypot(C[i][0]-C[i-1][0], C[i][1]-C[i-1][1]));
+      const s = u*L[L.length-1]; let k = 1; while(k < L.length-1 && L[k] < s) k++; const f = (s - L[k-1])/(L[k]-L[k-1] || 1);
+      return [C[k-1][0] + (C[k][0]-C[k-1][0])*f, C[k-1][1] + (C[k][1]-C[k-1][1])*f, L[L.length-1]]; };
+    const Ltot = sample(chainAt(leanAt((wY0+wY1)/2), (wY0+wY1)/2), 1)[2], Rw = 6, K = 200;
+    const yTopAt = s => wY0 + .2 - (s < Rw ? Rw - Math.sqrt(Rw*Rw - (Rw - s)**2) : 0);
     const glass = new THREE.MeshPhysicalMaterial({color:0xe9eef2, roughness:.04, metalness:0, transparent:true, opacity:.32, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:1.6, side:THREE.DoubleSide, depthWrite:false});
-    const smoke = new THREE.MeshPhysicalMaterial({color:0x606366, roughness:.18, transparent:true, opacity:.85, clearcoat:.6, side:THREE.DoubleSide});
-    const strip = (yA, yB2, m, dE = 0) => { const lv = [yA, (yA+yB2)/2, yB2], pos = [], idx = []; let n = 0;
-      for(const y of lv){ const C = chainAt(leanAt(y) + .12 - dE, y); n = C.length; for(const [x, z] of C) pos.push(x, y, z); }
-      for(let r=0;r<lv.length-1;r++) for(let i=0;i<n-1;i++){ const a = r*n+i, b = a+1, c = a+n, d = c+1; idx.push(a,b,c, b,d,c); }
+    const smoke = new THREE.MeshPhysicalMaterial({color:0x606366, roughness:.18, transparent:true, opacity:.85, clearcoat:.6, side:THREE.DoubleSide, depthWrite:false});
+    // a sheet over the window region; rows(s) gives the y list for the column at arc length s from the nearest end
+    const sheet = (rows, d, m, cols) => { const pos = [], idx = []; let R = 0;
+      for(const u of cols){ const s = Math.min(u, 1-u)*Ltot, ys = rows(s); R = ys.length; for(const y of ys){ const [x, z] = sample(chainAt(leanAt(y) + d, y), u); pos.push(x, y, z); } }
+      for(let c=0;c<cols.length-1;c++) for(let r=0;r<R-1;r++){ const a = c*R+r, b = a+1, cc = a+R, dd = cc+1; idx.push(a,cc,b, b,cc,dd); }
       const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
       return add(M, new THREE.Mesh(ge, m)); };
-    strip(wY0 + .2, wY1 - .2, glass).renderOrder = 2;                 // flush outer window over the whole band
-    strip(wY0 + .2, wY0 - 2, smoke, .06); strip(wY1 + 2, wY1 - .2, smoke, .06);
-    // smoky cut edge on the window's vertical ends (rear ends of both wings): first / last chain segment, full window height
-    for(const end of [0, 1]){ const lv = [wY0 + .2, (wY0+wY1)/2, wY1 - .2], pos = [], idx = [];
-      for(const y of lv){ const C = chainAt(leanAt(y) + .06, y), a = end ? C[C.length-1] : C[0], b = end ? C[C.length-2] : C[1];
-        const t = 2.2/Math.hypot(b[0]-a[0], b[1]-a[1]); pos.push(a[0], y, a[1], a[0] + (b[0]-a[0])*t, y, a[1] + (b[1]-a[1])*t); }
-      for(let r=0;r<2;r++){ const o = r*2; idx.push(o, o+1, o+2, o+1, o+3, o+2); }
-      const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
-      add(M, new THREE.Mesh(ge, smoke)); }
+    const U = []; for(let i=0;i<=K;i++){ const v = i/K; U.push(.5 - .5*Math.cos(v*Math.PI)); }   // denser near the ends (rounded corners)
+    const span = s => { const t = yTopAt(s), b = 2*((wY0+wY1)/2) - t; return [t, (t+b)/2, b]; };
+    sheet(span, .12, glass, U).renderOrder = 2;
+    const eW = 2.2/Ltot;                                      // smoky band: top + bottom borders, and the two vertical ends
+    sheet(s => { const t = yTopAt(s); return [t, t - 2.2]; }, .07, smoke, U);
+    sheet(s => { const b = 2*((wY0+wY1)/2) - yTopAt(s); return [b + 2.2, b]; }, .07, smoke, U);
+    for(const [u0, u1] of [[0, eW], [1 - eW, 1]]){ const cols = []; for(let i=0;i<=6;i++) cols.push(u0 + (u1-u0)*i/6); sheet(span, .07, smoke, cols); }
   }
 
   // ---------------------------------------------------------------- grey screw panel on the bar's upper back (seen from behind / below),
   // and the two wall screws on the band's back (ocspot_back_1)
   { // bracket saddle: the band's foot wraps 2.5 mm thick over the bar's rounded upper back, down to y = -104 (detail_backbar)
-    const sd = new THREE.Shape(), y0 = yT + 1, y1 = -104, n = 14;
+    const sd = new THREE.Shape(), y0 = yT + 1, y1 = -107, n = 16, Ws = Wb + 8;   // a little wider than the band, blending round the bar
     for(let i=0;i<=n;i++){ const y = y0 + (y1-y0)*i/n; i ? sd.lineTo(zBack(y) - 2.5, y) : sd.moveTo(zBack(y) - 2.5, y); }
     for(let i=n;i>=0;i--){ const y = y0 + (y1-y0)*i/n; sd.lineTo(zBack(y) + .3, y); }
-    const sm = ext(sd, Wb, .8, white); sm.geometry.rotateY(-Math.PI/2); sm.geometry.translate(Wb/2, 0, 0); M.add(sm); sm.castShadow = true; }
+    const sm = ext(sd, Ws, 1.2, white); sm.geometry.rotateY(-Math.PI/2); sm.geometry.translate(Ws/2, 0, 0); M.add(sm); sm.castShadow = true; }
   { const yP = -99, th = .5, zP = zBack(yP) - 2.5;            // grey screw panel on the saddle's lower end
     const p = add(M, H.rslab(64, 18, 1.2, 3, .3, greyP), 0, yP + .3*Math.sin(th), zP - .3*Math.cos(th)); p.rotation.x = Math.PI + th;
     for(const sx of [-26, 26]) add(p, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, .3, 32), mat(0xd3d4d5,{r:.4}))), sx, 0, .65);
