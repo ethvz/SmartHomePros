@@ -115,7 +115,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   const dishP = [[-2.7, D - 4.1], [-2.7, D - 3.5], [-1.9, D - 2.45], [-1.0, D - 1.25], [-.3, D - .4], [-.08, D - .15], [.15, D - .03], [.4, D]];   // crisp ~53-degree cone, 3.5 mm deep, 0.4 mm rim fillet
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
-    { type: 'pocket', pts: circ(0, -6.5, 9, 140), prof: uni(dishP), col: (k, K, v) => (.72 + .28 * sm(D - 3.5, D - .2, v[2])) * (1 - .45 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
+    { type: 'pocket', pts: circ(0, -6.5, 9, 140), prof: uni(dishP), col: (k, K, v) => (.55 + .45 * sm(D - 3.5, D - .1, v[2])) * (1 - .45 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
     { type: 'hole', pts: circ(0, 17.6, 3.0, 72), prof: uni(rrP(D, 1.0, 1.0, 9)) }];
   shell.vertexColors = true; add(B, solid(loops, shell, true));
 

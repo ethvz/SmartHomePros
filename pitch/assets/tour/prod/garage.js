@@ -114,7 +114,7 @@ export default H => {
     (c, x, y) => { c.beginPath(); c.roundRect(x - 5, y - 11, 10, 9, 2.5); c.roundRect(x - 5, y + 2, 10, 9, 2.5); c.stroke(); }];
   [-18.6, 0, 18.6].forEach((bx, i) => { const by = -32.6, bz = dome(bx, by);
     const bg = add(g, G(), mm(bx), mm(by), mm(bz));                      // follows the domed face: tilted to its local slope
-    bg.rotation.x = -Math.atan((dome(bx, by + .5) - dome(bx, by - .5)) / 1); bg.rotation.y = Math.atan((dome(bx + .5, by) - dome(bx - .5, by)) / 1);
+    bg.rotation.x = Math.atan((dome(bx, by + .5) - dome(bx, by - .5)) / 1); bg.rotation.y = -Math.atan((dome(bx + .5, by) - dome(bx - .5, by)) / 1);
     { const sh = new THREE.Shape(rrPts(mm(6.6), mm(10.6), mm(3.3)).map(([a, b]) => new THREE.Vector2(a, b))), hp = new THREE.Path(rrPts(mm(6.0), mm(10.0), mm(3.0)).map(([a, b]) => new THREE.Vector2(a, b)));
       sh.holes.push(hp); add(bg, new THREE.Mesh(new THREE.ShapeGeometry(sh), outlineM), 0, 0, mm(.03)); }   // single crisp groove line
     add(bg, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM), 0, 0, mm(-.02));

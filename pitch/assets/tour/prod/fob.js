@@ -3,7 +3,7 @@
 // printed light-grey legends and red dots, a debossed logo and a stadium key-ring slot with soft rounded edges.
 // Lies face-up on the counter (origin on the counter, face toward +y, ring end toward +z), its ring end resting on a steel split
 // ring that passes through the slot, with two house keys. Body modelled in mm (face +z), turned to lie flat, scaled to metres.
-export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
+export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   /* ---- module helpers (self-contained copy) ---- */
   const sm = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
   /* profiled solid: loops (one 'outer' outline, through 'hole's, blind 'pocket's), each swept through rings [x,y,z] listed
@@ -107,29 +107,29 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
 
   /* 1-3. shell */
   const grey = new THREE.MeshPhysicalMaterial({ color: 0x7a7a78, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
-  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x28292b, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
+  const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x28292b, rB: .5, w: .4, col: 0x141414, k: 1 }, { ax: 'y', at: -11.15, w: .35, col: 0xf4f4f2, k: .6 },
     { ax: 'z', at: 3, w: .25, col: 0x303132, k: .6 }]);
   const pocketP = []; pocketP.push([0, 9.6], [0, 10.5]); for (let i = 1; i <= 6; i++) { const t = i / 6 * Math.PI / 2; pocketP.push([.5 * (1 - Math.cos(t)), 10.5 + .5 * Math.sin(t)]); }
   const keysY = [20.1, 10.2, .2];
-  const loops = [{ type: 'outer', pts: pts(rr4(W, L, [9, 9, 8, 8]), 300), prof: uni(rrP(D, 2.5, 2.5, 8)) },
+  const loops = [{ type: 'outer', pts: pts(rr4(W, L, [11, 11, 11.5, 11.5]), 300), prof: uni(rrP(D, 2.5, 2.5, 8)) },
     ...keysY.map(y => ({ type: 'pocket', pts: offs(pts(H.rrShape(21.8, 7.1, 3.5), 110), 0, y), prof: uni(pocketP) })),
-    { type: 'hole', pts: offs(pts(H.rrShape(19, 6, 2.999), 120), 0, -24), prof: uni(rrP(D, 1.5, 1.5, 7)) }];
+    { type: 'hole', pts: offs(pts(H.rrShape(19, 6.5, 2.6), 140), 0, -23), prof: uni(rrP(D, 1.5, 2.0, 7)) }];
   add(F, solid(loops, shell));
 
   /* 4-6. keys (recessed 0.3 mm), legends, red dots */
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0x252628, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
-  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#9c9d9e';
-    x.font = '300 194px "Helvetica Neue", Helvetica, Arial, sans-serif';
+  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#8e8f90';
+    x.font = '300 140px "Helvetica Neue", Helvetica, Arial, sans-serif';
     const fit = (s, x0, x1, y) => { const m = x.measureText(s).width, [a, b] = Pp(x0, y), [c] = Pp(x1, y); x.save(); x.translate(a, b); x.scale((c - a) / m, 1); x.fillText(s, 0, 4); x.restore(); };
     fit('DISARM', -5.6, 5.5, 20.1 - 10.2); fit('STAY', -3.9, 3.0, 0); fit('AWAY', -4.6, 3.6, .2 - 10.2);
-    x.fillStyle = '#6e1416'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });
+    x.fillStyle = '#6e1416'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.0, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .7 });
   add(F, leg, 0, 10.2, D - .3 + .02);
 
   /* 7. debossed logo on the grey end */
-  const logo = plane(40, 12, 40, () => {}); add(F, logo, 0, -16.2, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 800, 240, 33 * 40, 6,
-    'rgba(20,20,20,.75)', 'rgba(255,255,255,.7)', 'rgba(0,0,0,.05)'); logo.material.map.needsUpdate = true; });
+  const logo = plane(40, 12, 40, () => {}); add(F, logo, 0, -15.2, D + .02);
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); deboss(x, img, 800, 240, 28 * 40, 7,
+    'rgba(10,10,10,.9)', 'rgba(255,255,255,.8)', 'rgba(0,0,0,.12)'); logo.material.map.needsUpdate = true; });
 
   if (bare) return g;
   /* 9. split ring (two coils of flat steel wire) through the slot and under the ring end, leaning over; two house keys on it */
@@ -142,12 +142,23 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   const piv = G(); piv.position.set(0, .001, .0325); piv.rotation.z = 30 * Math.PI / 180; g.add(piv);
   const RG = G(); RG.scale.setScalar(.001); RG.position.y = Rc * .001; piv.add(RG);
   for (const dx of [-.48, .48]) { const m = new THREE.Mesh(coil, steelD); m.rotation.z = Math.PI / 2; m.position.x = dx; RG.add(m); }
-  const brass = new THREE.MeshPhysicalMaterial({ color: 0xc9a86a, roughness: .3, metalness: 1 }), nickel = new THREE.MeshPhysicalMaterial({ color: 0xc4c7ca, roughness: .28, metalness: 1 });
+  const brass = new THREE.MeshPhysicalMaterial({ color: 0xb8954f, roughness: .32, metalness: 1 }), nickel = new THREE.MeshPhysicalMaterial({ color: 0xbfc3c6, roughness: .26, metalness: 1 });
+  const keyMesh = m => {                                       // house key lying flat, hole at the origin, blade along +x (mm, scaled to metres)
+    const s = new THREE.Shape(); s.moveTo(-4, -10); s.lineTo(14, -10); s.quadraticCurveTo(18, -10, 18, -6); s.lineTo(18, -4); s.lineTo(21, -3.5); s.lineTo(21, 3.5); s.lineTo(18, 4);
+    s.lineTo(18, 6); s.quadraticCurveTo(18, 10, 14, 10); s.lineTo(-4, 10); s.quadraticCurveTo(-8, 10, -8, 6); s.lineTo(-8, -6); s.quadraticCurveTo(-8, -10, -4, -10);
+    const hole = new THREE.Path(); hole.absarc(0, 0, 2.8, 0, Math.PI * 2, true); s.holes.push(hole);
+    const b = new THREE.Shape(); b.moveTo(21, 3); b.lineTo(55, 3); b.lineTo(58, 0); b.lineTo(55, -1.5);
+    for (let i = 0; i < 5; i++) { const x = 52 - i * 6; b.lineTo(x, -1.5); b.lineTo(x - 2, -4.5); b.lineTo(x - 4, -1.5); } b.lineTo(21, -3); b.lineTo(21, 3);
+    const kg = G(); kg.scale.setScalar(.001);
+    for (const sh of [s, b]) { const geo = new THREE.ExtrudeGeometry(sh, { depth: 1.4, bevelEnabled: true, bevelThickness: .25, bevelSize: .3, bevelSegments: 2, curveSegments: 16 }); geo.rotateX(-Math.PI / 2);
+      const mm = new THREE.Mesh(geo, m); mm.castShadow = true; kg.add(mm); }
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(6.2, .5, 8, 40), new THREE.MeshPhysicalMaterial({ color: 0x2b2c2e, roughness: .5 })); ring.rotation.x = Math.PI / 2; ring.position.set(4, 1.9, 0); kg.add(ring);   // rubber key-head ring
+    return kg; };
   piv.updateMatrixWorld(true);
   const onRing = t => new THREE.Vector3(0, Rc * Math.sin(t), Rc * Math.cos(t)).applyMatrix4(RG.matrix).applyMatrix4(piv.matrix);
   for (const [t, yaw, m, dy] of [[.05, -1.2, brass, 0], [-.45, -2.1, nickel, -.0008]]) {
     const p = onRing(t), kg = G(); kg.position.copy(p); kg.position.y += dy; g.add(kg);
     const pitch = Math.asin(Math.min(.9, (kg.position.y - .0009) / .049));
-    kg.rotation.set(0, yaw, -pitch); const k = keyMesh(m); k.position.set(.005, -.0008, 0); kg.add(k); }
+    kg.rotation.set(0, yaw, -pitch); const k = keyMesh(m); k.position.set(0, -.0008, 0); kg.add(k); }
   return g;
 };
