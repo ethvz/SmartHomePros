@@ -32,12 +32,12 @@ export default H => {
       const P = new Int16Array(OCPM.buf, p.p, p.nv*3), pos = new Float32Array(p.nv*3);
       for(let i=0;i<pos.length;i++) pos[i] = P[i]*OCPM.s;
       if(p.g === 1){ const Ng = new Int8Array(OCPM.buf, p.n, p.nv*3); for(let i=0;i<p.nv;i++){ pos[3*i] *= SX*.988;   // grille scaled with the shell, ~.5 inside its sides
-        if(pos[3*i+2] < .016) pos[3*i+2] = .016; } }   // the grille starts 16 mm off the wall: clamp (no sawtooth); the white strip covers z 7-16
+        if(Math.abs(Ng[3*i])/127 > .6 && pos[3*i+2] < .016) pos[3*i+2] = .016; } }   // side faces start 16 mm off the wall (one straight edge); the bottom wrap stays on its plane, hidden by the closing strip
       if(p.g === 0) for(let i=0;i<p.nv;i++){                 // shell: one flush outline from the wall to the front, 77 wide
         let x = pos[3*i]*SX, y = pos[3*i+1], z = pos[3*i+2];
-        if(z < .0128) x = Math.max(-.0385, Math.min(.0385, x));   // the CAD's wider back flange pulled in to the shell's 77 mm outline
-        if(z < .020) y = Math.min(.0440, y);                        // one flat top end from the wall to the R10 front corner (no step at the seam)
-        if(y > .036 && z > .021 && z < .04){ const dy = y - .036, dz = z - .021, L = Math.hypot(dy, dz); if(L > .010){ y = .036 + dy*.010/L; z = .021 + dz*.010/L; } }   // top-front corner R10
+        if(z < .017){ x = Math.max(-.0385, Math.min(.0385, x)); y = Math.max(-.0495, y); }   // the CAD's wider back flange pulled in to the shell's 77 mm outline
+        y = Math.min(.0440, y);                                    // one flat top end from the wall to the R10 front corner
+        if(y > .034 && z > .019 && z < .04){ const dy = y - .034, dz = z - .019, L = Math.hypot(dy, dz); if(L > .010){ y = .034 + dy*.010/L; z = .019 + dz*.010/L; } }   // top-front corner R10
         pos[3*i] = x; pos[3*i+1] = y; pos[3*i+2] = z; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
       geo.setAttribute('normal', new THREE.BufferAttribute(new Int8Array(OCPM.buf, p.n, p.nv*3),3,true));
@@ -45,6 +45,7 @@ export default H => {
       const Nr0 = new Int8Array(OCPM.buf, p.n, p.nv*3);
       if(p.g !== 1) I = keepTris(I, pos, (a, b, c) => Math.max(a, b, c) > .0072);            // shell: drop the CAD wall-plate layer (z < 7), rebuilt flush below
       geo.setIndex(new THREE.BufferAttribute(I,1));
+      if(p.g === 0) geo.computeVertexNormals();                // fresh normals after the clamps (no groove shading left over)
       if(p.g===1){ const uv = new Float32Array(p.nv*2), Nr = new Int8Array(OCPM.buf, p.n, p.nv*3);   // grille: project the hole pattern per face (front / sides / bottom) so the wrap keeps round holes
         for(let i=0;i<p.nv;i++){ const nx = Math.abs(Nr[3*i])/127, ny = Math.abs(Nr[3*i+1])/127;
           uv[2*i] = nx > .6 ? pos[3*i+2]/.0708 : (pos[3*i]+.0385)/.0770; uv[2*i+1] = ny > .6 ? pos[3*i+2]/.0475 : (pos[3*i+1]+.0493)/.0475; }
@@ -62,7 +63,7 @@ export default H => {
   // white shell sides/bottom between the 7 mm seam and the side grille (which starts 16 mm off the wall)
   { const s = H.rr4(77, 48, [3, 3, 10, 10], 0, -25.5); s.holes.push(H.rr4(74.6, 46.6, [1.8, 1.8, 8.8, 8.8], 0, -25.4));
     add(M, ext(s, 8.95, .3, mountW), 0, 0, 7.05);             // ends exactly at the grille's back edge (z 16)
-    add(M, H.rslab(70, 1.6, 14, .6, .3, mountW), 0, -47.4, 15);       // liner inside the bottom rim (hides the grille's back faces)
+    add(M, H.rslab(70, 1.6, 8, .6, .3, mountW), 0, -47.4, 12);       // liner inside the bottom rim (hides the grille's back faces)
     add(M, H.rslab(74, 2, 9, .8, .4, mountW), 0, -48.5, 11.5); }        // closes the mount's bottom end between z 7 and 16
   // back of the mount (open toward the wall, ocp_back_1 / detail_back): floor 15 mm in, thin centre plate (face 6 mm off the wall),
   // four tall U-shaped screw towers with real keyholes, channel walls, the brass insert tube standing 4 mm proud, cable slot
@@ -176,7 +177,7 @@ export default H => {
   // light / IR sensor (recessed 0.3), mic pinholes, wordmark
   add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.65, .4, 32), mat(0x1e1e1f,{r:.4}))), 0, -30.5, -.5);
   add(head, H.torus(1.2, .14, mat(0x3a3b3d,{r:.3,m:.4})), 0, -30.5, -.3);
-  add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .2, 24), mat(0x2a2a2c,{r:.08,x:{clearcoat:1}}))), 0, -30.5, -.25);
+  add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, .2, 24), mat(0x2a2a2c,{r:.08}))), 0, -30.5, -.25);
   for(const sx of [-25.5, 25.5]) add(head, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(.4, .4, .1, 16), mat(0x1c1c1d,{r:.7}))), sx, -28.5, .02);
   add(head, decal(DEC.logo, 27, 6.75, {color:0xe6e6e6, r:.45}), 0, -.6-.45, .03);   // wordmark ~16 mm above the lens centre (between detail_lens and front_1)
 

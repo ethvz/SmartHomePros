@@ -19,7 +19,7 @@ export default H => {
   // y = -152, faces leaning back 13 mm toward the bottom, near-semicircular back (rearmost z = 8), big round wing/back corners
   const zF = 93, yT = -85, yB = -152, lean = 13, leanW = 6, S = .12, wing = V2(.93, .37).normalize(), cW = wing.x*61 + wing.y*zF;   // centre face 122 at the top, wings ~68 deg to the wall
   const yc = (yT + yB)/2, ry = (yT - yB)/2;
-  const zBack = y => 8 + 28*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));   // near-semicircular back
+  const zBack = y => 8 + 14*(1 - Math.sqrt(Math.max(0, 1 - ((y - yc)/ry)**2)));   // near-semicircular back
   const Wb = 77, Tb = 10, Ro = 30, Ri = Ro - Tb, tT = 4, zTg = 74, yTop = -46.2;   // band starts just inside the mount's rim (no notch)
 
   // sheared group for everything that sits on / is the bar: y' = y - S*(z - 20)
@@ -40,7 +40,7 @@ export default H => {
     { const f7 = new THREE.Shape(), r7 = 7; f7.moveTo(Tb - .5, -49.4); f7.lineTo(Tb + r7, -49.4);   // R7 concave fillet: band front meets the mount's bottom end
       for(let k=1;k<=10;k++){ const a = Math.PI/2*k/10; f7.lineTo(Tb + r7 - r7*Math.sin(a), -49.4 - r7 + r7*Math.cos(a)); }
       f7.lineTo(Tb - .5, -49.4 - r7); f7.lineTo(Tb - .5, -49.4);
-      const fm7 = ext(f7, Wb, 1, white); fm7.geometry.rotateY(-Math.PI/2); fm7.geometry.translate(Wb/2, 0, 0); M.add(fm7); }
+      const g7 = new THREE.ExtrudeGeometry(f7, {depth:Wb - 2, bevelEnabled:false, curveSegments:12}); g7.rotateY(-Math.PI/2); g7.translate((Wb - 2)/2, 0, 0); M.add(new THREE.Mesh(g7, white)); }
     // thin tongue lying on the sloped bar top: plan rounded rectangle, R10 front corners, 4 mm thick (a real step), to z = 74
     const t = ext(rr4(Wb, zTg - Ro + 2, [10, 10, 0, 0], 0, (zTg + Ro - 2)/2), tT, 1.2, white);
     t.geometry.rotateX(Math.PI/2); t.geometry.translate(0, yT + tT, 0);
@@ -58,12 +58,12 @@ export default H => {
         let a0 = Math.atan2(P.y - Fc.y, P.x - Fc.x), a1 = Math.atan2(T1.y - Fc.y, T1.x - Fc.x); while(a1 - a0 > Math.PI) a1 -= 2*Math.PI; while(a0 - a1 > Math.PI) a1 += 2*Math.PI;
         const fs = new THREE.Shape(); fs.moveTo(T1.x, T1.y); fs.lineTo(Pc.x + .3, Pc.y + .3); fs.lineTo(P.x, P.y);
         for(let k=1;k<=16;k++){ const a = a0 + (a1 - a0)*k/16; fs.lineTo(Fc.x + rf*Math.cos(a), Fc.y + rf*Math.sin(a)); }
-        const fm = ext(fs, Wb, .8, white); fm.geometry.rotateY(-Math.PI/2); fm.geometry.translate(Wb/2, 0, 0); M.add(fm); } }
+        const gf = new THREE.ExtrudeGeometry(fs, {depth:Wb - 2, bevelEnabled:false, curveSegments:12}); gf.rotateY(-Math.PI/2); gf.translate((Wb - 2)/2, 0, 0); M.add(new THREE.Mesh(gf, white)); } }
   }
 
   // ---------------------------------------------------------------- light bar housing
   const lines = (d, y) => [ [wing.x, wing.y, cW - d[1]], [0, 1, zF - d[0]], [-wing.x, wing.y, cW - d[1]], [0, -1, -zBack(y)] ];   // d = [centre inset, wing inset]   // CCW by normal angle
-  const RC = [8, 8, 9, 9];                                  // front corners R8, rounded wing/back ends
+  const RC = [8, 8, 14, 14];                                  // front corners R8, rounded wing/back ends
   const nC = 10, nE = 14, B = nC + nE, NP = 4*B;
   const outline = (d, y) => {                                 // rounded convex polygon from half-planes n.p <= c, fixed topology
     const L = lines(d, y), P = [];
@@ -103,16 +103,16 @@ export default H => {
 
   // ---------------------------------------------------------------- LED faces: white reflector plate 1 mm behind the window with 3 real
   // capsule recesses (2.5 deep, darker walls, grey floor) x 2 clear TIR domes with a faceted core
-  const lensM = new THREE.MeshPhysicalMaterial({color:0x9aa0a6, roughness:.03, metalness:.05, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.35, specularIntensity:1, envMapIntensity:2.5, depthWrite:false});   // clear grey glass
+  const lensM = new THREE.MeshPhysicalMaterial({color:0x3c4044, roughness:.03, metalness:.05, clearcoat:1, clearcoatRoughness:.02, transparent:true, opacity:.3, specularIntensity:1, envMapIntensity:1.5, depthWrite:false});   // clear grey glass
   const coreM = new THREE.MeshPhysicalMaterial({color:0x24272a, roughness:.08, metalness:.3, flatShading:true, clearcoat:1});
   const die = mat(0xefe9da, {r:.4, x:{emissive:0x2a2822}});
   const domeGeo = new THREE.SphereGeometry(5.1, 40, 16, 0, Math.PI*2, 0, Math.PI/2); domeGeo.scale(1, .56, 1);
-  const coneGeo = new THREE.ConeGeometry(3.8, 2.4, 8, 1, true);
+  const coneGeo = new THREE.ConeGeometry(4.2, 3.2, 8, 1, true);
   const wallM = new THREE.MeshPhysicalMaterial({vertexColors:true, roughness:.7});          // capsule walls shaded floor -> lip
-  const sW = 32, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
-    { n: V2(0, 1), p: V2(0, zF), w: 108, cols: [-28, 0, 28], ln: lean },
-    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 50, cols: [-18, 0, 18], ln: leanW },
-    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 50, cols: [-18, 0, 18], ln: leanW } ];
+  const sW = 40, fc = V2(61, zF), wd = V2(wing.y, -wing.x), faces = [
+    { n: V2(0, 1), p: V2(0, zF), w: 100, cols: [-28, 0, 28], ln: lean },
+    { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 56, cols: [-20, 0, 20], ln: leanW },
+    { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 56, cols: [-20, 0, 20], ln: leanW } ];
   for(const F of faces){
     const slant = Math.hypot(yT - yB, F.ln), dv = V2(F.ln, yT - yB).normalize();
     const hW = (wY0 - wY1)*slant/(yT - yB) + 2, vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;
@@ -131,7 +131,7 @@ export default H => {
     const pm = add(f, new THREE.Mesh(pg, [refl, wallM]), 0, 0, zfl - .2); pm.receiveShadow = true;
     for(const cx of F.cols) for(const cy of [-12, 12]){
       const dmesh = add(f, new THREE.Mesh(domeGeo, lensM), cx, cy, zfl + .05); dmesh.rotation.x = Math.PI/2; dmesh.renderOrder = 1;
-      add(f, new THREE.Mesh(coneGeo, coreM), cx, cy, zfl + 1.25).rotation.x = -Math.PI/2;
+      add(f, new THREE.Mesh(coneGeo, coreM), cx, cy, zfl + 1.3).rotation.x = Math.PI/2;   // faceted core, apex up inside the dome
       add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .2, 16), die)), cx, cy, zfl + .1); }
   }
 
@@ -142,13 +142,13 @@ export default H => {
     const sample = (C, u) => { const L = [0]; for(let i=1;i<C.length;i++) L.push(L[i-1] + Math.hypot(C[i][0]-C[i-1][0], C[i][1]-C[i-1][1]));
       const s = u*L[L.length-1]; let k = 1; while(k < L.length-1 && L[k] < s) k++; const fr = (s - L[k-1])/(L[k]-L[k-1] || 1);
       return [C[k-1][0] + (C[k][0]-C[k-1][0])*fr, C[k-1][1] + (C[k][1]-C[k-1][1])*fr, L[L.length-1]]; };
-    const Lall = sample(chainAt(LA(yc), yc), 1)[2], Ltot = Lall - 8, Rw = 10, K = 220;   // window length fixed: its ends are vertical lines 7 mm before the wing ends at mid height
+    const Lall = sample(chainAt(LA(yc), yc), 1)[2], Ltot = Lall - 16, Rw = 12, K = 220;   // window length fixed: its ends are vertical lines 7 mm before the wing ends at mid height
     const yTopAt = s => wY0 + .2 - (s < Rw ? Rw - Math.sqrt(Rw*Rw - (Rw - s)**2) : 0), yMid = (wY0 + wY1)/2;
     const glass = new THREE.MeshPhysicalMaterial({color:0xeef2f5, roughness:.03, metalness:0, transparent:true, opacity:.3, clearcoat:1, clearcoatRoughness:.02, specularIntensity:1, envMapIntensity:2.5, side:THREE.DoubleSide, depthWrite:false});
     const smoke = new THREE.MeshPhysicalMaterial({color:0x55585b, roughness:.15, clearcoat:.8, side:THREE.DoubleSide});
     const sheet = (rows, d, m, cols) => { const pos = [], idx = []; let R = 0;
       for(const v of cols){ const s = Math.min(v, 1 - v)*Ltot, ys = rows(s); R = ys.length;
-        for(const y of ys){ const C = chainAt(LA(y, d), y), Ly = sample(C, 1)[2], u = .5 + (v - .5)*Ltot/Ly; const [x, z] = sample(C, u); pos.push(x, y, z); } }
+        for(const y of ys){ const C = chainAt(LA(y, d), y), Ly = sample(C, 1)[2], u = 8/Ly + v*(1 - 16/Ly); const [x, z] = sample(C, u); pos.push(x, y, z); } }   // ends 8 mm from the wing's rear edge on every row
       for(let c=0;c<cols.length-1;c++) for(let r=0;r<R-1;r++){ const a = c*R+r, b = a+1, cc = a+R, dd = cc+1; idx.push(a,cc,b, b,cc,dd); }
       const ge = new THREE.BufferGeometry(); ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ge.setIndex(idx); ge.computeVertexNormals();
       const m2 = new THREE.Mesh(ge, m); SG.add(m2); return m2; };
@@ -162,7 +162,7 @@ export default H => {
       { const t1 = yTopAt(0), b1 = bot(0); for(let k=1;k<8;k++) push(Ltot, t1 + (b1 - t1)*k/8); }    // right end, down
       for(let i=Ks;i>=0;i--){ const v = vv(i); push(v*Ltot, bot(Math.min(v, 1 - v)*Ltot)); }        // bottom, right -> left
       { const t1 = yTopAt(0), b1 = bot(0); for(let k=1;k<8;k++) push(0, b1 + (t1 - b1)*k/8); }       // left end, up
-      const n2 = L2.length, map = (sa, y) => { const C = chainAt(LA(y, dGlass - .05), y), Ly = sample(C, 1)[2]; const [x, z] = sample(C, .5 + (sa/Ltot - .5)*Ltot/Ly); return [x, y, z]; };
+      const n2 = L2.length, map = (sa, y) => { const C = chainAt(LA(y, dGlass - .05), y), Ly = sample(C, 1)[2]; const [x, z] = sample(C, 8/Ly + (sa/Ltot)*(1 - 16/Ly)); return [x, y, z]; };
       const pos = [], idx = [];
       for(let i=0;i<n2;i++){ const a = L2[(i - 1 + n2) % n2], b = L2[(i + 1) % n2], tx = b[0] - a[0], ty = b[1] - a[1], tl = Math.hypot(tx, ty) || 1;
         const nx = ty/tl, ny = -tx/tl, P = L2[i];                                            // inward normal of the clockwise loop
