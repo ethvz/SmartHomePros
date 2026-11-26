@@ -50,7 +50,7 @@ export default H => {
   const voidM = new THREE.MeshStandardMaterial({ color: 0x030303, roughness: .9, side: DS });
   const btn = phys(0x0a0a0a, { roughness: .06, clearcoat: 1, clearcoatRoughness: .03 });
   const ringM = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: .35, emissive: 0xff4a1c, emissiveIntensity: 1.0, envMapIntensity: .15, toneMapped: false, side: DS });
-  const lensM = H.PM.lens.clone(); lensM.side = DS;
+  const lensM = phys(0x05040a, { roughness: .02, metalness: .2, clearcoat: 1, clearcoatRoughness: 0, iridescence: .55, iridescenceIOR: 1.6, iridescenceThicknessRange: [320, 460], envMapIntensity: .6 });
 
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
 
@@ -130,7 +130,7 @@ export default H => {
   for (const x of [-6.2, 6.2]) { add(g, tube(.8, ZF - 1, ZF, voidM), x, 20.6, 0); add(g, disc(0, .8, voidM), x, 20.6, ZF - 1); }
 
   /* ---------- wordmark (flush print) ---------- */
-  add(g, H.decal(H.DEC.logo, 15.7, 3.95, { color: 0xd6d6d6, r: .4 }), 0, -19.5, ZF + .01);
+  add(g, H.decal(H.DEC.logo, 25.5, 6.4, { color: 0xd6d6d6, r: .4 }), 0, -19.5, ZF + .01);
 
   /* ---------- light ring (flush) + recessed doorbell button ---------- */
   const B = add(g, G(), 0, BY, ZF);

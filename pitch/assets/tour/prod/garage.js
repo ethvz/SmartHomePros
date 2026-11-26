@@ -34,12 +34,12 @@ export default H => {
   const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
   /* ---------- materials ---------- */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .55, clearcoat: .05 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0xa4a4a2, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(12), mm(.22), 0x9a9a98);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xf2f4f2, roughness: .28, transmission: .82, thickness: mm(3), ior: 1.45, clearcoat: .4, clearcoatRoughness: .3 });
-  const boardM = new THREE.MeshStandardMaterial({ color: 0x3c3c36, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe9dc9a, roughness: .35, emissive: 0xf3e6a6, emissiveIntensity: .25, clearcoat: .6 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xf4f6f4, roughness: .1, transmission: .96, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
+  const boardM = new THREE.MeshStandardMaterial({ color: 0x34342f, roughness: .7 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe9dc9a, roughness: .35, emissive: 0xf3e6a6, emissiveIntensity: .08, clearcoat: .6 });
   const btnM = white.clone();
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 

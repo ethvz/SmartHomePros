@@ -36,16 +36,16 @@ export default H => {
   const pp = (wmm, hmm, draw) => { const p = H.printPlane(wmm / 1000, hmm / 1000, (x, P) => draw(x, (a, b) => P(a / 1000, b / 1000))); p.scale.setScalar(1000); return p; };
 
   /* ---------- materials ---------- */
-  const satin = phys(0x1d1e20, { roughness: .32, clearcoat: .2, clearcoatRoughness: .35 });
+  const satin = phys(0x1d1e20, { roughness: .42, envMapIntensity: .55, specularIntensity: .6 });
   const foot = phys(0x2e2f31, { roughness: .72 });
   const pivot = phys(0x2a2b2d, { roughness: .4, clearcoat: .2 });
   const grey = phys(0x4b4c4f, { roughness: .6, sheen: .35, sheenRoughness: .7, sheenColor: 0x9a9ca0 });
   const glass = phys(0x050506, { roughness: .04, clearcoat: 1, clearcoatRoughness: .02, specularIntensity: 1 });
-  const discM = phys(0x141416, { roughness: .05, clearcoat: 1, clearcoatRoughness: .02 });
+  const discM = phys(0x1c1c1f, { roughness: .05, clearcoat: 1, clearcoatRoughness: .02 });
   const barrel = phys(0x0b0b0c, { roughness: .1, clearcoat: 1 });
   const voidM = new THREE.MeshStandardMaterial({ color: 0x030303, roughness: .9, side: DS });
   const btnM = phys(0x45464a, { roughness: .55, sheen: .3, sheenColor: 0x8a8c90 });
-  const lensM = H.PM.lens.clone(); lensM.side = DS;
+  const lensM = phys(0x04050a, { roughness: .02, metalness: .2, clearcoat: 1, clearcoatRoughness: 0, iridescence: .45, iridescenceIOR: 1.6, iridescenceThicknessRange: [300, 420], envMapIntensity: .6 });
   const ledM = new THREE.MeshStandardMaterial({ color: 0x3cff6a, emissive: 0x3cff6a, emissiveIntensity: 1.6, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
 
   const out = G(), g = add(out, G()); g.scale.setScalar(.001);
@@ -120,7 +120,7 @@ export default H => {
   add(hd, tube(.6, ZF - .8, ZF, voidM), 0, -12.4, 0); add(hd, disc(0, .6, voidM), 0, -12.4, ZF - .8);
   for (const x of [-21.6, 21.6]) { add(hd, tube(.5, ZF - .8, ZF, voidM), x, 0, 0); add(hd, disc(0, .5, voidM), x, 0, ZF - .8); }
   add(hd, new THREE.Mesh(new THREE.CircleGeometry(1, 32), ledM), 0, 21.7, ZF + .01);
-  add(hd, H.decal(H.DEC.logo, 10.8, 2.7, { color: 0xcfd0d2, r: .4 }), 0, -21.5, ZF + .01);
+  add(hd, H.decal(H.DEC.logo, 19, 4.75, { color: 0xcfd0d2, r: .4 }), 0, -21.5, ZF + .01);
   // top button: raised stadium with a hairline gap
   const tb = add(hd, H.ext(rrS(15, 6.5, 3.25), 1.2, .3, btnM), 0, 29.2, 7.8); tb.rotation.x = -PI / 2;
   const tg = add(hd, pp(16.5, 8, (x, P) => { const [a, b] = P(-7.75, 3.5), [c, d] = P(7.75, -3.5); x.fillStyle = '#18191a'; x.beginPath(); x.roundRect(a, b, c - a, d - b, 35); x.fill(); }), 0, 30.02, 7.8);

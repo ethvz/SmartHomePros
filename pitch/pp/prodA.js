@@ -39,7 +39,11 @@
       c.style.top=(y+vh+gap).toFixed(0)+'px'; c.style.height=ctlH+'px'; sec.style.setProperty('--ppk',k.toFixed(4));
     }); }
 
-  function run(){ strips(); art(); }
+  /* thermostat Features picture: as large as the upright screen leaves room for (headline + feature grid under it) */
+  function therm(){ const b=$('#thScroll'); if(!b) return; if(!isPP()){ b.style.removeProperty('--thk'); return; }
+    const H=window.SH||1032; b.style.setProperty('--thk',Math.max(.5,Math.min(.82,(H-800)/700)).toFixed(3)); }
+
+  function run(){ strips(); art(); therm(); }
   let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
   new MutationObserver(later).observe(document.documentElement,{attributes:true,attributeFilter:['class']});

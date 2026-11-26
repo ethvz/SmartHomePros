@@ -44,7 +44,7 @@
       paths += `<path d="${d}" stroke="url(#aiG${i})"/>`; }
     const svg = w.querySelector('.aiRing'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = `<defs>${defs}</defs><g fill="none" stroke-width="5" stroke-linecap="round">${paths}</g>`;
     /* centre: the "Vivint AI Technologies" swirl, cut from the artwork (centre 687,480, radius ~275) */
-    const Dc = Math.min(2 * rx + 10, 2 * ry - 2 * R), kc = Dc / 550, c = w.querySelector('.aiC');
+    const Dc = Math.min(2 * rx + (H < 1080 ? -20 : 10), 2 * ry - 2 * R), kc = Dc / 550, c = w.querySelector('.aiC');
     Object.assign(c.style, { left: (cx - Dc / 2) + 'px', top: (cy - Dc / 2) + 'px', width: Dc + 'px', height: Dc + 'px', backgroundImage: `url(${IMG})`,
       backgroundSize: `${1376 * kc}px ${964 * kc}px`, backgroundPosition: `${-(687 - 275) * kc}px ${-(480 - 275) * kc}px` });
   }
@@ -127,8 +127,18 @@
     const end = () => { d = null; }; box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
   }
 
-  function layout() { stripMode(); if (!isPP()) { featClear(); return; } aiLayout(); cmLayout(); featLayout(); }
-  function boot() { aiBuild(); cmBuild(); featWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
+
+  /* ---------- History: if the grid is taller than the screen (small phones), scale it to fit ---------- */
+  function histFit() {
+    const hx = Q('#ocHist'); if (!hx) return;
+    if (!isPP()) { hx.style.removeProperty('transform'); return; }
+    hx.style.transform = ''; const H = avail() - 10, last = hx.lastElementChild, h = last ? last.offsetTop + last.offsetHeight + 8 : 0;
+    if (h > H && h > 0) { const k = H / h; hx.style.transformOrigin = '50% 0'; hx.style.transform = `scale(${k.toFixed(4)})`; }
+  }
+  function histWatch() { const hx = Q('#ocHist'); if (!hx || hx.__ppw) return; hx.__ppw = 1; new MutationObserver(() => requestAnimationFrame(histFit)).observe(hx, { childList: true }); }
+
+  function layout() { stripMode(); if (!isPP()) { featClear(); histFit(); return; } aiLayout(); cmLayout(); featLayout(); histFit(); }
+  function boot() { aiBuild(); cmBuild(); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);

@@ -129,3 +129,24 @@ html.pp #prScroll .ppctl .lvt.on{background:#262628}
 html.pp #prScroll .ppctl .lvt:active{transform:scale(.96)}
 html.pp #prScroll .ppctl .lvl{position:relative!important;left:auto!important;top:auto!important;width:100%!important}
 html.pp #prScroll .ppctl .lvl button{height:60px;font-size:20px}
+
+/* ---------- Smart Hub ---------- */
+html.pp #hbScroll .hbh-vid{object-fit:cover;object-position:50% 50%}
+html.pp #hbScroll .hbh-top{left:36px!important;right:36px!important;top:110px!important}
+html.pp #hbScroll .hbh-top h1{font-size:54px!important}
+html.pp #hbScroll .hbh-top p{font-size:22px!important;line-height:1.35}
+
+/* ---------- Smart Thermostat ---------- */
+/* Features: picture on top (scaled by --thk from prodA.js), headline + line under it, the ten features as a 2-column grid */
+html.pp #thScroll .thc .th-media{left:50%!important;top:96px!important;transform:translateX(-50%) scale(var(--thk,.7))!important;transform-origin:50% 0!important}
+html.pp #thScroll .thc .thc-col{left:20px!important;right:20px!important;width:auto!important;top:calc(116px + 700px*var(--thk,.7))!important;bottom:auto!important;justify-content:flex-start}
+html.pp #thScroll .thc .thc-col h2{left:16px!important;height:auto!important;font-size:38px!important;display:block}
+html.pp #thScroll .thc .thc-col h2 br{display:none}
+html.pp #thScroll .thc .thc-col .sub{left:16px!important;width:auto!important;height:auto!important;min-height:0;font-size:18px!important;margin:8px 0 16px}
+html.pp #thScroll .thc #thfL{width:auto!important;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+html.pp #thScroll .thc .th-list button{height:60px;font-size:16.5px;padding:0 14px;gap:10px;border-radius:30px;line-height:1.1}
+html.pp #thScroll .thc .th-list button svg{width:22px;height:22px}
+html.pp #thSaveBg{display:none!important}
+html.pp #thScroll .thc .thm[data-k=save] img.thm-full{left:0!important;top:0!important;width:700px!important;height:700px!important;object-position:50% 40%;-webkit-mask-image:none!important;mask-image:none!important;border-radius:36px!important}
+html.pp #thScroll .thc .thm[data-k=save] .thm-stat.thm-big{left:44px!important;top:440px!important}
+html.pp #thScroll .thc .thm[data-k=save] img.thm-estar{right:30px!important;top:30px!important}
