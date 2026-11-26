@@ -7,7 +7,7 @@ export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
   const W = 43.4, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3.0, NW = 4.5, ND = .5;
-  const white = new THREE.MeshPhysicalMaterial({ color: 0xd6d6db, roughness: .38, clearcoat: .35, clearcoatRoughness: .28 });
+  const white = new THREE.MeshPhysicalMaterial({ color: 0xececee, roughness: .38, clearcoat: .35, clearcoatRoughness: .28 });
 
   // chamfered outline from y0 to y1; chTop/chBot: corner chamfers; notch: the 9 x 0.5 mm top-edge notch
   const outline = (y0, y1, chTop, chBot, notch) => { const s = new THREE.Shape();

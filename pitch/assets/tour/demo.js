@@ -157,6 +157,7 @@ body.dmMode #dmHud{opacity:0;pointer-events:none;transform:translateY(-10px)}
   #dmCap button{height:36px;padding:0 12px}
   #dmPad{gap:12px;padding:12px 16px}
 }
+@media (max-width:560px){ body:not(.focus) #dmHud{top:calc(env(safe-area-inset-top,0px) + 64px)} .emb body:not(.focus) #dmHud{top:66px} body:not(.focus) #dmScenes{top:calc(env(safe-area-inset-top,0px) + 116px)} .emb body:not(.focus) #dmScenes{top:118px} }
 @media (max-width:430px){ #dmCap .st{display:none} #dmPad .cd{display:none} }
 `; document.head.appendChild(css);
 
@@ -482,15 +483,15 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
     keypad:`<button class="pri" data-a="kpad">${IC.keys}Enter code</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
     hub:`<button class="pri" data-a="panel">${IC.hub}Use the hub</button>`,
   }[want];
-  if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
-  actK = want; actEl.classList.remove('off');
-  placeAct();
+  if(want === 'therm' && actEl.dataset.k === 'therm'){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
+  else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
+  actEl.dataset.k = want;
+  const was = actK; actK = want; actEl.classList.remove('off');
+  placeAct(); if(!was) setTimeout(placeAct, 650);
   showTry(want === 'hub'); }
 /* dock the control just above the tour's slim product bar (#card), centred on it; never over the product */
-function placeAct(){ const c = tour.card; if(!c) return; const r = c.getBoundingClientRect(), cs = getComputedStyle(c);
-  const m = new DOMMatrix(cs.transform === 'none' ? undefined : cs.transform), tr = (cs.translate || '').split(' ');   // the bar slides in: measure where it rests
-  const top = r.top - m.m42 - (parseFloat(tr[1]) || 0), cx = r.left + r.width/2 - m.m41 - (parseFloat(tr[0]) || 0);
-  actEl.style.left = cx + 'px'; actEl.style.bottom = Math.max(12, innerHeight - top + 10) + 'px'; }
+function placeAct(){ const c = tour.card; if(!c) return; const r = c.getBoundingClientRect();   // re-measured when the bar finishes sliding in
+  actEl.style.left = Math.min(innerWidth - actEl.offsetWidth/2 - 8, Math.max(actEl.offsetWidth/2 + 8, r.left + r.width/2)) + 'px'; actEl.style.bottom = Math.max(12, innerHeight - r.top + 10) + 'px'; }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }
 actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; const a = b.dataset.a;
   if(a === 'pad') enterPad('lock'); if(a === 'kpad') enterPad('keypad'); if(a === 'panel') enterPanel();

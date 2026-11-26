@@ -57,7 +57,7 @@ export default H => {
   const win = (mx, my, mz) => mx < -W/2 + .01 && Math.abs(my) < 12.5 && mz > 11.4 && mz < 18.4;
   add(g, cap(P, 10.5, 0, shell, false));
   add(g, sweep(P, prof, shell, win));
-  const bezel = new THREE.MeshPhysicalMaterial({color:0xc2c2c0, roughness:.6, clearcoat:.08});
+  const bezel = new THREE.MeshPhysicalMaterial({color:0xa2a2a0, roughness:.6, clearcoat:.08});
   add(g, sweep(P, [[.5, 31.3], [1.85, 30.2]], bezel));                                                         // straight bezel sloping down and in from the crest to the fabric
   add(g, sweep(P, [[1.85, 30.2], [1.85, 30.0]], dark));
   add(g, sweep(P, [[1.85, 30.0], [2.6, 30.0]], dark));                                                         // dark floor (the hairline gap) at the bezel foot
@@ -77,7 +77,7 @@ export default H => {
         const gr = x.createLinearGradient(-cw*.23, 0, cw*.23, 0), e = `rgb(${v*.8|0},${v*.8|0},${v*.8|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
         gr.addColorStop(0, e); gr.addColorStop(.5, m); gr.addColorStop(1, e);
         x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.23, rh*.75, 0, 0, TAU); x.fill(); x.restore(); }
-      if(rnd() < .7){ x.fillStyle = '#262626'; x.beginPath(); x.ellipse(q*cw, cy + rh/2 + (q%2)*rh/2, cw*.12, rh*.55, 0, 0, TAU); x.fill(); }   // staggered, irregular slit pores   // see-through slit pore between columns (0.25 x 0.45 mm)
+      if(rnd() < .7){ x.fillStyle = '#3a3a3a'; x.beginPath(); x.ellipse(q*cw, cy + rh/2 + (q%2)*rh/2, cw*.12, rh*.55, 0, 0, TAU); x.fill(); }   // staggered, irregular slit pores   // see-through slit pore between columns (0.25 x 0.45 mm)
     }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/T, 1/T); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
