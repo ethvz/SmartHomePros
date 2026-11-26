@@ -92,7 +92,7 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-im{max-width:none;z-in
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ppA-br .fsp-im{transform:translateX(60px)}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane.ppA-bl .fsp-im{transform:translateX(-60px)}
 html.pp :is(#prScroll,#hbScroll,#thScroll) [data-vis="1"] .fsp-pane:is(.ppA-br,.ppA-bl) .fsp-im{opacity:1;transform:none}
-html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane>:not(img){z-index:1}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane>:not(img){z-index:3}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-note{position:relative!important;left:auto!important;top:auto!important;grid-column:1/-1;width:auto!important;font-size:13px;color:rgba(255,255,255,.45)}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:17px!important;line-height:22px!important;color:rgba(255,255,255,.8)}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co b{font-size:19px!important;line-height:23px!important;margin-bottom:6px}
@@ -204,7 +204,7 @@ html.pp #prScroll .icm .ocm-col{left:20px!important;right:20px!important;width:a
 html.pp #prScroll .icm .ocm-col>*{pointer-events:auto}
 html.pp #prScroll .icm .dbm-h{left:16px!important;min-height:0!important;font-size:38px!important;display:block!important}
 html.pp #prScroll .icm .dbm-h small{font-size:18px!important;margin-top:8px}
-html.pp #prScroll .icm .dbm-list button{height:58px!important;font-size:16px!important;padding:0 12px!important;gap:10px!important;line-height:1.1}
+html.pp #prScroll .icm .dbm-list button{height:58px!important;font-size:17px!important;padding:0 12px!important;gap:10px!important;line-height:1.1}
 html.pp #prScroll .icm .dbm-list button .lvi{width:22px;height:22px}
 html.pp #prScroll .icm .ocm-fade{display:none!important}
 html.pp #prScroll .icm .ocm-cap{display:none!important}
@@ -252,7 +252,7 @@ html.pp #prScroll .psec.ppA-tiles>.nxa{display:none!important}
 /* Smart Hub hero: the whole Hub in view over a soft copy of its wall */
 html.pp #hbScroll [data-t=hero]{background:#3b3026}
 html.pp #hbScroll [data-t=hero]::before{content:"";position:absolute;inset:-40px;background:url(../assets/hb/hero_v.jpg?v=73) 50% 50%/cover;filter:blur(28px) brightness(.8);z-index:0}
-html.pp #hbScroll .hbh-vid{left:-322px!important;width:1238px!important;height:929px!important;top:calc(var(--H)*.55 - 470px)!important;object-fit:cover;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%)}
+html.pp #hbScroll .hbh-vid{left:-100px!important;width:800px!important;height:600px!important;top:calc(var(--H)*.55 - 300px)!important;object-fit:cover;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%)}
 /* Hub tables: use the height; readable type */
 html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:24px!important;right:24px;top:96px!important;font-size:40px!important;line-height:1.05}
 html.pp #p-hub #hbScroll .hbsub{left:24px!important;right:24px;top:150px!important;font-size:18px}
@@ -344,3 +344,9 @@ html.pp #prScroll .psec[data-t=specs]:has(.hl .dwseg) .fsp-pane{padding-bottom:2
   html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fsp-co b{font-size:17px!important;line-height:20px!important;margin-bottom:4px}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .fsp-pane .fst .r{min-height:48px}
 }
+/* picture sections: when a tile changes the crop, the artwork glides to its new frame (only after the first placement) */
+html.pp #prScroll .ppart[data-ppl]{transition:translate .5s cubic-bezier(.2,.8,.2,1),scale .5s cubic-bezier(.2,.8,.2,1),clip-path .5s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){ html.pp #prScroll .ppart[data-ppl]{transition:none} }
+/* Indoor Camera "Listening for Danger" (no phone): the photo grows into the phone's room instead of leaving a black gap */
+html.pp #prScroll .icm.solo .ocm-card{height:calc(var(--H) - 244px - var(--ppFoot,86px) - 300px)!important}
+@media (min-aspect-ratio:10/19){ html.pp #prScroll .icm.solo .ocm-card{height:calc(var(--H) - 212px - var(--ppFoot,86px) - 262px)!important} }

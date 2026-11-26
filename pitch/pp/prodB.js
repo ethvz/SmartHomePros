@@ -102,11 +102,15 @@
       const box = Q(bq), ph = Q(pq), L = Q(lq); if (!box || !ph || !L) return;
       const sec = L.closest('.otab'), H = window.SH || 1230, st = Q('#stage'), pf = parseFloat(getComputedStyle(st).getPropertyValue('--ppFoot')) || 76;
       const rows = Math.ceil(L.children.length / 2), bh = H >= 1200 ? 66 : 60, listH = rows * bh + (rows - 1) * 6;
-      const head = H < 1100 ? 168 : 186, mt = head, mh = Math.max(240, H - pf - 14 - listH - 18 - mt);
+      const head = H < 1100 ? 168 : 186;
+      /* 24/7 tab: the storage caption gets its own strip under the subtitle, and the media band starts below it */
+      const cap = sec.querySelector('.dbm-cap'), hd = sec.querySelector('.dbm-h'); let mt = head, capT = 0;
+      if (cap && hd && cap.classList.contains('on')) { capT = hd.offsetTop + hd.offsetHeight + 14; mt = Math.max(head, capT + cap.offsetHeight + 18); }
+      const mh = Math.max(240, H - pf - 14 - listH - 18 - mt);
       let phs, phh;
       if (pw === 920) { const port = ph.classList.contains('port'); phs = port ? mh / 732 : 560 / 920; phh = port ? mh : 454 * phs; }
       else { phs = Math.min(mh / 748, 330 / 372); phh = 748 * phs; }
-      const v = { '--lbh': bh + 'px', '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
+      const v = { '--capT': capT + 'px', '--lbh': bh + 'px', '--mt': mt + 'px', '--mh': mh + 'px', '--phs': phs.toFixed(4), '--phh': phh.toFixed(1) + 'px' };
       if (pw === 372) { const pl = 16; v['--cl'] = (pl + 372 * phs + 6).toFixed(1) + 'px';
         if (ph.style.getPropertyValue('left') !== pl + 'px') ph.style.setProperty('left', pl + 'px', 'important');
         const c = Q('#dbmCap'); if (c && c.style.getPropertyValue('transform') !== 'none') c.style.setProperty('transform', 'none', 'important'); }
@@ -115,11 +119,11 @@
   }
   /* the page's own balance() re-places these with inline !important styles: put ours back whenever it does */
   function featWatch() {
-    ['#dbmPhone', '#dbmCap', '#ocmPhone'].forEach(q => { const el = Q(q); if (!el || el.__ppw) return; el.__ppw = 1;
+    ['#dbmPhone', '#dbmCap', '#ocmPhone', '#ocmCap'].forEach(q => { const el = Q(q); if (!el || el.__ppw) return; el.__ppw = 1;
       new MutationObserver(() => { if (isPP()) featLayout(); }).observe(el, { attributes: true, attributeFilter: ['style', 'class'] }); });
   }
   function featClear() {
-    D.querySelectorAll('#ocScroll>.dbm,#dbScroll>.dbm').forEach(s => ['--lbh', '--mt', '--mh', '--phs', '--phh', '--cl'].forEach(k => s.style.removeProperty(k)));
+    D.querySelectorAll('#ocScroll>.dbm,#dbScroll>.dbm').forEach(s => ['--capT', '--lbh', '--mt', '--mh', '--phs', '--phh', '--cl'].forEach(k => s.style.removeProperty(k)));
     const ph = Q('#dbmPhone'); if (ph && ph.style.getPropertyValue('left') === '16px') ph.style.removeProperty('left');
   }
 
@@ -218,7 +222,7 @@
   function galEager(sec) { sec.querySelectorAll('.hgl img[loading=lazy]').forEach(im => { im.loading = 'eager'; }); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ppo) return; el.__ppo = 1;
     /* the wells only have a size once their page is shown: re-fit then (writes only to the images, never to the observed page) */
-    new MutationObserver(() => { if (isPP() && el.classList.contains('on')) { requestAnimationFrame(wellFit); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
+    new MutationObserver(() => { if (isPP() && el.classList.contains('on')) { requestAnimationFrame(() => { wellFit(); featLayout(); }); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
   function boot() { aiBuild(); cmBuild(); actBleed(); secWatch(); if (isPP()) D.querySelectorAll('#p-ocp.on,#p-dbcp.on').forEach(galEager); featWatch(); histWatch(); stripDrag(Q('#ocScroll')); stripDrag(Q('#dbScroll')); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));

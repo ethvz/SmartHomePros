@@ -22,10 +22,13 @@
      Parts after the first show a clone of the picture (and of its video, kept in sync). Default: the whole picture. */
   const LAY={
     'lock:lock':{mode:'stack',crops:[[70,200,820,590],[930,190,420,610]],w:[1,.78]},
-    'lock:colors':{mode:'grid',crops:[[66,222,298,428],[362,222,296,428],[662,222,296,428],[958,222,342,428]],labels:['Bronze','Nickel','Brass','Matte Black']},
+    /* tiles 3-4 show other artwork: Remote Control = phone + lock side by side, SmartActions = the phone alone */
+    'lock:lock:2':{crops:[[176,104,930,700]]},
+    'lock:lock:3':{crops:[[462,8,496,776]]},
+    'lock:colors':{mode:'grid',crops:[[66,222,296,428],[362,222,296,428],[660,222,296,428],[1004,222,296,428]],fade:['r','r','r','l'],labels:['Bronze','Nickel','Brass','Matte Black']},
     'garage:garage':{mode:'stack',crops:[[80,130,500,320],[592,190,696,710]],w:[.85,1]},
     'garage:gphone':{crops:[[224,36,448,900]]},
-    'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.8]},
+    'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.8],fade:['','','rb']},
     'app:phone':{crops:[[90,60,700,840]]}};
   const ART='img.full,video.ovid,.hl,.tip,.xf-ghost';
   const footH=()=>parseFloat(getComputedStyle($('#stage')).getPropertyValue('--ppFoot'))||86;
@@ -40,7 +43,15 @@
       gv.__o=v; if(!v.paused&&gv.paused) gv.play().catch(()=>{}); }
     else { gv.hidden=true; if(!gv.paused) gv.pause(); }
     return g; }
-  const place=(el,r,k,x,y)=>{ el.style.translate=`${(x-r[0]*k).toFixed(1)}px ${(y-r[1]*k).toFixed(1)}px`; el.style.scale=k.toFixed(4);
+  /* fade the crop's edges named in fd (l r t b), e.g. where a neighbour cuts in or the artwork itself ends in a straight line */
+  const fadeEdge=(el,r,fd)=>{ const g=[]; fd=fd||'';
+    if(fd.includes('r')) g.push(`linear-gradient(90deg,#000 ${(r[0]+r[2]*.8).toFixed(0)}px,transparent ${(r[0]+r[2]).toFixed(0)}px)`);
+    if(fd.includes('l')) g.push(`linear-gradient(90deg,transparent ${r[0].toFixed(0)}px,#000 ${(r[0]+r[2]*.2).toFixed(0)}px)`);
+    if(fd.includes('b')) g.push(`linear-gradient(180deg,#000 ${(r[1]+r[3]*.84).toFixed(0)}px,transparent ${(r[1]+r[3]).toFixed(0)}px)`);
+    if(fd.includes('t')) g.push(`linear-gradient(180deg,transparent ${r[1].toFixed(0)}px,#000 ${(r[1]+r[3]*.16).toFixed(0)}px)`);
+    const m=g.join(','), c=g.length>1?g.slice(1).map(()=>'intersect').join(','):'';
+    if(el.__fd!==m){ el.__fd=m; el.style.webkitMaskImage=m; el.style.maskImage=m; el.style.maskComposite=c; el.style.webkitMaskComposite=g.length>1?g.slice(1).map(()=>'source-in').join(','):''; } };
+  const place=(el,r,k,x,y)=>{ if(!el.dataset.ppl) setTimeout(()=>{ el.dataset.ppl=1; },80); el.style.translate=`${(x-r[0]*k).toFixed(1)}px ${(y-r[1]*k).toFixed(1)}px`; el.style.scale=k.toFixed(4);
     el.style.clipPath=`inset(${r[1]}px ${1376-r[0]-r[2]}px ${964-r[1]-r[3]}px ${r[0]}px)`; };
   function art(){ const pp=isPP(), H=window.SH||1032, id=(typeof PR!=='undefined'&&PR&&PR.id)||'';
     artSecs().forEach(sec=>{
@@ -55,18 +66,21 @@
       const n=c.querySelectorAll('.lvt').length, list=c.querySelector('.lvl'), short=H<1150;
       const cols=n<=4?n:3, rows=list?0:n?Math.ceil(n/cols):0, th=short?96:(n<=4?118:108), ctlH=list?list.children.length*64:rows*th+(rows?(rows-1)*10:0);
       c.dataset.n=n; c.style.setProperty('--cols',cols||1); c.style.setProperty('--th',th+'px'); sec.classList.toggle('ppA-tiles',n>0);
-      const L=LAY[id+':'+sec.dataset.t]||{crops:[[0,0,1376,964]]}, cr=L.crops, top0=100, bot=footH()+(n?20:96), gap=ctlH?24:0, avail=H-top0-bot-ctlH-gap;
+      const sub=PR&&PR.st&&PR.st[sec.dataset.t]?PR.st[sec.dataset.t].sub:null;
+      const L=LAY[id+':'+sec.dataset.t+':'+sub]||LAY[id+':'+sec.dataset.t]||{crops:[[0,0,1376,964]]}, cr=L.crops, top0=100, bot=footH()+(n?20:96), gap=ctlH?24:0, avail=H-top0-bot-ctlH-gap;
       const used=new Set([0]); let blockH=0;
-      if(L.mode==='grid'){ const lh=40, cw=284, gx=12, gy=14; let k=Math.min(...cr.map(r=>cw/r[2]),...cr.map(r=>(avail-2*lh-gy)/2/r[3]));
+      if(L.mode==='grid'){ const lh=40, cw=268, gx=16, gy=14, x0=(600-2*cw-gx)/2; let k=Math.min(...cr.map(r=>cw/r[2]),...cr.map(r=>(avail-2*lh-gy)/2/r[3]));
         const ch=Math.max(...cr.map(r=>r[3]*k)); blockH=2*(ch+lh)+gy; const y0=top0+Math.max(0,(H-top0-bot-ctlH-gap-blockH)/2);
-        cr.forEach((r,i)=>{ const col=i%2, row=i>>1, x=16+col*(cw+gx)+(cw-r[2]*k)/2, y=y0+row*(ch+lh+gy); const el=i?ghost(sec,w,i):w; used.add(i); place(el,r,k,x,y);
+        cr.forEach((r,i)=>{ const col=i%2, row=i>>1, x=x0+col*(cw+gx)+(cw-r[2]*k)/2, y=y0+row*(ch+lh+gy); const el=i?ghost(sec,w,i):w; used.add(i); place(el,r,k,x,y);
           let lb=sec.querySelector(':scope>.pplab[data-i="'+i+'"]'); if(!lb){ lb=document.createElement('div'); lb.className='pplab'; lb.dataset.i=i; sec.appendChild(lb); }
-          lb.textContent=(L.labels||[])[i]||''; Object.assign(lb.style,{left:(16+col*(cw+gx))+'px',top:(y+ch+6).toFixed(0)+'px',width:cw+'px'}); });
+          const tx=(L.labels||[])[i]||''; if(lb.textContent!==tx) lb.textContent=tx;
+          /* the locks overlap in the artwork: fade the edge where the neighbour cuts in, so every tile reads the same */
+          const fd=(L.fade||[])[i]; fadeEdge(el,r,fd); Object.assign(lb.style,{left:(x0+col*(cw+gx))+'px',top:(y+ch+6).toFixed(0)+'px',width:cw+'px'}); });
         c.style.top=(y0+blockH+gap).toFixed(0)+'px'; }
       else { const ws=L.w||cr.map(()=>1), sg=16;
         let k=Math.min(...cr.map((r,i)=>600/(r[2]*ws[i])), (avail-sg*(cr.length-1))/cr.reduce((a,r,i)=>a+r[3]*ws[i],0));
         blockH=cr.reduce((a,r,i)=>a+r[3]*k*ws[i],0)+sg*(cr.length-1); let y=top0+Math.max(0,(H-top0-bot-ctlH-gap-blockH)/2);
-        cr.forEach((r,i)=>{ const kk=k*ws[i], el=i?ghost(sec,w,i):w; used.add(i); place(el,r,kk,300-r[2]*kk/2,y); y+=r[3]*kk+sg; });
+        cr.forEach((r,i)=>{ const kk=k*ws[i], el=i?ghost(sec,w,i):w; used.add(i); place(el,r,kk,300-r[2]*kk/2,y); fadeEdge(el,r,(L.fade||[])[i]); y+=r[3]*kk+sg; });
         c.style.top=(y-sg+gap).toFixed(0)+'px'; }
       sec.querySelectorAll(':scope>.ppart.ppx,:scope>.pplab').forEach(x=>{ if(!used.has(+x.dataset.i)||(x.classList.contains('pplab')&&L.mode!=='grid')) x.remove(); });
       c.style.height=ctlH+'px';
@@ -103,12 +117,12 @@
      fx = where the product sits across the source image (0..1); the object-position is worked out from the box and image shapes. ---- */
   const setI=(el,p,v)=>{ if(el.style.getPropertyValue(p)!==v||el.style.getPropertyPriority(p)!=='important') el.style.setProperty(p,v,'important'); };
   const FOC={'ph/motion':.57,'ph/glass':.26,'ph/water':.60,'ph/smoke':.70,'ph/pendant':.30,'ph/fob':.38,'ph/keypad':.33,'ph/lock3':.70,
-    'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.30,'ph/firefighter':.55,'ph/therm2':.62,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.52,
+    'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.23,'ph/firefighter':.55,'ph/therm2':.71,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.47,
     'gal/lock_0':.40,'gal/lock_1':.27,'gal/lock_2':.27,'gal/lock_3':.53,'gal/lock_4':.40,'gal/lock_5':.55,'gal/lock_6':.52,'gal/lock_7':.52,'gal/lock_8':.28,
-    'gal/therm_0':.50,'gal/therm_1':.80,'gal/therm_2':.42,'gal/therm_3':.57,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
-    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.80,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
-    'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.68,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
-  const ZH={'ph/plug3':.72,'ph/firefighter':.74,'ph/water':.8,'ph/lock3':.66,'ph/chime3':.72,'ph/dws_surf':.76,'ph/dws_rec':.76,'gal/hub_0':.64,'gal/hub_5':.74};
+    'gal/therm_0':.50,'gal/therm_1':.83,'gal/therm_2':.42,'gal/therm_3':.66,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
+    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.76,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
+    'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.73,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
+  const ZH={'ph/plug3':.72,'ph/firefighter':.74,'ph/water':.8,'ph/lock3':.66,'ph/chime3':.72,'ph/dws_surf':.76,'ph/dws_rec':.76,'gal/hub_0':.64,'gal/hub_5':.74,'gal/hub_7':.7};
   const focKey=el=>{ const u=el.getAttribute('src')||''; const m=u.match(/assets\/((?:ph|gal|p)\/[\w]+)\./); return m&&m[1]; };
   function focal(){ const pp=isPP();
     BOX.forEach(q=>{ const b=$(q); if(!b) return;
@@ -130,22 +144,27 @@
   function bleed(){ const pp=isPP();
     BOX.forEach(q=>{ const b=$(q); if(!b) return;
       b.querySelectorAll('.strip.fsx>.fsp-pane').forEach((pn,pi)=>{ const ims=[...pn.querySelectorAll(':scope>img.fsp-im')]; if(!ims.length) return;
-        if(!pp){ ims.forEach(im=>{ if(!im.dataset.ppo) return; const o=JSON.parse(im.dataset.ppo); ['left','top','width','height'].forEach(p=>{ im.style.removeProperty(p); im.style[p]=o[p]; });
+        if(!pp){ ims.forEach(im=>{ if(!im.dataset.ppo) return; const o=JSON.parse(im.dataset.ppo); im.style.removeProperty('z-index'); ['left','top','width','height'].forEach(p=>{ im.style.removeProperty(p); im.style[p]=o[p]; });
             if(o.src&&im.getAttribute('src')!==o.src) im.src=o.src; delete im.dataset.ppo; }); pn.classList.remove('ppA-bl','ppA-br'); return; }
         ims.forEach(im=>{ if(!im.dataset.ppo) im.dataset.ppo=JSON.stringify({left:im.style.left,top:im.style.top,width:im.style.width,height:im.style.height,src:im.getAttribute('src')});
           /* the Firefighter side view is a photo on a grey wall: use the clean render instead */
           if(/fs\/fire_s\./.test(im.getAttribute('src'))) im.src=im.getAttribute('src').replace('fire_s.','fire_f.'); });
         const O=ims.map(im=>JSON.parse(im.dataset.ppo)), R=O.map(o=>[parseFloat(o.left),parseFloat(o.top),parseFloat(o.width),parseFloat(o.height)]);
         if(R.some(r=>r.some(isNaN))) return;
-        const gx=Math.min(...R.map(r=>r[0])), gy=Math.min(...R.map(r=>r[1])), gw=Math.max(...R.map(r=>r[0]+r[2]))-gx, gh=Math.max(...R.map(r=>r[1]+r[3]))-gy;
+        /* the product is the hero: size and place it alone; an app phone shown with it tucks in behind it on the inner side */
+        const isPh=i=>/_phone\./.test(O[i].src||''), P=R.map((r,i)=>i).filter(i=>!isPh(i)), Q=R.map((r,i)=>i).filter(isPh); if(!P.length) return;
+        const gx=Math.min(...P.map(i=>R[i][0])), gy=Math.min(...P.map(i=>R[i][1])), gw=Math.max(...P.map(i=>R[i][0]+R[i][2]))-gx, gh=Math.max(...P.map(i=>R[i][1]+R[i][3]))-gy;
         const H=pn.offsetHeight, txt=[...pn.children].filter(c=>!c.matches('img,svg')&&c.offsetHeight), tTop=txt.length?Math.min(...txt.map(c=>c.offsetTop)):H-200;
         const T=100, free=Math.max(160,tTop-30-T);
         /* a render may not be blown up past ~1.15x its own pixels */
-        let cap=9; ims.forEach((im,i)=>{ if(im.naturalWidth) cap=Math.min(cap,im.naturalWidth*1.15/R[i][2]); else if(!im.__ppl){ im.__ppl=1; im.addEventListener('load',later,{once:true}); } });
-        const k=Math.min(760/gw,free/gh,cap), w=gw*k, h=gh*k, right=pi%2===0;
-        /* narrow renders lose less to the edge so they still read as the product */
-        const off=w>320?.26:.14, L=right?600-w*(1-off):-w*off, Y=T+(free-h)/2;
-        ims.forEach((im,i)=>{ const r=R[i]; setI(im,'left',(L+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); });
+        let cap=9; P.forEach(i=>{ const im=ims[i]; if(im.naturalWidth) cap=Math.min(cap,im.naturalWidth*1.15/R[i][2]); else if(!im.__ppl){ im.__ppl=1; im.addEventListener('load',later,{once:true}); } });
+        const k=Math.min((Q.length?500:760)/gw,(Q.length?.86:1)*free/gh,cap), w=gw*k, h=gh*k, right=pi%2===0;
+        /* how much the screen edge cuts: less for narrow renders and long flat ones, so they still read as the product */
+        const off=w<=320?.08:w/h>1.8?.1:Q.length?.18:.26, L=right?600-w*(1-off):-w*off, Y=T+(free-h)/2;
+        P.forEach(i=>{ const r=R[i], im=ims[i]; setI(im,'left',(L+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); setI(im,'z-index','2'); });
+        Q.forEach(i=>{ const r=R[i], im=ims[i], ph=Math.min(free,h*1.1), pw=ph*r[2]/r[3];
+          let x=right?L-pw*.88:L+w-pw*.12; x=right?Math.max(28,x):Math.min(600-28-pw,x);
+          setI(im,'left',x.toFixed(1)+'px'); setI(im,'top',(T+(free-ph)/2).toFixed(1)+'px'); setI(im,'width',pw.toFixed(1)+'px'); setI(im,'height',ph.toFixed(1)+'px'); setI(im,'z-index','1'); });
         const want=right?'ppA-br':'ppA-bl'; if(!pn.classList.contains(want)){ pn.classList.remove('ppA-bl','ppA-br'); pn.classList.add(want); } }); }); }
 
   /* ---- "Which one" cards: sharp, large renders that bleed off the card's right edge ---- */
