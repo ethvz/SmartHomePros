@@ -221,6 +221,15 @@
       var m = document.querySelector('.dw.shpn-rv .dw-panel'); if (m) fromBurger(m); H.classList.remove('shpn-open'); } }, true);
   }
 
+  /* iPhone held upright: the corner (logo + hamburger) goes to the TOP left, clear of the status bar / Dynamic Island, and the
+     menu opens downward from it. iPads and phones held sideways keep it bottom left. html.shpn-top marks the upright phone. */
+  function topMode() {
+    var ph = Math.min(screen.width || 9999, screen.height || 9999) < 500 || Math.min(innerWidth, innerHeight) < 500;
+    var on = ph && innerHeight > innerWidth;
+    if (H.classList.contains('shpn-top') !== on) H.classList.toggle('shpn-top', on);
+  }
+  topMode(); addEventListener('resize', topMode); addEventListener('orientationchange', function () { setTimeout(topMode, 200); });
+
   function init() {
     if (APP === 'pitch') {
       if (!mountPitch()) { var n = 0, iv = setInterval(function () { if (mountPitch() || ++n > 40) clearInterval(iv); }, 250); }

@@ -150,12 +150,14 @@ html.shpn-recruit .board img[data-name="Vivint Logo"],
 html.shpn-recruit .board img[data-name="Logo (header hidden)"] { visibility: hidden !important; pointer-events: none !important; }
 html.shpn-recruit #phdr .ph-fix { display: none !important; }
 html.shpn-recruit #phdr .ph-scroll { padding-left: 8px; }
+html.shpn-recruit.shpn-top #phdr .ph-scroll { padding-left: 150px; }   /* the corner sits at the left of the header row */
 /* status bar / Dynamic Island: the phone header starts below it */
 html.shpn-recruit #phdr { padding-top: max(var(--sat, 0px), env(safe-area-inset-top, 0px)) !important; height: calc(max(var(--sat, 0px), env(safe-area-inset-top, 0px)) + 58px) !important; }
 /* phone footer (page tabs): beside the corner, level with it, clear of the home indicator */
 html.shpn-recruit #pfoot { left: calc(var(--shpn-l) + 146px) !important; right: max(12px, calc(env(safe-area-inset-right, 0px) + 4px)) !important; }
 /* phone: the corner sits level with the page tabs (#pfoot: bottom var(--sab) + 10px, 60px tall) */
-html.shpn-recruit.pph { --shpn-b: calc(var(--sab, 0px) + 18px); }
+html.shpn-recruit.pph:not(.shpn-top) { --shpn-b: calc(var(--sab, 0px) + 18px); }
+html.shpn-recruit.shpn-top #pfoot { left: max(12px, calc(env(safe-area-inset-left, 0px) + 4px)) !important; }
 html.shpn-recruit .shpn-corner .shpn-logo svg { height: 18px; }
 /* its menu: the same card as the others (solid, 30px corners), above the corner, opening out of the hamburger */
 html.shpn-recruit .dw.shpn .dw-panel { height: auto !important; bottom: calc(var(--shpn-foot) + 8px) !important; border-radius: 30px; background: #121212; -webkit-backdrop-filter: none; backdrop-filter: none;
@@ -174,3 +176,17 @@ html.shpn-recruit .dw.shpn-rv.drag .dw-in, html.shpn-recruit .dw.shpn-rv.drag .d
   html.shpn-recruit .dw.shpn-rv.on .dw-panel { opacity: 1; }
   html.shpn-recruit .dw.shpn-rv .dw-in, html.shpn-recruit .dw.shpn-rv .dw-head { transform: none; }
 }
+
+/* ======================= iPhone upright (html.shpn-top, set by shpnav.js): the corner at the TOP left ======================= */
+/* --shpn-top0: the corner's top, below the status bar / Dynamic Island (Recruit's --sat, else the safe area);
+   --shpn-head: the height it keeps clear at the top (corner + 8px); menus open downward from it */
+html.shpn-top { --shpn-top0: calc(max(var(--sat, 0px), env(safe-area-inset-top, 0px)) + 7px); --shpn-head: calc(var(--shpn-top0) + var(--shpn-hit) + 8px); }
+html.shpn-top .shpn-corner { top: var(--shpn-top0); bottom: auto; }
+html.shpn-top .shpn-corner::before { bottom: auto; top: calc(-1 * var(--shpn-top0)); background: radial-gradient(70% 80% at 0% 0%, rgba(0, 0, 0, .5), rgba(0, 0, 0, 0) 72%); }
+html.shpn-top .shpn-card { top: var(--shpn-head); bottom: auto; max-height: calc(100% - var(--shpn-head) - max(12px, env(safe-area-inset-bottom, 0px))); }
+html.shpn-top .shpn-toast { bottom: calc(max(12px, env(safe-area-inset-bottom, 0px)) + 18px); }
+html.shpn-top .shpn-corner.off, html.shpn-top.shp-sheet .shpn-corner { transform: translateY(-10px); }
+/* SHP page: its title moves right of the corner */
+html.shpn-top.shpn-home .brand .t { margin-left: 150px; }
+/* Fast Recruit: its menu card hangs from the corner */
+html.shpn-recruit.shpn-top .dw.shpn .dw-panel { top: var(--shpn-head) !important; bottom: max(12px, calc(var(--sab, 0px) + 8px)) !important; }

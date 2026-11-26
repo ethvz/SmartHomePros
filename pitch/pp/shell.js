@@ -22,7 +22,7 @@
   /* ---- Home: All Products grid re-cut for an upright screen ----
      4 columns: Outdoor Camera | Spotlight, then Doorbell, Indoor, Smart Hub; then 3 rows of 5 smaller tiles */
   function ppGrid(Wd, Ht) {
-    const G = 12, X0 = 16, Y0 = 50, Y1 = Ht - 10, w = Wd - 2 * X0, c4 = (w - 3 * G) / 4, c5 = (w - 4 * G) / 5, P = {};
+    const G = 12, X0 = 16, Y0 = 84,   /* Y0: below the top corner (--ppNavT) */ Y1 = Ht - 10, w = Wd - 2 * X0, c4 = (w - 3 * G) / 4, c5 = (w - 4 * G) / 5, P = {};
     const avail = Y1 - Y0, sh = Math.round(Math.min(c5 / 0.74, (avail - 4 * G) * 0.2)), big = (avail - 3 * sh - 4 * G) / 2;
     P.ocp = [X0, Y0, 2 * c4 + G, big]; P.ocspot = [X0 + 2 * (c4 + G), Y0, 2 * c4 + G, big];
     const y2 = Y0 + big + G;
@@ -62,8 +62,8 @@
       const pp = PP(), home = bar.classList.contains('home'), items = [...rail.children].filter(e => e.matches('.bbtn') && e.id !== 'amtBtn');
       const flat = pp && !home && rail.classList.contains('pnav') && !bar.classList.contains('hx-ctr') && items.length > 0;
       if (rail.classList.contains('pph') !== flat) rail.classList.toggle('pph', flat);
-      /* the pill is 310 wide (300 inside, beside the logo): up to 5 named tabs; more = fixed 58px icon tabs that scroll sideways */
-      const ico = flat && items.length > 5;
+      /* the pill is 502 wide (492 inside): up to 7 named tabs; more = fixed 58px icon tabs that scroll sideways */
+      const ico = flat && items.length > 7;
       if (rail.classList.contains('ico') !== ico) rail.classList.toggle('ico', ico);
       if (bar.classList.contains('ppnav') !== flat) bar.classList.toggle('ppnav', flat);
       if (bar.classList.contains('ppnologo')) bar.classList.remove('ppnologo');

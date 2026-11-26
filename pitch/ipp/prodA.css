@@ -199,3 +199,7 @@ html.ipp #p-hub #hbCmp .hbt .well{height:92px!important}
 html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.sns-c .go,.smk-c .go,.fsp button,.xw-pick button,.xw-go,.smk-tog button,.dwseg button,.hb3pill button,.th-list button,.dbm-list button,.dbai,.hbm):active{transform:scale(.95)}
 html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.xf-q,.xa-tog):active{transform:scale(.98)}
 @media (prefers-reduced-motion:reduce){ html.ipp :is(#prScroll,#hbScroll,#thScroll) :is(.sns-c .go,.smk-c .go,.fsp button,.xw-pick button,.xw-go,.dbm-list button,.th-list button):active{transform:none} }
+html.ipp #prScroll .sns-c{padding-top:24px!important;grid-template-columns:280px 1fr!important}
+html.ipp #prScroll .sns-c ul{gap:8px!important}
+html.ipp #prScroll .sns-c li{font-size:15px!important;line-height:1.3!important}
+html.ipp #prScroll .sns-c .bv{font-size:18px!important}
