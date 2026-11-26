@@ -138,7 +138,8 @@ button { font: inherit; color: inherit; }
 .card.book .ph .pv { object-position: 50% 30%; }
 .card.mini .ic { display: grid; place-items: center; }
 .card.mini .ic svg { width: 54%; height: 54%; fill: none; stroke: #000; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.card.pulse .ic { background: linear-gradient(135deg, #ff8fdc, rgb(var(--pk)) 55%, #c34697); }
+.card.pulse .ic { background: #000; }   /* Pulse app icon: white mark on black */
+.card.mini.pulse .ic svg { width: 60%; height: 60%; fill: #fff; stroke: none; }
 .card.book .ic { background: linear-gradient(135deg, #ffad6e, rgb(var(--or)) 55%, #e6743e); }
 .card.book.nope { animation: nope .45s var(--ease); }
 .pl-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.6s var(--ease) .7s forwards; }
@@ -509,7 +510,7 @@ button { font: inherit; color: inherit; }
     <a class="card mini pulse" href="https://pulse.vivint.com" target="_blank" rel="noopener" aria-label="Open Pulse (pulse.vivint.com)">
       <span class="art"><svg viewBox="0 0 300 120" preserveAspectRatio="none" fill="none"><path class="pl-line" pathLength="1" d="M0 92 L48 84 L78 88 L104 60 L122 74 L142 30 L160 96 L178 52 L204 64 L236 34 L268 42 L300 18" stroke="rgb(255,102,204)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 92 L48 84 L78 88 L104 60 L122 74 L142 30 L160 96 L178 52 L204 64 L236 34 L268 42 L300 18 V120 H0Z" fill="url(#plg)" opacity=".5"/><defs><linearGradient id="plg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgb(255,102,204)" stop-opacity=".45"/><stop offset="1" stop-color="rgb(255,102,204)" stop-opacity="0"/></linearGradient></defs></svg></span>
       <span class="sh"></span>
-      <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 5 12 2.5-6h4"/></svg></span>
+      <span class="ic"><svg viewBox="-12 -10 194 207" aria-hidden="true"><path d="M9 0H101Q107 0 111 4L166 59Q170 63 170 69V76Q170 90 156 90H90L4 4Q0 0 9 0Z"/><path d="M90 95V172Q90 187 75 187H15Q0 187 0 172V110Q0 95 15 95Z"/></svg></span>
       <span class="tag">pulse.vivint.com</span>
       <span class="bd">
         <span class="tx"><span class="ey">Track</span><span class="nm">Pulse</span><span class="ln">Your numbers, your team, the leaderboard.</span></span>
