@@ -27,7 +27,7 @@ export default H => {
   for (let k = 1; k <= 10; k++){ const t = k / 10, e = t;
     rings.push(outer.map(([x, y], i) => { const X = x + (rim[i][0] - x) * e, Y = y + (rim[i][1] - y) * e; return [X, Y, FZ + dome(X, Y)]; })); }
 
-  const plate = 0xc8c9cc, shell = 0xdcdddf, white = 0xf3f3f2;
+  const plate = 0xb9babd, shell = 0xd0d1d4, white = 0xf3f3f2;
   const PILL = { y: 0, z: 10, len: 21, wid: 6.5, gap: .4 };
   const pa = (PILL.len + 2 * PILL.gap) / 2 - (PILL.wid + 2 * PILL.gap) / 2, pr = (PILL.wid + 2 * PILL.gap) / 2;
   const cut = `vOP.x > 32.0 && length(vec2(vOP.z - ${PILL.z.toFixed(3)}, max(abs(vOP.y - ${PILL.y.toFixed(3)}) - ${pa.toFixed(3)}, 0.0))) < ${pr.toFixed(3)}`;

@@ -58,7 +58,7 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .xf.on .xf-a{max-height:420px}
 
 /* ---------- Which sensor goes where? (.sns-w): three compact cards stacked ---------- */
 html.pp #prScroll .sns-w .eb{left:36px!important;top:104px!important}
-html.pp #prScroll .sns-w h2{left:36px!important;right:36px;top:132px!important;font-size:50px!important}
+html.pp #prScroll .sns-w h2{left:36px!important;right:36px;top:132px!important;font-size:46px!important;line-height:1.02!important}
 html.pp #prScroll .sns-c{left:20px!important;right:20px;width:auto!important;height:calc((var(--H) - 470px)/3)!important;padding:22px 150px 0 26px!important;border-radius:28px}
 html.pp #prScroll .sns-c:nth-of-type(2){top:220px!important}
 html.pp #prScroll .sns-c:nth-of-type(3){top:calc(232px + (var(--H) - 470px)/3)!important}
@@ -211,3 +211,39 @@ html.pp #prScroll .icm .ocm-card img{left:40px!important;top:0!important;width:5
 html.pp #prScroll .icm .ocm-phone{left:30px!important;top:calc(var(--H) - 680px)!important;scale:.587;transform-origin:0 0!important}
 html.pp #prScroll .icm .ocm-phone.port{left:136px!important;top:calc(var(--H) - 800px)!important;scale:.44}
 html.pp #prScroll .icm .ocm-cap{display:none!important}
+
+/* ---------- shorter phones (e.g. 375x667: stage about 600x1067): tighten the tallest sections ---------- */
+@media (min-aspect-ratio:10/19){
+  html.pp #prScroll .sns-w h2 br{display:none}
+  html.pp #prScroll .sns-w h2{font-size:38px!important}
+  html.pp #prScroll .sns-c:nth-of-type(2){top:196px!important}
+  html.pp #prScroll .sns-c:nth-of-type(3){top:calc(206px + (var(--H) - 420px)/3)!important}
+  html.pp #prScroll .sns-c:nth-of-type(4){top:calc(216px + 2*(var(--H) - 420px)/3)!important}
+  html.pp #prScroll .sns-c{height:calc((var(--H) - 420px)/3)!important;padding-top:18px!important}
+  html.pp #prScroll .sns-c h3{font-size:24px!important}
+  html.pp #prScroll .sns-c .md{display:none!important}
+  html.pp #prScroll .sns-c .go,html.pp #prScroll .sns-c span.go{bottom:16px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-stage{height:280px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-p{height:280px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-link,html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-plus{top:140px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-why{top:668px!important;gap:8px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-why div{height:56px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-foot{display:none!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa{padding:16px 22px!important;row-gap:8px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-list{top:270px!important}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{top:84px!important;font-size:34px!important}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{top:150px!important;row-gap:3px!important}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{min-height:28px!important;font-size:11.5px!important;padding:2px 3px!important}
+  html.pp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:12.5px!important}
+  html.pp #p-hub #hbScroll #hbX .hbt .hd img{height:34px!important}
+  html.pp #p-hub #hbScroll .hb3pill{bottom:88px!important}
+  html.pp #p-hub #hbScroll .hbsub{top:136px!important}
+  html.pp #p-hub #hbOut .hbt{top:180px!important}
+  html.pp #p-hub #hbScroll .hbnew{top:140px!important}
+  html.pp #p-hub #hbScroll .hbnew .th img{width:120px}
+  html.pp #p-hub #hbScroll .hbnew .ft{margin-bottom:10px}
+  html.pp #p-hub #hbScroll .hbnew .ft span{font-size:14px}
+  html.pp #prScroll .smk-c>.best{display:none!important}
+  html.pp #thScroll .thc .th-list button{height:52px}
+  html.pp #prScroll .icm .dbm-list button{height:50px!important}
+}

@@ -1,11 +1,11 @@
 // fire: Vivint Smoke & CO Monitor (EC-FF345 alarm listener), 38.1 W x 76.2 H x 25.4 D mm. Back on the wall at z = 0, face toward +z.
 // Built in millimetres inside a 0.001-scaled group. Outline = rectangle with crisp 45 deg corner chamfers (3 mm legs) through the full
-// depth. A rear solid (small back edge round) and a front solid (soft front roll-off) share that outline; the face plate stands 1.4 mm
-// proud of the top strip, so its rounded top edge reads as the bright step rib 7.6-10.2 mm below the top. One pinhole with a countersink.
+// depth. A rear solid (small back edge round) and the face plate (broad soft roll-off, as the photo's side strips) share that outline.
+// Across the top a rounded rib bar (square ends, 3 mm in from the sides) catches the light as in the photo. One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
-  const W = 38.1, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3;
+  const W = 38.1, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3.5;
   const white = new THREE.MeshPhysicalMaterial({ color: 0xefeff0, roughness: .34, clearcoat: .35, clearcoatRoughness: .28 });
 
   // chamfered outline; top/bottom limits so the face plate can stop at the step

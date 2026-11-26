@@ -34,17 +34,17 @@ export default H => {
   const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
   /* ---------- materials ---------- */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0xa4a4a2, roughness: .58, clearcoat: .05 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0x9a9a98, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(12), mm(.22), 0x9a9a98);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xf4f6f4, roughness: .1, transmission: .96, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xd2d6d6, roughness: .22, transmission: .9, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x34342f, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xe9dc9a, roughness: .35, emissive: 0xf3e6a6, emissiveIntensity: .08, clearcoat: .6 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xebe5c4, roughness: .35, emissive: 0xf3e6a6, emissiveIntensity: .08, clearcoat: .6 });
   const btnM = white.clone();
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 
   /* ---------- body + face + light well: one watertight shell ---------- */
-  const N = 160, A0 = 49.2, A1 = 47.3, RR = 6, ZV = 30.6, ZE = 36.6, AF = A1 - RR;        // AF: where the roll meets the face
+  const N = 160, A0 = 49.2, A1 = 46.9, RR = 6, ZV = 30.6, ZE = 36.6, AF = A1 - RR;        // AF: where the roll meets the face
   const dome = (x, y) => { const rho = Math.cbrt(Math.abs(x) ** 3 + Math.abs(y) ** 3); return ZE + 1.5 * (1 - Math.min(1, rho / AF) ** 2); };   // mm
   const T = [...Array(N)].map((_, i) => i / N * Math.PI * 2);
   const ringA = (a, z) => T.map(t => { const [x, y] = sq(a, t); return [mm(x), mm(y), mm(z)]; });
@@ -54,7 +54,7 @@ export default H => {
   rings.push(ringA(A1, 18), ringA(A1, 25), ringA(A1, ZV));
   for (let i = 1; i <= 10; i++) { const q = i / 10 * Math.PI / 2; rings.push(ringA(A1 - RR * (1 - Math.cos(q)), ZV + RR * Math.sin(q))); }
   // pocket opening: rounded rect 34 x 32, r 10, centred (0, 1); each face ray runs from the pocket centre to the outer ring point
-  const PC = [0, 1], PW = 34, PH = 32, PR = 10;
+  const PC = [0, -.5], PW = 35.5, PH = 34, PR = 10.5;
   const inRR = (x, y) => { const qx = Math.abs(x - PC[0]) - (PW / 2 - PR), qy = Math.abs(y - PC[1]) - (PH / 2 - PR); return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - PR; };
   const outer = T.map(t => sq(AF, t));
   const inner = outer.map(([ox, oy]) => { const dx = ox - PC[0], dy = oy - PC[1]; let lo = 0, hi = 1; for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; inRR(PC[0] + dx * m, PC[1] + dy * m) < 0 ? lo = m : hi = m; } return [PC[0] + dx * lo, PC[1] + dy * lo]; });
@@ -73,8 +73,8 @@ export default H => {
 
   /* ---------- printing (conformed to the dome) ---------- */
   const printAt = (cx, cy, w, h, draw) => add(g, conform(printPlane(mm(w), mm(h), draw), (px, py) => mm(dome(cx + px * 1000, cy + py * 1000))), mm(cx), mm(cy), 0);
-  printAt(0, 38.5, 48, 6, (c, P) => {                                                         // CHAMBERLAIN, its E drawn as three detached bars
-    c.fillStyle = '#6e6e6e'; c.textBaseline = 'alphabetic'; c.font = '500 33px ' + FONT;
+  printAt(0, 36.4, 48, 6, (c, P) => {                                                         // CHAMBERLAIN, its E drawn as three detached bars
+    c.fillStyle = '#626262'; c.textBaseline = 'alphabetic'; c.font = '600 34px ' + FONT;
     const parts = ['C', 'H', 'A', 'M', 'B', 'E', 'R', 'L', 'A', 'I', 'N'], sp = 7, wE = 22;
     const ws = parts.map(ch => ch === 'E' ? wE : c.measureText(ch).width * 1.18); const tot = ws.reduce((a, b) => a + b, 0) + sp * (parts.length - 1);
     const k = 425 / tot; let [x, y] = P(mm(-21.25), mm(-1.65)); c.save(); c.translate(x, y); c.scale(k, 1);
@@ -85,7 +85,7 @@ export default H => {
   printAt(0, 25, 34, 10, (c, P) => {                                                          // vent slots: light dimples + dark through-holes, zig-zag
     const slot = (x, y, dark) => { const [px, py] = P(mm(x), mm(y)); const w = 11, h = 30;
       if (dark) { c.fillStyle = '#1a1a1a'; c.beginPath(); c.roundRect(px - w / 2, py - h / 2, w, h, w / 2); c.fill(); c.fillStyle = 'rgba(255,255,255,.18)'; c.beginPath(); c.roundRect(px - w / 2 + 1, py + h / 2 - 5, w - 2, 4, 2); c.fill(); return; }
-      const gr = c.createLinearGradient(px, py - h / 2, px, py + h / 2); gr.addColorStop(0, 'rgba(120,120,118,.85)'); gr.addColorStop(.45, 'rgba(190,190,188,.55)'); gr.addColorStop(1, 'rgba(235,235,233,.2)');
+      const gr = c.createLinearGradient(px, py - h / 2, px, py + h / 2); gr.addColorStop(0, 'rgba(95,95,93,.9)'); gr.addColorStop(.45, 'rgba(165,165,163,.7)'); gr.addColorStop(1, 'rgba(225,225,223,.35)');
       c.fillStyle = gr; c.beginPath(); c.roundRect(px - w / 2, py - h / 2, w, h, w / 2); c.fill();
       c.strokeStyle = 'rgba(150,150,148,.55)'; c.lineWidth = 1.2; c.stroke(); };
     for (const x of [-12.6, -4.2, 4.2, 12.6]) { slot(x, 2.8, false); slot(x, -2.7, false); }
@@ -103,7 +103,7 @@ export default H => {
     (c, x, y) => { c.beginPath(); c.arc(x, y, 4, 0, Math.PI * 2); c.stroke(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; c.beginPath(); c.moveTo(x + 6 * Math.cos(a), y + 6 * Math.sin(a)); c.lineTo(x + 8.5 * Math.cos(a), y + 8.5 * Math.sin(a)); c.stroke(); } },
     (c, x, y) => { c.beginPath(); c.roundRect(x - 5, y - 11, 10, 9, 2.5); c.roundRect(x - 5, y + 2, 10, 9, 2.5); c.stroke(); }];
   [-18.6, 0, 18.6].forEach((bx, i) => { const by = -32.6, bz = dome(bx, by);
-    printAt(bx, by, 8, 12, (c, P) => { const [px, py] = P(0, 0); c.strokeStyle = '#a8a8a8'; c.lineWidth = 3; c.beginPath(); c.roundRect(px - 31.5, py - 51.5, 63, 103, 31.5); c.stroke(); });
+    printAt(bx, by, 8, 12, (c, P) => { const [px, py] = P(0, 0); c.strokeStyle = '#8e8e8e'; c.lineWidth = 3.6; c.beginPath(); c.roundRect(px - 31.5, py - 51.5, 63, 103, 31.5); c.stroke(); });
     const b = add(g, pillow(mm(6), mm(10), mm(3), mm(.22), mm(.2), mm(.1), btnM), mm(bx), mm(by), mm(bz - .02));
     add(g, conform(printPlane(mm(5), mm(8), (c, P) => { c.strokeStyle = '#8a8a8a'; c.lineWidth = 1.6; const [x, y] = P(0, mm(-1.2)); icon[i](c, x, y); }),
       () => mm(.32)), mm(bx), mm(by), mm(bz - .02)); void b; });
