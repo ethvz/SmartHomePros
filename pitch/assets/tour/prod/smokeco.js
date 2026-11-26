@@ -156,7 +156,7 @@ export default H => {
       V2(35.1, 50.6), V2(35.1, 52.1), V2(34.9, 52.7), V2(34.5, 53), V2(34.1, 52.8), V2(33.9, 52.2), V2(33.85, 51.4)];
     const ch = add(g, new THREE.Mesh(new THREE.LatheGeometry(cp.map((p, i) => V2(p.x, p.y + ZB + (i > 4 ? LIFT : 0))), 180), white)); ch.rotation.x = Math.PI / 2;
     const dk = [V2(33.85, 51.4), V2(33.4, 50.6), V2(0, 50.6)];
-    const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + ZB + LIFT)), 120), mat(0x55575a, { r: .75 }))); di.rotation.x = Math.PI / 2; }
+    const di = add(g, new THREE.Mesh(new THREE.LatheGeometry(dk.map(p => V2(p.x, p.y + ZB + LIFT)), 120), mat(0x2e3032, { r: .8 }))); di.rotation.x = Math.PI / 2; }
 
   /* ---------- floating cap (TEST/HUSH button) with a shallow centre dimple */
   { const cp = [V2(0, 54.2), V2(25.8, 54.2), V2(26.6, 54.45), V2(26.95, 55), V2(27, 55.6), V2(27, 57.5), V2(26.9, 58.2), V2(26.6, 58.7), V2(26.1, 59.05),

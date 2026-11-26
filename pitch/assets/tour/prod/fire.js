@@ -1,11 +1,11 @@
-// fire: Vivint Smoke & CO Monitor (EC-FF345 alarm listener), 38.1 W x 76.2 H x 25.4 D mm. Back on the wall at z = 0, face toward +z.
+// fire: Vivint Smoke & CO Monitor (EC-FF345 alarm listener), 43.4 W x 76.2 H x 25.4 D mm (width from the photo, 0.57 of the height; spec sheet says 38.1). Back on the wall at z = 0, face toward +z.
 // Built in millimetres inside a 0.001-scaled group. Outline = rectangle with crisp 45 deg corner chamfers (3 mm legs) through the full
 // depth. A rear solid (small back edge round) and the face plate (broad soft roll-off, as the photo's side strips) share that outline.
 // Across the top a rounded rib bar (square ends, 3 mm in from the sides) catches the light as in the photo. One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
   const outer = G(), g = G(); g.scale.setScalar(.001); outer.add(g);
-  const W = 38.1, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3.5;
+  const W = 43.4, Ht = 76.2, X = W / 2, Y = Ht / 2, C = 3.5;
   const white = new THREE.MeshPhysicalMaterial({ color: 0xefeff0, roughness: .34, clearcoat: .35, clearcoatRoughness: .28 });
 
   // chamfered outline; top/bottom limits so the face plate can stop at the step
@@ -27,8 +27,8 @@ export default H => {
     t.repeat.set(1 / 4, 1 / 4); t.offset.set(2 / 4, (2 - PH) / 4); return t; })();
   const pm = splitMat(white, white, 'y', Y - 38, .22, 0xdcdddb); pm.alphaMap = mask; pm.alphaTest = .5;
   add(g, extS(outline(-Y, Y, true, true), 16.6, 2.4, 3, pm), 0, 0, 8);
-  // top rib: rounded bar 32 mm long (3 mm in from each side, square ends), 7.0-9.6 mm below the top, standing 0.8 mm proud (to 25.4)
-  add(g, H.rslab(32, 2.6, 1.8, .35, .75, white), 0, Y - 8.3, 25.4 - .9);
+  // top rib: rounded bar W - 6 long (3 mm in from each side, square ends), 7.0-9.6 mm below the top, standing 0.8 mm proud (to 25.4)
+  add(g, H.rslab(W - 6, 2.6, 1.8, .35, .75, white), 0, Y - 8.3, 25.4 - .9);
 
   // pinhole: countersink (dia 2.6) into a dark 1.6 mm bore, 27.8 mm below the top (floor just above the hidden rear-solid face)
   { const V2 = (r, z) => new THREE.Vector2(r, z);
