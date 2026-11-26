@@ -101,7 +101,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   if (!bare) { F.rotation.x = -Math.PI / 2 - Math.atan(lift / L); F.position.y = lift / 2 * .001; }
 
   /* 1-3. shell */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0x868684, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0x7a7a78, roughness: .55, clearcoat: .04, clearcoatRoughness: .6 });
   const shell = lineMat(grey, [{ ax: 'y', at: -10.8, B: 0x333436, rB: .5, w: .3, col: 0x2b2b2c, k: .9 },
     { ax: 'z', at: 3, w: .25, col: 0x303132, k: .6 }]);
   const pocketP = []; pocketP.push([0, 9.6], [0, 10.5]); for (let i = 1; i <= 6; i++) { const t = i / 6 * Math.PI / 2; pocketP.push([.5 * (1 - Math.cos(t)), 10.5 + .5 * Math.sin(t)]); }
@@ -114,8 +114,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC, keyMesh } = H;
   /* 4-6. keys (recessed 0.3 mm), legends, red dots */
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0x2f3032, roughness: .5 });
   for (const y of keysY) add(F, rslab(19.9, 5.6, 1.6, 2.79, .6, keyM), 0, y, D - .3 - .8);
-  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#a4a5a6';
-    x.font = '400 146px "Helvetica Neue", Helvetica, Arial, sans-serif';
+  const leg = plane(24, 28, 50, (x, Pp) => { x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillStyle = '#9c9d9e';
+    x.font = '300 146px "Helvetica Neue", Helvetica, Arial, sans-serif';
     const fit = (s, x0, x1, y) => { const m = x.measureText(s).width, [a, b] = Pp(x0, y), [c] = Pp(x1, y); x.save(); x.translate(a, b); x.scale((c - a) / m, 1); x.fillText(s, 0, 4); x.restore(); };
     fit('DISARM', -5.6, 6.0, 20.1 - 10.2); fit('STAY', -3.6, 3.6, 0); fit('AWAY', -4.1, 4.3, .2 - 10.2);
     x.fillStyle = '#b0282a'; for (const y of [20.1 - 10.2, .2 - 10.2]) { const [a, b] = Pp(-7.1, y); x.beginPath(); x.arc(a, b, .8 * 50, 0, Math.PI * 2); x.fill(); } }, { r: .5 });

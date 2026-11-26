@@ -11,7 +11,7 @@ export default H => {
   const white = new THREE.MeshPhysicalMaterial({color:0xecedee, roughness:.6, clearcoat:.08, clearcoatRoughness:.6, sheen:.3, sheenRoughness:.8, sheenColor:0xffffff});
   const barW = new THREE.MeshPhysicalMaterial({color:0xeeeff0, roughness:.5, clearcoat:.15, clearcoatRoughness:.45, sheen:.3, sheenRoughness:.7, sheenColor:0xffffff});
   const refl = new THREE.MeshPhysicalMaterial({color:0xf4f4f4, roughness:.75, sheen:.2, sheenColor:0xffffff});
-  const reflDeep = new THREE.MeshPhysicalMaterial({color:0xeeeeef, roughness:.7});
+  const reflDeep = new THREE.MeshPhysicalMaterial({color:0xd9dadc, roughness:.7});
   const greyP = mat(0xbec0c2, {r:.55});
 
   // ---------------------------------------------------------------- bracket: vertical band + J bend (side profile extruded across 77 mm)
@@ -67,7 +67,7 @@ export default H => {
   const bar = new THREE.Mesh(bg, [barW, reflDeep]); bar.castShadow = bar.receiveShadow = true; M.add(bar);
 
   // ---------------------------------------------------------------- LED faces: reflector plate with 3 capsule recesses x 2 LED domes, per face
-  const ledM = new THREE.MeshPhysicalMaterial({color:0xa4a7aa, roughness:.06, metalness:.1, clearcoat:1, clearcoatRoughness:.03, transmission:.0, sheen:.2});
+  const ledM = new THREE.MeshPhysicalMaterial({color:0x6f7275, roughness:.05, metalness:.1, clearcoat:1, clearcoatRoughness:.03, transmission:.0, sheen:.2});
   const ledIn = mat(0x55585b, {r:.3});
   const slant = Math.hypot(yT - yB, lean), dv = V2(lean, yT - yB).normalize();     // down-the-face direction: (inward lean, down)
   // faces: horizontal outward normal, top-edge centre point (x, z), usable width, column offsets

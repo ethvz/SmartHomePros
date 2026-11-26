@@ -2,7 +2,7 @@
 // artwork (orange field, white border ring, "Protected by / vivint / 855.484.8468 | vivint.com") in satin reflective vinyl,
 // bolted to the front of a 19 mm square white post that runs on above it to a black square cap. Two empty mounting holes.
 // Origin at the ground on the post axis, +z out of the sign face. Modelled in mm inside a group scaled to metres.
-export default H => { const { THREE, G, add, rbox, photoTex } = H;
+export default H => { const { THREE, G, add, rbox, DEC } = H;
   /* ---- module helpers (self-contained copy) ---- */
   const sm = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
   /* profiled solid: loops (one 'outer' outline, through 'hole's, blind 'pocket's), each swept through rings [x,y,z] listed
@@ -111,14 +111,33 @@ export default H => { const { THREE, G, add, rbox, photoTex } = H;
   for (const y of [131, -133]) { const h = new THREE.Path(); h.absarc(0, y, 2.5, 0, Math.PI * 2, true); sh.holes.push(h); }
   const geo = new THREE.ExtrudeGeometry(sh, { depth: T - .4, bevelEnabled: true, bevelThickness: .2, bevelSize: .2, bevelOffset: -.2, bevelSegments: 2, curveSegments: 160 });
   geo.translate(0, 0, .2);
-  { const p = geo.attributes.position, n = geo.attributes.normal, uv = geo.attributes.uv, Ra = Rd / .985;   // crop the artwork's grey cut line
+  { const p = geo.attributes.position, n = geo.attributes.normal, uv = geo.attributes.uv, Ra = Rd;
     for (let i = 0; i < p.count; i++) { const nz = n.getZ(i); if (Math.abs(nz) < .9) continue;
       uv.setXY(i, .5 + (nz > 0 ? 1 : -1) * p.getX(i) / (2 * Ra), .5 + p.getY(i) / (2 * Ra)); } uv.needsUpdate = true; }
   const peel = (() => { const N = 256, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), d = x.createImageData(N, N);
     for (let i = 0; i < N * N; i++) { const v = 128 + (Math.random() - .5) * 90; d.data.set([v, v, v, 255], i * 4); } x.putImageData(d, 0, 0);
     x.filter = 'blur(2px)'; x.drawImage(c, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 5); return t; })();
-  const art = photoTex('ysign');
-  const face = new THREE.MeshStandardMaterial({ map: art, color: 0xe4e4e4, roughness: .5, envMapIntensity: .5, bumpMap: peel, bumpScale: .6 });
+  /* the artwork, laid out to the measured official art (mm from the centre): orange field, white ring, type, real wordmark */
+  const N = 2048, cv = document.createElement('canvas'); cv.width = cv.height = N; const cx = cv.getContext('2d'), k = N / (2 * Rd);
+  const art = new THREE.CanvasTexture(cv); art.colorSpace = THREE.SRGBColorSpace; art.anisotropy = 8;
+  const P = (x, y) => [N / 2 + x * k, N / 2 - y * k];
+  const font = (w, px) => `${w} ${px * k}px "Vivint Sans", "Avenir Next", "Montserrat", "Helvetica Neue", Arial, sans-serif`;
+  const fitText = (t, x0, x1, yc, capH, w) => { cx.font = font(w, capH / .7); const m = cx.measureText(t).width, [a, b] = P(x0, yc), [c] = P(x1, yc);
+    cx.save(); cx.translate(a, b); cx.scale((c - a) / m, 1); cx.textBaseline = 'middle'; cx.fillText(t, 0, 0); cx.restore(); };
+  let logo = null;
+  const draw = () => { cx.fillStyle = '#fbfaf7'; cx.fillRect(0, 0, N, N); cx.fillStyle = '#ff8200'; cx.beginPath(); cx.arc(N / 2, N / 2, 145 * k, 0, Math.PI * 2); cx.fill();
+    cx.fillStyle = '#fbfaf7'; fitText('Protected by', -33, 33, 71, 8, 500);
+    fitText('855.484.8468', -94.2, -12.5, -73.5, 10, 400); fitText('vivint.com', 11.9, 90.5, -73.5, 10, 400);
+    { const [a, b] = P(-.5, -64.4), [c, d] = P(.5, -82); cx.fillRect(a, b, c - a, d - b); }
+    if (logo) { const [a, b] = P(-114.2, 35.6), [c, d] = P(116.3, -35.6); cx.drawImage(logo.img, logo.x, logo.y, logo.w, logo.h, a, b, c - a, d - b); }
+    art.needsUpdate = true; };
+  draw();
+  whenImg(DEC.logo, img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g2 = c.getContext('2d'); g2.drawImage(img, 0, 0);
+    const D = g2.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (D[(y * c.width + x) * 4 + 3] > 100) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    logo = { img, x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 }; draw(); });
+  if (document.fonts) document.fonts.load(font(500, 8)).then(draw, () => {});
+  const face = new THREE.MeshStandardMaterial({ map: art, color: 0xa0a0a0, roughness: .5, envMapIntensity: .4, bumpMap: peel, bumpScale: .6 });
   const edge = new THREE.MeshPhysicalMaterial({ color: 0xf2f2f2, roughness: .35, metalness: .3 });
   const disc = new THREE.Mesh(geo, [face, edge]); disc.castShadow = disc.receiveShadow = true; add(S, disc, 0, yC, zB);
   return g;

@@ -67,11 +67,11 @@ export default H => {
     x.fillStyle = '#3e3e3e'; x.fillRect(0, 0, N, N);                                        // dark gaps between the stitch columns
     for(let r=0;r<rows;r++) for(let q=0;q<cols;q++) for(const side of [-1, 1]){                 // each stitch: two loops leaning into a V
       const roll = rnd(); let v = 182 + rnd()*14; if(roll < .12) v = 140 + rnd()*14; else if(roll > .92) v = 226 + rnd()*20;
-      const cx = q*cw + cw/2 + side*cw*.21, cy = r*rh + rh/2;
-      x.save(); x.translate(cx, cy); x.rotate(side*.6);
+      const cx = q*cw + cw/2 + side*cw*.16, cy = r*rh + rh/2 + (q%2)*0;
+      x.save(); x.translate(cx, cy); x.rotate(side*.5);
       const gr = x.createLinearGradient(-cw*.19, 0, cw*.19, 0), e = `rgb(${v*.5|0},${v*.5|0},${v*.5|0})`, m = `rgb(${v|0},${v|0},${v|0})`;
       gr.addColorStop(0, e); gr.addColorStop(.45, m); gr.addColorStop(1, e);
-      x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.17, rh*.6, 0, 0, Math.PI*2); x.fill(); x.restore(); }
+      x.fillStyle = gr; x.beginPath(); x.ellipse(0, 0, cw*.15, rh*.64, 0, 0, Math.PI*2); x.fill(); x.restore(); }
     const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/12.8, 1/14.4); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
     const bt = new THREE.CanvasTexture(c); bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.copy(t.repeat); bt.anisotropy = 16;
     const fab = new THREE.MeshPhysicalMaterial({color:0xb0b0b0, map:t, bumpMap:bt, bumpScale:3, roughness:.95, sheen:.6, sheenRoughness:.9, sheenColor:0xcfcfcf, envMapIntensity:.5});

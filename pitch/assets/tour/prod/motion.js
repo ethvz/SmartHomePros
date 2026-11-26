@@ -45,11 +45,11 @@ export default H => {
   /* Fresnel lens: frosted lavender-grey, faint vertical facet bands, shade under the top lip; follows the crown 1.5 mm down */
   const lensRings = [];
   for (const s of [1, .92, .8, .65, .5, .35, .2, .08]) lensRings.push(lensO.map(([x, y]) => { const X = x * s, Y = LCY + (y - LCY) * s; return [X, Y, FZ + crown(X, Y) - 1.5 + .25 * (1 - (X / 27.5) ** 2)]; }));
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa4a2ae, roughness: .62, map: K.bandsTex(true), specularIntensity: .15 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x9a99a4, roughness: .62, map: K.bandsTex(true), specularIntensity: .15 });
   add(u, new THREE.Mesh(K.skin(lensRings, { end: [0, LCY, FZ + crown(0, LCY) - 1.25], uv: (x, y) => [(x + LX / 2) / LX, (y - LY0) / (LY1 - LY0)] }), lensM));
 
   /* wordmark, tone-on-tone, flush on the crowned face */
-  add(u, decal(DEC.logo, 36, 9, { color: 0xc6c7c9, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .06);
+  add(u, decal(DEC.logo, 36, 9, { color: 0xc6c7c9, r: .5 }), 0, -25.4, FZ + crown(0, -25.4) + .25);
 
   /* TEST pill: dark gap ring pocket (1 mm deep), grey cap 0.6 mm below the side surface, printed TEST reading downward */
   K.pocket(u, K.pill(PILL.len + 2 * PILL.gap, PILL.wid + 2 * PILL.gap), 1.0, 'x', 35, PILL.y, PILL.z, 0x4c4e51);

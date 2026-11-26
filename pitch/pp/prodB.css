@@ -267,7 +267,7 @@ html.pp #ocHist .fcol .sm{grid-template-columns:1fr;gap:8px;margin-top:8px}
 html.pp #ocHist .fcol .sm img{height:auto;aspect-ratio:16/10;border-radius:10px}
 html.pp #ocHist .fnote{font-size:14px;line-height:1.3}
 /* storage caption sits over the photo: give it its own glass so it always reads */
-html.pp #ocScroll>.dbm .ocm-cap.dbm-cap.on{width:auto!important;max-width:290px;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:20px;padding:14px 16px;width:220px!important;box-sizing:border-box}
+html.pp #ocScroll>.dbm .ocm-cap.dbm-cap.on{width:auto!important;height:auto!important;max-width:290px;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:20px;padding:14px 16px;width:220px!important;box-sizing:border-box}
 html.pp #ocScroll>.dbm .ocm-cap.dbm-cap{left:auto!important;right:20px}
 
 /* ---------- review fixes ---------- */
@@ -301,8 +301,8 @@ html.pp #ocScroll .ocm-card img[data-im="ocm/spot"]{left:10%!important;width:80%
 /* OCP vs Arlo: the split clip becomes two stacked halves (Vivint on top, Arlo below; prodB.js adds the synced second copy) */
 html.pp #ocArlo{--vh:clamp(180px,calc((var(--H) - var(--pf) - 560px) / 2),330px)}
 html.pp #ocArloVid,html.pp #ocArloVid2{left:16px!important;width:568px!important;height:var(--vh)!important;border-radius:20px!important;object-fit:cover!important;top:200px!important}
-html.pp #ocArloVid{object-position:0 50%!important}
-html.pp #ocArloVid2{position:absolute;display:block;object-position:100% 50%;top:calc(212px + var(--vh))!important}
+html.pp #ocArloVid{object-position:0 0!important}
+html.pp #ocArloVid2{position:absolute;display:block;object-position:100% 0;top:calc(212px + var(--vh))!important}
 html.pp #ocArlo .ocar-l{display:none}
 html.pp #ocArlo .ocar-w{left:24px!important;right:24px!important;top:calc(236px + 2 * var(--vh))!important}
 #ocArloVid2{display:none}
@@ -319,7 +319,8 @@ html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx>.fsp-pane{padding-top
 html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .fsp-im{object-position:50% 100%}
 
 /* History footage: the explanation spans the width under the clips */
-html.pp #ocHist .fnote{grid-column:1/-1;width:auto!important;margin-top:4px}
+html.pp #ocHist .fgrid{position:relative}
+html.pp #ocHist .fnote{position:absolute;left:0;right:0;top:calc(100% + 14px);width:auto!important;margin:0;columns:2;column-gap:22px;font-size:15px!important;line-height:1.4!important}
 html.pp #ocHist .fcol .sm img{aspect-ratio:4/3}
 
 /* Works With on short screens: two reasons stay, product label sits lower than the picture */
