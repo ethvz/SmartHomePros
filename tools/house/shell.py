@@ -207,6 +207,7 @@ for o in SC.objects:
         c = o.matrix_world @ f.center; n = (o.matrix_world.to_3x3() @ f.normal).normalized()
         X, Y, Z = c.x, c.z, -c.y; nx, ny, nz = n.x, n.z, -n.y     # back to three coords
         base = me.materials[f.material_index].name
+        if base == 'trim' and o.name.startswith('entry') and in_hall(X + nx*.05, Y, Z + nz*.05): f.material_index = slot(o, P)   # the hall's cut faces
         if base == 'stucco':
             if o.name.startswith(('gr_','core','entry')):
                 if nz > .9 and abs(Z - BZ1) < .02 and X > EX1 - .01: f.material_index = slot(o, CUT)        # wall ends on the cut

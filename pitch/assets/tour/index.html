@@ -555,7 +555,7 @@ const GARAGE = {panels:[], track:{x0:-9.6, x1:-7.2, z:3.89, yBottom:.04, yTop:2.
    Blender (mdl/house.glb) with real openings and a lightmap of its own; it loads further down. Here: only the live parts. */
 const DOOR = [-4.35, -3.4];
 /* front door: slab door, glass sidelight strip, trim, lever inside and out */
-/* the door leaf swings on FRONT_DOOR (a pivot group at the hinge edge x = DOOR[0], z = 3.84; rotate .rotation.y, negative opens inward) */
+/* the door leaf swings on FRONT_DOOR (a pivot group at the hinge edge x = DOOR[0], z = 3.84; rotate .rotation.y, POSITIVE opens inward into the hall, negative swings out) */
 const FRONT_DOOR = new THREE.Group(); FRONT_DOOR.position.set(DOOR[0], 0, 3.84); scene.add(FRONT_DOOR);
 { const [a,b] = DOOR, d = new THREE.Group(); d.position.set(-a, 0, -3.84); FRONT_DOOR.add(d);
   slab(a,b,FL,FL+2.35,3.84,3.9,M.door,d);
