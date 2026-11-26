@@ -83,7 +83,7 @@
     'lock:lock:3':{crops:[[462,8,496,776]]},
     'lock:colors':{mode:'grid',crops:[[66,222,296,428],[362,222,296,428],[660,222,296,428],[1004,222,296,428]],fade:['r','r','r','l'],labels:['Bronze','Nickel','Brass','Matte Black']},
     'garage:garage':{mode:'stack',crops:[[80,130,500,320],[592,190,696,710]],w:[.8,1]},
-    'garage:gphone':{keep:1,crops:[[200,30,840,900]]},
+    'garage:gphone':{keep:1,crops:[[200,30,900,900]]},
     'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.86],fade:['','','b']},
     'app:phone':{crops:[[90,60,700,840]]}};
   const ART='img.full,video.ovid,.hl,.tip,.xf-ghost', CAPK=1.65;

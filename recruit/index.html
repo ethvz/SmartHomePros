@@ -4221,7 +4221,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
       S.on = true; S.map = map; start(e); }
     function start(e) { rail.classList.add('frscrub'); sc.__scrub = true; try { if (e.pointerId != null) rail.setPointerCapture(e.pointerId); } catch (_) {}
       if (sc.__stopSpring) sc.__stopSpring();
-      let dot = rail.querySelector(':scope > .scrubDot'); if (!dot) { dot = document.createElement('i'); dot.className = 'scrubDot'; rail.prepend(dot); } S.dot = dot; dot.style.opacity = '1'; dot.style.transition = 'none';
+      let dot = rail.querySelector(':scope > .scrubDot'); if (!dot) { dot = document.createElement('em'); dot.className = 'scrubDot'; rail.prepend(dot); } S.dot = dot; dot.style.opacity = '1'; dot.style.transition = 'none';
       update(e, true); animA(26); try { haptic('select'); } catch (_) {} }
     function update(e, first) { const M = S.map, ly = Math.max(M[0].c, Math.min(M[M.length - 1].c, local(e))); S.ly = ly;
       let i = 0; while (i < M.length - 2 && ly > M[i + 1].c) i++; const a = M[i], b = M[i + 1], t = Math.max(0, Math.min(1, (ly - a.c) / (b.c - a.c)));

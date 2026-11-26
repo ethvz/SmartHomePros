@@ -129,3 +129,14 @@ html.ipp #prScroll .ipctl .lvl{position:relative!important;left:auto!important;t
 html.ipp #prScroll .iplab{position:absolute;z-index:6;text-align:center;font-size:22px;font-weight:500;color:#fff;letter-spacing:-.2px}
 html.ipp #prScroll .psec.ipA-tiles>.nxa{display:none!important}
 @media (prefers-reduced-motion:reduce){ html.ipp #prScroll .ipart[data-ipl]{transition:none} }
+
+/* ---------- Vivint App "App" section: copy left, the live phone right (the landscape arrangement, the phone a touch larger) ---------- */
+html.ipp #prScroll .appemu{background:radial-gradient(ellipse at 72% 50%,rgba(5,229,175,.10),transparent 60%),#000}
+html.ipp #prScroll .appemu .ae-copy{left:var(--ipL)!important;width:380px!important}
+html.ipp #prScroll .appemu .ae-phone{left:548px!important;scale:1.04;transform-origin:50% 50%}
+html.ipp #prScroll .appemu .ae-copy h2{font-size:58px}
+
+/* ---------- Indoor Camera Pro hero: the video fills the screen, headline top left as in landscape ---------- */
+html.ipp #prScroll .ichv .ich-vid{object-fit:cover}
+html.ipp #prScroll .ichv .ich-txt{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 60px)!important;width:auto!important;max-width:760px}
+html.ipp #prScroll .ichv .dbai{right:var(--ipR)!important;left:auto!important;top:calc(var(--ipTop) + 40px)!important}
