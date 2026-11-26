@@ -100,29 +100,29 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   }
   /* ---- end helpers ---- */
   const g = G(), drop = .13;                                                 // cap top hangs 130 mm below the hook
-  const W = 31, HT = 54, D = 11.5;
+  const W = 31, HT = 53, D = 11;
   const B = G(); B.scale.setScalar(.001); B.position.set(0, -drop - HT / 2 * .001, .004); g.add(B);   // body: back centre origin, mm
 
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
   const body = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .5, clearcoat: .06, clearcoatRoughness: .6 });
-  const shell = lineMat(body, [{ ax: 'y', at: 10, B: 0x6e6e6c, rB: .55, w: .3, col: 0x6c6c6a, k: .9 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
-  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 3.5, st = 8, out = [];
+  const shell = lineMat(body, [{ ax: 'y', at: 9.5, B: 0x6e6e6c, rB: .55, w: .35, col: 0x5a5a58, k: 1 }, { ax: 'y', at: 9.15, w: .35, col: 0xffffff, k: .6 }, { ax: 'z', at: 2.5, w: .25, col: 0x8a8a88, k: .75 }]);
+  const outerProf = (x, y, nx, ny) => { const u = sm(12, 27, y), rb = 2.5 + 1.6 * u, rf = 4.5, st = 8, out = [];
     const T = []; for (let i = 0; i <= st; i++) T.push(i / st); T.splice(1, 0, .03); T.splice(T.length - 1, 0, .97);
     for (const u of T) { const t = u * Math.PI / 2, d = rb * (1 - Math.sin(t)); out.push([x + nx * d, y + ny * d, rb * (1 - Math.cos(t))]); }
     for (const u of T) { const t = u * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
-  const dishP = [[-2.82, 9.6], [-2.82, 10.5], [-1.8, 11.19], [-.95, 11.8], [-.45, 12.14], [-.08, 12.36], [.3, 12.46], [.65, 12.495], [1.0, 12.5]].map(([d, z]) => [d, D - (12.5 - z) * 1.15]);   // 2.3 mm deep cone
+  const dishP = [[-2.7, D - 3.6], [-2.7, D - 3.0], [-1.7, D - 2.0], [-.7, D - 1.0], [-.1, D - .4], [.1, D - .18], [.3, D - .05], [.5, D]];   // crisp 45-degree cone, 3 mm deep, 0.5 mm rim fillet
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
-    { type: 'pocket', pts: circ(0, -6.5, 9, 120), prof: uni(dishP), col: (k, K, v) => (.7 + .3 * sm(D - 2.4, D - .2, v[2])) * (1 - .3 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
-    { type: 'hole', pts: circ(0, 18.2, 3.2, 72), prof: uni(rrP(D, 1.5, 1.5, 9)) }];
+    { type: 'pocket', pts: circ(0, -6.5, 9, 140), prof: uni(dishP), col: (k, K, v) => (.72 + .28 * sm(D - 3, D - .2, v[2])) * (1 - .45 * sm(-2, 8, v[1] + 6.5 - .5 * v[0]) * (1 - sm(D - .3, D, v[2]))) },
+    { type: 'hole', pts: circ(0, 17.6, 3.0, 72), prof: uni(rrP(D, 1.0, 1.0, 9)) }];
   shell.vertexColors = true; add(B, solid(loops, shell, true));
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
   const btnM = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .6, clearcoat: .05 });
-  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 3.0);
-  add(B, new THREE.Mesh(new THREE.RingGeometry(5.97, 6.2, 96), new THREE.MeshStandardMaterial({ color: 0x2e2e2e, roughness: .9 })), 0, -6.5, D - 3.15);
+  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 3.7);
+  add(B, new THREE.Mesh(new THREE.RingGeometry(5.98, 6.32, 96), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .9 })), 0, -6.5, D - 3.55);
 
   /* 3. pry notch on the back-cover seam, bottom centre */
   const notch = plane(7, 1.6, 60, (x, Pp) => { const [a, b] = Pp(-3, .5), [c, d] = Pp(3, -.5), gr = x.createLinearGradient(0, b, 0, d);
@@ -131,8 +131,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
 
   /* 7. debossed "vivint" on the cap (tone on tone) */
   const logo = plane(30, 10, 40, () => {});
-  logo.material.roughness = .55; add(B, logo, 0, 12.6, D + .02);
-  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 22 * 40, 4,
+  logo.material.roughness = .55; add(B, logo, 0, 11.4, D + .02);
+  whenImg(DEC.logo, img => { const x = logo.material.map.image.getContext('2d'); x.clearRect(0, 0, 1200, 400); deboss(x, img, 600, 200, 24 * 40, 4,
     'rgba(30,30,30,.6)', 'rgba(255,255,255,.75)', 'rgba(0,0,0,.06)'); logo.material.map.needsUpdate = true; });
 
   if ((/[?&](bare|studio)=/.test(location.search) && !/[?&]full/.test(location.search))) return g;   // product-photo studio views: the pendant alone
@@ -150,7 +150,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   const cordMat = len => { const t = braid.clone(); t.needsUpdate = true; t.repeat.set(len / .0032, 1);
     return new THREE.MeshStandardMaterial({ color: 0xffffff, map: t, bumpMap: t, bumpScale: 1.5, roughness: .85 }); };
   const r = .0016, toW = (x, y, z) => new THREE.Vector3(x * .001, -drop - HT / 2 * .001 + y * .001, .004 + z * .001);   // body mm -> group metres
-  const cy = 24.25, cz = D / 2, ry = 4.35, rz = D / 2 + 1.6;
+  const cy = 23.55, cz = D / 2, ry = 4.55, rz = D / 2 + 1.6;
   for (const sx of [-1.45, 1.45]) {                                          // the two cord passes round the bar
     const L = []; for (let i = 0; i < 32; i++) { const t = i / 32 * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
       L.push(toW(sx, cy + ry * Math.sign(s) * Math.abs(s) ** (2 / 3.2), cz + rz * Math.sign(c) * Math.abs(c) ** (2 / 3.2))); }
