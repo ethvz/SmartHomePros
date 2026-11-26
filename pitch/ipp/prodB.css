@@ -182,3 +182,49 @@ html.ipp :is(#ocScroll,#dbScroll) .xw-foot{left:calc(var(--gx) + 48px)!important
 /* FAQs: the questions run the full width under the heading */
 html.ipp :is(#ocScroll,#dbScroll) .xf-src{left:calc(var(--gx) + 48px)!important;top:calc(var(--bT) + 222px)!important}
 html.ipp :is(#ocScroll,#dbScroll) .xf-list{left:calc(var(--gx) + 30px)!important;right:36px!important;top:calc(var(--bT) + 282px)!important;bottom:calc(var(--bF) + 24px)!important}
+
+/* ===================== AI wheel (#p-ai): the landscape wheel, centred in the upright screen (prodB.js sets --aik / --aix / --aiy) ===================== */
+html.ipp #p-ai{background:#000}
+html.ipp #p-ai>img.full,html.ipp #p-ai>#aiHot{left:0!important;top:0!important;width:1376px!important;height:964px!important;right:auto;bottom:auto;transform-origin:0 0;transform:translate(var(--aix,-171px),var(--aiy,260px)) scale(var(--aik,1))}
+html.ipp #p-ai>#aiHot{position:absolute}
+html.ipp #p-ai #aiHot .hot{transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+html.ipp #p-ai.on>img.full{animation:ippAiIn .8s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes ippAiIn{from{opacity:0;scale:.94}to{opacity:1;scale:1}}
+@media (prefers-reduced-motion:reduce){html.ipp #p-ai.on>img.full{animation:none}}
+
+/* AI detail modal: the landscape card (picture + products on the left, story on the right), narrowed and centred */
+html.ipp #m-ai{bottom:var(--bF)!important}
+html.ipp .aibox{left:26px;right:26px;width:auto;top:50%;height:auto;max-height:calc(var(--H) - var(--bF) - var(--bT));transform:translateY(-50%);box-sizing:border-box;display:grid;grid-template-columns:400px minmax(0,1fr);grid-template-rows:auto auto 1fr auto;column-gap:40px;padding:54px 44px 50px 46px;overflow:hidden}
+html.ipp .aibox>*{position:relative!important;left:auto!important;top:auto!important}
+html.ipp .aibox .img{grid-column:1;grid-row:1/4;width:100%!important;height:620px!important;align-self:stretch}
+html.ipp .aibox .prods{grid-column:1;grid-row:4;width:auto!important;height:auto!important;min-height:150px;box-sizing:border-box}
+html.ipp .aibox h2{grid-column:2;grid-row:1;width:auto!important;font-size:54px;line-height:56px;margin:0 50px 0 0}
+html.ipp .aibody{grid-column:2;grid-row:2/5;width:auto!important;margin-top:26px}
+html.ipp .aix{position:absolute!important;right:24px!important;left:auto!important;top:22px!important;width:52px!important;height:52px!important}
+
+/* ===================== Compatibility (#p-compat): brand cards cut from the grid artwork, stacked, devices at one scale (prodB.js) ===================== */
+html.ipp #p-compat>img.full,html.ipp #p-compat>.hot{display:none}
+html.ipp #p-compat{background:#000}
+html.ipp #cmIPP{display:block;position:absolute;left:0;top:0;width:1032px}
+html.ipp #cmIPP h2{position:absolute;left:60px;top:calc(var(--bT) + 6px);font-size:62px;font-weight:500;letter-spacing:-1.5px;color:#fff;line-height:1;margin:0}
+html.ipp #cmIPP .cmR{position:absolute;display:flex}
+html.ipp #cmIPP .cmC{flex:none;background-repeat:no-repeat;position:relative;transition:transform .15s cubic-bezier(.2,.8,.2,1),filter .15s}
+html.ipp #cmIPP .cmC.hot{background:#fff;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+html.ipp #cmIPP .cmC i{position:absolute;background-repeat:no-repeat;pointer-events:none}
+html.ipp #cmIPP .cmC.hot:active{transform:scale(.98);filter:brightness(.93)}
+html.ipp #p-compat.on #cmIPP .cmR,html.ipp #p-compat.on #cmIPP h2{animation:ippUp .6s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0)*50ms + .05s)}
+@keyframes ippUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){html.ipp #p-compat.on #cmIPP .cmR,html.ipp #p-compat.on #cmIPP h2{animation:none}}
+/* detail modal: the wide picture across the width, centred above the footer */
+html.ipp #m-compat{bottom:var(--bF)}
+html.ipp #cmImg{left:20px!important;width:992px!important;height:auto!important;top:50%!important;transform:translateY(-50%)}
+html.ipp #m-compat .mclose{left:auto!important;right:28px;top:calc(var(--bT) - 20px)!important}
+
+/* ===================== What's New: months stack down the upright screen with landscape type sizes ===================== */
+html.ipp #p-whatsnew h2{left:60px;top:calc(var(--bT) + 6px)}
+html.ipp #p-whatsnew .wnl{left:60px;top:calc(var(--bT) + 130px);width:912px}
+html.ipp #p-whatsnew .wnm{padding:40px 0 46px}
+html.ipp #p-whatsnew .wnm .mo{width:130px}
+
+/* ===================== PreView / BirdsEye placeholders: centred above the footer ===================== */
+html.ipp #p-preview .ph,html.ipp #p-birdseye .ph{left:0;right:0;width:1032px;bottom:var(--bF);padding:0 80px;box-sizing:border-box}

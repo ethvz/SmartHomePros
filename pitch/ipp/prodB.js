@@ -82,16 +82,68 @@
       sec.insertBefore(im, sec.firstChild); });
   }
 
+
+  /* ---------- AI wheel: the landscape artwork + its hotspots, scaled so the wheel spans the width, centred in the free height ---------- */
+  function aiFit() {
+    const sec = Q('#p-ai'); if (!sec) return;
+    const H = window.SH || 1485, T = top0(), F = foot(), k = 1.05;           /* wheel + labels span ~x 205..1185 of the 1376 artwork */
+    const cx = 516, cy = T + (H - T - F) / 2 - 10;
+    setP(sec, '--aik', String(k)); setP(sec, '--aix', (cx - 695 * k).toFixed(1) + 'px'); setP(sec, '--aiy', (cy - 488 * k).toFixed(1) + 'px');
+  }
+
+  /* ---------- Compatibility: the landscape grid image cut into brand cards and stacked (artwork px, 2064x1446) ---------- */
+  const CMV = [45, 210, 1975, 477];
+  const CMS = { gig: { y: [715, 931], lg: [56, 186], dv: [186, 1112], cm: '2gig' }, dsc: { y: [960, 1180], lg: [56, 186], dv: [186, 1115], cm: 'dsc' },
+    hon: { y: [1204, 1420], lg: [56, 186], dv: [186, 1106], cm: 'honeywell' }, adt: { y: [715, 931], lg: [1184, 1314], dv: [1322, 1910], cm: 'adt' },
+    ring: { y: [965, 1180], lg: [1184, 1314], dv: [1375, 1915], cm: 'ring' }, ss: { y: [1206, 1420], dv: [1190, 1495], cm: 'simplisafe' },
+    xf: { y: [1206, 1420], dv: [1550, 2004], cm: 'simplisafe' } };
+  const ROWS = [['vivint'], ['gig'], ['dsc'], ['hon'], ['adt'], ['ring'], ['ss', 'xf']];
+  const CIMG = 'assets/compat_grid.webp?v=176';
+  function cmBuild() {
+    const sec = Q('#p-compat'); if (!sec || Q('#cmIPP')) return;
+    const w = D.createElement('div'); w.id = 'cmIPP';
+    w.innerHTML = '<h2>Compatibility</h2>' + ROWS.map((r, i) => `<div class="cmR" style="--i:${i + 1}">` + r.map(k => k === 'vivint' ? '<div class="cmC cmV" data-k="vivint"></div>'
+      : `<div class="cmC hot" data-k="${k}" data-cm="${CMS[k].cm}">${CMS[k].lg ? '<i class="cmL"></i>' : ''}<i class="cmD"></i></div>`).join('') + '</div>').join('');
+    sec.appendChild(w);
+  }
+  function cmLayout() {
+    const w = Q('#cmIPP'); if (!w) return;
+    const H = window.SH || 1485, T = top0(), F = foot(), top = T + 104, maxW = 912, LG = 200, PAD = 24;
+    w.style.height = H + 'px';
+    let s = maxW / (LG + Math.max(...['gig', 'dsc', 'hon', 'adt', 'ring'].map(k => CMS[k].dv[1] - CMS[k].dv[0])) + PAD), sv = maxW / CMV[2];
+    const hs = () => 216 * s, gap0 = 14;
+    const need = CMV[3] * sv + 6 * hs() + 6 * gap0, room = H - F - 20 - top, g = Math.min(1, room / need);
+    s *= g; sv *= g; const RW = maxW * g, gap = Math.min(gap0 + (g === 1 ? (room - need) / 7 : 0), 26), set = (el, o) => Object.assign(el.style, o);
+    let y = top + (g === 1 ? Math.max(0, room - need - 6 * (gap - gap0)) / 2 : 0);
+    w.querySelectorAll('.cmR').forEach((row, i) => {
+      const r = ROWS[i], h = r[0] === 'vivint' ? CMV[3] * sv : hs();
+      set(row, { top: y + 'px', left: (1032 - RW) / 2 + 'px', width: RW + 'px', height: h + 'px', gap: gap + 'px' });
+      const tot = r.reduce((a, k) => a + (k === 'vivint' ? 1 : CMS[k].dv[1] - CMS[k].dv[0]), 0);
+      row.querySelectorAll('.cmC').forEach(c => {
+        const k = c.dataset.k;
+        if (k === 'vivint') { const [x0, y0] = CMV;
+          return set(c, { width: RW + 'px', height: h + 'px', borderRadius: 34 * sv + 'px', backgroundImage: `url(${CIMG})`, backgroundSize: `${2064 * sv}px ${1446 * sv}px`, backgroundPosition: `${-x0 * sv}px ${-y0 * sv}px` }); }
+        const m = CMS[k], cw = r.length > 1 ? (RW - gap * (r.length - 1)) * (m.dv[1] - m.dv[0]) / tot : RW, y0 = m.y[0] + 4, ch = (m.y[1] - m.y[0] - 8) * s;
+        set(c, { width: cw + 'px', height: h + 'px', borderRadius: 34 * s + 'px' });
+        const crop = (el, x0, x1, left) => set(el, { left: left + 'px', top: (h - ch) / 2 + 'px', width: (x1 - x0) * s + 'px', height: ch + 'px', backgroundImage: `url(${CIMG})`,
+          backgroundSize: `${2064 * s}px ${1446 * s}px`, backgroundPosition: `${-x0 * s}px ${-y0 * s}px` });
+        const lg = c.querySelector('.cmL'), L = m.lg ? LG * s : 0;
+        if (lg) crop(lg, m.lg[0], m.lg[1], 24 * s);
+        crop(c.querySelector('.cmD'), m.dv[0], m.dv[1], L + (cw - L - (m.dv[1] - m.dv[0]) * s) / 2);
+      });
+      y += h + gap; });
+  }
+
   function featClear() {
     const ph = Q('#dbmPhone'); if (ph && ph.style.getPropertyValue('left') === '140px') ph.style.removeProperty('left');
     const c = Q('#dbmCap'); if (c && c.style.getPropertyValue('transform') === 'none') c.style.removeProperty('transform');
   }
-  function layout() { galFocus(); arloTwin(); if (!isIPP()) { featClear(); return; } spinFit(); featLayout(); }
+  function layout() { galFocus(); arloTwin(); if (!isIPP()) { featClear(); return; } spinFit(); featLayout(); aiFit(); cmLayout(); }
   function galEager(sec) { sec.querySelectorAll('.hgl img[loading=lazy]').forEach(im => { im.loading = 'eager'; }); }
   function secWatch() { ['#p-ocp', '#p-dbcp'].forEach(q => { const el = Q(q); if (!el || el.__ippo) return; el.__ippo = 1;
     /* writes only to children / other elements, never to the observed page's class */
     new MutationObserver(() => { if (isIPP() && el.classList.contains('on')) { requestAnimationFrame(layout); galEager(el); } }).observe(el, { attributes: true, attributeFilter: ['class'] }); }); }
-  function boot() { actBleed(); secWatch(); featWatch(); layout(); }
+  function boot() { cmBuild(); actBleed(); secWatch(); featWatch(); layout(); }
   let raf = 0; const later = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => requestAnimationFrame(layout)); };
   addEventListener('resize', later); addEventListener('orientationchange', () => setTimeout(later, 300));
   if (window.visualViewport) visualViewport.addEventListener('resize', later);
