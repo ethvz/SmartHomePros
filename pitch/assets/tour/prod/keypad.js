@@ -36,9 +36,9 @@ export default H => {
   const FONT = '"Vivint Sans", "Circular Std", "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif';
 
   /* ---------- materials ---------- */
-  const grey = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .62, envMapIntensity: .5 });
+  const grey = new THREE.MeshPhysicalMaterial({ color: 0x8a8a88, roughness: .62, envMapIntensity: .35 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xeeeeed, roughness: .45, clearcoat: .1, clearcoatRoughness: .5 });
-  const body = splitMat(grey, white, 'z', mm(10.5), mm(.2), 0x707070);
+  const body = splitMat(grey, white, 'z', mm(10.5), mm(.25), 0x707070);
   const faceM = white.clone();
   const keyM = new THREE.MeshPhysicalMaterial({ color: 0xefefee, roughness: .35, clearcoat: .3, clearcoatRoughness: .25 }), keyMV = keyM.clone(); keyMV.vertexColors = true;
   const hair = new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: .7 }), hairL = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7 });
@@ -52,9 +52,9 @@ export default H => {
   const ring = (d, r, z) => rrPts(mm(W - 2 * d), mm(Hh - 2 * d), mm(r)).map(([x, y]) => [x, y, mm(z)]);
   for (let i = 0; i <= 5; i++) { const a = i / 5 * Math.PI / 2; const d = 1.5 * (1 - Math.sin(a)); rings.push(ring(d, 14.3 - d, 1.5 * (1 - Math.cos(a)))); }
   for (let i = 1; i <= 6; i++) { const t = i / 6, d = .6 * t; rings.push(ring(d, 14.3 - d, 1.5 + 8.0 * t)); }          // grey sides, a gentle linear flare
-  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = .6 + 1.5 * (1 - Math.cos(a)); rings.push(ring(d, 14.3 - d, 9.5 + 1.0 * Math.sin(a))); }   // 1 mm forward-facing grey shoulder just behind the split
-  rings.push(ring(2.3, 12.0, 11.8), ring(2.6, 11.7, 13.5));                                   // white side wall with ~6 deg draft inward
-  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 2.6 + 2.5 * (1 - Math.cos(a)); rings.push(ring(d, 11.7 - 2.5 * (1 - Math.cos(a)), 13.5 + 2.5 * Math.sin(a))); }   // R2.5 roll into the face
+  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = .6 + 2.4 * (1 - Math.cos(a)); rings.push(ring(d, 14.3 - d, 9.5 + 1.0 * Math.sin(a))); }   // forward-facing grey shoulder: the white starts 3.0 mm in from the back outline on every side
+  rings.push(ring(3.15, 11.15, 11.8), ring(3.3, 11.0, 13.5));                                   // white side wall with ~6 deg draft inward
+  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 3.3 + 2.5 * (1 - Math.cos(a)); rings.push(ring(d, 11.0 - 2.5 * (1 - Math.cos(a)), 13.5 + 2.5 * Math.sin(a))); }   // R2.5 roll into the face
   add(g, ringMesh(rings, body, false, true));
   // flat face with the three emergency openings
   const ER = 7.65, EY = -52.4, EX = [-21.1, 0, 21.1];

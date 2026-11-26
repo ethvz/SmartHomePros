@@ -697,7 +697,9 @@ const SH_MAP = {stucco:M.siding, paint:M.paint, cut:M.cut, roof:M.roof, soffit:M
     o.traverse(m => { if(!m.isMesh) return; m.userData.shell = true;
       const base = SH_MAP[(m.material.name||'').replace(/\.\d+$/,'')] || M.siding;
       if(shLM && base !== M.glassLit && base !== M.glassDark){
-        if(!cache.has(base)){ const bm = new THREE.MeshBasicMaterial({color:base.color.clone(), map:base.map||null, lightMap:shLM, lightMapIntensity:k*Math.PI});
+        /* grade: the outside sits low (dusk), the rooms stay bright so the cutaway is the brightest thing in frame */
+        const grade = (base === M.paint || base === M.ceil || base === M.cut) ? .64 : base === M.roof ? .6 : .3;
+        if(!cache.has(base)){ const bm = new THREE.MeshBasicMaterial({color:base.color.clone(), map:base.map||null, lightMap:shLM, lightMapIntensity:k*Math.PI*grade});
           if(base === M.roof){ bm.aoMap = TXC.roofVar; bm.aoMap.channel = 0; bm.aoMapIntensity = 1; }   // large-scale weathering breaks up the shingle tile
           cache.set(base, bm); }
         m.material = cache.get(base); m.castShadow = m.receiveShadow = false;
@@ -777,7 +779,7 @@ BAKE.meshes = bakeTargets(); BAKE.density = packUV2(BAKE.meshes, BAKE.size);
 if(__PK['bake/lm.webp'] && !/nobake|bakeexport/.test(location.search)){
   const lm = texLoader.load(PK('bake/lm.webp')); lm.channel = 1; lm.colorSpace = THREE.SRGBColorSpace; lm.flipY = false;
   const LMK = await fetch(PK('bake/lm.json')).then(r=>r.json()).then(j=>j.k).catch(()=>2.5);
-  const K = LMK * Math.PI, swap = new Map();
+  const K = LMK * Math.PI * .74, swap = new Map();   // same interior grade as the shell's rooms
   const conv = m => { if(swap.has(m)) return swap.get(m);
     const n = new THREE.MeshBasicMaterial({color:m.color.clone(), map:m.map||null, lightMap:lm, lightMapIntensity:K});
     if(m===M.floor || m===M.quartz || m===M.cab){ n.envMap = scene.environment; n.combine = THREE.MixOperation; n.reflectivity = m===M.floor ? .07 : .1; }

@@ -37,7 +37,7 @@ export default H => {
   const grey = new THREE.MeshPhysicalMaterial({ color: 0xb9b9b7, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.2), 0x8e8e8c);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xdedbd0, roughness: .05, clearcoat: 1, clearcoatRoughness: .05, transparent: true, opacity: .12, depthWrite: false });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xdedbd0, roughness: .05, clearcoat: .3, clearcoatRoughness: .1, specularIntensity: .25, envMapIntensity: .25, transparent: true, opacity: .1, depthWrite: false });   // keeps its sheen low so the well behind it reads
   const boardM = new THREE.MeshStandardMaterial({ color: 0x3e443c, roughness: .7 });
   const ledM = new THREE.MeshPhysicalMaterial({ color: 0xd8ab30, roughness: .35, emissive: 0xffb820, emissiveIntensity: .12, clearcoat: .6 });
   const ledFrameM = new THREE.MeshStandardMaterial({ color: 0xf2f0e8, roughness: .5 });
@@ -62,7 +62,7 @@ export default H => {
   const FK = 16;
   for (let k = 1; k <= FK; k++) { const s = k / FK, e = s; rings.push(outer.map(([ox, oy], i) => { const x = ox + (inner[i][0] - ox) * e, y = oy + (inner[i][1] - oy) * e; return [mm(x), mm(y), mm(dome(x, y))]; })); }
   // light well: a shallow soft dish (1.5 mm), then a sharp rounded-square hole 25 x 25 (r 6) with near-vertical walls down to the floor
-  const HW = 25, HR = 6, ZF = ZE - 8, DD = 2.2;
+  const HW = 25, HR = 6, ZF = ZE - 8, DD = 1.2;
   const inHole = (x, y) => { const qx = Math.abs(x - PC[0]) - (HW / 2 - HR), qy = Math.abs(y - PC[1]) - (HW / 2 - HR); return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - HR; };
   const hole = inner.map(([ix, iy]) => { const dx = ix - PC[0], dy = iy - PC[1]; let lo = 0, hi = 1; for (let k = 0; k < 40; k++) { const m = (lo + hi) / 2; inHole(PC[0] + dx * m, PC[1] + dy * m) < 0 ? lo = m : hi = m; } return [PC[0] + dx * lo, PC[1] + dy * lo]; });
   const top = inner.map(([x, y]) => dome(x, y));
@@ -74,11 +74,11 @@ export default H => {
   for (const s2 of [.7, .4, .12]) rings.push(hole.map(([x, y]) => [mm(PC[0] + (x - PC[0]) * s2), mm(PC[1] + (y - PC[1]) * s2), mm(ZF)]));
   add(g, ringMesh(rings.slice(0, nBody), bodyM, false, true));
   { // hole walls and floor: same white plastic, darkened toward the floor (baked ambient occlusion) like the shadowed well in the photos
-    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0xcfcbbd, roughness: .45, vertexColors: true }), true, false);
+    const wm = ringMesh(rings.slice(nBody - 1), new THREE.MeshPhysicalMaterial({ color: 0x8f8c72, roughness: .6, envMapIntensity: .5, vertexColors: true }), true, false);
     const pa = wm.geometry.attributes.position, col = [], zTop = mm(dome(0, PC[1]) - DD);
     const n = hole.length;
     for (let i = 0; i < pa.count; i++) { const t = Math.min(1, Math.max(0, (pa.getZ(i) - mm(ZF)) / (zTop - mm(ZF)))), top = Math.max(0, (pa.getY(i) - mm(PC[1])) / mm(HW / 2));
-      let f = (.85 + .15 * t ** 1.5) * (1 - .31 * top * (1 - t * .3));   // top wall reaches ~0x8e8c82                                     // darker toward the floor, and more on the top wall (shadowed from above)
+      let f = (.8 + .2 * t ** 1.5) * (1 - .24 * top * (1 - t * .3));   // top wall reaches ~0x8e8c82                                     // darker toward the floor, and more on the top wall (shadowed from above)
       const ri = Math.floor(i / n), lt = pa.getX(i) < mm(-HW * .25) || pa.getY(i) > mm(PC[1] + HW * .25);
       if ((ri === 1 || ri === 2) && lt) f = .5;                                                                // 0.5 mm dark lip line on the left and top walls                                                                // 0.3 mm dark line right under the hole edge (0x6a6a66 on 0xd4d1c4)
       col.push(f, f, f); }
