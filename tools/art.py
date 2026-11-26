@@ -16,7 +16,7 @@ PACK_MAX = 7_000_000
 LANDING_KEEP |= {os.path.relpath(_f, ROOT) for _f in __import__('glob').glob(os.path.join(ROOT, 'connect', '**', '*.*'), recursive=True)}
 # images that the iPhone-portrait stylesheets (pitch/pp/*.css) reference with url(): those files are not run through the
 # packer's HTML transform, so their images must stay as plain files in the artifact
-for _c in __import__('glob').glob(os.path.join(ROOT, 'pitch', 'pp', '*.css')):
+for _c in __import__('glob').glob(os.path.join(ROOT, 'pitch', 'pp', '*.css')) + __import__('glob').glob(os.path.join(ROOT, 'pitch', 'ipp', '*.css')):
     for _u in re.findall(r"url\((?![\"']?data:)[\"']?([^)\"'?]+)", open(_c, encoding='utf-8').read()):
         LANDING_KEEP.add(os.path.normpath(os.path.join('pitch/pp', _u)))
 
