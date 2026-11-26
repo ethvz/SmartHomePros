@@ -235,9 +235,11 @@ function glowMat(m, hex, k){ if(!m || !m.emissive) return; if(m.userData.e0 == n
 const meshMats = o => { const a = []; o.traverse(m => { if(m.isMesh) (Array.isArray(m.material) ? m.material : [m.material]).forEach(x => a.push(x)); }); return a; };
 function pressKey(mesh, hex = GREEN){ if(!mesh) return; const mats = meshMats(mesh);
   if(mesh.userData.z0 == null) mesh.userData.z0 = mesh.position.z;
-  mats.forEach(m => glowMat(m, hex, 1.6)); mesh.position.z = mesh.userData.z0 - .0004;
+  const tint = (m, k) => { if(!m.color) return; if(m.userData.kc0 == null) m.userData.kc0 = m.color.getHex(); m.color.setHex(m.userData.kc0).lerp(KEYC.setHex(hex), .85*k); };   // backlit key: the whole cap turns green
+  mats.forEach(m => { glowMat(m, hex, 1.1); tint(m, 1); }); mesh.position.z = mesh.userData.z0 - .0004;
   clearTimeout(mesh.userData.kt); mesh.userData.kt = setTimeout(() => { mesh.position.z = mesh.userData.z0;
-    tween(.35, k => mats.forEach(m => glowMat(m, hex, 1.6*(1 - k))), easeOut); }, 260); }
+    tween(.4, k => mats.forEach(m => { glowMat(m, hex, 1.1*(1 - k)); tint(m, 1 - k); }), easeOut); }, 300); }
+const KEYC = new THREE.Color();
 
 /* Smart Lock: status LEDs, thumb-turn, keys; it rides on the front door when the door swings */
 const LOCK = {
@@ -562,7 +564,7 @@ function automation(name, o = {}){
     capStep(1, 'Alarm disarmed'); M.arm = 'dis'; paintArm(); HUBDO.home(); HUBDO.arm('dis'); await LOCK.flash(GREEN, 1);   // the hub card shows it disarm
     capStep(2, 'Door unlocked'); HUBDO.lock(false); await LOCK.set(false);
     capStep(3, 'Door opens'); await fly(SH.door()); await DOOR.swing(true);
-    capStep(4, 'Lights on'); await fly(SH.great()); await LIT.to(1, 1.4);
+    capStep(4, 'Lights on'); if(M.lights < .9){ await fly(SH.great()); await LIT.to(1, 1.4); }
     capStep(5, 'Comfort 72°'); await fly(SH.therm()); M.th.cur = Math.max(M.th.cur, 74); await TH.to(72, 'cool'); HUBDO.therm(); await wait(.6);
     capDone('Welcome home'); await fly(SH.door()); await DOOR.swing(false, 1.8); });
   if(name === 'disarm' || name === 'kpok') return sequence('disarm', async () => {
