@@ -1,5 +1,5 @@
-// Keypad: Vivint wireless keypad, 80.0 x 150.1 x 14 mm (depth taken from the photos/renders: the spec sheet's 26.7 mm does not match them). One moulded body: grey back shell that flares out 2.1 mm toward the
-// wall, flush colour split at z = 8.7 mm into the white front cover (vertical band, R3 roll into a flat face). Soft-dome keys only
+// Keypad: Vivint wireless keypad, 80.0 x 150.1 x 16 mm (depth taken from the photos/renders: the spec sheet's 26.7 mm does not match them). One moulded body: grey back shell that flares out 2.1 mm toward the
+// wall, flush colour split at z = 10.5 mm into the white front cover (vertical band, R3 roll into a flat face). Soft-dome keys only
 // 0.8 mm proud with hairline outlines, a flush frosted motion lens, three emergency keys recessed in dark sloped rings with
 // dished tops, printed legends and wordmark, downcast-light slot under the bottom, buzzer holes on the right side.
 export default H => {
@@ -38,22 +38,22 @@ export default H => {
   /* ---------- materials ---------- */
   const grey = new THREE.MeshPhysicalMaterial({ color: 0x9d9d9a, roughness: .62, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xeeeeed, roughness: .45, clearcoat: .1, clearcoatRoughness: .5 });
-  const body = splitMat(grey, white, 'z', mm(8.7), mm(.35), 0x6e6e6c);
+  const body = splitMat(grey, white, 'z', mm(10.5), mm(.2), 0x8e8e8c);
   const faceM = white.clone();
-  const keyM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f3, roughness: .5, sheen: .5, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
-  const hair = new THREE.MeshStandardMaterial({ color: 0xa9a9a9, roughness: .7 });
-  const ringM = new THREE.MeshStandardMaterial({ color: 0x2f3031, roughness: .8, side: THREE.DoubleSide });
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x96989a, roughness: .75, sheen: .3, sheenColor: 0xffffff });
-  const lightM = new THREE.MeshPhysicalMaterial({ color: 0xdcdedb, roughness: .4, emissive: 0x83f4b8, emissiveIntensity: .0 });
+  const keyM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f3, roughness: .4, sheen: .3, sheenRoughness: .6, sheenColor: 0xffffff, clearcoat: .1, clearcoatRoughness: .6 });
+  const hair = new THREE.MeshStandardMaterial({ color: 0x8c8c8c, roughness: .7 }), hairL = new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: .7 });
+  const ringM = new THREE.MeshStandardMaterial({ color: 0x5c5d5e, roughness: .9, envMapIntensity: .2, side: THREE.DoubleSide });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0x8f9193, roughness: .6 });
+  const lightM = new THREE.MeshPhysicalMaterial({ color: 0xc4c6c3, roughness: .7, emissive: 0x83f4b8, emissiveIntensity: 0 });
   const holeM = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .9 });
 
   /* ---------- body ---------- */
-  const W = 80.0, Hh = 150.1, FZ = mm(14.0), rings = [];
+  const W = 80.0, Hh = 150.1, FZ = mm(16.0), rings = [];
   const ring = (d, r, z) => rrPts(mm(W - 2 * d), mm(Hh - 2 * d), mm(r)).map(([x, y]) => [x, y, mm(z)]);
   for (let i = 0; i <= 5; i++) { const a = i / 5 * Math.PI / 2; const d = 1.5 * (1 - Math.sin(a)); rings.push(ring(d, 14.3 - d, 1.5 * (1 - Math.cos(a)))); }
-  for (let i = 1; i <= 10; i++) { const t = i / 10, d = 2.1 * t * t; rings.push(ring(d, 14.3 - 2.1 * t, 1.5 + 7.2 * t)); }
-  rings.push(ring(2.1, 12.2, 9.9), ring(2.1, 12.2, 11.0));
-  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 2.1 + 3 * (1 - Math.cos(a)); rings.push(ring(d, 12.2 - 3 * (1 - Math.cos(a)), 11.0 + 3 * Math.sin(a))); }
+  for (let i = 1; i <= 10; i++) { const t = i / 10, d = 2.1 * t; rings.push(ring(d, 14.3 - 2.1 * t, 1.5 + 9.0 * t)); }
+  rings.push(ring(2.1, 12.2, 11.8), ring(2.1, 12.2, 13.0));
+  for (let i = 1; i <= 8; i++) { const a = i / 8 * Math.PI / 2, d = 2.1 + 3 * (1 - Math.cos(a)); rings.push(ring(d, 12.2 - 3 * (1 - Math.cos(a)), 13.0 + 3 * Math.sin(a))); }
   add(g, ringMesh(rings, body, false, true));
   // flat face with the three emergency openings
   const ER = 7.65, EY = -52.4, EX = [-21.1, 0, 21.1];
@@ -63,25 +63,25 @@ export default H => {
 
   /* ---------- keys ---------- */
   const keyAt = (x, y, w, h, r, label, font, dy = 0) => {
-    const ol = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(rrPts(mm(w + .5), mm(h + .5), mm(r + .25)).map(([a, b]) => new THREE.Vector2(a, b)))), hair);
-    add(g, ol, mm(x), mm(y), FZ + mm(.02));
-    const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.45), mm(.45), mm(.35), keyM), mm(x), mm(y), FZ);
-    if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#363636'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    const ol = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(rrPts(mm(w + .7), mm(h + .7), mm(r + .35)).map(([a, b]) => new THREE.Vector2(a, b)))), hair);
+    add(g, ol, mm(x), mm(y), FZ + mm(.03));
+    const k = add(g, pillow(mm(w), mm(h), mm(r), mm(.5), mm(.5), mm(.6), keyM), mm(x), mm(y), FZ);
+    if (label) add(g, conform(printPlane(mm(Math.min(w, 20)), mm(h * .7), (c, P) => { c.fillStyle = '#4d4d4d'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
       c.font = font; c.fillText(label, ...P(0, mm(dy))); }), (px, py) => k.userData.zf(inset(px + 0, py, mm(w), mm(h), mm(r)))), mm(x), mm(y), FZ);
     return k; };
-  keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '500 46px ' + FONT, -1.65);
-  keyAt(16.7, 56.6, 23.4, 14.3, 7.15, 'Away', '500 46px ' + FONT, -1.65);
+  keyAt(-16.7, 56.6, 23.4, 14.3, 7.15, 'Stay', '400 44px ' + FONT, -1.65);
+  keyAt(16.7, 56.6, 23.4, 14.3, 7.15, 'Away', '400 44px ' + FONT, -1.65);
   const CX = [-21.1, 0, 21.1], RY = [35.4, 14.3, -6.8, -27.9], D = 14.35;
   for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) keyAt(CX[c], RY[r], D, D, D / 2, String(r * 3 + c + 1), '400 64px ' + FONT, -2.25);
   keyAt(CX[0], RY[3], D, D, D / 2, 'Clear', '400 44px ' + FONT, -1.5);
   keyAt(CX[1], RY[3], D, D, D / 2, '0', '400 64px ' + FONT, -2.25);
   { // tactile dot above the 5
-    const zf = (D / 2 - 3.0); const kz = (mm(.45) + mm(.35) * (1 - (1 - Math.min(1, (mm(zf) - mm(.45)) / (mm(D / 2) - mm(.45)))) ** 2));
+    const zf = (D / 2 - 3.0); const kz = (mm(.5) + mm(.6) * (1 - (1 - Math.min(1, (mm(zf) - mm(.5)) / (mm(D / 2) - mm(.5)))) ** 2));
     const dot = new THREE.Mesh(new THREE.SphereGeometry(mm(.4), 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), keyM); dot.rotation.x = Math.PI / 2; dot.scale.set(1, .75, 1);
     add(g, dot, mm(CX[1]), mm(RY[1] + 3.0), FZ + kz - mm(.02)); }
   // motion lens, flush (0.2 mm proud), frosted grey
-  { const l = new THREE.Mesh(new THREE.CylinderGeometry(mm(7.15), mm(7.15), mm(.5), 64), lensM); l.rotation.x = Math.PI / 2; add(g, l, mm(CX[2]), mm(RY[3]), FZ - mm(.05));
-    add(g, lathe([[7.15, -.3], [7.15, .12], [7.0, .2], [0, .2]], lensM, 64), mm(CX[2]), mm(RY[3]), FZ); }
+  { add(g, lathe([[7.15, -.3], [7.15, .05], [6.9, .14], [6.2, .22], [4.5, .29], [2.2, .32], [0, .33]], lensM, 64), mm(CX[2]), mm(RY[3]), FZ);   // 0.3 mm soft dome
+    const ol = new THREE.Mesh(new THREE.RingGeometry(mm(7.1), mm(7.35), 64), hairL); add(g, ol, mm(CX[2]), mm(RY[3]), FZ + mm(.03)); }
 
   /* ---------- emergency keys ---------- */
   const icons = [
@@ -93,10 +93,10 @@ export default H => {
     (c, P) => { const [x, y] = P(0, 0); c.beginPath(); c.moveTo(x, y + 23);                                                // flame with inner flame
       c.bezierCurveTo(x - 22, y + 22, x - 20, y - 2, x - 6, y - 23); c.bezierCurveTo(x - 4, y - 10, x + 4, y - 9, x + 8, y - 16); c.bezierCurveTo(x + 22, y - 1, x + 21, y + 22, x, y + 23); c.stroke();
       c.beginPath(); c.moveTo(x, y + 21); c.bezierCurveTo(x - 9, y + 20, x - 8, y + 8, x - 1, y + 1); c.bezierCurveTo(x + 1, y + 7, x + 6, y + 8, x + 6, y + 12); c.bezierCurveTo(x + 8, y + 17, x + 5, y + 21, x, y + 21); c.stroke(); }];
-  const dish = r => -1.0 - .6 * (1 - Math.min(1, (r / 5.7)) ** 2);
+  const dish = r => -.6 - .4 * (1 - Math.min(1, (r / 5.7)) ** 2);
   EX.forEach((x, i) => {
-    add(g, lathe([[ER, .02], [ER - .15, -.05], [6.15, -1.0], [6.15, -2.6]], ringM), mm(x), mm(EY), FZ);            // dark conical bezel
-    const prof = [[6.1, -2.6], [6.1, -1.2], [6.0, -1.03], [5.75, -1.0]]; for (let k = 1; k <= 10; k++) { const r = 5.7 * (1 - k / 10); prof.push([r, dish(r)]); }
+    add(g, lathe([[ER, .02], [ER - .15, -.04], [6.05, -.6], [6.0, -.72]], ringM), mm(x), mm(EY), FZ);              // matte grey conical bezel, meets the button
+    const prof = [[6.0, -.72], [5.92, -.63], [5.75, -.6]]; for (let k = 1; k <= 10; k++) { const r = 5.7 * (1 - k / 10); prof.push([r, dish(r)]); }
     add(g, lathe(prof, keyM), mm(x), mm(EY), FZ);                                                                       // concave white button
     add(g, conform(printPlane(mm(7), mm(7), (c, P) => { c.strokeStyle = '#4a4a4a'; c.lineWidth = 4; c.lineJoin = c.lineCap = 'round'; icons[i](c, P); }),
       (px, py) => mm(dish(Math.hypot(px, py) * 1000))), mm(x), mm(EY), FZ);
@@ -109,9 +109,9 @@ export default H => {
 
   /* ---------- downcast light (bottom face) and buzzer holes (right side) ---------- */
   { const sh = new THREE.Shape(rrPts(mm(40), mm(2), mm(1)).map(([a, b]) => new THREE.Vector2(a, b)));
-    const geo = new THREE.ExtrudeGeometry(sh, { depth: mm(.4), bevelEnabled: true, bevelThickness: mm(.15), bevelSize: mm(.15), bevelOffset: -mm(.15), bevelSegments: 3 });
-    const m = new THREE.Mesh(geo, lightM); m.rotation.x = Math.PI / 2 + .28; add(g, m, 0, mm(-74.55 + .45), mm(5)); }
-  for (let k = -1; k <= 1; k++) { const h = new THREE.Mesh(new THREE.CylinderGeometry(mm(.5), mm(.5), mm(.6), 20), holeM); h.scale.set(1.6, 1, 1); h.rotation.z = Math.PI / 2; h.rotation.y = -.28;
-    add(g, h, mm(39.5 - .25), mm(-3 + k * 2.8), mm(5)); }
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: mm(.2), bevelEnabled: false });
+    const m = new THREE.Mesh(geo, lightM); m.rotation.x = Math.PI / 2 - .23; add(g, m, 0, mm(-74.23 + .05 + .2), mm(5)); }
+  for (let k = -1; k <= 1; k++) { const h = new THREE.Mesh(new THREE.CylinderGeometry(mm(.5), mm(.5), mm(.6), 20), holeM); h.scale.set(1.6, 1, 1); h.rotation.z = Math.PI / 2; h.rotation.y = -.23;
+    add(g, h, mm(39.18 - .25), mm(-3 + k * 2.8), mm(5)); }
   return g;
 };
