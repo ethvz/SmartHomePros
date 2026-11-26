@@ -36,7 +36,7 @@ export default H => {
   const pp = (wmm, hmm, draw) => { const p = H.printPlane(wmm / 1000, hmm / 1000, (x, P) => draw(x, (a, b) => P(a / 1000, b / 1000))); p.scale.setScalar(1000); return p; };
 
   /* ---------- materials ---------- */
-  const satin = phys(0x1d1e20, { roughness: .42, envMapIntensity: .55, specularIntensity: .6 });
+  const satin = phys(0x1d1e20, { roughness: .55, envMapIntensity: .4, specularIntensity: .5 });
   const foot = phys(0x2e2f31, { roughness: .72 });
   const pivot = phys(0x2a2b2d, { roughness: .4, clearcoat: .2 });
   const grey = phys(0x4b4c4f, { roughness: .6, sheen: .35, sheenRoughness: .7, sheenColor: 0x9a9ca0 });
@@ -137,10 +137,10 @@ export default H => {
   sd.rotation.x = PI / 2;
 
   /* ---------- back hub: mushroom pivot holding the loop arch ---------- */
-  const hb = [[0, -19.4], [4.25, -19.4], [4.45, -19.6], [6.3, -23.9], [6.6, -24.2], [13.8, -24.2]];
-  for (let i = 1; i <= 8; i++) { const t = i / 8 * PI / 2; hb.push([13.8 + 2.7 * Math.sin(t), -21.5 - 2.7 * Math.cos(t)]); }
-  for (let i = 1; i <= 6; i++) { const t = i / 6 * PI / 2; hb.push([15.5 + Math.cos(t), -21.5 + Math.sin(t)]); }
-  hb.push([14.5, -20.5], [14.5, -11.5]);
+  const hb = [[0, -19.4], [4.25, -19.4], [4.45, -19.6], [6.3, -23.9], [6.6, -24.2], [12.8, -24.2]];
+  for (let i = 1; i <= 8; i++) { const t = i / 8 * PI / 2; hb.push([12.8 + 2.7 * Math.sin(t), -21.5 - 2.7 * Math.cos(t)]); }
+  for (let i = 1; i <= 6; i++) { const t = i / 6 * PI / 2; hb.push([14.5 + Math.cos(t), -21.5 + Math.sin(t)]); }
+  hb.push([14.4, -20.5], [14.4, -11.5]);
   add(hd, lathe(hb, satin));
   add(hd, H.rslab(5, 3.5, .4, .8, .1, voidM), 0, 0, -19.35);
 

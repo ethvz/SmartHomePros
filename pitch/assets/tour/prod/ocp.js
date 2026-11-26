@@ -21,7 +21,7 @@ export default H => {
     const mountMat = mountW.clone(); mountMat.side = THREE.DoubleSide;
     // hairline parting groove at z = 7 mm (wall-plate layer / front shell): same white both sides, fine dark line
     const mountSplit = H.splitMat(mountMat, mountMat, 'z', .007, .0003, 0x8a8c8f); mountSplit.side = THREE.DoubleSide;
-    const grl = grilleMat(0xc4c6c8, [5.2,3.6]); grl.side = THREE.DoubleSide;
+    const grl = grilleMat(0xc4c6c8, [6.5,4.5]); grl.side = THREE.DoubleSide;
     const Mt = [mountSplit, grl, mountMat];
     const cad = add(g, G());
     for(const p of OCPM.parts){

@@ -1,4 +1,4 @@
-// Emergency Pendant (Vivint PB01): 31 x 54 x 12.5 mm chunky tag. One continuous satin shell, white body / light-grey cap split
+// Emergency Pendant (Vivint PB01): 31 x 54 x 11.5 mm chunky tag. One continuous satin shell, white body / light-grey cap split
 // flush at a hairline, a wide conical dish with a flat grey button sitting flush with its floor, a funnelled lanyard hole and a
 // debossed tone-on-tone logo on the cap, back-cover hairline with a pry notch. It hangs from a black wall hook on a braided black
 // cord tied through its hole with a lark's head. Origin: the hook (on the wall, z = 0). Body modelled in mm, scaled to metres.
@@ -95,7 +95,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
   }
   /* ---- end helpers ---- */
   const g = G(), drop = .13;                                                 // cap top hangs 130 mm below the hook
-  const W = 31, HT = 54, D = 12.5;
+  const W = 31, HT = 54, D = 11.5;
   const B = G(); B.scale.setScalar(.001); B.position.set(0, -drop - HT / 2 * .001, .004); g.add(B);   // body: back centre origin, mm
 
   /* 1-3. shell: white body, grey cap above y = +10 (flush hairline), back-cover hairline at z = 2.5 */
@@ -106,7 +106,7 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
     for (let i = 0; i <= st; i++) { const t = i / st * Math.PI / 2, d = rf * (1 - Math.cos(t)); out.push([x + nx * d, y + ny * d, D - rf + rf * Math.sin(t)]); }
     return out; };
   // 4. dish (pocket): cone from the button gap (r 6.25, 2 mm down) up to an 18 mm rim with a 1 mm fillet onto the face
-  const dishP = [[-2.75, 9.6], [-2.75, 10.5], [-1.8, 11.19], [-.95, 11.8], [-.45, 12.14], [-.08, 12.36], [.3, 12.46], [.65, 12.495], [1.0, 12.5]];
+  const dishP = [[-2.75, 9.6], [-2.75, 10.5], [-1.8, 11.19], [-.95, 11.8], [-.45, 12.14], [-.08, 12.36], [.3, 12.46], [.65, 12.495], [1.0, 12.5]].map(([d, z]) => [d, D - (12.5 - z) * 1.15]);   // 2.3 mm deep cone
   const loops = [
     { type: 'outer', pts: pts(rr4(W, HT, [12, 12, 10, 10]), 260), prof: outerProf },
     { type: 'pocket', pts: circ(0, -6.5, 9, 120), prof: uni(dishP) },
@@ -115,8 +115,8 @@ export default H => { const { THREE, G, add, rslab, rr4, DEC } = H;
 
   /* 5. button: flat light-grey disc flush with the dish floor, dark hairline gap */
   const btnM = new THREE.MeshPhysicalMaterial({ color: 0xcccbc8, roughness: .6, sheen: .4, sheenRoughness: .7, sheenColor: 0xffffff, clearcoat: .05 });
-  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, 9.8);
-  add(B, new THREE.Mesh(new THREE.RingGeometry(5.95, 6.3, 96), new THREE.MeshStandardMaterial({ color: 0x2e2e2e, roughness: .9 })), 0, -6.5, 9.65);
+  const btn = solid([{ type: 'outer', pts: circ(0, 0, 6, 96), prof: uni([[0, 0], [0, .5], [.08, .66], [.2, .7]]) }], btnM); add(B, btn, 0, -6.5, D - 3.0);
+  add(B, new THREE.Mesh(new THREE.RingGeometry(5.95, 6.3, 96), new THREE.MeshStandardMaterial({ color: 0x2e2e2e, roughness: .9 })), 0, -6.5, D - 3.15);
 
   /* 3. pry notch on the back-cover seam, bottom centre */
   const notch = plane(7, 1.6, 60, (x, Pp) => { const [a, b] = Pp(-3, .5), [c, d] = Pp(3, -.5), gr = x.createLinearGradient(0, b, 0, d);

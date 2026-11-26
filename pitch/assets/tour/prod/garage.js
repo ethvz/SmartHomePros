@@ -37,9 +37,9 @@ export default H => {
   const grey = new THREE.MeshPhysicalMaterial({ color: 0x9a9a98, roughness: .58, clearcoat: .05 });
   const white = new THREE.MeshPhysicalMaterial({ color: 0xf1f1ef, roughness: .4, clearcoat: .15, clearcoatRoughness: .45 });
   const bodyM = splitMat(grey, white, 'z', mm(10), mm(.5), 0x4a4a4a);
-  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xa9adad, roughness: .22, transmission: .9, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
+  const lensM = new THREE.MeshPhysicalMaterial({ color: 0xe6eaea, roughness: .06, transmission: .97, thickness: mm(1), ior: 1.4, clearcoat: .6, clearcoatRoughness: .1 });
   const boardM = new THREE.MeshStandardMaterial({ color: 0x34342f, roughness: .7 });
-  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xebe5c4, roughness: .35, emissive: 0xf3e6a6, emissiveIntensity: .08, clearcoat: .6 });
+  const ledM = new THREE.MeshPhysicalMaterial({ color: 0xebe5c4, roughness: .35, emissive: 0xfff3c8, emissiveIntensity: .35, clearcoat: .6 });
   const btnM = white.clone();
   const cordM = new THREE.MeshPhysicalMaterial({ color: 0xf4f4f2, roughness: .45, clearcoat: .2 });
 
@@ -90,12 +90,12 @@ export default H => {
       c.strokeStyle = 'rgba(150,150,148,.55)'; c.lineWidth = 1.2; c.stroke(); };
     for (const x of [-12.6, -4.2, 4.2, 12.6]) { slot(x, 2.8, false); slot(x, -2.7, false); }
     for (const x of [-8.4, 0, 8.4]) slot(x, .6, true); });
-  printAt(30.8, -.6, 18, 12, (c, P) => {                                                      // myQ connected
+  printAt(31.0, -.6, 24, 14, (c, P) => {                                                      // myQ connected
     c.fillStyle = '#858585'; c.textBaseline = 'alphabetic'; c.textAlign = 'left';
-    let [x, y] = P(mm(-6.8), mm(.4)); c.font = '300 52px ' + FONT; c.fillText('my', x, y); const wmy = c.measureText('my').width;
-    c.font = '700 54px ' + FONT; c.fillText('Q', x + wmy + 1, y); const wq = c.measureText('Q').width;
-    c.font = '400 13px ' + FONT; c.fillText('®', x + wmy + wq + 1, y - 34);
-    c.fillStyle = '#8c8c8c'; c.font = '500 22px ' + FONT; c.textAlign = 'center'; [x, y] = P(0, mm(-4.3)); c.fillText('connected™', x, y); });
+    let [x, y] = P(mm(-8.6), mm(.6)); c.font = '300 66px ' + FONT; c.fillText('my', x, y); const wmy = c.measureText('my').width;
+    c.font = '700 70px ' + FONT; c.fillText('Q', x + wmy + 1, y); const wq = c.measureText('Q').width;
+    c.font = '400 16px ' + FONT; c.fillText('®', x + wmy + wq + 1, y - 44);
+    c.fillStyle = '#8c8c8c'; c.font = '500 27px ' + FONT; c.textAlign = 'center'; [x, y] = P(mm(-.6), mm(-5.0)); c.fillText('connected™', x, y); });
 
   /* ---------- three near-flush pill buttons ---------- */
   const icon = [
