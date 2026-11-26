@@ -185,3 +185,8 @@ html.pp #allTiles .ht[data-k=shp2]::after{font-size:15px!important;color:rgba(25
 html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}
 /* Doorbell / Indoor (All grid): two-line names at 16px, so the product sits higher */
 html.pp #allTiles .ht img.cp.big{top:40%!important;height:60%!important}
+
+/* ---------- top corner (burger + logo, --ppNavT): the two sections whose own big heading starts in that band move down ---------- */
+html.pp #stage #cmPP{top:48px}
+html.pp #stage #p-whatsnew h2{top:calc(var(--ppNavT) + 4px)}
+html.pp #stage #p-whatsnew .wnl{top:calc(var(--ppNavT) + 92px)}

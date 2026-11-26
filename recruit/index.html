@@ -4177,7 +4177,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
   // eased apart so the bigger titles never overlap, and the rail itself doesn't move. A light haptic tick marks each new
   // section; letting go lands on it and the title eases back. A tap is still just a tap (it wakes after 6px of movement).
   // Reduced motion: the nearest title is only highlighted, nothing grows or moves.
-  // o: rail, items() (elements along the rail, in order), link(el) (its section link), sel(i) (CSS selector of item i),
+  // o: rail, items() (elements along the rail, in order), link(el) (its section link), sel(el) (CSS selector of that item),
   //    ax ('y' standing up / 'x' lying down: the dots in the iPhone header, which show the nearest title in a small label
   //    under the finger instead), layer() (the page it scrolls), active()
   function dock(o) {
@@ -4193,11 +4193,11 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     function paint() { if (!S || !S.map) { if (css.textContent) css.textContent = ''; return; }
       const M = S.map, sp = M.length > 1 ? (M[M.length - 1].c - M[0].c) / (M.length - 1) : 50, rm = RM(); let out = '';
       M.forEach((m, i) => { const dd = m.c - S.ly, g = Math.exp(-Math.pow(dd / (sp * 0.7), 2)), near = m === S.near;
-        if (X) { out += `${o.sel(m.i)}{scale:${rm ? 1 : (1 + 0.9 * g).toFixed(3)} !important;${near ? 'background:#05E5AF !important;border-color:#05E5AF !important;' : ''}}`; return; }
+        if (X) { out += `${o.sel(m.b)}{scale:${rm ? 1 : (1 + 0.9 * g).toFixed(3)} !important;${near ? 'background:#05E5AF !important;border-color:#05E5AF !important;' : ''}}`; return; }
         const k = rm ? 0 : 1, scl = 1 + 0.45 * g * k, push = k * Math.tanh(dd / sp) * 9 * (1 - g);   // (push: neighbours move away from the grown title)
-        out += `${o.sel(m.i)}{translate:0 ${push.toFixed(1)}px !important}`
-          + `${o.sel(m.i)} > span:last-child{transform-origin:0 50% !important;scale:${scl.toFixed(3)} !important;${near ? 'color:#05E5AF !important;opacity:1 !important;' : g > .3 ? 'color:#fff !important;opacity:1 !important;' : ''}}`
-          + (near && !rm ? `${o.sel(m.i)} > span:first-child{scale:1.2 !important}` : ''); });
+        out += `${o.sel(m.b)}{translate:0 ${push.toFixed(1)}px !important}`
+          + `${o.sel(m.b)} > span:last-child{transform-origin:0 50% !important;scale:${scl.toFixed(3)} !important;${near ? 'color:#05E5AF !important;opacity:1 !important;' : g > .3 ? 'color:#fff !important;opacity:1 !important;' : ''}}`
+          + (near && !rm ? `${o.sel(m.b)} > span:first-child{scale:1.2 !important}` : ''); });
       if (css.textContent !== out) css.textContent = out;
       if (X && tip) { const n = S.near; tip.textContent = title(n.a); tip.style.left = S.ly + 'px'; } }
     // where each section starts, in the scroller's own units (phones draw the scroller at screen size, iPads inside the scaled page)
@@ -4240,8 +4240,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     const rail = layer.querySelector('.board nav'); if (!rail || rail.__dock) return;
     const its = () => [...rail.querySelectorAll('a[href^="#sec-"]')].filter(a => a.offsetHeight);
     const off = dock({ rail, ax: 'y', layer: () => layer,
-      items: () => { const L = its(); L.forEach((a, i) => { if (a.dataset.fdi !== String(i)) a.dataset.fdi = String(i); }); return L; },
-      link: a => a, sel: i => `.board nav.frscrub a[data-fdi="${i}"]`,
+      items: its, link: a => a, sel: a => `.board nav.frscrub a[href="${a.getAttribute('href')}"]`,   // (by its link: the page re-draws the rail and drops added attributes)
       active: () => { if (!layer.isConnected || (current && current.layer !== layer)) return false; const r = rail.getBoundingClientRect(), g = getComputedStyle(rail);
         return r.height > 40 && g.visibility !== 'hidden' && parseFloat(g.opacity) > 0.5 && FR.get('ui') === 'none'; } });
     if (off) (layer._off = layer._off || []).push(off);
@@ -4250,7 +4249,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
   function phDock(pg) {
     const links = () => { const CL = current && current.layer; return CL ? [...CL.querySelectorAll('.board nav a')].filter(x => !CL._keep || CL._keep.has((x.getAttribute('href') || '').slice(5))).sort((p, q) => (parseFloat(p.style.top) || 0) - (parseFloat(q.style.top) || 0)) : []; };
     dock({ rail: pg, ax: 'x', layer: () => current && current.layer,
-      items: () => [...pg.querySelectorAll('b')], link: b => links()[+b.dataset.i], sel: i => `#phdr .ph-prog.frscrub b[data-i="${i}"]`,
+      items: () => [...pg.querySelectorAll('b')], link: b => links()[+b.dataset.i], sel: b => `#phdr .ph-prog.frscrub b[data-i="${b.dataset.i}"]`,
       active: () => pphOn() && !pg.hidden && !!phdr && !phdr.classList.contains('idle') && !phdr.classList.contains('navopen') && FR.get('ui') === 'none' });
   }
 

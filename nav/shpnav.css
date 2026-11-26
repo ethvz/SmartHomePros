@@ -188,5 +188,6 @@ html.shpn-top .shpn-toast { bottom: calc(max(12px, env(safe-area-inset-bottom, 0
 html.shpn-top .shpn-corner.off, html.shpn-top.shp-sheet .shpn-corner { transform: translateY(-10px); }
 /* SHP page: its title moves right of the corner */
 html.shpn-top.shpn-home .brand .t { margin-left: 150px; }
+html.shpn-top.shpn-home .brand .t .mk { display: none; }   /* the corner's logo already carries the house mark */
 /* Fast Recruit: its menu card hangs from the corner */
 html.shpn-recruit.shpn-top .dw.shpn .dw-panel { top: var(--shpn-head) !important; bottom: max(12px, calc(var(--sab, 0px) + 8px)) !important; }
