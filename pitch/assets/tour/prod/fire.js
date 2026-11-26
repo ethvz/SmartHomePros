@@ -2,7 +2,7 @@
 // Built in millimetres inside a 0.001-scaled group. Outline = rectangle with crisp 45 deg corner chamfers (3 mm legs) through the full
 // depth and a shallow 9 x 0.5 mm notch centred in the top edge (photo). Rear solid + plate body share the outline; the front is ONE
 // height-field surface over that outline (so every change is flush): 2 mm side/edge roll-offs running unbroken round the chamfers, the
-// face at z 24.6; inside the side bands (4.4 mm in, ending in straight 45 deg ramps) a top strip set back through a steep rounded step
+// face at z 24.6; inside the side bands (fading out 4.4-6.9 mm in from the sides) a top strip set back through a steep rounded step
 // 3.4 mm below the top (the highlight line), and a rib 7.4-10.1 mm below the top: a low lip and an up-facing ramp (the photo's bright band). One countersunk pinhole.
 export default H => {
   const { THREE, G, add, ext, splitMat } = H;
@@ -30,20 +30,20 @@ export default H => {
     // edge and notch (photo); the deepest drop wins, so it stays continuous. dside = distance to the sides/chamfers (not the top).
     for (let i = 0; i < OP.length; i++) { const [x1, y1] = OP[i], [x2, y2] = OP[(i + 1) % OP.length], dx2 = x2 - x1, dy2 = y2 - y1;
       const tt = Math.max(0, Math.min(1, ((x - x1) * dx2 + (y - y1) * dy2) / (dx2 * dx2 + dy2 * dy2))), dd = Math.hypot(x - x1 - tt * dx2, y - y1 - tt * dy2);
-      const top = y1 > Y - 1 && y2 > Y - 1, bs = top ? .8 : BS, bt = top ? .6 : BT;
+      const top = y1 > Y - 1 && y2 > Y - 1, bs = top ? 1.5 : BS, bt = top ? .8 : BT;   // top edge: an R1.5-ish round, full width
       if (!top) dside = Math.min(dside, dd);
       if (dd < bs) { const q = (bs - dd) / bs; drop = Math.max(drop, bt * (Math.sqrt(q * q + .01) - .1) / (Math.sqrt(1.01) - .1)); } }
-    // the top detail sits INSIDE the side bands: it ends at x = +-(X - 4.4) with a straight 45 deg ramp (no plan radius, no blend into the
-    // chamfer), so the side bands and corner chamfers run at full face height to the top round.
+    // the top detail sits INSIDE the side bands: it fades out between |x| = X - 6.9 and X - 4.4 (no wall), so the side bands and corner
+    // chamfers run at full face height to the top round.
     // Rib (photo's bright band, 7.4-10.1 mm below the top): a low lip at its foot, then a ~25 deg up-facing ramp back 0.7 mm; above it the
     // face curves gently back, then a steep rounded step 3.4 mm below the top sets the strip back a further 0.55 mm; the step faces
     // the light and is the photo's highlight line, and the strip keeps tipping back to the top edge.
-    const t = y - (Y - 7.4), xin = (X - 4.4) - Math.abs(x);
-    let P = -.7 * ss(Y - 9.7, Y - 7.4, y);
-    if (t > 0) P -= t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3);
-    P -= .55 * ss(Y - 3.4 - .2, Y - 3.4 + .2, y);
-    z += Math.max(P, -Math.max(0, xin));
-    if (xin > 0) z += .06 * ss(Y - 10.4, Y - 9.6, y) * (1 - ss(Y - 9.6, Y - 9.0, y));              // the rib's foot lip
+    // inset masks depend on x only: the strip detail fades out over 2.5 mm, the rib ends over 1 mm, so nothing ends in a wall
+    const t = y - (Y - 7.4), ax = Math.abs(x), m = ss(X - 4.4, X - 6.9, ax), mr = ss(X - 4.4, X - 5.4, ax);
+    let P = -.7 * ss(Y - 9.7, Y - 7.4, y) * mr;
+    if (t > 0) P -= m * (t < 4.3 ? .25 * (t / 4.3) ** 2 : .25 + .1 * (t - 4.3));
+    P -= m * .55 * ss(Y - 3.4 - .2, Y - 3.4 + .2, y);
+    z += P + mr * .06 * ss(Y - 10.4, Y - 9.6, y) * (1 - ss(Y - 9.6, Y - 9.0, y));          // + the rib's foot lip
     // a fine concave crease 1.4 mm in from the outer edge of the side/bottom bands (photo: a dark hairline inside each band)
     z -= .1 * Math.exp(-(((dside - 1.4) / .12) ** 2));
     z -= drop;
@@ -62,8 +62,8 @@ export default H => {
   const pm = splitMat(white, white, 'y', Y - 38, .22, 0xa8a9a8); pm.alphaMap = mask; pm.alphaTest = .5;
   body();                                                 // plate body: same masked material, so the pinhole stays open through its front
 
-  // front height field: 0.2 mm grid; points outside the outline are pulled onto it, so the edge is exact
-  { const st = .2, nx = Math.ceil(W / st) + 2, ny = Math.ceil(Ht / st) + 2, pos = [], nor = [], uv = [], idx = [], e = .03;
+  // front height field: 0.1 x 0.2 mm grid; points outside the outline are pulled onto it, so the edge is exact
+  { const st = .2, nx = Math.ceil(W / .1) + 2, ny = Math.ceil(Ht / st) + 2, pos = [], nor = [], uv = [], idx = [], e = .03;
     for (let j = 0; j <= ny; j++) for (let i = 0; i <= nx; i++) {
       let x = -X - st + i * (W + 2 * st) / nx, y = -Y - st + j * (Ht + 2 * st) / ny;
       const n = near(x, y); if (n.d < 0) { x = n.bx; y = n.by; }
