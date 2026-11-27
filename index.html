@@ -778,15 +778,10 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
     card.addEventListener('click', function () {
       if (busy) return; busy = true;
       var app = card.dataset.app; try { localStorage.setItem('shpc_last', app); sessionStorage.setItem('shp_asm', String(Date.now())); } catch (e) {}   // the app assembles its first screen on arrival (nav/shpnav.js)
-      var r = card.getBoundingClientRect(), z = document.createElement('div'), ph = card.querySelector('.ph');
-      z.className = 'zoom'; z.innerHTML = '<div class="ph"></div><div class="sh"></div>';
-      z.firstChild.style.backgroundImage = getComputedStyle(ph).backgroundImage; z.firstChild.style.backgroundPosition = getComputedStyle(ph).backgroundPosition;
-      z.style.left = r.left + 'px'; z.style.top = r.top + 'px'; z.style.width = r.width + 'px'; z.style.height = r.height + 'px';
-      document.body.appendChild(z);
-      requestAnimationFrame(function () { requestAnimationFrame(function () {
-        z.style.left = '0px'; z.style.top = '0px'; z.style.width = innerWidth + 'px'; z.style.height = innerHeight + 'px'; z.style.borderRadius = '0px'; z.classList.add('full');
-      }); });
-      setTimeout(function () { location.href = app + '/index.html'; }, 560);
+      /* no zoom into the card: the SHP page just fades out and the app assembles its first screen (nav/shpnav.js) */
+      document.body.style.transition = 'opacity .16s ease-out'; document.body.style.opacity = '0';
+      setTimeout(function () { location.href = app + '/index.html'; }, 170);
+      addEventListener('pageshow', function (e) { if (e.persisted) { document.body.style.opacity = ''; busy = false; } }, { once: true });   // back from the app: visible again
     });
   });
   /* settings sheet */
