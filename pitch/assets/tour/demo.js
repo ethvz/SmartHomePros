@@ -83,7 +83,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 .dmSc small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
 .dmSc.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px}
 .dmSc.wide i{color:#fff}
-/* Smart Deter controls in the camera bars: the deter toggle glows red while on; the linger time cycles 5 / 10 / 15 / 30 s */
+/* Smart Deter controls in the camera bars: the deter toggle glows red while on; the linger time cycles 2 / 5 / 10 / 15 s */
 #card #dmAct button.dtr.on{background:rgba(255,59,48,.24);box-shadow:inset 0 0 0 1px rgba(255,92,80,.65)}
 #card #dmAct button.dtr.on svg{color:#ff5a4f}
 #card #dmAct button.lg{padding:0 13px;gap:6px;font-variant-numeric:tabular-nums}
@@ -672,7 +672,7 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
 function deterBar(k){ const on = M.deter[k];
   return `<button class="dtr${on ? ' on' : ''}" data-a="deter" aria-pressed="${on}" aria-label="Deter ${on ? 'on' : 'off'}">${IC.deter}${T_(on ? 'Deter on' : 'Deter off')}</button>`
     + (on ? `<button class="pri" data-a="visit" aria-label="Simulate a visitor">${IC.person}${T_('Visitor')}</button>` : '')
-    + (on && k === 'ocspot' ? `<button class="lg" data-a="linger" aria-label="Whistle after lingering ${LINGER.get()} seconds">${IC.clock}<span>${LINGER.get()}s</span></button>` : ''); }
+    + (on && k === 'ocspot' ? `<button class="lg" data-a="linger" aria-label="Strobe after lingering ${LINGER.get()} seconds">${IC.clock}<span>${LINGER.get()}s</span></button>` : ''); }
 { const p = parts('therm'); if(p.setState){ const set0 = p.setState; p.setState = o => { const r = set0(o); if(actK === 'therm') queueMicrotask(syncAct); return r; }; } }
 function showTryApp(on){ if(on){ appShowDock(true); tryApp.classList.add('vis'); } else { tryApp.classList.remove('vis'); if(!MODE.kind && !MODE.run && APP.docked) appShowDock(false); } }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }
@@ -791,12 +791,12 @@ function automation(name, o = {}){
 /* ------------------------------------------------------------------ Smart Deter (Doorbell Camera Pro, Outdoor Camera Pro, Spotlight Pro)
    Deter on: the camera's red light ring goes dark and an illustrative red cone sweeps the yard from it (the Vivint app's deter
    animation). A visitor: the rings blink, the cones lock on, the whistle sounds; the Spotlight Pro's beam follows the person, and
-   lingering past the set time (5 / 10 / 15 / 30 s, remembered) whistles again. Cones, beam, person and sound waves exist only while
+   lingering past the set time (2 / 5 / 10 / 15 s, remembered) makes the Spotlight Pro strobe and whistle again. Cones, beam, person and sound waves exist only while
    deter is on or a visitor plays, and are disposed after. */
 const DCAM = ['dbcp', 'ocp', 'ocspot'], APPK = { dbcp:'door', ocp:'night', ocspot:'gen2' }, FROMAPP = { door:'dbcp', night:'ocp', gen2:'ocspot' };
 M.deter = { dbcp:false, ocp:false, ocspot:false };
-const LINGERS = [5, 10, 15, 30];
-const LINGER = { mem:5,
+const LINGERS = [2, 5, 10, 15];   // owner: the Spotlight Pro strobes after someone lingers a couple of seconds (default 2 s)
+const LINGER = { mem:2,
   get(){ try { const v = +localStorage.getItem('tourDeterLinger'); if(LINGERS.includes(v)) return v; } catch(e){} return this.mem; },
   next(){ const v = LINGERS[(LINGERS.indexOf(this.get()) + 1) % LINGERS.length]; this.mem = v; try { localStorage.setItem('tourDeterLinger', String(v)); } catch(e){} return v; } };
 /* the whistle: primed on the tap that starts a visitor (iOS plays audio only after a gesture); silent fallback = the sound waves */
@@ -907,7 +907,10 @@ function dtStep(now){ const dt = Math.min(.05, (now - (DT.last || now))/1000); D
     if(DT.aim){ tmpD.copy(DT.aim).sub(b.A); const s = SKIP.on ? 1 : 1 - Math.exp(-dt*6); b.yaw += (Math.atan2(tmpD.x, tmpD.z) - b.yaw)*s; b.pitch += (Math.atan2(-tmpD.y, Math.hypot(tmpD.x, tmpD.z)) - b.pitch)*s; }
     placeCone(b, DT.aim ? b.A.distanceTo(DT.aim) + 1.2 : 12);
     if(DT.aim && b.vis > .001){ b.spot.position.set(DT.aim.x, GY + .02, DT.aim.z); b.spot.scale.set(1.9, 1, 1.9); b.sm.opacity = b.gop*b.vis; }   // a pool of light at the visitor's feet (DT.leds || []).forEach(({ m, e, i }, j) => { if(b.vis > .001){ m.emissive.setHex(j ? 0xffffff : 0xfff4e2); m.emissiveIntensity = j ? .55*b.vis : 1 + 5*b.vis; } else { m.emissive.setHex(e); m.emissiveIntensity = i; } });
-    if(DT.person) DT.person.light(b.vis);
+    /* lingering: the Spotlight Pro strobes (6 flashes a second; 2 with reduced motion) */
+    const sf = DT.strobe > now ? (Math.floor(now/(reduce ? 250 : 83)) % 2 ? 1 : .05) : 1;
+    if(sf < 1){ b.mat.uniforms.uO.value *= sf; b.sm.opacity *= sf; (DT.leds || []).forEach(({ m }) => { m.emissiveIntensity *= sf; }); }
+    if(DT.person) DT.person.light(b.vis*sf);
     if(b.vis > 0 || want) busy = true; else { dropCone(b); DT.beam = null; } }
   for(let i = DT.waves.length - 1; i >= 0; i--){ const w = DT.waves[i], e = (now - w.t0)/1200;
     if(e >= 1){ scene.remove(w.m); w.m.material.dispose(); DT.waves.splice(i, 1); continue; } busy = true; if(e < 0) continue;
@@ -931,9 +934,9 @@ function visitor(){ if(MODE.run) return; WH.prime();
       await per.walk(.17, .32); DT.aim = per.aim; DT.spotOn = true; capStep(2, 'Spotlight follows');
       await per.walk(.32, 1); per.at(1, false, false);
       const n = LINGER.get(); for(let i = n; i > 0; i--){ capStep(3, `Lingering · ${i}s`); await wait(1); }
-      capStep(4, 'Whistle · Move along'); detect([...new Set(['ocspot', ...cams()])], `Person lingering over ${n}s. Spotlight whistle sounded.`); await wait(1.9);
+      capStep(4, 'Strobe · Whistle'); DT.strobe = performance.now() + 2600; detect([...new Set(['ocspot', ...cams()])], `Person lingering over ${n}s. Spotlight Pro strobed.`); await wait(2.6); DT.strobe = 0;
       await per.walk(1, .1, true); await Promise.all([tween(.6, e => per.fade(1 - e)), per.walk(.1, 0, true)]);
-    } finally { DT.track = null; DT.aim = null; DT.spotOn = false; per.dispose(); DT.person = null; runDeter(); }
+    } finally { DT.track = null; DT.aim = null; DT.spotOn = false; DT.strobe = 0; per.dispose(); DT.person = null; runDeter(); }
     capDone('Visitor deterred'); await wait(1);
     if(auto){ setDeter(DCAM, false); }
   }, { withHub:false }); }
