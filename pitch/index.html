@@ -5664,6 +5664,43 @@ document.addEventListener('click',e=>{ const t=e.target.closest&&e.target.closes
 <link rel="stylesheet" href="pp/sales.css?v=1"><script src="pp/sales.js?v=1" defer></script>
 <link rel="stylesheet" href="pp/protect.css?v=1"><script src="pp/protect.js?v=1" defer></script>
 <link rel="stylesheet" href="pp/brand.css?v=2"><script src="pp/brand.js?v=1" defer></script>
+<!-- iPhone portrait top bar (after the pp files so it wins): the page eyebrow sits in the top-RIGHT corner, centred on the Vivint
+     logo, right edge on the 28px content margin (x 572). Page headlines start below the bar, left edge on the logo wordmark (x 94).
+     Stage px: the logo image (#barlogo content box) spans x 94-, y 29-60 (middle 44.5). -->
+<style id="ppTop">
+html.pp{--ppLx:94px;--ppRx:572px}
+/* eyebrow: right-aligned box from just right of the logo (x 240) to the content margin; wraps to two lines rather than colliding */
+html.pp #screen{--ebR:572px}
+html.pp #screen:has(#p-about.on,#p-awards.on,#p-videos.on){--ebR:576px}   /* these pages' cards run to x 576 */
+html.pp #screen:has(#p-packages.on){--ebR:584px}                          /* package cards run to x 584 */
+html.pp #gTitle{left:calc(240px - var(--gx,0px))!important;width:calc(var(--ebR) - 240px)!important;top:18.5px!important;padding:0!important}
+html.pp #gTitle span{left:auto!important;right:0;max-width:calc(var(--ebR) - 240px)!important;text-align:right;white-space:normal!important;line-height:1.3}
+/* the Back pill keeps its spot right of the logo (x 244-349): the eyebrow stays right-aligned and narrows to the space past it */
+html.pp body.hasbk #gTitle{transform:none!important;left:calc(362px - var(--gx,0px))!important;width:calc(var(--ebR) - 362px)!important}
+html.pp body.hasbk #gTitle span{max-width:calc(var(--ebR) - 362px)!important}
+/* Home's pinned eyebrow (#lpT): same corner, same middle line */
+html.pp #lpT{transform:translateY(17px)!important;left:0!important;width:var(--ppRx)!important}
+html.pp #lpT .lpl{left:auto!important;right:0;text-align:right}
+/* headlines: left edge on the logo wordmark */
+html.pp #p-history .hy2-h{left:var(--ppLx)!important;max-width:calc(var(--ppRx) - var(--ppLx))}
+html.pp #p-history .hy2-h h1{font-size:60px}
+html.pp #p-awards .aw-h h1{margin-left:calc(var(--ppLx) - 24px)}
+html.pp #p-videos .vl2-h h2{margin-left:calc(var(--ppLx) - 24px)}
+html.pp #p-comparisons>h2,html.pp #p-buyouts>h2,html.pp #p-patents>h2,html.pp #p-moves>h2,html.pp #p-social>h2,html.pp #p-protection>h2{left:var(--ppLx)!important}
+html.pp #p-whatsnew>h2{left:calc(var(--ppLx) - var(--gx,0px))!important}
+html.pp #p-military .ppmil{left:var(--ppLx);right:28px}
+html.pp #p-psa .psa-side>h2.t2,html.pp #p-playback .pbx>h2,html.pp #p-nrg .ng-h>h1{margin-left:calc(var(--ppLx) - 28px)}
+html.pp #hbScroll .hbh-top{left:var(--ppLx)!important;right:28px!important;text-align:left!important}
+html.pp #hbScroll .hbh-top>*{text-align:left!important}
+html.pp #ocScroll .och-txt{left:var(--ppLx)!important;width:calc(var(--ppRx) - var(--ppLx))!important}
+/* NRG: the second line must stop short of the nrg logo (x 468-572) */
+html.pp #p-nrg .ng-h>h1{font-size:41px}
+/* Monitoring hero: its headline is baked into a crop of the slide (pp/protect.js). Pin the first letter (3.84% into the crop) to the
+   logo line and shrink the crop so the text ends at the content margin; percentages keep it right on short phones too */
+html.pp #p-monitoring .ppg[data-k=mon_hero]>.ppc:first-child{left:var(--ppLx)!important;transform-origin:3.84% 0;transform:translateX(-3.84%) scale(.905)}
+/* Compatibility: its title leaves the corner band and becomes the headline below it */
+html.pp #stage #cmPP h2{left:var(--ppLx)!important;top:calc(var(--ppNavT,84px) + 8px)!important}
+</style>
 <!-- iPad portrait layouts (html.ipp), one file per section group -->
 <link rel="stylesheet" href="ipp/shell.css?v=1"><script src="ipp/shell.js?v=1" defer></script>
 <link rel="stylesheet" href="ipp/brand.css?v=1"><script src="ipp/brand.js?v=1" defer></script>

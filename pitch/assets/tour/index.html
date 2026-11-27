@@ -1606,7 +1606,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 35;
+const TOURV = 36;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1649,7 +1649,7 @@ const PLACE = {
   therm: {pos:V(3.1,FL+1.45,GR.cz+.01), view:V(0,0,1),          d:.66},
   window:{pos:V(-5.35,1.2935,4.030), view:V(0,0,1), s:1.15,    d:.5},   // seated on the bottom rail (rail y 1.25-1.31, face z 4.03)
   glass: {pos:V(GR.x1-.01,FL+2.75,1.8), view:V(-1,0,0),        d:.7},
-  plug:  {pos:V(4.6,FL+.32,GR.cz+.01), view:V(0,0,1),         d:.65},
+  plug:  {pos:V(4.6,FL+.32,GR.cz+.01), view:V(-.3,0,1).normalize(),         d:.65},
   ocp:   {pos:V(6.3,4.3,3.02),       view:V(.3,0,1),            d:.95},
 };
 /* boxes the hotspot rings can hide behind (solid parts of the house) */
@@ -1693,6 +1693,30 @@ for(const [k,o] of Object.entries(OUTLETS)){ const p = byKey[k]; if(!p) continue
   const lowRec = b.min.y - .025*s - .0145*s;          // centre of the lower receptacle
   o.position.y = lowRec + .019*s;                     // plate centre (receptacles sit at +/-19 mm)
   if(Math.abs(p.view.x) > .5) o.position.z = c.z; else o.position.x = c.x; }
+/* the floor lamp plugged into the Smart Plug: stands in the corner right of the outlet, its cord runs from the plug's cord end
+   along the floor to the base. Off by default; the live demo switches it (house.plugLamp.set(0..1)). */
+const PLUG_LAMP = (() => { const P = byKey.plug; if(!P) return null;
+  const lp = V(5.1, FL, GR.cz + .22), g = new THREE.Group(); g.position.copy(lp); scene.add(g);
+  const base = cyl(.12,.025,M.blackM,32); base.position.y = .012; g.add(base);
+  const pole = cyl(.012,1.5,M.blackM,10); pole.position.y = .76; g.add(pole);
+  const shadeM = phys(0xf2e8d8,{r:.8,x:{side:THREE.DoubleSide,emissive:0xffb466,emissiveIntensity:0,transmission:0}});
+  const shade = new THREE.Mesh(new THREE.CylinderGeometry(.14,.17,.28,40,1,true), shadeM); shade.position.y = 1.52; g.add(shade);
+  const bulbM = new THREE.MeshBasicMaterial({color:0x6d6a64}); const bulb = new THREE.Mesh(new THREE.SphereGeometry(.04,20,12), bulbM); bulb.position.y = 1.47; g.add(bulb);
+  const light = new THREE.PointLight(0xffc489, 0, 5, 2); light.position.set(lp.x - .05, FL + 1.45, lp.z + .05); scene.add(light);
+  /* floor cord: picks up where the plug's own cord ends */
+  scene.updateMatrixWorld(true); let end = null;
+  P.model.traverse(m => { if(!end && m.isMesh && m.geometry.type === 'TubeGeometry'){ end = m.geometry.parameters.path.getPoint(1).applyMatrix4(m.matrixWorld); } });
+  if(end){ const y = FL + .007, pts = [end.clone(), V(end.x + .1, y, end.z + .02), V(lp.x - .28, y, lp.z - .02), V(lp.x - .12, y + .004, lp.z)];
+    pts[0].y = Math.max(y, pts[0].y);
+    const c = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, .0035, 8, false), mat(0x2b2826,{r:.5})); c.name = 'lampCord'; scene.add(c); }
+  /* a soft warm halo around the shade so "on" reads even in a bright room */
+  const hc = document.createElement('canvas'); hc.width = hc.height = 128; const hx = hc.getContext('2d'), gr = hx.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,'rgba(255,214,150,1)'); gr.addColorStop(.35,'rgba(255,190,110,.45)'); gr.addColorStop(1,'rgba(255,170,90,0)'); hx.fillStyle = gr; hx.fillRect(0,0,128,128);
+  const haloM = new THREE.SpriteMaterial({map:new THREE.CanvasTexture(hc), transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending});
+  const halo = new THREE.Sprite(haloM); halo.scale.setScalar(1.1); halo.position.y = 1.5; halo.visible = false; g.add(halo);
+  const warm = new THREE.Color(0xfff1d6), off = new THREE.Color(0x6d6a64), sh0 = shadeM.color.clone(), shOn = new THREE.Color(0xffd9a0);
+  return { light, group:g, set(k){ shadeM.emissiveIntensity = 2.4*k; shadeM.color.copy(sh0).lerp(shOn, k); bulbM.color.copy(off).lerp(warm, k);
+    light.intensity = 10*k; haloM.opacity = .55*k; halo.visible = k > .01; } }; })();
 
 /* ------------------------------------------------------------------ camera rig */
 const controls = new OrbitControls(camera, canvas);
@@ -2055,7 +2079,7 @@ if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).th
 });
 // test hooks for review
 window.__tour = { focus:k=>focus(byKey[k]), overview, state, camera, controls, scene, THREE, MODELS, renderer,
-  house: {garagePanels:GARAGE.panels, garageTrack:GARAGE.track, garageTrackY:GARAGE.track.yCeil, garageMats:GDM, frontDoor:FRONT_DOOR, tree:TREE, lights:LIGHTS, GR} };
+  house: {garagePanels:GARAGE.panels, garageTrack:GARAGE.track, garageTrackY:GARAGE.track.yCeil, garageMats:GDM, frontDoor:FRONT_DOOR, tree:TREE, lights:LIGHTS, GR, plugLamp:PLUG_LAMP} };
 Object.assign(window.__tour, { flyTo, byKey, PRODUCTS, setHint, homeView, poseFor, sheetMQ, TOURV });   // for the live demo
 if(!/[?&](studio=|bakeexport)/.test(location.search)) import('./demo.js?v=' + TOURV).catch(e => console.warn('demo.js', e));
 /* dev studio: ?studio=<product>&az=<deg>&el=<deg>[&fill=<0..1>] shows one product alone on a light backdrop, lit like a

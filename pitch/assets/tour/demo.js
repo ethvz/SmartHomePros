@@ -86,6 +86,8 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 /* Smart Deter controls in the camera bars: the deter toggle glows red while on; the linger time cycles 2 / 5 / 10 / 15 s */
 #card #dmAct button.dtr.on{background:rgba(255,59,48,.24);box-shadow:inset 0 0 0 1px rgba(255,92,80,.65)}
 #card #dmAct button.dtr.on svg{color:#ff5a4f}
+#card #dmAct button.tog.on{background:rgba(5,229,175,.2);box-shadow:inset 0 0 0 1px rgba(5,229,175,.6)}
+#card #dmAct button.tog.on svg{color:#05e5af}
 #card #dmAct button.lg{padding:0 13px;gap:6px;font-variant-numeric:tabular-nums}
 /* hub emulator: one iframe, docked on the 3D glass (homography) or floating as a picture-in-picture card */
 #dmHub{position:fixed;left:0;top:0;width:1280px;height:750px;transform-origin:0 0;z-index:4;pointer-events:none;opacity:0;transition:opacity .45s}
@@ -156,7 +158,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
   #card #dmAct .t{display:none}
   #card #dmAct .nm{display:block;font-size:11.5px;letter-spacing:-.01em;font-weight:700;color:#fff;margin:0 4px 0 2px;white-space:nowrap}
   #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
-  #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock],#card #dmAct button.dtr{width:40px;padding:0;justify-content:center}
+  #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock],#card #dmAct button.dtr,#card #dmAct button.tog{width:40px;padding:0;justify-content:center}
   #card #dmAct button.lg{padding:0 9px;gap:4px}
   #card #dmAct button.rnd{width:34px;height:34px}
   #card #dmAct .tv{min-width:40px;font-size:16px}
@@ -252,7 +254,8 @@ const redEl = el('div', { id:'dmRed' });
 document.body.appendChild(capEl);   // keep the caption above the run shield
 
 /* ------------------------------------------------------------------ the house's live state */
-const M = { arm:'dis', locked:true, garage:0, garageOpen:false, door:0, th:{ mode:'cool', sp:70, cur:72 }, lights:1, alarm:false };
+const M = { arm:'dis', locked:true, garage:0, garageOpen:false, door:0, th:{ mode:'cool', sp:70, cur:72 }, lights:1, alarm:false, lamp:false,
+  lampAuto:(() => { try{ return localStorage.getItem('tourLampAuto') !== '0'; }catch(e){ return true; } })() };
 const MODE = { kind:null, lockCam:false, run:null, back:null };   // kind: 'panel' | 'lockpad' | 'keypad'
 const P = k => byKey[k];
 const parts = k => (P(k) && P(k).model && P(k).model.userData.parts) || {};
@@ -283,6 +286,7 @@ const SH = {
   smoke:   () => { const p = P('smokeco'); return shot(p.center.clone().add(V(0, -.9, 0)), V(.2, -.25, 1), 3.1); },
   great:   () => shot(V(1.2, 1.6, -1.5), V(.15, .35, 1), 8.5),
   home:    () => { const HV = T.homeView(); return T.poseFor(HV); },
+  plug:    () => { const c = P('plug').center; return shot(V(c.x + .3, c.y + .78, c.z + .3), V(-.45, .1, 1), 3.7); },   // the Smart Plug and the floor lamp it powers
   front:   () => { const port = aspect() < 1, tg = port ? V(-3.4, 2.2, 5.6) : V(-1.6, 1.7, 5.4), d = fitDist(port ? 11 : 15.6, 5.8, .92, .74);   // the whole street front: cones, door, visitor
     return { pos:tg.clone().addScaledVector(V(0, .44, 1).normalize(), d), target:tg }; },
 };
@@ -388,6 +392,9 @@ const HUBSCR = (() => { let mesh = null; const p = P('hub'); if(!p) return { dra
     t.needsUpdate = true; };
   const m = mesh.material; m.map = t; m.emissiveMap = t; draw(); document.fonts && document.fonts.ready.then(draw);
   return { draw }; })();
+/* the floor lamp on the Smart Plug (dining corner) */
+const LAMP = { k:0, apply(k){ this.k = k; const L = HOUSE.plugLamp; if(L) L.set(k); kick(); },
+  async set(on, sec = .7){ M.lamp = on; syncAct(); syncApp(); const k0 = this.k, k1 = on ? 1 : 0; if(k0 === k1) return; await tween(sec, e => this.apply(k0 + (k1 - k0)*e), easeOut); } };
 /* house lights (interior point lights + exposure) for Goodnight / Welcome / Smoke */
 const LIT = { base:null, exp0:renderer.toneMappingExposure,
   list(){ const L = HOUSE.lights || {}; return (L.interior || []).filter(Boolean); },
@@ -649,7 +656,7 @@ function adoptTherm(){ const p = parts('therm'); if(!p.getState) return; const s
   if(st.mode) M.th.mode = st.mode; if(st.setpoint != null) M.th.sp = st.setpoint; if(st.current != null) M.th.cur = st.current; }
 const T_ = s => `<span class="t">${s}</span>`;
 function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.focus.k : null;
-  const want = ['lock', 'garage', 'therm', 'keypad', 'hub', 'app', ...DCAM].includes(f) ? f : null;
+  const want = ['lock', 'garage', 'therm', 'plug', 'keypad', 'hub', 'app', ...DCAM].includes(f) ? f : null;
   if(!want){ if(actK){ actEl.classList.add('off'); tour.card.classList.remove('dmHas'); actK = null; } showTry(false); showTryApp(false); return; }
   if(want === 'therm') adoptTherm();
   const a = TH.active(), lab = a === 'cool' ? 'Cooling' : a === 'heat' ? 'Heating' : M.th.mode === 'off' ? 'Off' : 'Idle';
@@ -658,10 +665,11 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
     garage:`<button class="pri" data-a="gar">${IC.garage}${M.garageOpen ? 'Close' : 'Open'}</button>`,
     therm:`<button class="rnd" data-a="tdn" aria-label="Cooler">${IC.down}</button><div class="tv">${M.th.sp}°<small class="${a || ''}">${lab}</small></div><button class="rnd" data-a="tup" aria-label="Warmer">${IC.up}</button>`,
     keypad:`<button class="pri" data-a="kpad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
+    plug:`<button class="pri" data-a="lamp" aria-pressed="${M.lamp}">${IC.bulb}${T_(M.lamp ? 'Lamp off' : 'Lamp on')}</button><button class="tog${M.lampAuto ? ' on' : ''}" data-a="lampauto" aria-pressed="${M.lampAuto}" aria-label="Person detected turns the lamp on: ${M.lampAuto ? 'on' : 'off'}">${IC.person}${T_('Person → Lamp')}</button>`,
     hub:`<button class="pri" data-a="panel">${IC.hub}${T_('Use the hub')}</button>`,
     app:`<button class="pri" data-a="app">${IC.phone}${T_('Use the app')}</button>`,
   }[want] ?? deterBar(want);
-  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', keypad:'Keypad', hub:'Smart Hub', app:'Vivint App', dbcp:'Doorbell', ocp:'Camera', ocspot:'Spotlight' }[want]}</span>` + H;
+  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', plug:'Smart Plug', keypad:'Keypad', hub:'Smart Hub', app:'Vivint App', dbcp:'Doorbell', ocp:'Camera', ocspot:'Spotlight' }[want]}</span>` + H;
   if(want === 'therm' && actEl.dataset.k === 'therm' && actEl.querySelector('.tv')){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
   else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
   actEl.dataset.k = want;
@@ -679,6 +687,8 @@ function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else
 actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; const a = b.dataset.a;
   if(a === 'pad') enterPad('lock'); if(a === 'kpad') enterPad('keypad'); if(a === 'panel') enterPanel(); if(a === 'app') enterApp();
   if(a === 'lock') device('lock', !M.locked); if(a === 'gar') device('garage', !M.garageOpen);
+  if(a === 'lamp') device('plug', !M.lamp);
+  if(a === 'lampauto'){ M.lampAuto = !M.lampAuto; try{ localStorage.setItem('tourLampAuto', M.lampAuto ? '1' : '0'); }catch(e){} syncAct(); }
   if(a === 'tup') device('therm', Math.min(90, M.th.sp + 1)); if(a === 'tdn') device('therm', Math.max(50, M.th.sp - 1));
   if(a === 'away' || a === 'stay') automation(a, { from:'keypad' });
   if(a === 'deter' && actK && !MODE.run){ WH.prime(); setDeter([actK], !M.deter[actK]); syncApp(); }
@@ -712,6 +722,7 @@ function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async
   syncAct(); }); return queue; }
 /* make every device match the model in one go (after a skip) */
 function settle(){ GAR.place(M.garage = M.garageOpen ? 1 : 0); GAR.leds(0); const t = parts('lock').turn; if(t) t.rotation.z = M.locked ? 0 : -Math.PI/2;
+  LAMP.apply(M.lamp ? 1 : 0);
   if(DOOR.pivot) DOOR.pivot.rotation.y = DOOR.sign*1.35*M.door; TH.glow = 1; TH.paint(); paintArm();
   const ls = LIT.list(); if(LIT.base) ls.forEach((l, i) => l.intensity = LIT.base[i]*(.12 + .88*M.lights)); renderer.toneMappingExposure = LIT.exp0*(.45 + .55*M.lights);
   }
@@ -722,6 +733,7 @@ function device(k, v){
   return sequence('dev-' + k, async () => {
     if(k === 'lock'){ caption('Smart Lock', v ? 'Locking…' : 'Unlocking…', ['lock']); HUBDO.lock(v); await fly(SH.lock()); await LOCK.set(v); capDone(v ? 'Front door locked' : 'Front door unlocked'); await wait(.6); }
     if(k === 'garage'){ caption('Garage', v ? 'Opening…' : 'Closing…', ['garage']); HUBDO.garage(v); const f = fly(SH.garage()); await wait(.5); await Promise.all([f, GAR.set(v)]); capDone(v ? 'Garage open' : 'Garage closed'); }
+    if(k === 'plug'){ caption('Smart Plug', v ? 'Lamp on' : 'Lamp off', ['bulb']); await fly(SH.plug()); await LAMP.set(v); capDone(v ? 'Lamp on' : 'Lamp off'); await wait(1.6); }
     if(k === 'therm'){ caption('Thermostat', `Set to ${v}°`, ['temp']); await fly(SH.therm()); await TH.to(v); HUBDO.therm(); capDone(`${v}° · ${TH.active() === 'heat' ? 'Heating' : TH.active() === 'cool' ? 'Cooling' : 'Holding'}`); await wait(.8); }
   }); }
 /* the hub asked for something */
@@ -762,7 +774,7 @@ function automation(name, o = {}){
     capStep(1, 'Alarm disarmed'); M.arm = 'dis'; paintArm(); HUBDO.home(); HUBDO.arm('dis'); await LOCK.flash(GREEN, 1);   // the hub card shows it disarm
     capStep(2, 'Door unlocked'); HUBDO.lock(false); await LOCK.set(false);
     capStep(3, 'Door opens'); await fly(SH.door()); await DOOR.swing(true);
-    capStep(4, 'Lights on'); if(M.lights < .9){ await fly(SH.great()); await LIT.to(1, 1.4); }
+    capStep(4, 'Lights on'); if(M.lights < .9 || !M.lamp){ await fly(SH.great()); await Promise.all([LIT.to(1, 1.4), LAMP.set(true, 1.2)]); }
     capStep(5, 'Comfort 72°'); await fly(SH.therm()); M.th.cur = Math.max(M.th.cur, 74); await TH.to(72, 'cool'); HUBDO.therm(); await wait(.6);
     capDone('Welcome home'); await fly(SH.door()); await DOOR.swing(false, 1.8); M.th.cur = 72; TH.paint(); });   // by now the room has reached 72°
   if(name === 'disarm' || name === 'kpok') return sequence('disarm', async () => {
@@ -773,7 +785,7 @@ function automation(name, o = {}){
     caption('Automation', 'Goodnight', ['lock', 'garage', 'bulb', 'temp', 'shield']);
     capStep(0, 'Doors locked'); HUBDO.lock(true); await fly(SH.lock()); if(M.door) await DOOR.swing(false, 1.4); await LOCK.set(true);
     capStep(1, M.garageOpen ? 'Closing the garage' : 'Garage closed'); await fly(SH.garage()); HUBDO.garage(false); await GAR.set(false); await wait(.3);
-    capStep(2, 'Lights off'); await fly(SH.great()); await LIT.to(.15, 1.8);
+    capStep(2, 'Lights off'); await fly(SH.great()); await Promise.all([LIT.to(.15, 1.8), LAMP.set(false, 1.4)]);
     capStep(3, 'Sleep 68°'); await fly(SH.therm()); M.th.cur = Math.max(M.th.cur, 72); await TH.to(68, 'cool'); HUBDO.therm(); await wait(.5);
     capStep(4, 'Armed Stay'); await atHub(); HUBDO.home(); M.arm = 'stay'; HUBDO.arm('stay'); paintArm(); await wait(1.6); await offHub();
     capDone('Goodnight'); await finale(); });
@@ -934,18 +946,20 @@ function setDeter(keys, on){ keys.forEach(k => { if(!(k in M.deter)) return; M.d
 function visitor(){ if(MODE.run) return; WH.prime();
   return sequence('deter', async () => {
     const auto = !DCAM.some(k => M.deter[k]), cams = () => DCAM.filter(k => M.deter[k]);
-    caption('Smart Deter', 'Watching the yard', ['eye', 'person', 'bulb', 'clock', 'spk']); capStep(0);
+    const lamp = M.lampAuto;
+    caption('Smart Deter', 'Watching the yard', ['eye', 'person', 'bulb', 'clock', 'spk', ...(lamp ? ['home'] : [])]); capStep(0);
     const f = fly(SH.front()); if(auto){ await wait(.5); setDeter(DCAM, true); } await f; if(!SKIP.on) await wait(1.2);
     const per = DT.person = mkPerson(); runDeter();
     try {
       await Promise.all([tween(.7, e => per.fade(e)), per.walk(0, .17)]);
-      DT.track = per.chest; capStep(1, 'Person detected · Whistle'); detect(cams(), 'Person detected at the Front Door. Deter whistle sounded.');
+      DT.track = per.chest; capStep(1, 'Person detected · Whistle'); detect(cams(), 'Person detected at the Front Door. Deter whistle sounded.' + (lamp ? ' Floor lamp turned on.' : '')); if(lamp) LAMP.set(true, 1);
       await per.walk(.17, .32); DT.aim = per.aim; DT.spotOn = true; capStep(2, 'Spotlight follows');
       await per.walk(.32, 1); per.at(1, false, false);
       const n = LINGER.get(); for(let i = n; i > 0; i--){ capStep(3, `Lingering · ${i}s`); await wait(1); }
       capStep(4, 'Strobe · Whistle'); DT.strobe = performance.now() + 2600; detect([...new Set(['ocspot', ...cams()])], `Person lingering over ${n}s. Spotlight Pro strobed.`); await wait(2.6); DT.strobe = 0;
       await per.walk(1, .1, true); await Promise.all([tween(.6, e => per.fade(1 - e)), per.walk(.1, 0, true)]);
     } finally { DT.track = null; DT.aim = null; DT.spotOn = false; DT.strobe = 0; per.dispose(); DT.person = null; runDeter(); }
+    if(lamp){ capStep(5, 'Automation · Lamp on'); await fly(SH.plug()); if(!M.lamp) await LAMP.set(true, 1); await wait(1.6); }
     capDone('Visitor deterred'); await wait(1);
     if(auto){ setDeter(DCAM, false); }
   }, { withHub:false }); }
@@ -965,4 +979,4 @@ addEventListener('resize', () => { if((MODE.kind === 'panel' || MODE.kind === 'a
 
 /* ------------------------------------------------------------------ boot */
 DOOR.init(); GAR.init(); TH.paint(); paintArm(); syncAct();
-window.__demo = { DT, setDeter, visitor, LINGER, WH, RING, stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, APP, automation, device, enterPanel, enterApp, appMatrix, appPip, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };
+window.__demo = { LAMP, DT, setDeter, visitor, LINGER, WH, RING, stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, APP, automation, device, enterPanel, enterApp, appMatrix, appPip, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };
