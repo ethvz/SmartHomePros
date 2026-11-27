@@ -157,8 +157,8 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   html:not(.pph) .layer.pinon .board :is(.pdown, .pgflow) { transition: opacity .25s ease; }
   html:not(.pph) .layer.pinon.rowoff .board :is(.pdown, .pgflow) { opacity: 0 !important; pointer-events: none !important; }
   /* iPhone: content scrolling under the header (corner menu, FAQs, Guide, section dots) or the tab bar fades into black */
-  html.pph #phdr.on::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: calc(var(--sat, 0px) + 150px); z-index: -1; pointer-events: none;
-    background: linear-gradient(180deg, rgba(0,0,0,.94) 0%, rgba(0,0,0,.9) 55%, rgba(0,0,0,.5) 80%, rgba(0,0,0,0) 100%); }
+  html.pph #phdr.on::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: calc(var(--sat, 0px) + 185px); z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,.96) 0%, rgba(0,0,0,.93) 62%, rgba(0,0,0,.6) 82%, rgba(0,0,0,0) 100%); }
   html.pph #pfoot.on::before { content: ''; position: absolute; left: -12px; right: -12px; bottom: calc(-10px - var(--sab, 0px)); height: calc(var(--sab, 0px) + 130px); z-index: -1; pointer-events: none;
     background: linear-gradient(0deg, rgba(0,0,0,.94) 0%, rgba(0,0,0,.85) 50%, rgba(0,0,0,0) 100%); }
   .frband { display: none; }
@@ -1927,7 +1927,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     if (!on && !upright && !PHONE) { const RB = rowTopOf(layer); if (RB) {
       const ck = 'rsv:' + (layer._fn || '') + '#' + sec.id; if (!spanCache.has(ck)) { const pt = w.style.translate, ps = w.style.scale; w.style.translate = ''; w.style.scale = ''; const sp = contentSpan(w); w.style.translate = pt; w.style.scale = ps; if (sp && sp[3] > sp[2]) spanCache.set(ck, sp); }
       const sp = spanCache.get(ck);
-      if (sp) { const T = sp[2], B = sp[3], lim = (+sec.dataset.h || 1024) - 1024 + RB - 18; /* (a long section: its last screen ends above the row) */ if (B > lim) { const k = Math.max(0.78, (lim - T) / (B - T)); w.style.transformOrigin = '733px ' + T.toFixed(0) + 'px'; w.style.scale = k.toFixed(3); } } } }
+      if (sp) { const T = sp[2], B = sp[3], lim = (+sec.dataset.h || 1024) - H + RB - 18; /* (a long section: its last screen ends above the row) */ if (B > lim) { const k = Math.max(0.78, (lim - T) / (B - T)); w.style.transformOrigin = '733px ' + T.toFixed(0) + 'px'; w.style.scale = k.toFixed(3); } } } }
   }
   // top of the bottom row (page pills, Create Custom Flow) in design pixels
   function rowTopOf(layer) {
