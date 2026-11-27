@@ -16,6 +16,7 @@
   H.classList.add('shpn-' + APP);
 
   var LOGO = '<svg class="lg" viewBox="20 4 1620 380" aria-hidden="true"><path d="M1343.07 303.45c-21.88 0-39.58 17.52-39.58 39.15 0 21.62 17.69 39.15 39.58 39.15 21.82 0 39.58-17.53 39.58-39.15 0-21.63-17.76-39.15-39.58-39.15z"/><path d="M1462.07 45l-155.72 141.25v52.92c57.67-20.1 120.93 9.9 141.22 67 4.19 11.7 6.32 24.03 6.32 36.43 0 12.74-2.26 24.93-6.32 36.34h134.03c20.02 0 36.25-16.04 36.25-35.84v-156.85L1462.07 45z"/><path d="M353.81 5.85c-21.85 0-39.56 17.52-39.56 39.15 0 21.62 17.71 39.15 39.56 39.15 21.85 0 39.57-17.53 39.57-39.15 0-21.63-17.72-39.15-39.57-39.15z"/><path d="M353.81 113.32c-18.19 0-32.93 14.59-32.93 32.58v232.13h65.85V145.91c0-17.99-14.74-32.59-32.92-32.59z"/><path d="M741.61 5.85c-21.88 0-39.58 17.52-39.58 39.15 0 21.62 17.69 39.15 39.58 39.15 21.82 0 39.58-17.53 39.58-39.15 0-21.63-17.76-39.15-39.58-39.15z"/><path d="M741.61 113.32c-18.23 0-32.93 14.59-32.93 32.58v232.13h65.85V145.9c0-17.98-14.77-32.58-32.92-32.58z"/><path d="M1158.75 73.24c0-17.99-14.7-32.58-32.93-32.58-18.16 0-32.93 14.59-32.93 32.58v217.03c0 56.68 33.46 87.78 88.74 87.78h50.62v-56.97h-36.98c-25.34 0-36.45-14.02-36.45-36.09V174.4h73.44v-56.93h-73.37V73.24z"/><path d="M960.19 113.57c-38.65 0-63.86 20.48-74.7 39.99h-6.79v-7.66c0-17.99-14.77-32.58-32.93-32.58-18.23 0-32.93 14.59-32.93 32.58v232.13h67.52V231.71c0-33.08 26.27-58.16 58.74-58.16s53.21 21.58 53.21 53.67v150.82h65.85V212.75c0-56.13-37.12-99.18-97.91-99.18z"/><path d="M548.88 305.76h-4.14l-64.91-188.29h-70.64l86.31 228.93c10.8 28.23 42.67 42.46 71.19 31.78 14.78-5.54 26.46-17.07 32.07-31.68l86.77-229.03h-72.25z"/><path d="M225.45 117.47h72.24l-86.76 228.97c-10.77 28.21-42.61 42.44-71.11 31.78-14.85-5.55-26.57-17.17-32.15-31.88L21.41 117.47h70.65l64.86 188.29h4.19z"/></svg>';
+  var SHPW = '<span class="shpn-word"><svg viewBox="1296 36 312 352" aria-hidden="true"><path d="M1343.07 303.45c-21.88 0-39.58 17.52-39.58 39.15 0 21.62 17.69 39.15 39.58 39.15 21.82 0 39.58-17.53 39.58-39.15 0-21.63-17.76-39.15-39.58-39.15z"/><path d="M1462.07 45l-155.72 141.25v52.92c57.67-20.1 120.93 9.9 141.22 67 4.19 11.7 6.32 24.03 6.32 36.43 0 12.74-2.26 24.93-6.32 36.34h134.03c20.02 0 36.25-16.04 36.25-35.84v-156.85L1462.07 45z"/></svg>SHP</span>';
   var IC = {
     home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4.5l8 6.7V20h-5.4v-5.4H9.4V20H4z"/></svg>',
     pitch: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.2 2.8 5.2 13.4h6.1l-1 7.8 8-10.6h-6.1z"/></svg>',
@@ -102,10 +103,10 @@
 
   /* ---------- the corner: hamburger + Vivint logo (SHP page, Fast Recruit) ---------- */
   var corner = null;
-  function makeCorner(onMenu, onLogo, logoLabel) {
+  function makeCorner(onMenu, onLogo, logoLabel, mark) {
     corner = document.createElement('div'); corner.className = 'shpn-corner';
     corner.innerHTML = '<button type="button" class="shpn-burger" aria-label="Menu" aria-expanded="false">' + IC.burger + '</button>'
-      + '<button type="button" class="shpn-logo" aria-label="' + logoLabel + '">' + LOGO + '</button>';
+      + '<button type="button" class="shpn-logo" aria-label="' + logoLabel + '">' + (mark || LOGO) + '</button>';
     var b = corner.querySelector('.shpn-burger'), l = corner.querySelector('.shpn-logo');
     press(b); press(l);
     b.addEventListener('click', function (e) { e.stopPropagation(); onMenu(); });
@@ -134,7 +135,7 @@
   };
   function shpBuild() {
     dw = document.createElement('div'); dw.className = 'shpn-dw'; dw.setAttribute('role', 'dialog'); dw.setAttribute('aria-modal', 'true'); dw.setAttribute('aria-label', 'Menu');
-    dw.innerHTML = '<div class="shpn-scrim"></div><nav class="shpn-card"><div class="shpn-h">' + LOGO + '<span class="sub">Smart Home Pros</span>'
+    dw.innerHTML = '<div class="shpn-scrim"></div><nav class="shpn-card"><div class="shpn-h">' + SHPW + '<span class="sub">Smart Home Pros</span>'
       + '<button type="button" class="shpn-x" aria-label="Close menu">' + IC.x + '</button></div></nav>';
     var card = dw.querySelector('.shpn-card');
     card.appendChild(selector());
@@ -238,7 +239,7 @@
       makeCorner(frMenu, frHome, 'Fast Recruit home'); frWatch();
       var d0 = document.querySelector('.dw'); if (d0) frDecorate(d0);
     } else {
-      makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); toTop(); }, 'Smart Home Pros: back to top');
+      makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); toTop(); }, 'Smart Home Pros: back to top', SHPW);
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && dw && dw.classList.contains('on')) shpClose(); });
       /* scrolled: frosted corner (and on an upright iPhone, a dark strip behind the status bar + corner); class written only on change */
       var strip = document.createElement('div'); strip.className = 'shpn-strip'; strip.setAttribute('aria-hidden', 'true'); document.body.appendChild(strip);
@@ -246,9 +247,10 @@
       var onS = function () { if (!sq) sq = requestAnimationFrame(scr); };
       addEventListener('scroll', onS, { passive: true }); if (app) app.addEventListener('scroll', onS, { passive: true }); scr();
       /* the SHP page's Settings sheet: hide the corner while it is up (attribute writes only when the state differs) */
-      var st = document.querySelector('.sheet');
-      if (st) { var sync = function () { var on = st.classList.contains('on'); if (st.__shpn !== on) { st.__shpn = on; sheet(on); } };
-        new MutationObserver(sync).observe(st, { attributes: true, attributeFilter: ['class'] }); sync(); }
+      /* (also the story viewer, the announcements grid, the quick-links drawer and the event panel: all toggle .on) */
+      [].forEach.call(document.querySelectorAll('.sheet, .story, .annx, .drawer, .evp'), function (st) {
+        var sync = function () { var on = st.classList.contains('on'); if (!!st.__shpn !== on) { st.__shpn = on; sheet(on); } };
+        new MutationObserver(sync).observe(st, { attributes: true, attributeFilter: ['class'] }); sync(); });
     }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

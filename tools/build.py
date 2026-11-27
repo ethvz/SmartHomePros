@@ -50,7 +50,7 @@ NAV_FILES = ('nav/shpnav.css', 'nav/shpnav.js')
 NAV_RE = r'<link rel="stylesheet" href="\.\./nav/shpnav\.css[^"]*">\n<script src="\.\./nav/shpnav\.js[^"]*" defer></script>\n'
 
 
-def nav_ver():
+def nav_ver():   # same version as tools/navstamp.py
     h = hashlib.sha1()
     for f in NAV_FILES:
         h.update(open(os.path.join(ROOT, f), 'rb').read())
@@ -125,4 +125,5 @@ if __name__ == '__main__':
     if '--pitch' in sys.argv:
         copy_tree(FP, os.path.join(ROOT, 'pitch'), ['README.md', 'tools/', '.gitignore'])
     patch_recruit(); patch_pitch()
+    import navstamp; navstamp.stamp()   # the SHP page + Fast Pitch load the shared nav by content version
     print("Smart Home Pros built")

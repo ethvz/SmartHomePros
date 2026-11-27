@@ -21,6 +21,7 @@ case "$1" in
     printf '{"decision":"block","reason":"The Smart Home Pros artifact is out of date with the repo. Before finishing: run `bash tools/artifact-sync.sh build`, publish the files it lists (page _artifact/index.html, root _artifact, files = the listed paths) to %s with the Artifact tool (read the artifact first), then run `bash tools/artifact-sync.sh mark`."}\n' "$URL"
     ;;
   build)
+    python3 tools/navstamp.py >/dev/null || exit 1   # shared nav: content version into the pages that load it
     SHPC_ART="$PWD/$OUT" python3 tools/art.py >/dev/null || exit 1
     (cd $OUT && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort | while read -r f; do echo "$(shasum -a 256 "$f" | cut -c1-64) $f"; done) > $OUT.manifest
     if [ -f $MAN ]; then

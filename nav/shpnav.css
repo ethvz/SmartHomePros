@@ -64,7 +64,8 @@ html.shp-sheet .shpn-corner, .shpn-corner.off { opacity: 0; pointer-events: none
 html.shp-sheet .shpn-corner > button, .shpn-corner.off > button { pointer-events: none; }
 /* Fast Recruit: under its own overlays (pages opened over a page, section menus); above them only while its menu is open */
 html.shpn-recruit .shpn-corner { z-index: 95; }
-html.shpn-recruit.shpn-open .shpn-corner { z-index: 100001; }
+/* menu open: the corner sits under the menu's dimmed backdrop in every app (as Fast Pitch's footer does); tapping there closes */
+html.shpn-open .shpn-corner { z-index: 99999; }
 .shpn-corner:not(.off) { transition: opacity .25s ease, transform .35s var(--shpn-e); }
 
 /* ---------- menu card (SHP page) ---------- */
@@ -122,26 +123,34 @@ html.shpn-recruit.shpn-open .shpn-corner { z-index: 100001; }
 /* ======================= Fast Pitch (html.shpn-pitch): the selector in its menu (stage px) ======================= */
 #drawer .shpn-apps { font-size: 19px; margin: 0 0 16px; }
 #drawer .m2-app { display: none !important; }   /* the selector replaces the old "Switch app" button */
+#bar #homeX { display: none !important; }   /* About / Videos / Yard Sign live in the menu only (owner) */
+/* the corner in landscape / iPad portrait: glyph 34 + logo 26 stage px = 26 + 20 CSS px on an iPad, as in the other apps */
+html:not(.pp) #burger .ic, html:not(.pp) #burger svg { width: 34px !important; height: 34px !important; }
+html:not(.pp) #bar #barlogo, html:not(.pp) #bar.home #barlogo { height: 26px !important; }
 /* landscape: the menu keeps its height, so its tiles give up a little room to the selector */
-html:not(.pp):not(.ipp) #drawer .shpn-apps { font-size: 16px; margin-bottom: 12px; }
+html:not(.pp):not(.ipp) #drawer .shpn-apps { font-size: 17px; margin-bottom: 12px; }
+html:not(.pp) #drawer .shpn-app span { font-size: .92em; }   /* labels ~12 CSS px on an iPad */
 html:not(.pp):not(.ipp) #drawer .m2-t { height: 70px !important; }
 html:not(.pp):not(.ipp) #drawer .m2-s { height: 40px !important; }
 html:not(.pp):not(.ipp) #drawer .m2-l { margin: 14px 4px 4px !important; }
 html.pp #drawer .shpn-apps { font-size: 22px; margin: 0 0 14px; }
-html.pp #stage #drawer .m2-t { height: 80px !important; }   /* room for the selector */
-html.pp #stage #drawer .m2-s { height: 50px !important; }
-@media (max-height: 700px) { html.pp #drawer .shpn-apps { font-size: 19px; margin-bottom: 10px; } html.pp #stage #drawer .m2-t { height: 66px !important; } html.pp #stage #drawer .m2-s { height: 44px !important; } }
+html.pp #stage #drawer .m2-t { height: 72px !important; }   /* room for the selector */
+html.pp #stage #drawer .m2-s { height: 46px !important; }
+@media (max-height: 700px) { html.pp #drawer .shpn-apps { font-size: 19px; margin-bottom: 10px; } html.pp #stage #drawer .m2-t { height: 60px !important; } html.pp #stage #drawer .m2-s { height: 40px !important; } }
 /* iPad portrait (html.ipp, nav block owned by the shared navigation): footer = the landscape footer (burger + logo bottom left),
    lifted clear of the home indicator; the menu card a little wider. --ippFoot = height kept clear by the footer. */
-html.ipp #stage { --ippFoot: 84px; }
-html.ipp #stage #drawer { width: 700px !important; bottom: 80px !important; }
+html.ipp #stage { --ippFoot: 104px; }
+/* the footer is lifted 20 stage px (16 CSS px) clear of the home-indicator zone */
+html.ipp #stage #bar { bottom: 20px !important; }
+html.ipp #stage #drawer { width: 700px !important; top: auto !important; height: auto !important; bottom: 100px !important; max-height: calc(var(--H) - 116px); overflow-y: auto; }
 html.ipp #drawer .shpn-apps { font-size: 20px; }
 /* Home footer: the 1032-wide stage has less room between the logo (ends ~219) and the centred category pill (304 wide) than the
    Tiles / 3D Home pill needs (156): start the category pill 12px after where that pill ends (219 + 12 + 156 + 12 = 399, centre 551);
    the page's own place() then keeps Tiles / 3D Home halfway between the logo and it (12px either side). */
 html.ipp #stage #bar.home #barRight { left: 551px !important; }
-html.ipp #drawer .m2-t { height: 92px !important; }
-html.ipp #drawer .m2-s { height: 50px !important; }
+html.ipp #drawer .m2-t { height: 84px !important; }
+html.ipp #drawer .m2-s { height: 48px !important; }
+html.ipp #drawer .m2-f { margin-top: 18px !important; }
 
 /* ======================= Fast Recruit (html.shpn-recruit) ======================= */
 /* the header's own hamburger + logo move to the corner */
@@ -157,13 +166,13 @@ html.shpn-recruit #phdr { padding-top: max(var(--sat, 0px), env(safe-area-inset-
 /* phone footer (page tabs): beside the corner, level with it, clear of the home indicator */
 html.shpn-recruit #pfoot { left: calc(var(--shpn-l) + 146px) !important; right: max(12px, calc(env(safe-area-inset-right, 0px) + 4px)) !important; }
 /* phone: the corner sits level with the page tabs (#pfoot: bottom var(--sab) + 10px, 60px tall) */
-html.shpn-recruit.pph:not(.shpn-top) { --shpn-b: calc(var(--sab, 0px) + 18px); }
 html.shpn-recruit.shpn-top #pfoot { left: max(12px, calc(env(safe-area-inset-left, 0px) + 4px)) !important; }
 html.shpn-recruit .shpn-corner .shpn-logo svg { height: 18px; }
 /* its menu: the same card as the others (solid, 30px corners), above the corner, opening out of the hamburger */
 html.shpn-recruit .dw.shpn .dw-panel { height: auto !important; bottom: calc(var(--shpn-foot) + 8px) !important; border-radius: 30px; background: #121212; -webkit-backdrop-filter: none; backdrop-filter: none;
   border-color: rgba(255, 255, 255, .08); }
-html.shpn-recruit .dw.shpn .dw-in .shpn-apps { font-size: 14px; margin: 0 0 12px; }
+html.shpn-recruit .dw.shpn .dw-in .shpn-apps { font-size: 15px; margin: 0 0 12px; }
+html.shpn-recruit .dw.shpn .dw-panel { width: min(460px, calc(100vw - 24px)) !important; }
 html.shpn-recruit .dw-foot .dw-app { display: none !important; }
 html.shpn-recruit .dw-foot { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 html.shpn-recruit .dw.shpn-rv .dw-panel { transform: none; clip-path: inset(var(--ct, 90%) var(--cr, 80%) var(--cb, 0px) var(--cl, 0px) round 30px); transition: clip-path .42s var(--shpn-e); }
@@ -188,8 +197,10 @@ html.shpn-top .shpn-card { top: var(--shpn-head); bottom: auto; max-height: calc
 html.shpn-top .shpn-toast { bottom: calc(max(12px, env(safe-area-inset-bottom, 0px)) + 18px); }
 html.shpn-top .shpn-corner.off, html.shpn-top.shp-sheet .shpn-corner { transform: translateY(-10px); }
 /* SHP page: its title moves right of the corner */
-html.shpn-top.shpn-home .brand .t { margin-left: 150px; }
-html.shpn-top.shpn-home .brand .t .mk { display: none; }   /* the corner's logo already carries the house mark */
+/* SHP page, upright iPhone: the corner IS the SHP title (the header's own title gives way); the bottom peek shrinks to the grab handle */
+html.shpn-top.shpn-home .brand .t { visibility: hidden; }
+html.shpn-top.shpn-home .hero { --peek: clamp(40px, 6vh, 54px); }
+html.shpn-top.shpn-home .more .grab { margin-bottom: 6px !important; }
 /* Fast Recruit: its menu card hangs from the corner */
 html.shpn-recruit.shpn-top .dw.shpn .dw-panel { top: var(--shpn-head) !important; bottom: max(12px, calc(var(--sab, 0px) + 8px)) !important; }
 
@@ -206,3 +217,9 @@ html.shpn-top .shpn-strip { display: block; }
 html.shpn-top.shpn-scrolled .shpn-strip { opacity: 1; }
 html.shpn-open .shpn-strip { opacity: 0; }
 html.shpn-home:not(.shpn-top) .more .in::after { content: ''; display: block; height: calc(var(--shpn-foot) + 16px); }
+
+/* SHP wordmark (the SHP page's corner and menu header instead of the Vivint logo) */
+.shpn-word { display: inline-flex; align-items: center; gap: 6px; color: #fff; font: 700 22px/1 'Vivint Sans', Helvetica, Arial, sans-serif; letter-spacing: -.02em; }
+.shpn-word svg { height: 20px; width: auto; fill: rgb(var(--shpn-g)); flex: none; filter: none !important; margin: 0 !important; }
+.shpn-corner .shpn-word { filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55)); }
+.shpn-h .shpn-word { font-size: 24px; }
