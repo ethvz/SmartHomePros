@@ -60,8 +60,8 @@
 html.shpn-open .shpn-corner::before { opacity: 0; }
 /* HOOK: the corner hides while a full-screen sheet or modal is up. Any sheet calls
    document.documentElement.classList.toggle('shp-sheet', open)   (or SHPNav.sheet(open)) when it opens / closes. */
-html.shp-sheet .shpn-corner, .shpn-corner.off { opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s ease, transform .3s var(--shpn-e); }
-html.shp-sheet .shpn-corner > button, .shpn-corner.off > button { pointer-events: none; }
+html.shp-sheet .shpn-corner, html.frplay .shpn-corner, .shpn-corner.off { opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s ease, transform .3s var(--shpn-e); }
+html.shp-sheet .shpn-corner > button, html.frplay .shpn-corner > button, .shpn-corner.off > button { pointer-events: none; }
 /* Fast Recruit: under its own overlays (pages opened over a page, section menus); above them only while its menu is open */
 html.shpn-recruit .shpn-corner { z-index: 95; }
 /* menu open: the corner sits under the menu's dimmed backdrop in every app (as Fast Pitch's footer does); tapping there closes */
