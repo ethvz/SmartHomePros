@@ -123,7 +123,9 @@ html.shpn-open .shpn-corner { z-index: 99999; }
 /* ======================= Fast Pitch (html.shpn-pitch): the selector in its menu (stage px) ======================= */
 #drawer .shpn-apps { font-size: 19px; margin: 0 0 16px; }
 #drawer .m2-app { display: none !important; }   /* the selector replaces the old "Switch app" button */
-#bar #homeX { display: none !important; }   /* About / Videos / Yard Sign live in the menu only (owner) */
+#bar #homeX { display: none !important; }
+/* landscape / iPad portrait: Compatibility's artwork carries its own title, so the floating page name stays hidden there */
+html:not(.pp) #stage:has(#p-compat.on) #gTitle { opacity: 0 !important; pointer-events: none; }   /* About / Videos / Yard Sign live in the menu only (owner) */
 /* the corner in landscape / iPad portrait: glyph 34 + logo 26 stage px = 26 + 20 CSS px on an iPad, as in the other apps */
 html:not(.pp) #burger .ic, html:not(.pp) #burger svg { width: 34px !important; height: 34px !important; }
 html:not(.pp) #bar #barlogo, html:not(.pp) #bar.home #barlogo { height: 26px !important; }
