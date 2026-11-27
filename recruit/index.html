@@ -1267,8 +1267,8 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 // Phones: skip the live glass blur (it's what runs the Claude app out of memory, especially when zoomed in).
 try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim === 'phone' : Math.min(screen.width, screen.height) < 600) document.documentElement.classList.add('lite'); } catch (e) {}
 </script>
-<link rel="stylesheet" href="../nav/shpnav.css?v=0253e340">
-<script src="../nav/shpnav.js?v=0253e340" defer></script>
+<link rel="stylesheet" href="../nav/shpnav.css?v=8efb6df8">
+<script src="../nav/shpnav.js?v=8efb6df8" defer></script>
 </head>
 <body>
 <div id="stage"><div id="viewport"><div id="frame"></div></div></div>
@@ -1909,7 +1909,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     if (!on && !upright && !PHONE) { const RB = rowTopOf(layer); if (RB) {
       const ck = 'rsv:' + (layer._fn || '') + '#' + sec.id; if (!spanCache.has(ck)) { const pt = w.style.translate, ps = w.style.scale; w.style.translate = ''; w.style.scale = ''; const sp = contentSpan(w); w.style.translate = pt; w.style.scale = ps; if (sp && sp[3] > sp[2]) spanCache.set(ck, sp); }
       const sp = spanCache.get(ck);
-      if (sp) { const T = sp[2], B = sp[3], lim = (+sec.dataset.h || 1024) - 1024 + RB - 18; if (B > lim) {   // (a long section: its last screen ends above the row) const k = Math.max(0.78, (lim - T) / (B - T)); w.style.transformOrigin = '733px ' + T.toFixed(0) + 'px'; w.style.scale = k.toFixed(3); } } } }
+      if (sp) { const T = sp[2], B = sp[3], lim = (+sec.dataset.h || 1024) - 1024 + RB - 18; /* (a long section: its last screen ends above the row) */ if (B > lim) { const k = Math.max(0.78, (lim - T) / (B - T)); w.style.transformOrigin = '733px ' + T.toFixed(0) + 'px'; w.style.scale = k.toFixed(3); } } } }
   }
   // top of the bottom row (page pills, Create Custom Flow) in design pixels
   function rowTopOf(layer) {

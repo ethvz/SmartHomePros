@@ -172,6 +172,21 @@
   }
 
   /* ---------- Fast Pitch: the selector under its menu header (its drawer is built once, by the page's own script) ---------- */
+  /* Fast Pitch nav reserve: a solid band behind the footer, and a spacer at the end of every scrolling page (shpnav.css) */
+  function pitchReserve() {
+    var st = document.getElementById('stage'); if (!st) return;
+    if (!document.getElementById('shpnFoot')) { var f = document.createElement('div'); f.id = 'shpnFoot'; f.setAttribute('aria-hidden', 'true'); st.appendChild(f); }
+    var pad = function (pg) {
+      [pg].concat([].slice.call(pg.querySelectorAll('*'))).forEach(function (el) {
+        if (el.__shpnPad || el.classList.contains('shpn-endpad')) return;
+        var cs = getComputedStyle(el); if (!/(auto|scroll)/.test(cs.overflowY) || el.clientHeight < 200 || el.scrollHeight <= el.clientHeight + 4) return;
+        el.__shpnPad = 1; var sp = document.createElement('div'); sp.className = 'shpn-endpad'; sp.setAttribute('aria-hidden', 'true'); el.appendChild(sp);
+      });
+    };
+    var pages = document.querySelectorAll('#stage .page');
+    var mo = new MutationObserver(function (recs) { recs.forEach(function (r) { var pg = r.target; if (pg.classList.contains('on') && !pg.__shpnSeen) { pg.__shpnSeen = 1; setTimeout(function () { pad(pg); pg.__shpnSeen = 0; }, 700); } }); });
+    [].forEach.call(pages, function (pg) { mo.observe(pg, { attributes: true, attributeFilter: ['class'] }); if (pg.classList.contains('on')) setTimeout(function () { pad(pg); }, 900); });
+  }
   function mountPitch() {
     var d = document.getElementById('drawer'); if (!d || d.querySelector('.shpn-apps')) return !!d;
     var h = d.querySelector('.m2-h'); if (!h) return false;
@@ -235,6 +250,7 @@
   function init() {
     if (APP === 'pitch') {
       if (!mountPitch()) { var n = 0, iv = setInterval(function () { if (mountPitch() || ++n > 40) clearInterval(iv); }, 250); }
+      pitchReserve();
     } else if (APP === 'recruit') {
       makeCorner(frMenu, frHome, 'Fast Recruit home'); frWatch();
       var d0 = document.querySelector('.dw'); if (d0) frDecorate(d0);
@@ -243,7 +259,12 @@
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && dw && dw.classList.contains('on')) shpClose(); });
       /* scrolled: frosted corner (and on an upright iPhone, a dark strip behind the status bar + corner); class written only on change */
       var strip = document.createElement('div'); strip.className = 'shpn-strip'; strip.setAttribute('aria-hidden', 'true'); document.body.appendChild(strip);
-      var app = document.querySelector('.app'), sq = 0, scr = function () { sq = 0; var on = Math.max(window.scrollY || 0, app ? app.scrollTop : 0) > 8; if (H.classList.contains('shpn-scrolled') !== on) H.classList.toggle('shpn-scrolled', on); };
+      var app = document.querySelector('.app'), sq = 0, lastY = 0, scr = function () { sq = 0;
+        var y = Math.max(window.scrollY || 0, app ? app.scrollTop : 0), on = y > 8, max = app ? app.scrollHeight - app.clientHeight : 0;
+        if (H.classList.contains('shpn-scrolled') !== on) H.classList.toggle('shpn-scrolled', on);
+        var away = H.classList.contains('shpn-away'); if (y - lastY > 6 && y > 80 && y < max - 4) away = true; else if (lastY - y > 6 || y <= 80 || y >= max - 4) away = false;
+        if (Math.abs(y - lastY) > 6 || y <= 80 || y >= max - 4) lastY = y;
+        if (H.classList.contains('shpn-away') !== away) H.classList.toggle('shpn-away', away); };
       var onS = function () { if (!sq) sq = requestAnimationFrame(scr); };
       addEventListener('scroll', onS, { passive: true }); if (app) app.addEventListener('scroll', onS, { passive: true }); scr();
       /* the SHP page's Settings sheet: hide the corner while it is up (attribute writes only when the state differs) */

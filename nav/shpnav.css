@@ -213,8 +213,12 @@ html.shpn-recruit.shpn-top .dw.shpn .dw-panel { top: var(--shpn-head) !important
 html.shpn-scrolled .shpn-corner { background-color: rgba(18, 20, 22, .62); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 8px 24px rgba(0, 0, 0, .35); }
 html.shpn-scrolled .shpn-corner::before { opacity: 0; }
-.shpn-strip { position: fixed; left: 0; right: 0; top: 0; height: calc(var(--shpn-head, 0px) + 18px); z-index: 100000; pointer-events: none; opacity: 0; transition: opacity .3s ease;
-  background: linear-gradient(180deg, rgba(0, 0, 0, .92) 0%, rgba(0, 0, 0, .78) 62%, rgba(0, 0, 0, 0) 100%); display: none; }
+.shpn-strip { position: fixed; left: 0; right: 0; top: 0; height: var(--shpn-head, 0px); z-index: 100000; pointer-events: none; opacity: 0; transition: opacity .3s ease;
+  background: rgba(8, 10, 12, .9); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); box-shadow: 0 1px 0 rgba(255, 255, 255, .06); display: none; }
+html.shpn-top.shpn-scrolled .shpn-corner { background-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }   /* the bar is its backdrop */
+/* iPad / sideways: the bottom corner steps aside while scrolling down and comes back on the way up (or at the very top / end) */
+html.shpn-home.shpn-away:not(.shpn-top) .shpn-corner { opacity: 0; pointer-events: none; transform: translateY(14px); }
+html.shpn-home.shpn-away:not(.shpn-top) .shpn-corner > button { pointer-events: none; }
 html.shpn-top .shpn-strip { display: block; }
 html.shpn-top.shpn-scrolled .shpn-strip { opacity: 1; }
 html.shpn-open .shpn-strip { opacity: 0; }
@@ -225,3 +229,20 @@ html.shpn-home:not(.shpn-top) .more .in::after { content: ''; display: block; he
 .shpn-word svg { height: 20px; width: auto; fill: rgb(var(--shpn-g)); flex: none; filter: none !important; margin: 0 !important; }
 .shpn-corner .shpn-word { filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55)); }
 .shpn-h .shpn-word { font-size: 24px; }
+
+/* ======================= Fast Pitch: nav reserve (no content under the corner or the footer) ======================= */
+/* --navFoot: height the footer keeps clear (footer + 8px). #shpnFoot (made by shpnav.js) is a solid band behind the footer so
+   nothing reads through it; every scrolling page gets a spacer of that height at its end (.shpn-endpad) so its last content can
+   scroll clear of the footer. On an upright iPhone the top band (#ppTopShade) is solid the same way behind the top corner. */
+#stage { --navFoot: 84px; }
+html.pp #stage { --navFoot: calc(var(--ppFoot, 84px) + 8px); }
+html.ipp #stage { --navFoot: calc(var(--ippFoot, 104px) + 4px); }
+#shpnFoot { position: absolute; left: 0; right: 0; bottom: 0; height: var(--navFoot); z-index: 15; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, #000 18px, #000 100%); }
+.shpn-endpad { display: block; flex: none; grid-column: 1 / -1; width: 1px; height: var(--navFoot); pointer-events: none; visibility: hidden; }
+html.pp #stage #ppTopShade { z-index: 15 !important; height: calc(var(--ppNavT) + 14px) !important; background: linear-gradient(180deg, #000 0, #000 calc(100% - 18px), rgba(0, 0, 0, 0) 100%) !important; }
+html.pp #stage #lpT { z-index: 16; }
+/* Hub / Thermostat: the "scroll down" chevron sits above the footer */
+html.pp #stage :is(#hbScroll, #thScroll, #prScroll) .nxa { bottom: calc(var(--navFoot) + 8px) !important; }
+/* the page name beside the corner: two lines at most, never past the right edge */
+html.pp #stage #gTitle span { white-space: normal !important; display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.25; max-width: 100% !important; }
