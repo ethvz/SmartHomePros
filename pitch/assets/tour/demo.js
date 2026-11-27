@@ -843,9 +843,13 @@ function apexOf(k){ const p = P(k), g = p.model; g.updateMatrixWorld(true); cons
 function ensureCone(k){ if(DT.cones[k] || !P(k)) return; const c = mkCone(0xff2a1f, .27, .62, .5), cf = DCFG[k], v = P(k).view;
   c.A = apexOf(k); c.base = Math.atan2(v.x, v.z) + cf.yaw; c.p0 = Math.atan2(c.A.y - GY, cf.reach); c.yaw = c.base; c.pitch = c.p0; DT.cones[k] = c;
   if(renderer.compileAsync) renderer.compileAsync(c.piv, camera, scene).catch(() => {}); }
-function ensureBeam(){ if(DT.beam || !P('ocspot')) return; const g = P('ocspot').model; g.updateMatrixWorld(true);
-  const c = mkCone(0xfff0d2, .24, .55, .75); c.A = g.localToWorld(V(0, -.118, .07)); c.yaw = 0; c.pitch = .8; DT.beam = c;
-  const L = g.userData.spotLeds || []; DT.leds = L.map(m => ({ m, e:m.emissive.getHex(), i:m.emissiveIntensity })); }
+/* Spotlight Pro: five fixed light zones (left wing, three front columns, right wing; see prod/ocspot.js). Tracking = the lit zone hands off
+   to whichever zone faces the person (as in Timeline 1.MOV); lingering = every zone strobes. DT.beam = { zones:[cone...], act } */
+function ensureBeam(){ if(DT.beam || !P('ocspot')) return; const g = P('ocspot').model; g.updateMatrixWorld(true); const Z = g.userData.spotZones || [];
+  const zones = Z.map(z => { const c = mkCone(0xfff0d2, .3, .42, .55); c.A = g.localToWorld(z.pos.clone()); const d = z.dir.clone().transformDirection(g.matrixWorld);
+    c.yaw = Math.atan2(d.x, d.z); c.pitch = .42; c.z = z; c.e0 = z.die.emissive.getHex(); c.i0 = z.die.emissiveIntensity; return c; });
+  const refl = [...new Set(Z.map(z => z.refl))].map(m => ({ m, e:m.emissive.getHex(), i:m.emissiveIntensity }));
+  DT.beam = { zones, refl, act:-1, C:g.localToWorld(V(0, -.118, .05)) }; }
 /* sound waves: rings that open out from a whistling camera (also the visual when the audio can't play) */
 function wave(k, delay = 0){ const p = P(k); if(!p) return;
   if(!DT.wgeo) DT.wgeo = new THREE.RingGeometry(.86, 1, 40);
@@ -903,15 +907,20 @@ function dtStep(now){ const dt = Math.min(.05, (now - (DT.last || now))/1000); D
     const al = DT.alert[k] > now; if(al) busy = true;
     RING.set(k, al ? blink : M.deter[k] ? 0 : 1); }
   if(DT.spotOn && !DT.beam) ensureBeam();
-  const b = DT.beam; if(b){ const want = DT.spotOn ? 1 : 0; b.vis += (want - b.vis)*Math.min(1, dt*4); if(Math.abs(want - b.vis) < .004) b.vis = want;
-    if(DT.aim){ tmpD.copy(DT.aim).sub(b.A); const s = SKIP.on ? 1 : 1 - Math.exp(-dt*6); b.yaw += (Math.atan2(tmpD.x, tmpD.z) - b.yaw)*s; b.pitch += (Math.atan2(-tmpD.y, Math.hypot(tmpD.x, tmpD.z)) - b.pitch)*s; }
-    placeCone(b, DT.aim ? b.A.distanceTo(DT.aim) + 1.2 : 12);
-    if(DT.aim && b.vis > .001){ b.spot.position.set(DT.aim.x, GY + .02, DT.aim.z); b.spot.scale.set(1.9, 1, 1.9); b.sm.opacity = b.gop*b.vis; }   // a pool of light at the visitor's feet (DT.leds || []).forEach(({ m, e, i }, j) => { if(b.vis > .001){ m.emissive.setHex(j ? 0xffffff : 0xfff4e2); m.emissiveIntensity = j ? .55*b.vis : 1 + 5*b.vis; } else { m.emissive.setHex(e); m.emissiveIntensity = i; } });
-    /* lingering: the Spotlight Pro strobes (6 flashes a second; 2 with reduced motion) */
-    const sf = DT.strobe > now ? (Math.floor(now/(reduce ? 250 : 83)) % 2 ? 1 : .05) : 1;
-    if(sf < 1){ b.mat.uniforms.uO.value *= sf; b.sm.opacity *= sf; (DT.leds || []).forEach(({ m }) => { m.emissiveIntensity *= sf; }); }
-    if(DT.person) DT.person.light(b.vis*sf);
-    if(b.vis > 0 || want) busy = true; else { dropCone(b); DT.beam = null; } }
+  const b = DT.beam; if(b){
+    const strobe = DT.strobe > now, sf = strobe ? (Math.floor(now/(reduce ? 250 : 83)) % 2 ? 1 : .04) : 1;   // 6 flashes a second (2 with reduced motion)
+    if(DT.spotOn && DT.aim){ tmpD.copy(DT.aim).sub(b.C); const ya = Math.atan2(tmpD.x, tmpD.z); let best = -1, bd = 9;
+      b.zones.forEach((c, i) => { let d = ya - c.yaw; d = Math.abs(Math.atan2(Math.sin(d), Math.cos(d))) - (i === b.act ? .12 : 0); if(d < bd){ bd = d; best = i; } });   // a little hysteresis
+      b.act = best; } else b.act = -1;
+    let any = false, lit = 0; const rk = 1 - Math.exp(-dt*(SKIP.on ? 60 : 9));
+    b.zones.forEach((c, i) => { const want = DT.spotOn ? (strobe ? 1 : i === b.act ? 1 : 0) : 0; c.vis += (want - c.vis)*rk; if(Math.abs(want - c.vis) < .004) c.vis = want;
+      placeCone(c, 7); const v = c.vis*sf; c.mat.uniforms.uO.value = c.op*v; c.sm.opacity *= sf;
+      if(i === b.act && DT.aim && !strobe && c.vis > .001){ c.spot.position.set(DT.aim.x, GY + .02, DT.aim.z); c.spot.scale.set(1.9, 1, 1.9); c.sm.opacity = c.gop*c.vis; }   // pool at the visitor's feet
+      const m = c.z.die; if(v > .002){ m.emissive.copy(WARM); m.emissiveIntensity = 1 + 5*v; } else { m.emissive.setHex(c.e0); m.emissiveIntensity = c.i0; }
+      lit = Math.max(lit, v); if(c.vis > 0 || want) any = true; });
+    b.refl.forEach(({ m, e, i }) => { if(lit > .002){ m.emissive.copy(WARM); m.emissiveIntensity = .45*lit; } else { m.emissive.setHex(e); m.emissiveIntensity = i; } });
+    if(DT.person) DT.person.light(lit);
+    if(any) busy = true; else { b.zones.forEach(c => { c.z.die.emissive.setHex(c.e0); c.z.die.emissiveIntensity = c.i0; dropCone(c); }); DT.beam = null; } }
   for(let i = DT.waves.length - 1; i >= 0; i--){ const w = DT.waves[i], e = (now - w.t0)/1200;
     if(e >= 1){ scene.remove(w.m); w.m.material.dispose(); DT.waves.splice(i, 1); continue; } busy = true; if(e < 0) continue;
     w.m.visible = true; w.m.quaternion.copy(camera.quaternion); w.m.scale.setScalar(.08 + .85*e); w.m.material.opacity = .9*Math.pow(1 - e, 1.6); }

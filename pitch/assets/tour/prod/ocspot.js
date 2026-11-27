@@ -113,6 +113,10 @@ export default H => {
     { n: V2(0, 1), p: V2(0, zF), w: 100, cols: [-28, 0, 28], ln: lean },
     { n: V2(wing.x, wing.y), p: V2(fc.x + wd.x*sW, fc.y + wd.y*sW), w: 42, cols: [-14, 0, 14], ln: leanW },
     { n: V2(-wing.x, wing.y), p: V2(-fc.x - wd.x*sW, fc.y + wd.y*sW), w: 42, cols: [-14, 0, 14], ln: leanW } ];
+  /* five light zones, as on the real Spotlight Pro (Timeline 1.MOV): left wing, the front panel's three columns, right wing. Each has its own
+     LED material and a fixed aim (g-local metres; the model is authored in mm), so demo.js can hand the light from zone to zone. */
+  const zones = [];
+  faces.forEach((F, fi) => { F.refl = refl.clone(); F.zone = {}; });
   for(const F of faces){
     const slant = Math.hypot(yT - yB, F.ln), dv = V2(F.ln, yT - yB).normalize();
     const hW = (wY0 - wY1)*slant/(yT - yB) + 2, vMid = (yT - (wY0 + wY1)/2)/(yT - yB)*slant;
@@ -128,11 +132,15 @@ export default H => {
     { const P = pg.attributes.position, col = new Float32Array(P.count*3), D = zp - zfl + .2, a = new THREE.Color(0x8f9396), b = new THREE.Color(0xe6e7e8), c = new THREE.Color();
       for(let i=0;i<P.count;i++){ c.copy(a).lerp(b, Math.max(0, Math.min(1, P.getZ(i)/D))); col[3*i] = c.r; col[3*i+1] = c.g; col[3*i+2] = c.b; }
       pg.setAttribute('color', new THREE.BufferAttribute(col, 3)); }
-    const pm = add(f, new THREE.Mesh(pg, [refl, wallM]), 0, 0, zfl - .2); pm.receiveShadow = true;
+    const pm = add(f, new THREE.Mesh(pg, [F.refl, wallM]), 0, 0, zfl - .2); pm.receiveShadow = true;
     for(const cx of F.cols) for(const cy of [-12, 12]){
       const dmesh = add(f, new THREE.Mesh(domeGeo, lensM), cx, cy, zfl + .05); dmesh.rotation.x = Math.PI/2; dmesh.renderOrder = 1;
       add(f, new THREE.Mesh(coneGeo, coreM), cx, cy, zfl + 1.0).rotation.x = Math.PI/2;   // faceted core, apex up inside the dome
-      add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .2, 16), die)), cx, cy, zfl + .1); }
+      const zk = F === faces[0] ? cx : 'w';
+      if(!F.zone[zk]){ const front = F === faces[0], a = front ? cx/28*.45 : 0;   // front columns fan out ~26 deg; wings aim along their face
+        const dir = front ? new THREE.Vector3(Math.sin(a), 0, Math.cos(a)) : new THREE.Vector3(F.n.x, 0, F.n.y);
+        F.zone[zk] = { die:die.clone(), refl:F.refl, pos:new THREE.Vector3((front ? cx : F.p.x)/1000, (yT + yB)/2000, (front ? zF : F.p.y)/1000), dir }; zones.push(F.zone[zk]); }
+      add(f, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .2, 16), F.zone[zk].die)), cx, cy, zfl + .1); }
   }
 
   // ---------------------------------------------------------------- clear wraparound window: 0.6 under the lip, R10 corners, ends 4 mm before
@@ -192,6 +200,6 @@ export default H => {
     for(const sx of [-27, 27]){ add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, .6, 24), scr)), sx, -56, -.2);
       for(const r of [0, Math.PI/2]){ const sl = add(M, new THREE.Mesh(new THREE.BoxGeometry(2.6, .45, .2), mat(0x55585b,{r:.6})), sx, -56, -.55); sl.rotation.z = r; } }
   }
-  g.userData.spotLeds = [die, refl];   // demo.js lights the bar while the spotlight follows someone
+  zones.sort((a, b) => a.pos.x - b.pos.x); g.userData.spotZones = zones;   // demo.js lights one zone at a time to follow someone
   return g;
 };

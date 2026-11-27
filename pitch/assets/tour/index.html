@@ -750,7 +750,8 @@ const FRONT_DOOR = new THREE.Group(); FRONT_DOOR.position.set(DOOR[0], 0, 3.84);
 { const [a,b] = DOOR, d = new THREE.Group(); d.position.set(-a, 0, -3.84); FRONT_DOOR.add(d);
   slab(a,b,FL,FL+2.35,3.84,3.9,M.door,d);
   slab(a+.12,a+.24,FL+.3,FL+2.1,3.9,3.905,M.frost,d); slab(a+.12,a+.24,FL+.3,FL+2.1,3.835,3.84,M.frost,d);
-  for(let i=0;i<5;i++) slab(a+.42,b-.12,FL+.42+i*.38,FL+.62+i*.38,3.9,3.906,M.frost,d);   // stacked frosted lites (reference door)
+  for(let i=0;i<5;i++) slab(a+.3,b-.42,FL+.42+i*.38,FL+.62+i*.38,3.9,3.906,M.frost,d);   // stacked frosted lites (reference door); they stop short of the
+  // latch stile so the Smart Lock and its lever (at DOOR[1] - .22) sit on solid door, not glass
   slab(a-.08,a,FL,FL+2.43,3.78,4.04,M.trim); slab(b,b+.08,FL,FL+2.43,3.78,4.04,M.trim); slab(a-.08,b+.08,FL+2.35,FL+2.43,3.78,4.04,M.trim);   // frame stays put
   /* door levers: drawn by the Smart Lock model (prod/lock.js), one on each side of the door */ }
 /* wall lantern beside the door */
@@ -1605,7 +1606,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 33;
+const TOURV = 35;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
