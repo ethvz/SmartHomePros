@@ -50,7 +50,7 @@ const SH=(kind,s=30)=>{ const c=kind==='dis'?'#111':'#fff', bg=kind==='dis'?'#1a
   const g=kind==='dis'?'<path d="M9.3 9.6l5.4 5.4M14.7 9.6l-5.4 5.4" stroke="#05e0a6" stroke-width="2" stroke-linecap="round"/>':kind==='away'?'<rect x="8.4" y="10.6" width="7.2" height="4" rx="1.2" fill="#fff"/><path d="M9.4 10.6l.9-2h3.4l.9 2" stroke="#fff" stroke-width="1.3" fill="none"/>':'<path d="M8.4 12.6L12 9.6l3.6 3v3.4H8.4z" fill="#fff"/>';
   return `<svg class="sh" width="${s}" height="${s}" viewBox="0 0 24 24"><path d="M12 2.6l8 3v6c0 5.2-3.4 9-8 10.4-4.6-1.4-8-5.2-8-10.4v-6z" fill="${kind==='dis'?'#14211c':'#f2683a'}"/>${g}</svg>`; };
 const CAMS=[{k:'door',n:'Doorbell Camera Pro',t:'1h ago',dt:1,src:'v_door',sq:1},{k:'indoor',n:'Indoor Camera Pro',t:'5m ago',src:'indoor',talk:1},
-  {k:'drive',n:'Outdoor Camera Pro',t:'38m ago',src:'drive'},{k:'night',n:'Outdoor Camera Pro',t:'8h ago',dt:1,src:'yard'},{k:'gen2',n:'Outdoor Camera Pro Gen 2',t:'yesterday',dt:1,src:'night'}];
+  {k:'drive',n:'Outdoor Camera Pro',t:'38m ago',src:'drive'},{k:'night',n:'Outdoor Camera Pro',t:'8h ago',dt:1,src:'yard'},{k:'gen2',n:'Outdoor Camera Pro 3',t:'yesterday',dt:1,src:'night'}];
 const LIGHTS=[['Bedroom',75],['Entryway',0],['Front Porch',100],['Kitchen',90],['Living Room',85],['Outdoor Camera Pro…',0]];
 const S={sec:'dis',since:'11:08 PM',lock:{front:1,side:1},gar:{main:0,side:0},th:{bed:{n:'Bedroom',mode:'heat',set:66,cur:65,fan:'auto',hum:33},hall:{n:'Hallway',mode:'cool',set:72,cur:74,fan:'auto',hum:38}},light:LIGHTS.map(l=>l[1]),lastL:LIGHTS.map(l=>l[1]||80),deter:{door:0,night:0,gen2:0},tab:'home',busy:{}};
 let R,toastT,zoomT,liveCam=null;
