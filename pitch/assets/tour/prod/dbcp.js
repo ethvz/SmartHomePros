@@ -159,8 +159,8 @@ export default H => {
   /* ---------- light ring (flush) + recessed doorbell button ---------- */
   const B = add(g, G(), 0, BY, ZF);
   { const rp = [[13.3, -.12], [13.4, -.03]]; for (let i = 0; i <= 7; i++) rp.push([13.55 + (15.3 - 13.55) * i / 7, -.01]); rp.push([15.42, -.04], [15.45, -.15], [15.45, -1.6]);
-    add(B, lathe(rp, ringM)); }                                                          // one band: bright inner edge grading to deep red-orange
-  add(B, tube(13.3, -1.15, -.12, ringWall));                                             // diffuser inner wall, lit
+    add(B, lathe(rp, ringM)).userData.ring = true; }   // one band: bright inner edge grading to deep red-orange (demo.js: dark while deter is on)
+  add(B, tube(13.3, -1.15, -.12, ringWall)).userData.ring = true;                                             // diffuser inner wall, lit
   add(B, lathe([[0, -2.1], [1.5, -2.08], [4, -1.97], [8, -1.65], [11, -1.3], [12.6, -1.13]], btn));   // dished button, flat at the pole
   add(B, lathe([[12.6, -1.13], [13.05, -1.12], [13.25, -1.2], [13.3, -1.4], [13.3, -2.8]], btnRim));   // button-black rim; only the vertical wall above is lit (review r5)
   add(B, disc(13.25, 15.5, voidM), 0, 0, -1.6);

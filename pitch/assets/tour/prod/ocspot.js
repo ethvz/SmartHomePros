@@ -192,5 +192,6 @@ export default H => {
     for(const sx of [-27, 27]){ add(M, H.faceZ(new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, .6, 24), scr)), sx, -56, -.2);
       for(const r of [0, Math.PI/2]){ const sl = add(M, new THREE.Mesh(new THREE.BoxGeometry(2.6, .45, .2), mat(0x55585b,{r:.6})), sx, -56, -.55); sl.rotation.z = r; } }
   }
+  g.userData.spotLeds = [die, refl];   // demo.js lights the bar while the spotlight follows someone
   return g;
 };

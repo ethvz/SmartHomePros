@@ -81,6 +81,12 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 .dmSc i{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--c,#05E5AF);color:#04110d}
 .dmSc i svg{width:22px;height:22px}
 .dmSc small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.dmSc.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px}
+.dmSc.wide i{color:#fff}
+/* Smart Deter controls in the camera bars: the deter toggle glows red while on; the linger time cycles 5 / 10 / 15 / 30 s */
+#card #dmAct button.dtr.on{background:rgba(255,59,48,.24);box-shadow:inset 0 0 0 1px rgba(255,92,80,.65)}
+#card #dmAct button.dtr.on svg{color:#ff5a4f}
+#card #dmAct button.lg{padding:0 13px;gap:6px;font-variant-numeric:tabular-nums}
 /* hub emulator: one iframe, docked on the 3D glass (homography) or floating as a picture-in-picture card */
 #dmHub{position:fixed;left:0;top:0;width:1280px;height:750px;transform-origin:0 0;z-index:4;pointer-events:none;opacity:0;transition:opacity .45s}
 #dmHub.vis{opacity:1}
@@ -150,7 +156,8 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
   #card #dmAct .t{display:none}
   #card #dmAct .nm{display:block;font-size:11.5px;letter-spacing:-.01em;font-weight:700;color:#fff;margin:0 4px 0 2px;white-space:nowrap}
   #card #dmAct button{height:40px;padding:0 11px;font-size:13px}
-  #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock]{width:40px;padding:0;justify-content:center}
+  #card #dmAct button.pri:has(.t),#card #dmAct button[data-a=lock],#card #dmAct button.dtr{width:40px;padding:0;justify-content:center}
+  #card #dmAct button.lg{padding:0 9px;gap:4px}
   #card #dmAct button.rnd{width:34px;height:34px}
   #card #dmAct .tv{min-width:40px;font-size:16px}
   #card #dmAct .tv small{font-size:8.5px;letter-spacing:.1em}
@@ -217,6 +224,11 @@ const IC = {
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  deter:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 12L6.2 17.6M12 12l5.8 5.6" opacity=".55"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>',
+  person:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.6"/><path d="M8.5 21l1.2-6.5L8 11.5c1-1.6 2.4-2.3 4-2.3s3 .7 4 2.3l-1.7 3L15.5 21"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  spk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10"/></svg>',
 };
 const el = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); for(const k in attrs) e.setAttribute(k, attrs[k]); e.innerHTML = html; document.body.appendChild(e); return e; };
 const hud = el('div', { id:'dmHud' }, `<div id="dmArm" class="glass"><i></i><span>Disarmed</span></div>
@@ -224,9 +236,9 @@ const hud = el('div', { id:'dmHud' }, `<div id="dmArm" class="glass"><i></i><spa
   <button class="dmPill glass" id="dmAppB" aria-label="Use the Vivint App">${IC.phone}<span>App</span></button>
   <button class="dmPill glass lbl" id="dmScB" aria-label="Scenes">${IC.spark}<span>Scenes</span></button>`);
 const SCN = [['away','Arm Away','Leaving home', IC.shield, '#ff9a3c'], ['welcome','Welcome Home','Code at the door', IC.home, '#05E5AF'],
-  ['night','Goodnight','Lock up for bed', IC.moon, '#8fa8ff'], ['smoke','Smoke Alarm','Fire safety', IC.fire, '#ff5a4a']];
+  ['night','Goodnight','Lock up for bed', IC.moon, '#8fa8ff'], ['smoke','Smoke Alarm','Fire safety', IC.fire, '#ff5a4a'], ['deter','Smart Deter','A visitor at night', IC.person, '#ff3b30']];
 const scenesEl = el('div', { id:'dmScenes', class:'glass off' }, '<h3>Automations</h3>' + SCN.map(([k, t, s, i, c]) =>
-  `<button class="dmSc" data-sc="${k}" style="--c:${c}"><i>${i}</i><span>${t}<small>${s}</small></span></button>`).join(''));
+  `<button class="dmSc${k === 'deter' ? ' wide' : ''}" data-sc="${k}" style="--c:${c}"><i>${i}</i><span>${t}<small>${s}</small></span></button>`).join(''));
 const hubEl = el('div', { id:'dmHub' }, '<div id="dmShield"></div>');
 const appEl = el('div', { id:'dmApp' }, '<div id="dmAppShield"></div>');
 const tryApp = el('div', { id:'dmTryApp', class:'glass' }, '<b></b>Tap the phone');
@@ -271,6 +283,8 @@ const SH = {
   smoke:   () => { const p = P('smokeco'); return shot(p.center.clone().add(V(0, -.9, 0)), V(.2, -.25, 1), 3.1); },
   great:   () => shot(V(1.2, 1.6, -1.5), V(.15, .35, 1), 8.5),
   home:    () => { const HV = T.homeView(); return T.poseFor(HV); },
+  front:   () => { const port = aspect() < 1, tg = port ? V(-3.3, 1.5, 5.6) : V(-1.6, 1.7, 5.4), d = fitDist(port ? 12 : 15.6, 5.8, .92, .74);   // the whole street front: cones, door, visitor
+    return { pos:tg.clone().addScaledVector(V(0, .44, 1).normalize(), d), target:tg }; },
 };
 
 /* ------------------------------------------------------------------ devices */
@@ -535,7 +549,8 @@ async function enterApp(back){ if(MODE.run) return; await app(); quietTour(); MO
   if(MODE.kind === 'app') appEl.classList.add('live'); }
 /* house -> app: the app shows what the house (or the hub) just did, without echoing it back */
 function syncApp(){ if(!APP.api || MODE.run) return; const t = M.th;
-  APP.api.apply({ sec:M.alarm ? null : M.arm, lock:{ front:M.locked }, gar:{ main:M.garageOpen }, th:{ hall:{ set:t.sp, cur:t.cur, mode:t.mode === 'off' ? 'off' : t.mode === 'heat' ? 'heat' : 'cool' } }, lights:M.lights > .5 }); }
+  APP.api.apply({ sec:M.alarm ? null : M.arm, lock:{ front:M.locked }, gar:{ main:M.garageOpen }, th:{ hall:{ set:t.sp, cur:t.cur, mode:t.mode === 'off' ? 'off' : t.mode === 'heat' ? 'heat' : 'cool' } }, lights:M.lights > .5,
+    deter:{ door:+M.deter.dbcp, night:+M.deter.ocp, gen2:+M.deter.ocspot } }); }
 /* app -> house: a tap in the app plays the same 3D sequences the hub triggers */
 let appTh = null;
 function fromApp(type, d){ if(MODE.run) return;
@@ -546,6 +561,9 @@ function fromApp(type, d){ if(MODE.run) return;
       if(d.set !== M.th.sp || d.mode !== M.th.mode){ M.th.mode = d.mode; device('therm', d.set); } }, 900); }
   if(type === 'light'){ const S = APP.api.state, on = !!(S.light[3] || S.light[4]); if(on === (M.lights > .5)) return;
     sequence('dev-lights', async () => { caption('Lights', on ? 'Lights on' : 'Lights off', ['bulb']); await fly(SH.great()); await LIT.to(on ? 1 : .15, 1.4); capDone(on ? 'Lights on' : 'Lights off'); await wait(.5); }); }
+  if(type === 'deter'){ const ks = (d.keys || []).map(k => FROMAPP[k]).filter(k => k && M.deter[k] !== !!d.on); if(!ks.length) return;
+    sequence('dev-deter', async () => { caption('Smart Deter', d.on ? 'Turning deter on' : 'Turning deter off', ['eye']); await fly(SH.front()); setDeter(ks, d.on);
+      await wait(d.on ? 2.6 : 1.2); capDone(d.on ? 'Deter on · Scanning' : 'Deter off'); await wait(.6); }, { withHub:false }); }
   if(type === 'sc') automation(d.k === 'leave' ? 'away' : d.k === 'bed' ? 'night' : 'welcome', d.k === 'arrive' ? { typed:true } : {});
 }
 const HUDO_therm = () => HUBDO.therm();
@@ -631,7 +649,7 @@ function adoptTherm(){ const p = parts('therm'); if(!p.getState) return; const s
   if(st.mode) M.th.mode = st.mode; if(st.setpoint != null) M.th.sp = st.setpoint; if(st.current != null) M.th.cur = st.current; }
 const T_ = s => `<span class="t">${s}</span>`;
 function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.focus.k : null;
-  const want = ['lock', 'garage', 'therm', 'keypad', 'hub', 'app'].includes(f) ? f : null;
+  const want = ['lock', 'garage', 'therm', 'keypad', 'hub', 'app', ...DCAM].includes(f) ? f : null;
   if(!want){ if(actK){ actEl.classList.add('off'); tour.card.classList.remove('dmHas'); actK = null; } showTry(false); showTryApp(false); return; }
   if(want === 'therm') adoptTherm();
   const a = TH.active(), lab = a === 'cool' ? 'Cooling' : a === 'heat' ? 'Heating' : M.th.mode === 'off' ? 'Off' : 'Idle';
@@ -642,14 +660,19 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
     keypad:`<button class="pri" data-a="kpad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
     hub:`<button class="pri" data-a="panel">${IC.hub}${T_('Use the hub')}</button>`,
     app:`<button class="pri" data-a="app">${IC.phone}${T_('Use the app')}</button>`,
-  }[want];
-  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', keypad:'Keypad', hub:'Smart Hub', app:'Vivint App' }[want]}</span>` + H;
+  }[want] ?? deterBar(want);
+  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', keypad:'Keypad', hub:'Smart Hub', app:'Vivint App', dbcp:'Doorbell', ocp:'Camera', ocspot:'Spotlight' }[want]}</span>` + H;
   if(want === 'therm' && actEl.dataset.k === 'therm' && actEl.querySelector('.tv')){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
   else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
   actEl.dataset.k = want;
   const nx = tour.card.querySelector('#next'); if(actEl.parentNode !== tour.card || actEl.nextSibling !== nx) tour.card.insertBefore(actEl, nx);
   actK = want; actEl.classList.remove('off'); tour.card.classList.add('dmHas'); tour.card.dataset.dm = want;
   showTry(want === 'hub'); showTryApp(want === 'app'); }
+/* a camera's bar: Deter on/off; with deter on, "Visitor" plays the demo (and the Spotlight Pro sets its linger time) */
+function deterBar(k){ const on = M.deter[k];
+  return `<button class="dtr${on ? ' on' : ''}" data-a="deter" aria-pressed="${on}" aria-label="Deter ${on ? 'on' : 'off'}">${IC.deter}${T_(on ? 'Deter on' : 'Deter off')}</button>`
+    + (on ? `<button class="pri" data-a="visit" aria-label="Simulate a visitor">${IC.person}${T_('Visitor')}</button>` : '')
+    + (on && k === 'ocspot' ? `<button class="lg" data-a="linger" aria-label="Whistle after lingering ${LINGER.get()} seconds">${IC.clock}<span>${LINGER.get()}s</span></button>` : ''); }
 { const p = parts('therm'); if(p.setState){ const set0 = p.setState; p.setState = o => { const r = set0(o); if(actK === 'therm') queueMicrotask(syncAct); return r; }; } }
 function showTryApp(on){ if(on){ appShowDock(true); tryApp.classList.add('vis'); } else { tryApp.classList.remove('vis'); if(!MODE.kind && !MODE.run && APP.docked) appShowDock(false); } }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }
@@ -657,12 +680,14 @@ actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(
   if(a === 'pad') enterPad('lock'); if(a === 'kpad') enterPad('keypad'); if(a === 'panel') enterPanel(); if(a === 'app') enterApp();
   if(a === 'lock') device('lock', !M.locked); if(a === 'gar') device('garage', !M.garageOpen);
   if(a === 'tup') device('therm', Math.min(90, M.th.sp + 1)); if(a === 'tdn') device('therm', Math.max(50, M.th.sp - 1));
-  if(a === 'away' || a === 'stay') automation(a, { from:'keypad' }); });
+  if(a === 'away' || a === 'stay') automation(a, { from:'keypad' });
+  if(a === 'deter' && actK && !MODE.run){ WH.prime(); setDeter([actK], !M.deter[actK]); syncApp(); }
+  if(a === 'visit') visitor(); if(a === 'linger'){ LINGER.next(); syncAct(); } });
 /* watch the tour's focus changes cheaply (it has no events): body class + data attribute */
 new MutationObserver(() => syncAct()).observe(document.body, { attributes:true, attributeFilter:['class', 'data-fk'] });
 
 /* ------------------------------------------------------------------ the caption + sequencer */
-const STEPI = { keys:IC.keys, lock:IC.lock, unlock:IC.unlock, garage:IC.garage, temp:IC.temp, shield:IC.shield, bulb:IC.bulb, door:IC.door, bell:IC.bell, fire:IC.fire, home:IC.home, moon:IC.moon };
+const STEPI = { eye:IC.eye, person:IC.person, clock:IC.clock, spk:IC.spk, keys:IC.keys, lock:IC.lock, unlock:IC.unlock, garage:IC.garage, temp:IC.temp, shield:IC.shield, bulb:IC.bulb, door:IC.door, bell:IC.bell, fire:IC.fire, home:IC.home, moon:IC.moon };
 function caption(kicker, title, steps, alarm){ capEl.querySelector('small').textContent = kicker; capEl.querySelector('b').textContent = title;
   capEl.querySelector('.st').innerHTML = (steps || []).map(s => `<i>${STEPI[s] || IC.check}</i>`).join(''); capEl.classList.toggle('alarm', !!alarm); capEl.classList.remove('off'); }
 function capStep(i, title){ const st = [...capEl.querySelectorAll('.st i')]; st.forEach((s, j) => { s.classList.toggle('done', j < i); s.classList.toggle('cur', j === i); }); if(title) capEl.querySelector('b').textContent = title; }
@@ -715,6 +740,7 @@ let thermTimer = null;
 /* ------------------------------------------------------------------ automations */
 const ECO = 78;
 function automation(name, o = {}){
+  if(name === 'deter') return visitor();
   const S = () => EMU.S;
   if(name === 'away' || name === 'stay') return sequence(name, async () => {
     const away = name === 'away';
@@ -762,6 +788,152 @@ function automation(name, o = {}){
     /* reset: the alarm is silenced, the door closes, heating/cooling resumes */
     SMOKE.off(); setFill(1.6); M.alarm = false; HUBDO.clearAlarm(); M.arm = 'dis'; paintArm(); await DOOR.swing(false, 1.6); await LOCK.set(true); M.th.mode = 'cool'; TH.paint(); }, {});   // reset: door shut and relocked, comfort back on (the hub follows when the run ends)
 }
+/* ------------------------------------------------------------------ Smart Deter (Doorbell Camera Pro, Outdoor Camera Pro, Spotlight Pro)
+   Deter on: the camera's red light ring goes dark and an illustrative red cone sweeps the yard from it (the Vivint app's deter
+   animation). A visitor: the rings blink, the cones lock on, the whistle sounds; the Spotlight Pro's beam follows the person, and
+   lingering past the set time (5 / 10 / 15 / 30 s, remembered) whistles again. Cones, beam, person and sound waves exist only while
+   deter is on or a visitor plays, and are disposed after. */
+const DCAM = ['dbcp', 'ocp', 'ocspot'], APPK = { dbcp:'door', ocp:'night', ocspot:'gen2' }, FROMAPP = { door:'dbcp', night:'ocp', gen2:'ocspot' };
+M.deter = { dbcp:false, ocp:false, ocspot:false };
+const LINGERS = [5, 10, 15, 30];
+const LINGER = { mem:5,
+  get(){ try { const v = +localStorage.getItem('tourDeterLinger'); if(LINGERS.includes(v)) return v; } catch(e){} return this.mem; },
+  next(){ const v = LINGERS[(LINGERS.indexOf(this.get()) + 1) % LINGERS.length]; this.mem = v; try { localStorage.setItem('tourDeterLinger', String(v)); } catch(e){} return v; } };
+/* the whistle: primed on the tap that starts a visitor (iOS plays audio only after a gesture); silent fallback = the sound waves */
+const WH = { a:null, ok:false,
+  el(){ if(!this.a){ try { const a = new Audio('../oc/whistle.mp3'); a.preload = 'auto'; a.playsInline = true; this.a = a; } catch(e){ this.a = null; } } return this.a; },
+  prime(){ const a = this.el(); if(!a || this.ok) return; try { a.muted = true; const p = a.play(); if(p) p.then(() => { if(!this.live){ a.pause(); a.currentTime = 0; } a.muted = false; this.ok = true; }).catch(() => { a.muted = false; }); } catch(e){} },
+  play(){ if(SKIP.on) return; const a = this.el(); if(!a) return; try { this.live = true; a.muted = false; a.currentTime = 0; const p = a.play(); if(p) p.catch(() => {}); } catch(e){} } };
+/* the light rings: each camera's own copy of its ring material (the Outdoor Camera Pro and Spotlight Pro share one otherwise) */
+const RING = { m:{},
+  mats(k){ if(this.m[k]) return this.m[k]; const a = [], g = P(k) && P(k).model;
+    if(g) g.traverse(o => { if(o.isMesh && o.userData.ring && !Array.isArray(o.material)){ o.material = o.material.clone(); o.material.userData.ei0 = o.material.emissiveIntensity; a.push(o.material); } });
+    return (this.m[k] = a); },
+  set(k, f){ for(const x of this.mats(k)){ const v = x.userData.ei0*f; if(x.emissiveIntensity !== v) x.emissiveIntensity = v; } } };
+const GY = .055;                                                         // the yard's surface
+const DCFG = { dbcp:{ reach:3.4, amp:.6, per:7.2, ph:0, yaw:.05 }, ocp:{ reach:6.6, amp:.5, per:8.6, ph:2.1, yaw:-.35 }, ocspot:{ reach:6.2, amp:.5, per:6.4, ph:4.2, yaw:.3 } };
+const CONE_VS = `varying float vT; varying float vF; varying float vD;
+void main(){ vT = position.z; vec4 mv = modelViewMatrix*vec4(position, 1.); vec3 n = normalize(normalMatrix*normal); vF = abs(dot(n, normalize(-mv.xyz))); vD = -mv.z; gl_Position = projectionMatrix*mv; }`;
+const CONE_FS = `uniform vec3 uC; uniform float uO; varying float vT; varying float vF; varying float vD;
+void main(){ float a = uO*pow(1. - vT, 1.35)*smoothstep(0., .07, vT)*(.28 + .72*vF*vF)*smoothstep(.35, 2., vD); gl_FragColor = vec4(uC, a); }`;
+const DT = { cones:{}, beam:null, waves:[], person:null, alert:{}, track:null, aim:null, spotOn:false, lit:0, last:0, geo:null, pgeo:null, wgeo:null, tex:null, leds:null };
+const tmpD = V(0, 0, 0), WARM = new THREE.Color(0xfff2dc);
+function glowTex(){ const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.35, 'rgba(255,255,255,.5)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+function mkCone(col, half, op, gop){
+  if(!DT.geo){ DT.geo = new THREE.ConeGeometry(1, 1, 28, 1, true); DT.geo.translate(0, -.5, 0); DT.geo.rotateX(-Math.PI/2);   // apex at the origin, base at z = 1, radius 1
+    DT.pgeo = new THREE.PlaneGeometry(1, 1); DT.pgeo.rotateX(-Math.PI/2); DT.tex = glowTex(); }
+  const mat = new THREE.ShaderMaterial({ uniforms:{ uC:{ value:new THREE.Color(col) }, uO:{ value:0 } }, vertexShader:CONE_VS, fragmentShader:CONE_FS,
+    transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide });
+  const piv = new THREE.Object3D(); piv.rotation.order = 'YXZ'; const m = new THREE.Mesh(DT.geo, mat); m.renderOrder = 3; m.frustumCulled = false; piv.add(m);
+  const sm = new THREE.MeshBasicMaterial({ map:DT.tex, color:col, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending, toneMapped:false });
+  const spot = new THREE.Mesh(DT.pgeo, sm); spot.renderOrder = 2; spot.frustumCulled = false; piv.visible = spot.visible = false; scene.add(piv, spot);
+  return { piv, m, mat, spot, sm, half, op, gop, yaw:0, pitch:.5, vis:0, A:null }; }
+function dropCone(c){ scene.remove(c.piv, c.spot); c.mat.dispose(); c.sm.dispose(); }
+/* point a cone from A along yaw / pitch (down); it reaches the ground (or maxLen), with a soft pool where its axis lands */
+function placeCone(c, maxLen){ const A = c.A, sp = Math.max(Math.sin(c.pitch), .05), cp = Math.cos(c.pitch), drop = A.y - GY, full = drop/sp, L = Math.min(full, maxLen), r = Math.tan(c.half)*L;
+  const on = c.vis > .001; if(c.piv.visible !== on){ c.piv.visible = c.spot.visible = on; } if(!on) return;
+  c.piv.position.copy(A); c.piv.rotation.set(c.pitch, c.yaw, 0); c.m.scale.set(r, r, L);
+  c.spot.position.set(A.x + Math.sin(c.yaw)*cp*L, GY + .02, A.z + Math.cos(c.yaw)*cp*L); c.spot.rotation.y = c.yaw; c.spot.scale.set(2.1*r, 1, Math.min(2.1*r/sp, 6*r));
+  c.mat.uniforms.uO.value = c.op*c.vis; c.sm.opacity = (full <= maxLen + .01 ? c.gop : 0)*c.vis; }
+function apexOf(k){ const p = P(k), g = p.model; g.updateMatrixWorld(true); const hp = g.userData.headPose;
+  if(k === 'dbcp') return p.center.clone().add(V(0, .06, .04));         // lens at the top of the doorbell
+  return hp ? g.localToWorld(hp.glass.clone()) : p.center.clone(); }
+function ensureCone(k){ if(DT.cones[k] || !P(k)) return; const c = mkCone(0xff2a1f, .27, .62, .5), cf = DCFG[k], v = P(k).view;
+  c.A = apexOf(k); c.base = Math.atan2(v.x, v.z) + cf.yaw; c.p0 = Math.atan2(c.A.y - GY, cf.reach); c.yaw = c.base; c.pitch = c.p0; DT.cones[k] = c;
+  if(renderer.compileAsync) renderer.compileAsync(c.piv, camera, scene).catch(() => {}); }
+function ensureBeam(){ if(DT.beam || !P('ocspot')) return; const g = P('ocspot').model; g.updateMatrixWorld(true);
+  const c = mkCone(0xfff0d2, .24, .55, .75); c.A = g.localToWorld(V(0, -.118, .07)); c.yaw = 0; c.pitch = .8; DT.beam = c;
+  const L = g.userData.spotLeds || []; DT.leds = L.map(m => ({ m, e:m.emissive.getHex(), i:m.emissiveIntensity })); }
+/* sound waves: rings that open out from a whistling camera (also the visual when the audio can't play) */
+function wave(k, delay = 0){ const p = P(k); if(!p) return;
+  if(!DT.wgeo) DT.wgeo = new THREE.RingGeometry(.86, 1, 40);
+  for(let i = 0; i < 3; i++){ const m = new THREE.Mesh(DT.wgeo, new THREE.MeshBasicMaterial({ color:0xff3b30, transparent:true, opacity:0, depthWrite:false, blending:THREE.AdditiveBlending, toneMapped:false, side:THREE.DoubleSide }));
+    m.renderOrder = 4; m.position.copy(k === 'ocspot' ? DT.cones.ocspot ? DT.cones.ocspot.A : p.center : apexOf(k)); m.visible = false; scene.add(m);
+    DT.waves.push({ m, t0:performance.now() + delay*1000 + i*260 }); } runDeter(); }
+/* someone was seen: rings blink, the whistle sounds, the app gets the event */
+function detect(keys, msg){ const now = performance.now(); keys.forEach(k => { DT.alert[k] = now + 2800; wave(k); }); WH.play();
+  if(msg && APP.api) try { APP.api.apply({ toast:msg }); } catch(e){} }
+/* a simple low-poly visitor (capsules, a hood, a walk cycle) on a path from the street to the front door */
+const VPATH = [V(2.9, 0, 7.25), V(.7, 0, 6.15), V(-1.8, 0, 5.35), V(-3.3, 0, 4.95), V(-3.88, 0, 4.8)];
+function mkPerson(){ const mk = (c, e) => new THREE.MeshStandardMaterial({ color:c, roughness:.85, emissive:e, transparent:true, opacity:0 });
+  const top = mk(0x4b5563, 0x161a20), bot = mk(0x262b33, 0x0d0f13), skin = mk(0xc69c7e, 0x22170f), mats = [top, bot, skin], e0 = mats.map(m => m.emissive.clone()), geos = [];
+  const g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  const mesh = (geo, m, x, y, z, par) => { geos.push(geo); const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); par.add(o); return o; };
+  const cap = (r, l) => new THREE.CapsuleGeometry(r, l, 3, 10);
+  mesh(cap(.155, .34), top, 0, 1.19, 0, body).scale.set(1, 1, .68);
+  mesh(new THREE.SphereGeometry(.1, 14, 10), skin, 0, 1.6, .012, body);
+  mesh(new THREE.SphereGeometry(.118, 14, 10, 0, Math.PI*2, 0, Math.PI*.6), top, 0, 1.61, -.014, body).rotation.x = -.35;   // hood
+  const limb = (x, y, r, l, m) => { const pv = new THREE.Group(); pv.position.set(x, y, 0); body.add(pv); mesh(cap(r, l), m, 0, -(l/2 + r), 0, pv); return pv; };
+  const legs = [limb(-.085, .86, .066, .66, bot), limb(.085, .86, .066, .66, bot)], arms = [limb(-.215, 1.42, .05, .5, top), limb(.215, 1.42, .05, .5, top)];
+  arms[0].rotation.z = -.08; arms[1].rotation.z = .08;
+  const curve = new THREE.CatmullRomCurve3(VPATH, false, 'centripetal'), len = curve.getLength(), N = 40, hy = new Float32Array(N + 1);
+  { const sh = []; scene.traverse(o => { if(o.isMesh && o.userData.shell) sh.push(o); }); const rc = new THREE.Raycaster(), dn = V(0, -1, 0), q = V(0, 0, 0);
+    for(let i = 0; i <= N; i++){ curve.getPointAt(i/N, q); rc.set(q.set(q.x, 2.6, q.z), dn); const h = rc.intersectObjects(sh, false)[0]; hy[i] = h ? Math.min(.4, h.point.y) : GY; } }
+  g.visible = false; scene.add(g);
+  const pos = V(0, 0, 0), tan = V(0, 0, 0), chest = V(0, 0, 0), aim = V(0, 0, 0); let rotY = null;
+  const P_ = {
+    chest, aim, u:0,
+    at(u, back, moving = true){ P_.u = u; curve.getPointAt(Math.min(1, Math.max(0, u)), pos); curve.getTangentAt(Math.min(1, Math.max(0, u)), tan); if(back) tan.negate();
+      const f = u*N, i = Math.min(N - 1, Math.floor(f)); pos.y = hy[i] + (hy[i + 1] - hy[i])*(f - i); g.position.copy(pos);
+      const want = Math.atan2(tan.x, tan.z); if(rotY == null) rotY = want; let d = want - rotY; d = Math.atan2(Math.sin(d), Math.cos(d)); rotY += d*(SKIP.on ? 1 : .18); g.rotation.y = rotY;
+      const ph = u*len/.74*Math.PI, s = moving ? Math.sin(ph) : 0;
+      legs[0].rotation.x = s*.5; legs[1].rotation.x = -s*.5; arms[0].rotation.x = -s*.42; arms[1].rotation.x = s*.42; body.position.y = moving ? Math.abs(Math.cos(ph))*.028 : 0;
+      chest.copy(pos).y += 1.05; aim.copy(pos).y += .55; },
+    walk(u0, u1, back){ return tween(Math.abs(u1 - u0)*len/1.15, e => P_.at(u0 + (u1 - u0)*e, back), t => t).then(() => P_.at(u1, back, false)); },
+    fade(o){ g.visible = o > .002; mats.forEach(m => { m.opacity = o; m.depthWrite = o > .98; }); },
+    light(v){ mats.forEach((m, i) => m.emissive.copy(e0[i]).lerp(WARM, v*.26)); },
+    dispose(){ scene.remove(g); geos.forEach(x => x.dispose()); mats.forEach(m => m.dispose()); } };
+  P_.at(0); return P_; }
+/* one step for everything above; it removes itself (and frees the GPU objects) once nothing is on */
+function dtStep(now){ const dt = Math.min(.05, (now - (DT.last || now))/1000); DT.last = now; const t = now/1000; let busy = false;
+  const blink = .5 + .5*Math.sin(now/62);
+  for(const k of DCAM){ const c = DT.cones[k], want = M.deter[k] && !(k === 'ocspot' && DT.spotOn) ? 1 : 0;   // the Spotlight Pro's own beam takes over from its red cone
+    if(c){ c.vis += (want - c.vis)*Math.min(1, dt*(want ? 3 : 5)); if(Math.abs(want - c.vis) < .004) c.vis = want;
+      const cf = DCFG[k]; let y, p, rate;
+      if(DT.track && want){ tmpD.copy(DT.track).sub(c.A); y = Math.atan2(tmpD.x, tmpD.z); p = Math.atan2(-tmpD.y, Math.hypot(tmpD.x, tmpD.z)); rate = 8; }
+      else { y = c.base + (reduce ? 0 : cf.amp*Math.sin(t*2*Math.PI/cf.per + cf.ph)); p = c.p0; rate = 2.2; }
+      const s = SKIP.on ? 1 : 1 - Math.exp(-dt*rate); c.yaw += (y - c.yaw)*s; c.pitch += (p - c.pitch)*s;
+      placeCone(c, DT.track && want ? c.A.distanceTo(DT.track) + .45 : k === 'dbcp' ? 6 : 9);   // locked on: the cone ends on the person
+      if(c.vis > 0 || want) busy = true; else if(!M.deter[k]){ dropCone(c); delete DT.cones[k]; } }
+    const al = DT.alert[k] > now; if(al) busy = true;
+    RING.set(k, al ? blink : M.deter[k] ? 0 : 1); }
+  if(DT.spotOn && !DT.beam) ensureBeam();
+  const b = DT.beam; if(b){ const want = DT.spotOn ? 1 : 0; b.vis += (want - b.vis)*Math.min(1, dt*4); if(Math.abs(want - b.vis) < .004) b.vis = want;
+    if(DT.aim){ tmpD.copy(DT.aim).sub(b.A); const s = SKIP.on ? 1 : 1 - Math.exp(-dt*6); b.yaw += (Math.atan2(tmpD.x, tmpD.z) - b.yaw)*s; b.pitch += (Math.atan2(-tmpD.y, Math.hypot(tmpD.x, tmpD.z)) - b.pitch)*s; }
+    placeCone(b, DT.aim ? b.A.distanceTo(DT.aim) + 1.2 : 12);
+    if(DT.aim && b.vis > .001){ b.spot.position.set(DT.aim.x, GY + .02, DT.aim.z); b.spot.scale.set(1.9, 1, 1.9); b.sm.opacity = b.gop*b.vis; }   // a pool of light at the visitor's feet (DT.leds || []).forEach(({ m, e, i }, j) => { if(b.vis > .001){ m.emissive.setHex(j ? 0xffffff : 0xfff4e2); m.emissiveIntensity = j ? .55*b.vis : 1 + 5*b.vis; } else { m.emissive.setHex(e); m.emissiveIntensity = i; } });
+    if(DT.person) DT.person.light(b.vis);
+    if(b.vis > 0 || want) busy = true; else { dropCone(b); DT.beam = null; } }
+  for(let i = DT.waves.length - 1; i >= 0; i--){ const w = DT.waves[i], e = (now - w.t0)/1200;
+    if(e >= 1){ scene.remove(w.m); w.m.material.dispose(); DT.waves.splice(i, 1); continue; } busy = true; if(e < 0) continue;
+    w.m.visible = true; w.m.quaternion.copy(camera.quaternion); w.m.scale.setScalar(.08 + .85*e); w.m.material.opacity = .9*Math.pow(1 - e, 1.6); }
+  if(DT.person) busy = true;
+  if(!busy) stopDeter(); }
+function runDeter(){ if(!perFrame.has(dtStep)){ DT.last = 0; perFrame.add(dtStep); } kick(); }
+function stopDeter(){ perFrame.delete(dtStep); DCAM.forEach(k => RING.set(k, M.deter[k] ? 0 : 1));
+  if(!Object.keys(DT.cones).length && !DT.beam && !DT.waves.length){ [DT.geo, DT.pgeo, DT.wgeo, DT.tex].forEach(x => x && x.dispose()); DT.geo = DT.pgeo = DT.wgeo = DT.tex = null; } }
+function setDeter(keys, on){ keys.forEach(k => { if(!(k in M.deter)) return; M.deter[k] = !!on; if(on) ensureCone(k); }); runDeter(); syncAct(); }
+/* "Simulate visitor": someone walks up to the door at night, gets seen, lit and whistled at, lingers, gets whistled at again, leaves */
+function visitor(){ if(MODE.run) return; WH.prime();
+  return sequence('deter', async () => {
+    const auto = !DCAM.some(k => M.deter[k]), cams = () => DCAM.filter(k => M.deter[k]);
+    caption('Smart Deter', 'Watching the yard', ['eye', 'person', 'bulb', 'clock', 'spk']); capStep(0);
+    const f = fly(SH.front()); if(auto){ await wait(.5); setDeter(DCAM, true); } await f; if(!SKIP.on) await wait(1.2);
+    const per = DT.person = mkPerson(); runDeter();
+    try {
+      await Promise.all([tween(.7, e => per.fade(e)), per.walk(0, .17)]);
+      DT.track = per.chest; capStep(1, 'Person detected · Whistle'); detect(cams(), 'Person detected at the Front Door. Deter whistle sounded.');
+      await per.walk(.17, .32); DT.aim = per.aim; DT.spotOn = true; capStep(2, 'Spotlight follows');
+      await per.walk(.32, 1); per.at(1, false, false);
+      const n = LINGER.get(); for(let i = n; i > 0; i--){ capStep(3, `Lingering · ${i}s`); await wait(1); }
+      capStep(4, 'Whistle · Move along'); detect([...new Set(['ocspot', ...cams()])], `Person lingering over ${n}s. Spotlight whistle sounded.`); await wait(1.9);
+      await per.walk(1, .1, true); await Promise.all([tween(.6, e => per.fade(1 - e)), per.walk(.1, 0, true)]);
+    } finally { DT.track = null; DT.aim = null; DT.spotOn = false; per.dispose(); DT.person = null; runDeter(); }
+    capDone('Visitor deterred'); await wait(1);
+    if(auto){ setDeter(DCAM, false); }
+  }, { withHub:false }); }
 /* scenes menu */
 $('#dmScB').addEventListener('click', e => { e.stopPropagation(); if(MODE.run) return; scenesEl.classList.toggle('off'); $('#dmScB').classList.toggle('on', !scenesEl.classList.contains('off')); });
 scenesEl.addEventListener('click', e => { const b = e.target.closest('[data-sc]'); if(!b) return; scenesEl.classList.add('off'); $('#dmScB').classList.remove('on');
@@ -778,4 +950,4 @@ addEventListener('resize', () => { if((MODE.kind === 'panel' || MODE.kind === 'a
 
 /* ------------------------------------------------------------------ boot */
 DOOR.init(); GAR.init(); TH.paint(); paintArm(); syncAct();
-window.__demo = { stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, APP, automation, device, enterPanel, enterApp, appMatrix, appPip, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };
+window.__demo = { DT, setDeter, visitor, LINGER, WH, RING, stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, APP, automation, device, enterPanel, enterApp, appMatrix, appPip, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };

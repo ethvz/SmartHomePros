@@ -3,7 +3,7 @@
    Asset paths resolve from this file's own URL (pitch/), so it works from both pages.
    Parent hooks: AppEmu.on(fn) gets (type, detail) for the presenter's own taps only ('lock' {k,lock}, 'gar' {k,open},
    'sec' {k}, 'deter' {keys,on}, 'th' {k,set,mode}, 'light' {i,v,all}, 'sc' {k}); AppEmu.apply({...}) sets state from outside
-   without echoing back. */
+   without echoing back (deter {door,night,gen2: 0|1}; toast: 'message' shows an info toast). */
 window.AppEmu=(()=>{
 const BASE=(()=>{ try{ return new URL('../../',document.currentScript.src).href; }catch(e){ return ''; } })();
 const subs=new Set(); let QUIET=0;
@@ -245,8 +245,9 @@ const apply=o=>{ if(!R) return; QUIET++; try{
   if(o.lock) for(const k in o.lock) if(o.lock[k]!=null&&!!S.lock[k]!==!!o.lock[k]) doLock(k,o.lock[k]?1:0);
   if(o.gar) for(const k in o.gar) if(o.gar[k]!=null&&!!S.gar[k]!==!!o.gar[k]) doGar(k,o.gar[k]?1:0);
   if(o.th) for(const k in o.th){ const t=S.th[k], v=o.th[k]; if(t&&v){ Object.assign(t,v); } }
+  if(o.deter) for(const k in o.deter) if(k in S.deter&&!!S.deter[k]!==!!o.deter[k]) S.deter[k]=o.deter[k]?1:0;
   if(o.lights!=null){ const on=!!o.lights; [3,4].forEach(i=>{ if(!!S.light[i]!==on){ if(S.light[i]) S.lastL[i]=S.light[i]; S.light[i]=on?(S.lastL[i]||80):0; } }); }
-  render(); if(thK&&$('.ae-ts').classList.contains('on')) thSheet(); }finally{ QUIET--; } };
+  render(); if(thK&&$('.ae-ts').classList.contains('on')) thSheet(); if(o.toast) toast(o.toast,'info'); }finally{ QUIET--; } };
 const reset=()=>{ if(!R) return; closeSheets(); closeLive(); unpop(); $('.ae-arm').classList.remove('on'); $('.ae-menu').classList.remove('on'); $('.ae-page').classList.remove('on'); tab('home'); $('[data-v=home]').scrollTo({top:0}); };
 return {mount,state:S,on:f=>{ subs.add(f); return ()=>subs.delete(f); },apply,reset};
 })();

@@ -166,7 +166,7 @@ export default H => {
 
   // light ring (flush, 75 -> 70, R10/R7, hairline gaps) and the front glass (70 x 70 R7, holes for the lens and the light sensor)
   { const s = rrShape(74.7, 74.7, 13.85); s.holes.push(rrShape(70.3, 70.3, 11.15));
-    add(head, ext(s, 1.2, .12, PM.ring), 0, 0, -1.3);
+    add(head, ext(s, 1.2, .12, PM.ring), 0, 0, -1.3).userData.ring = true;   // demo.js: dark while deter is on, blinks on a detection
     const gs = rrShape(70, 70, 11), lh = new THREE.Path(); lh.absarc(0, -17, 9.84, 0, Math.PI*2, true); gs.holes.push(lh);
     const sh = new THREE.Path(); sh.absarc(0, -30.5, 1.7, 0, Math.PI*2, true); gs.holes.push(sh);
     add(head, ext(gs, 1.2, .15, glassK), 0, 0, -1.2); }

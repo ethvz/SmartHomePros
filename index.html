@@ -78,6 +78,10 @@ button { font: inherit; color: inherit; }
 .brand .t b { font-size: clamp(26px, 3.9vmin, 38px); margin-top: 0; white-space: nowrap; }
 @media (max-width: 700px) { .brand .t b { font-size: 23px; } .brand .t .mk { height: calc(23px * .73); } .brand .news { display: none; } .brand .annb { margin-left: auto; } }
 .brand .t .ts { display: none; }
+/* SHP mark (the rep silhouette badge, owner 2026-11-27): taller than the title's capitals, like a badge */
+.brand .t .mk.shpm { height: calc(clamp(26px, 3.9vmin, 38px) * 1.25) !important; width: auto; filter: drop-shadow(0 2px 10px rgba(0,0,0,.35)); }
+@media (max-width: 700px) { .brand .t .mk.shpm { height: 30px !important; } }
+@media (max-width: 700px) and (orientation: portrait) { .brand .t .mk.shpm { height: 36px !important; } }
 @media (max-width: 700px) and (orientation: portrait) { .brand .t .tl { display: none; } .brand .t .ts { display: inline; font-size: 30px; letter-spacing: .02em; } .brand .t .mk { height: calc(30px * .73); } }
 
 /* ---- news: story circles ---- */
@@ -600,7 +604,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 <main class="app">
   <div class="hero">
   <header class="brand">
-    <div class="t" role="heading" aria-level="1" aria-label="Smart Home Pros"><svg class="mk" viewBox="1296 36 312 352" aria-hidden="true"><path d="M1343.07,303.45c-21.88,0-39.58,17.52-39.58,39.15c0,21.620,17.69,39.15,39.58,39.15c21.82,0,39.58-17.53,39.58-39.15C1382.65,320.97,1364.89,303.45,1343.07,303.45z"/><path d="M1462.07,45l-155.72,141.25v52.92c57.67-20.1,120.93,9.9,141.22,67c4.19,11.7,6.32,24.03,6.320,36.43c0,12.74-2.26,24.93-6.32,36.34h134.03c20.02,0,36.25-16.04,36.25-35.84c0-0.01,0-0.03,0-0.05v-156.8L1462.07,45z"/></svg><b><span class="tl">Smart Home Pros</span><span class="ts">SHP</span></b></div>
+    <div class="t" role="heading" aria-level="1" aria-label="Smart Home Pros"><img class="mk shpm" src="connect/shp-mark.png" alt="" draggable="false"><b><span class="tl">Smart Home Pros</span><span class="ts">SHP</span></b></div>
     <nav class="news" aria-label="New announcements"></nav>
     <button class="gear" aria-label="Settings" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1z"/></svg></button>
   </header>
