@@ -541,6 +541,8 @@ button { font: inherit; color: inherit; }
   background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.035)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 34px -16px rgba(0,0,0,.7); }
 .wg[data-sz="m"] { grid-column: span 4; }
 .wg[data-sz="l"] { grid-column: span 4; grid-row: span 4; }
+.wg[data-sz="xl"] { grid-column: span 8; grid-row: span 4; }
+@media (max-width: 600px) { .wg[data-sz="xl"] { grid-column: span 4; } }   /* phones: as wide as the screen allows */
 .wg > .wx { display: none; }
 .wf { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; padding: clamp(12px, 7cqmin, 20px); display: flex; flex-direction: column; }
 .wf.nw { animation: wfIn .45s var(--ease); } @keyframes wfIn { from { opacity: 0; } }
@@ -616,6 +618,23 @@ button { font: inherit; color: inherit; }
 .md.td span { background: rgb(var(--g)); color: #000; font-weight: 700; }
 .md i { position: absolute; left: 50%; bottom: 2%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: rgb(var(--c)); }
 .wg[data-sz="l"] .nl { flex: none; }
+/* wide calendar: the month on the left, what's coming up on the right */
+.cx { flex: 1; min-height: 0; display: flex; gap: clamp(14px, 4cqmin, 28px); }
+.cxm, .cxl { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.cxl { padding-left: clamp(14px, 4cqmin, 28px); box-shadow: inset 1px 0 0 rgba(255,255,255,.08); }
+.cxl .wt { margin-right: 34px; } .cxl .nl { gap: clamp(8px, 2.4cqmin, 12px); } .cxl .ne b { font-size: clamp(13px, 3.6cqmin, 17px); } .cxl .ne small { font-size: clamp(11px, 3cqmin, 14px); }
+.cxm .wt { margin-right: 0; }
+@container (max-width: 640px) { .cx { flex-direction: column; gap: 8px; } .cxl { flex: none; padding-left: 0; box-shadow: none; } .cxl .wt { display: none; } .cxl .nl { max-height: 84px; } }
+/* size menu: tap a widget's corner in edit mode */
+.wsm { position: fixed; z-index: 36; display: flex; gap: 4px; padding: 6px; border-radius: 24px; background: rgba(32,36,39,.9); -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 24px 60px rgba(0,0,0,.65); animation: wsmIn .26s var(--ease); }
+.wsm.out { animation: wsmOut .18s ease-in forwards; pointer-events: none; }
+@keyframes wsmIn { from { opacity: 0; transform: scale(.85); } } @keyframes wsmOut { to { opacity: 0; transform: scale(.9); } }
+.wsm button { min-width: 76px; height: 80px; padding: 0 8px; border: 0; border-radius: 18px; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.78); cursor: pointer; transition: background .2s, transform .2s var(--ease); }
+.wsm button:active { transform: scale(.92); background: rgba(255,255,255,.1); }
+.wsm button i { display: grid; place-items: end start; height: 30px; }
+.wsm button i b { display: block; width: calc(var(--w) * 7.5px); height: calc(var(--h) * 7.5px); border-radius: 5px; box-shadow: inset 0 0 0 2px currentColor; background: rgba(255,255,255,.06); }
+.wsm button.on { color: rgb(var(--g)); background: rgba(var(--g), .14); } .wsm button.on i b { background: rgba(var(--g), .25); }
 /* faces: feedback */
 .wg[data-k="fb"] { background: linear-gradient(140deg, rgba(var(--g), .2), rgba(var(--y), .06) 70%), rgba(255,255,255,.03); box-shadow: inset 0 0 0 1px rgba(var(--g), .26), 0 14px 34px -16px rgba(0,0,0,.7); }
 .wg[data-k="fb"] .wf { padding: 0; }
@@ -639,7 +658,7 @@ body.wedit .card { opacity: 1; transform: none; }
 body.wedit .brand { pointer-events: none; opacity: .45; transition: opacity .3s; }
 body.wedit .more .in { padding-bottom: 96px; }
 @keyframes jig { from { rotate: calc(-1 * var(--ja, 1deg)); } to { rotate: var(--ja, 1deg); } }
-.wg[data-sz="m"] { --ja: .55deg; } .wg[data-sz="l"] { --ja: .38deg; }
+.wg[data-sz="m"] { --ja: .55deg; } .wg[data-sz="l"] { --ja: .38deg; } .wg[data-sz="xl"] { --ja: .22deg; }
 .card:nth-child(2n), .wg:nth-child(2n) { --jd: -.13s; } .card:nth-child(3n), .wg:nth-child(3n) { --jd: -.07s; } .card:nth-child(4n), .wg:nth-child(4n) { --jd: -.19s; }
 .wg.drag { background-color: rgb(24,28,31); }
 .wg.drag, .card.drag { z-index: 20; animation: none !important; scale: 1.05; box-shadow: 0 34px 80px -12px rgba(0,0,0,.9); transition: scale .25s var(--ease), box-shadow .25s !important; }
@@ -787,7 +806,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
     };
     try { var o = JSON.parse(localStorage.getItem('shpc_order') || 'null'); if (o) shpcOrder(o); } catch (e) {}
     /* widget sizes (s / m / l), shpc_wsz { data-k: size } */
-    try { var z = JSON.parse(localStorage.getItem('shpc_wsz') || 'null'); if (z) [].forEach.call(I.children, function (w) { if (/^[sml]$/.test(z[w.dataset.k])) w.dataset.sz = z[w.dataset.k]; }); } catch (e) {}
+    try { var z = JSON.parse(localStorage.getItem('shpc_wsz') || 'null'); if (z) [].forEach.call(I.children, function (w) { if (/^(s|m|l|xl)$/.test(z[w.dataset.k])) w.dataset.sz = z[w.dataset.k]; }); } catch (e) {}
   })();
   </script>
 </main>
@@ -1437,7 +1456,9 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
     cal: function (sz) {
       if (sz === 's') return dayBlock() + '<div class="nl">' + evRows(2) + '</div>';
       if (sz === 'm') return '<div class="cm">' + dayBlock() + '<div class="nl">' + evRows(3) + '</div></div>';
-      var t = dt(TODAY); return wt('cal', MONL[t.getUTCMonth()] + ' ' + t.getUTCFullYear()) + mini() + '<div class="nl">' + evRows(2) + '</div>';
+      var t = dt(TODAY), mo = wt('cal', MONL[t.getUTCMonth()] + ' ' + t.getUTCFullYear()) + mini();
+      if (sz === 'xl') return '<div class="cx"><div class="cxm">' + mo + '</div><div class="cxl">' + wt('arrow', 'Coming up') + '<div class="nl">' + evRows(7) + '</div></div></div>';
+      return mo + '<div class="nl">' + evRows(2) + '</div>';
     },
     fb: function (sz) {
       return '<button class="wfb" data-wa="fb">' + svg('fb') + '<span><b>' + (sz === 's' ? 'Feedback' : 'Tell us what to fix') + '</b><small>' + (sz === 's' ? 'What should we fix?' : 'Your feedback goes straight to the team') + '</small>' + (sz === 'l' ? '<em>Send feedback</em>' : '') + '</span></button>';
@@ -1497,7 +1518,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
      Tiles wiggle; drag one to move it (the others make room), pull a widget's corner to resize it (a tap on the corner
      steps s > m > l). The 4 app tiles reorder among themselves. Order in shpc_order, widget sizes in shpc_wsz. ---- */
   var cards = $('.cards'), grid = $('.more .in'), rbar = $('.rbar');
-  var SZ = { s: [2, 2], m: [4, 2], l: [4, 4] }, gap = 14, u = 128, edit = false, eat = 0;
+  var SZ = { s: [2, 2], m: [4, 2], l: [4, 4], xl: [8, 4] }, SZN = { s: 'Small', m: 'Medium', l: 'Large', xl: 'Wide' }, cols = 8, gap = 14, u = 128, edit = false, eat = 0;
   function items(box) { return $$(':scope > [data-k]', box); }
   function keys(box) { return items(box).map(function (x) { return x.dataset.k; }); }
   function sizes() { var o = {}; items(grid).forEach(function (w) { o[w.dataset.k] = w.dataset.sz; }); return o; }
@@ -1505,7 +1526,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
   function vib() { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} }
   /* square grid units: the row height is the column width */
   function measure() {
-    var cs = getComputedStyle(grid), cols = cs.gridTemplateColumns.split(' ').length || 8; gap = parseFloat(cs.columnGap) || 12;
+    var cs = getComputedStyle(grid); cols = cs.gridTemplateColumns.split(' ').length || 8; gap = parseFloat(cs.columnGap) || 12;
     u = Math.max(40, (grid.clientWidth - gap * (cols - 1)) / cols); grid.style.setProperty('--u', u.toFixed(2) + 'px');
   }
   measure(); if (window.ResizeObserver) new ResizeObserver(measure).observe(grid); else addEventListener('resize', measure);
@@ -1566,18 +1587,34 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
     eat = Date.now() + 400; save();
   }
 
-  /* resize: pull the corner; the widget snaps to whichever size is nearest the finger */
+  /* resize: tap the corner for a menu of sizes, or pull it; the widget snaps to whichever size is nearest the finger.
+     The calendar also goes wide (8 x 4), on screens with room for it. */
+  function fits(el) { return Object.keys(SZ).filter(function (k) { return k !== 'xl' || (el.dataset.k === 'cal' && cols >= 8); }); }
+  var M = null;
+  function closeSize() { if (!M) return; var m = M.box; M = null; m.classList.add('out'); setTimeout(function () { m.remove(); }, 200); }
+  function sizeMenu(el) {
+    closeSize(); var box = document.createElement('div'); box.className = 'wsm'; box.setAttribute('role', 'menu'); box.setAttribute('aria-label', 'Size');
+    box.innerHTML = fits(el).map(function (k) { return '<button type="button" role="menuitemradio" aria-checked="' + (k === el.dataset.sz) + '" data-z="' + k + '" class="' + (k === el.dataset.sz ? 'on' : '') + '"><i><b style="--w:' + SZ[k][0] + ';--h:' + SZ[k][1] + '"></b></i>' + SZN[k] + '</button>'; }).join('');
+    body.appendChild(box); M = { box: box, el: el };
+    var c = $('.wrz', el).getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
+    var top = c.bottom + 6 + h < innerHeight - 10 ? c.bottom + 6 : Math.max(10, c.top - h - 6);
+    box.style.left = Math.max(10, Math.min(innerWidth - w - 10, c.right - w)) + 'px'; box.style.top = top + 'px';
+    box.style.transformOrigin = (c.right - parseFloat(box.style.left)) + 'px ' + (top > c.top ? '0' : '100%');
+    box.addEventListener('click', function (e) { var b = e.target.closest('[data-z]'); if (!b) return; if (b.dataset.z !== el.dataset.sz) setSize(el, b.dataset.z); save(); closeSize(); });
+    setTimeout(function () { var b = $('.on', box) || $('button', box); if (b) b.focus({ preventScroll: true }); }, 30);
+  }
+  app.addEventListener('scroll', closeSize, { passive: true }); addEventListener('resize', closeSize);
   function setSize(el, sz) { flip([grid], function () { el.dataset.sz = sz; SHPW.render(el); }); vib(); }
   function rzMove(x, y) {
     if (!R.moved && Math.hypot(x - R.x, y - R.y) < 8) return; R.moved = true;
     var now = performance.now(); if (now < R.cool) return;
     var r = lay(R.el), pr = grid.offsetParent.getBoundingClientRect(), cw = u + gap, c = (x - pr.left - r.l + gap / 2) / cw, rw = (y - pr.top - r.t + gap / 2) / cw, best = null, bd = 1e9;
-    Object.keys(SZ).forEach(function (k) { var d = Math.pow(SZ[k][0] - c, 2) + Math.pow(SZ[k][1] - rw, 2); if (d < bd) { bd = d; best = k; } });
+    closeSize(); fits(R.el).forEach(function (k) { var d = Math.pow(SZ[k][0] - c, 2) + Math.pow(SZ[k][1] - rw, 2); if (d < bd) { bd = d; best = k; } });
     if (best !== R.el.dataset.sz) { setSize(R.el, best); R.cool = now + 260; }
   }
   function rzEnd(tap) {
     var r = R; R = null; r.el.classList.remove('rsz');
-    if (tap && !r.moved) setSize(r.el, { s: 'm', m: 'l', l: 's' }[r.el.dataset.sz] || 's');
+    if (tap && !r.moved) { if (r.had) closeSize(); else sizeMenu(r.el); }
     eat = Date.now() + 400; save();
   }
 
@@ -1586,14 +1623,15 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
     if (edit) return; closeOv(true); edit = true; body.classList.add('wedit'); vib();
     setTimeout(function () { if (edit) $('.rdone').focus({ preventScroll: true }); }, 400);
   }
-  function done() { if (!edit) return; edit = false; clearT(); if (D) drop(); body.classList.remove('wedit'); save(); }
+  function done() { if (!edit) return; closeSize(); edit = false; clearT(); if (D) drop(); body.classList.remove('wedit'); save(); }
   document.addEventListener('pointerdown', function (e) {
+    if (M && !M.box.contains(e.target) && !(e.target.closest && e.target.closest('.wrz'))) { closeSize(); eat = Date.now() + 500; return; }
     if (e.button > 0 || D || R || !e.isPrimary) return;
     var t = e.target; if (!app.contains(t) || cur) return;
     var tile = t.closest('.wg, .card');
     if (edit) {
       var rz = t.closest('.wrz');
-      if (rz) { e.preventDefault(); R = { el: rz.parentNode, x: e.clientX, y: e.clientY, moved: false, cool: 0 }; R.el.classList.add('rsz'); return; }
+      if (rz) { e.preventDefault(); R = { el: rz.parentNode, x: e.clientX, y: e.clientY, moved: false, cool: 0, had: !!(M && M.el === rz.parentNode) }; R.el.classList.add('rsz'); return; }
       if (!tile) return;
       clearT(); T = { x: e.clientX, y: e.clientY, el: tile, armed: e.pointerType === 'mouse' };
       if (!T.armed) T.arm = setTimeout(function () { if (T) T.armed = true; }, 150);   /* a quick swipe still scrolls the page */
@@ -1665,7 +1703,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
   }
   $('.x', wov).addEventListener('click', function () { closeOv(); });
   $('.scrim', wov).addEventListener('click', function () { closeOv(); });
-  addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (cur && !document.querySelector('.drawer.on, .evp.on, .story.on, .mc.on')) closeOv(); else if (edit) done(); });
+  addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (M) { closeSize(); return; } if (cur && !document.querySelector('.drawer.on, .evp.on, .story.on, .mc.on')) closeOv(); else if (edit) done(); });
   grid.addEventListener('click', function (e) { var b = e.target.closest('.wbig'); if (b && !edit) { e.stopPropagation(); openOv(b.parentNode.dataset.k); } });
   window.shpcWidget = { open: openOv, close: closeOv, edit: enter, done: done };
   function toast(msg, act, fn) { var t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); body.appendChild(t); }

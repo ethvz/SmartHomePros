@@ -28,13 +28,13 @@ html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barR
   html.pp #burger,html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #barRight.pnav .bbtn,html.pp #bar #prodBtn,html.pp #bar #amtBtn{transition:opacity .2s ease,color .15s ease!important}
   html.pp #burger:active,html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barRight.pnav .bbtn:active,html.pp #bar #prodBtn:active,html.pp #bar #amtBtn:active{transform:none}}
 
-/* Home: one row = Tiles | 3D Home on the left (12-178), the four categories on the right (188-588). Burger + logo are at the top;
+/* Home: one row = the four categories on the left (12-412), Tiles | 3D Home in the bottom-right corner (422-588). Burger + logo are at the top;
    About / Videos / Yard Sign live in the menu only (the old #homeX pill is gone, nav/shpnav.css) */
-html.pp #bar #hmode{left:12px!important;right:auto!important;transform:none!important;bottom:var(--ppB)!important}
+html.pp #bar #hmode{left:auto!important;right:12px!important;transform:none!important;bottom:var(--ppB)!important}
 html.pp #bar #hmode button{width:78px!important}
 html.pp #bar #hmode i{top:5px!important;left:5px!important;width:78px!important;height:58px!important;border-radius:29px!important}
 html.pp #bar #hmode.d3 i{transform:translateX(80px)!important}
-html.pp #bar.home #barRight.pnav{left:auto!important;right:12px!important;transform:none!important;bottom:var(--ppB)!important;width:calc(100% - 12px - 12px - 166px - 10px)!important;box-sizing:border-box;justify-content:space-between}
+html.pp #bar.home #barRight.pnav{left:12px!important;right:auto!important;transform:none!important;bottom:var(--ppB)!important;width:calc(100% - 12px - 12px - 166px - 10px)!important;box-sizing:border-box;justify-content:space-between}
 html.pp #bar.home #barRight.pnav .bbtn{flex:1 1 0!important;width:auto!important;min-width:0}
 html.pp #bar #homeX{left:auto!important;right:12px!important;transform:none!important}
 html.pp #bar #homeX .bbtn{width:84px!important}

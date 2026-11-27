@@ -1045,6 +1045,7 @@ body,button,input{font-family:"Vivint Sans",Figtree,system-ui,sans-serif}
 
 /* home: nav pill back at the bottom, tiles full size */
 #bar.home #barRight.pnav{top:auto!important;right:auto!important;left:50%!important;bottom:7px!important;transform:translateX(-50%)!important;flex-direction:row!important;width:auto!important;padding:5px!important;gap:2px!important;animation:none!important}
+#bar.home #barRight.pnav{left:var(--hcx,50%)!important}   /* slides left of the view pill when the bar is too narrow for both */
 #bar.home #barRight.pnav .bbtn{width:72px!important;height:44px!important;border-radius:22px!important}
 #bar.home #barRight.pnav .bbtn .ic{width:19px;height:19px}
 #bar.home #barRight.pnav .rdiv{width:1px;height:26px;margin:0 5px}
@@ -4991,11 +4992,15 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
     if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=41&fb=76';   /* (SHP app: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
-  /* keep the pill halfway between the logo and the category pill (both move with the layout) */
-  const place=()=>{ const bar=$('#bar'), lg=$('#barlogo'), cat=$('#barRight'); if(!bar||!lg||!cat) return; const b=bar.getBoundingClientRect(), l=lg.getBoundingClientRect(), c=cat.getBoundingClientRect();
-    if(!l.width||!c.width) return; pill.style.setProperty('--hmx', ((l.right+c.left)/2 - b.left)*(bar.offsetWidth/b.width)+'px'); };   /* the stage is scaled to fit: back to bar px */
+  /* the view pill sits in the bottom-right corner; the category pill stays centred unless that would touch it,
+     then it moves to the middle of the room left of the view pill (after the logo, when it shows) */
+  const place=()=>{ const bar=$('#bar'), lg=$('#barlogo'), cat=$('#barRight'); if(!bar||!cat||!bar.classList.contains('home')) return;
+    const b=bar.getBoundingClientRect(), p=pill.getBoundingClientRect(), k=bar.offsetWidth/(b.width||1), cw=cat.offsetWidth; if(!p.width||!cw) return;   /* the stage is scaled to fit: back to bar px */
+    const l=lg&&lg.getBoundingClientRect(), lo=(l&&l.width&&l.right<p.left?l.right-b.left:0)*k+12, hi=(p.left-b.left)*k-12, mid=bar.offsetWidth/2;
+    if(mid+cw/2<=hi&&mid-cw/2>=lo) bar.style.removeProperty('--hcx'); else bar.style.setProperty('--hcx', Math.max(cw/2+8,(lo+hi)/2)+'px'); };
   addEventListener('resize',place); new ResizeObserver(place).observe($('#bar')); [0,120,400,700,1200].forEach(t=>setTimeout(place,t));
   $('#barRight').addEventListener('transitionend',place);
+  new MutationObserver(place).observe($('#bar'),{attributes:true,attributeFilter:['class']});
   /* run the 3D scene only while it is on screen (3D view picked and the home page showing) */
   const ctl=()=>{ const f=box.firstChild; if(!f||!f.contentWindow) return; const on=pg.classList.contains('d3')&&pg.classList.contains('on')&&!document.hidden; f.contentWindow.postMessage({fpTourCtl:on?'resume':'pause'},'*'); };
   new MutationObserver(ctl).observe(pg,{attributes:true,attributeFilter:['class']}); document.addEventListener('visibilitychange',ctl);
@@ -5627,7 +5632,7 @@ body.ly-on [contenteditable=true]{outline:2px solid #05E5AF!important;cursor:tex
 #p-home #tour3d{left:0!important;right:0!important;top:0!important;bottom:0!important;border-radius:0!important}
 /* Tiles | 3D Home: a footer pill like About / Videos / Yard Sign (icon over small label), on the home page only, centred
    halfway between the vivint logo and the category pill (left set by the script below) */
-#bar #hmode{position:absolute;top:auto;bottom:7px;left:var(--hmx,26%);transform:translateX(-50%);display:flex;gap:2px;padding:5px;border-radius:999px;background:#1c1c1c;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.45);z-index:31;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+#bar #hmode{position:absolute;top:auto;bottom:7px;left:auto;right:calc(18px + env(safe-area-inset-right,0px));transform:none;display:flex;gap:2px;padding:5px;border-radius:999px;background:#1c1c1c;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.45);z-index:31;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
 #bar.home #hmode{opacity:1;visibility:visible;transition:opacity .3s}
 #bar #hmode button{width:72px;height:44px;min-width:0;padding:0;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(255,255,255,.62);font:inherit;letter-spacing:0}
 #bar #hmode button:active{transform:scale(.95)}
@@ -5658,7 +5663,7 @@ document.addEventListener('click',e=>{ const t=e.target.closest&&e.target.closes
 </script>
 <!-- iPhone portrait layouts (html.pp), one file per section group -->
 <style>html.pp #stage{height:var(--H)}</style>
-<link rel="stylesheet" href="pp/shell.css?v=14"><script src="pp/shell.js?v=7" defer></script>
+<link rel="stylesheet" href="pp/shell.css?v=15"><script src="pp/shell.js?v=7" defer></script>
 <link rel="stylesheet" href="pp/prodA.css?v=2"><script src="pp/prodA.js?v=2" defer></script>
 <link rel="stylesheet" href="pp/prodB.css?v=2"><script src="pp/prodB.js?v=2" defer></script>
 <link rel="stylesheet" href="pp/sales.css?v=1"><script src="pp/sales.js?v=1" defer></script>
