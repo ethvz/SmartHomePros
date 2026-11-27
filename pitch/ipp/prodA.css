@@ -147,9 +147,9 @@ html.ipp #prScroll .icm .ocm-col{left:var(--ipL)!important;right:var(--ipR)!impo
 html.ipp #prScroll .icm .dbm-h{width:auto!important;min-height:0!important}
 html.ipp #prScroll .icm .dbm-list{display:grid!important;grid-template-columns:1fr 1fr;column-gap:16px;width:auto!important}
 html.ipp #prScroll .icm .ocm-fade{display:none!important}
-html.ipp #prScroll .icm .ocm-card{left:216px!important;top:calc(var(--ipTop) + 450px)!important;height:calc(var(--H) - var(--ipTop) - 450px)!important}
+html.ipp #prScroll .icm .ocm-card{left:216px!important;top:calc(var(--ipTop) + 500px)!important;height:calc(var(--H) - var(--ipTop) - 500px)!important}
 html.ipp #prScroll .icm .ocm-phone{left:56px!important;top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
-html.ipp #prScroll .icm .ocm-cap{left:72px!important;top:auto!important;bottom:calc(var(--ipBot) + 520px)!important}
+html.ipp #prScroll .icm .ocm-cap{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 412px)!important;bottom:auto!important;transform:none!important;z-index:4}
 
 /* ---------- Smart Thermostat Highlights (.thc): the picture on top (scaled by --ipThk from ipp/prodA.js), headline + the ten
    features under it in two columns ---------- */
@@ -173,15 +173,24 @@ html.ipp #p-hub #hbCall>.hbln,html.ipp #p-hub #hbCall>.hbdot{display:none!import
 html.ipp #p-hub #hbCall>.hbco{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:15px;line-height:21px;padding-left:24px}
 html.ipp #p-hub #hbCall>.hbco b{font-size:20px;line-height:24px;margin-bottom:8px}
 html.ipp #p-hub #hbCall>.hbco::before{content:"";position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:50%;background:var(--vg,#05E5AF);box-shadow:0 0 10px rgba(5,229,175,.6)}
-html.ipp #p-hub #hbSpec .hbspec{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 540px)!important}
+html.ipp #p-hub #hbSpec .hbspec{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 580px)!important}
 html.ipp #p-hub #hbScroll .otab.fb>.fsp{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
 /* History / What's New / Outage: each pane is one 1032-wide screen; panes sit 1376 apart because the pill slides by 1376 */
 html.ipp #p-hub #hbX .hbpane{width:1032px!important;height:var(--H)!important;margin-right:344px}
 html.ipp #p-hub #hbScroll .hx3{height:var(--H)!important}
 html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbH{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 20px)!important}
-html.ipp #p-hub #hbScroll .hbsub{left:var(--ipL)!important;right:var(--ipR)}
+html.ipp #p-hub #hbScroll .hbsub{left:var(--ipL)!important;right:var(--ipR);top:calc(var(--ipTop) + 96px)!important}
+html.ipp #p-hub #hbScroll #hbOut .hbt{top:calc(var(--ipTop) + 150px)!important}
 html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 120px)!important}
-html.ipp #p-hub #hbScroll .hbnew{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 130px)!important;grid-template-columns:1fr!important}
+html.ipp #p-hub #hbScroll .hbnew{left:var(--ipL)!important;right:var(--ipR)!important;top:calc(var(--ipTop) + 120px)!important;bottom:calc(var(--ipBot) + 120px)!important;grid-template-columns:1fr 1fr!important;gap:0 36px!important;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;align-content:start}
+html.ipp #p-hub #hbScroll .hbnew::-webkit-scrollbar{display:none}
+html.ipp #p-hub #hbScroll .hbnew>div{padding-top:0!important}
+html.ipp #p-hub #hbScroll .hbnew .th{gap:16px;margin-bottom:16px}
+html.ipp #p-hub #hbScroll .hbnew .th img{width:170px}
+html.ipp #p-hub #hbScroll .hbnew .th span{font-size:19px}
+html.ipp #p-hub #hbScroll .hbnew .ft{gap:16px;margin-bottom:22px}
+html.ipp #p-hub #hbScroll .hbnew .ft img{width:36px;height:36px}
+html.ipp #p-hub #hbScroll .hbnew .ft b{font-size:19px}
 html.ipp #p-hub #hbScroll .hb3pill{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
 html.ipp #p-hub #hbOut .hbfoot{left:var(--ipL)!important;right:var(--ipR)}
 /* hero: the whole Hub in view (the landscape video at near its landscape size) over a soft copy of its wall; title on top */
@@ -208,3 +217,18 @@ html.ipp #thSaveBg{display:none!important}
 html.ipp #thScroll .thc .thm[data-k=save] img.thm-full{display:block!important;max-width:700px!important;left:0!important;top:0!important;width:700px!important;height:700px!important;object-position:50% 40%;-webkit-mask-image:none!important;mask-image:none!important;border-radius:36px!important}
 html.ipp #thScroll .thc .thm[data-k=save] .thm-stat.thm-big{display:block!important;left:44px!important;top:470px!important}
 html.ipp #thScroll .thc .thm[data-k=save] img.thm-estar{display:block!important;right:30px!important;top:30px!important}
+
+/* ---------- review round 1 ---------- */
+/* heroes whose product sits low in the photo: the copy moves to the top left on a soft top shade (as on Indoor Camera / Door & Window) */
+html.ipp #prScroll .lhero:has(img[src*="ph/lock3"],img[src*="ph/chime3"],img[src*="ph/fob."]) .lh-txt{top:calc(var(--ipTop) + 50px)!important;bottom:auto!important}
+html.ipp #prScroll .lhero:has(img[src*="ph/lock3"],img[src*="ph/chime3"],img[src*="ph/fob."]) .lh-scrim{background:linear-gradient(180deg,rgba(0,0,0,.66) 0,rgba(0,0,0,.4) 22%,rgba(0,0,0,0) 44%,rgba(0,0,0,0) 80%,rgba(0,0,0,.4) 100%)!important}
+/* Hub tables: larger, readable type */
+html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt{row-gap:8px!important}
+html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .rl{font-size:17px!important}
+html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .c{font-size:15px!important;min-height:44px!important}
+html.ipp #p-hub #hbScroll :is(#hbX,#hbCmp) .hbt .hd{font-size:16px}
+html.ipp #p-hub #hbScroll #hbHist .hbt .c{min-height:40px!important}
+/* garage tip: stays at full size (ipp/prodA.js anchors it on the artwork) */
+html.ipp #prScroll .psec>.tip{z-index:7}
+/* Which smoke: on shorter iPads the cards drop the long description so the bullets and button keep clear */
+@media (min-aspect-ratio:72/100){ html.ipp #prScroll .smk-c>p{display:none!important} html.ipp #prScroll .smk-c{padding-top:32px!important} }

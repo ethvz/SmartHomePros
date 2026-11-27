@@ -26,7 +26,7 @@
     'ph/plug3':.33,'ph/chime3':.40,'ph/garage2':.25,'ph/firefighter':.55,'ph/therm2':.675,'ph/dws_surf':.62,'ph/dws_rec':.25,'p/ic_hero':.46,
     'gal/lock_0':.40,'gal/lock_1':.27,'gal/lock_2':.27,'gal/lock_3':.53,'gal/lock_4':.40,'gal/lock_5':.55,'gal/lock_6':.52,'gal/lock_7':.52,'gal/lock_8':.28,
     'gal/therm_0':.50,'gal/therm_1':.83,'gal/therm_2':.42,'gal/therm_3':.66,'gal/garage_0':.72,'gal/garage_1':.52,'gal/garage_2':.22,'gal/garage_3':.33,
-    'gal/hub_0':.63,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.83,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
+    'gal/hub_0':.53,'gal/hub_1':.64,'gal/hub_2':.42,'gal/hub_3':.83,'gal/hub_4':.70,'gal/hub_5':.66,'gal/hub_6':.68,'gal/hub_7':.70,'gal/hub_8':.68,
     'gal/icp_0':.63,'gal/icp_1':.65,'gal/icp_2':.73,'gal/icp_3':.32,'gal/icp_4':.40,'gal/icp_5':.37,'gal/icp_6':.62};
   const focKey=el=>{ const u=el.getAttribute('src')||el.getAttribute('poster')||''; const m=u.match(/assets\/((?:ph|gal|p)\/[\w]+)\./); return m&&m[1]; };
   function focal(){ const on=isI();
@@ -66,7 +66,7 @@
           const tops=[...pn.children].filter(c=>!c.matches('img,svg')&&c.offsetHeight).map(c=>c.offsetTop), tTop=tops.length?Math.min(...tops):H-F-300;
           const free=Math.max(200,tTop-56-(T+30)); k=Math.min(600/gw,free/gh,cap); X=(L+W-R)/2-gw*k/2; Y=T+30+(free-gh*k)/2; }
         else {
-          const colW=400, free=H-T-F-190; k=Math.min(colW/gw,free/gh,cap); X=L+(colW-gw*k)/2; Y=T+40+(free-gh*k)/2;
+          const colW=420, tog=pn.closest('.psec')&&pn.closest('.psec').querySelector('.hl .dwseg')?100:0, free=Math.min(560,H-T-F-210-tog); k=Math.min(Math.sqrt(400*460/(gw*gh)),colW/gw,free/gh,cap); X=L+(colW-gw*k)/2; Y=T+40+(free-gh*k)/2;
           const th=fst.offsetHeight; setI(fst,'left',(L+colW+56)+'px'); setI(fst,'width',(W-R-(L+colW+56))+'px'); setI(fst,'top',Math.max(T+60,Math.round(Y+gh*k/2-th/2+20))+'px'); }
         ims.forEach((im,i)=>{ const r=R0[i]; setI(im,'left',(X+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); });
         if(svg){ setI(svg,'transform-origin','0 0'); setI(svg,'transform',`translate(${(X-gx*k).toFixed(1)}px,${(Y-gy*k).toFixed(1)}px) scale(${k.toFixed(4)})`); }
@@ -79,14 +79,14 @@
      layouts where the landscape arrangement already fits the upright width and the tiles stay beside the picture. ---- */
   const LAY={
     'lock:lock':{mode:'stack',crops:[[70,200,820,590],[930,190,420,610]],w:[1,.8]},
-    'lock:lock:2':{crops:[[176,104,930,700]]},
+    'lock:lock:2':{crops:[[176,150,930,654]]},
     'lock:lock:3':{crops:[[462,8,496,776]]},
-    'lock:colors':{mode:'grid',crops:[[66,222,296,428],[362,222,296,428],[660,222,296,428],[1004,222,296,428]],fade:['r','r','r','l'],labels:['Bronze','Nickel','Brass','Matte Black']},
-    'garage:garage':{mode:'stack',crops:[[80,130,500,720],[592,190,696,710]],w:[.8,1]},
+    'lock:colors':{mode:'stack',crops:[[56,220,700,480],[636,220,684,480]],fade:['r','l']},
+    'garage:garage':{mode:'stack',crops:[[80,130,500,720],[560,200,730,690]],w:[.8,1]},
     'garage:gphone':{keep:1,crops:[[200,30,900,900]]},
-    'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.86],fade:['','','b']},
+    'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.86],fade:['','','lrb']},
     'app:phone':{crops:[[90,60,700,840]]}};
-  const ART='img.full,video.ovid,.hl,.tip,.xf-ghost', CAPK=1.65;
+  const ART='img.full,video.ovid,.hl,.xf-ghost', CAPK=1.65;
   function artSecs(){ const b=$('#prScroll'); return b?[...b.children].filter(s=>s.classList.contains('psec')&&(s.querySelector(':scope>img.full')||s.querySelector(':scope>.ipart>img.full'))):[]; }
   function ghost(sec,w,i){ let g=sec.querySelector(':scope>.ipart.ipx[data-i="'+i+'"]');
     if(!g){ g=document.createElement('div'); g.className='ipart ipx'; g.dataset.i=i; g.setAttribute('aria-hidden','true'); g.innerHTML='<img class="full" alt=""><video class="ovid" muted playsinline loop></video>'; w.after(g); }
@@ -109,7 +109,7 @@
     artSecs().forEach(sec=>{
       let w=sec.querySelector(':scope>.ipart:not(.ipx)'), c=sec.querySelector(':scope>.ipctl');
       if(!on){ if(w){ [...w.children].forEach(x=>sec.insertBefore(x,w)); w.remove(); } if(c){ const hl=sec.querySelector('.hl'); [...c.children].forEach(x=>hl&&hl.appendChild(x)); c.remove(); }
-        sec.querySelectorAll(':scope>.ipart.ipx,:scope>.iplab').forEach(x=>{ const v=x.querySelector('video'); if(v) v.pause(); x.remove(); }); setCls(sec,'ipA-tiles',0); return; }
+        sec.querySelectorAll(':scope>.ipart.ipx,:scope>.iplab').forEach(x=>{ const v=x.querySelector('video'); if(v) v.pause(); x.remove(); }); setCls(sec,'ipA-tiles',0); const tp=sec.querySelector(':scope>.tip'); if(tp&&tp.style.translate) tp.style.translate=''; return; }
       if(!w){ w=document.createElement('div'); w.className='ipart'; sec.insertBefore(w,sec.firstChild); }
       sec.querySelectorAll(':scope>'+ART.split(',').join(',:scope>')).forEach(x=>w.appendChild(x));
       const sub=PR&&PR.st&&PR.st[sec.dataset.t]?PR.st[sec.dataset.t].sub:null;
@@ -120,6 +120,7 @@
       const n=c?c.querySelectorAll('.lvt').length:0, list=c&&c.querySelector('.lvl');
       const cols=n<=5?n:4, rows=list?0:n?Math.ceil(n/cols):0, th=n<=5?130:112, ctlH=list?list.children.length*64:rows*th+(rows?(rows-1)*12:0);
       if(c){ c.style.setProperty('--cols',cols||1); c.style.setProperty('--th',th+'px'); } setCls(sec,'ipA-tiles',n>0);
+      const tip=sec.querySelector(':scope>.tip'); let tipT=''; if(w.querySelector(':scope>.tip')) sec.appendChild(w.querySelector(':scope>.tip'));
       const top0=T+24, bot=F+(n?36:110), gap=ctlH?36:0, avail=H-top0-bot-ctlH-gap;
       const used=new Set([0]); let blockH=0;
       if(Ly.mode==='grid'){ const lh=48, gx=24, gy=20, cw=(CW-gx)/2, x0=L; let k=Math.min(CAPK,...cr.map(r=>cw/r[2]),...cr.map(r=>(avail-2*lh-gy)/2/r[3]));
@@ -131,7 +132,10 @@
       else { const ws=Ly.w||cr.map(()=>1), sg=24, maxW=Ly.keep?CW:CW;
         let k=Math.min(CAPK,...cr.map((r,i)=>maxW/(r[2]*ws[i])), (avail-sg*(cr.length-1))/cr.reduce((a,r,i)=>a+r[3]*ws[i],0));
         blockH=cr.reduce((a,r,i)=>a+r[3]*k*ws[i],0)+sg*(cr.length-1); let y=top0+Math.max(0,(avail-blockH)/2);
-        cr.forEach((r,i)=>{ const kk=k*ws[i], el=i?ghost(sec,w,i):w; used.add(i); place(el,r,kk,CX-r[2]*kk/2,y); fadeEdge(el,r,(Ly.fade||[])[i]); y+=r[3]*kk+sg; }); }
+        cr.forEach((r,i)=>{ const kk=k*ws[i], el=i?ghost(sec,w,i):w; used.add(i); const x=CX-r[2]*kk/2; place(el,r,kk,x,y); fadeEdge(el,r,(Ly.fade||[])[i]);
+          if(!i&&tip){ const tl=parseFloat(tip.style.left)||0, tt=parseFloat(tip.style.top)||0, th=tip.offsetHeight||0; tipT=`${(x+(tl-r[0])*kk-tl).toFixed(1)}px ${(y+(tt-r[1])*kk-th*(1-kk)-tt).toFixed(1)}px`; }
+          y+=r[3]*kk+sg; }); }
+      if(tip&&tip.style.translate!==tipT) tip.style.translate=tipT;
       sec.querySelectorAll(':scope>.ipart.ipx,:scope>.iplab').forEach(x=>{ if(!used.has(+x.dataset.i)||(x.classList.contains('iplab')&&Ly.mode!=='grid')){ const v=x.querySelector('video'); if(v) v.pause(); x.remove(); } });
       if(c){ const ct=(H-bot-ctlH).toFixed(0)+'px'; if(c.style.top!==ct) c.style.top=ct; c.style.height=ctlH+'px'; }
     }); }
@@ -142,7 +146,7 @@
 
   /* ---- Smart Hub live 3D view (#emuF): Modes keeps the landscape geometry (the Hub between the two rails); Hardware / Specs
      draw the Hub large at the top with the text in a grid under it. Its messages carry a 'pre' geometry; we swap hw / sp. ---- */
-  const hubPre=()=>{ const T=TOP(); return { hw:{cx:552,cy:T+250,w:640}, sp:{cx:552,cy:T+240,w:600} }; };
+  const hubPre=()=>{ const T=TOP(); return { hw:{cx:552,cy:T+260,w:620}, sp:{cx:552,cy:T+300,w:560} }; };
   function hub(){ const f=$('#emuF'), w=f&&f.contentWindow; if(!w) return; let fresh=false;
     try{ if(!w.__ipA){ const o=w.postMessage.bind(w); w.postMessage=function(m,t){ if(isI()&&m&&m.pre) m=Object.assign({},m,{pre:Object.assign({},m.pre,hubPre())}); return o(m,t); }; w.__ipA=1; fresh=true; } }catch(e){ return; }
     const k=(isI()?'ip':'ls')+(window.SH||0); if(fresh||hub.k!==k){ hub.k=k; } }
