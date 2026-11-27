@@ -328,6 +328,10 @@ body.one #scr{box-shadow:none;border-radius:0}body.one #hint{display:none}
 #scr.set #dk{opacity:0;pointer-events:none;transform:scale(.985)}
 
 /* ---- from the Smart Hub page: garage, deter on, status view, person detected, alarm ---- */
+#dk .edgeL{position:absolute;left:0;top:0;width:32px;bottom:100px;z-index:4;touch-action:none}
+#dk:not([data-tab=home]) .edgeL,#dk.ed .edgeL,#dk.cm .edgeL,#dk.sh .edgeL{display:none}
+#sv{touch-action:none;overflow:hidden;transform-origin:50% 50%}
+#sv .svp{overflow:hidden}
 #hm .hdl{position:absolute;left:0;top:250px;width:30px;height:200px;z-index:3;display:flex;align-items:center}
 #hm .hdl i{width:6px;height:96px;border-radius:3px;background:rgba(255,255,255,.85);margin-left:5px}
 .dt.on .bn{background:#ff3b30;color:#fff}
@@ -482,30 +486,32 @@ body.one #scr{box-shadow:none;border-radius:0}body.one #hint{display:none}
 /* rearrange mode */
 #edn{position:absolute;left:1092px;top:23px;height:44px;padding:0 22px;border-radius:22px;background:#fff;color:#141414;font-size:19px;font-weight:500;z-index:8;opacity:0;pointer-events:none;transform:scale(.8);transition:opacity .25s,transform .3s var(--ease)}
 #dk.ed #edn{opacity:1;pointer-events:auto;transform:none}
-#dk.ed #nvD{opacity:.35;pointer-events:none}
+#dk.ed #nvD{opacity:.6;pointer-events:none}
 .tl .edc{position:absolute;inset:0;border-radius:22px;opacity:0;pointer-events:none;transition:opacity .3s}
 #dk.ed #hm .tl .edc{opacity:1}
 #dk.ed #hm .tl>*:not(.edc){opacity:0;transition:opacity .3s}
-#dk.ed #hm .tl.lift>.im{opacity:.45}
-#dk.ed #hm .sec{opacity:.5}
-#dk.ed #hm .tl{background:#161616;box-shadow:none;outline:2.5px dashed rgba(255,255,255,.85);outline-offset:-2.5px;touch-action:none;transition:left .35s var(--ease),top .35s var(--ease),transform .2s,outline-color .2s;animation:jig .32s ease-in-out infinite alternate}
-#dk.ed #hm .tl:nth-child(odd){animation-delay:-.16s}
-#dk.ed #hm .tl.lift{outline:2px solid rgba(255,255,255,.3);background:#262626;animation:none}
-#dk.ed #hm .tl.lift .edc .e1{color:#fff}
-#dk.ed #hm .tl.drag{z-index:6;transition:none;box-shadow:0 20px 50px rgba(0,0,0,.6)}
-@keyframes jig{from{rotate:-.5deg}to{rotate:.5deg}}
-.edc .e1{position:absolute;left:22px;top:24px;font-size:29px;color:rgba(255,255,255,.75)}
-.edc .e2{position:absolute;left:22px;top:66px;font-size:22px;color:rgba(255,255,255,.55)}
-.edc .eh{position:absolute;left:18px;bottom:18px;width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)}
-#dk.ed #hm .tl.lift .edc .eh{background:rgba(255,255,255,.28);color:#fff}
+#dk.ed #hm{touch-action:none;scroll-snap-type:none}
+/* edit cards: solid, calm (no jiggle); the dots handle moves a card, anywhere else scrolls the row */
+#dk.ed #hm .tl{background:#25282a;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.07);outline:2.5px dashed transparent;outline-offset:-2.5px;transition:left .32s var(--ease),top .32s var(--ease),width .32s var(--ease),height .32s var(--ease),background .25s,box-shadow .25s,outline-color .25s,transform .25s var(--ease)}
+#dk.ed #hm .tl.lift{background:#2f3336}
+#dk.ed #hm .tl.press{transform:scale(.97)}
+/* while a card is held: every other card turns into a dashed slot, and the empty slots of the grid show */
+#dk.drg #hm .tl:not(.drag){background:rgba(255,255,255,.025);box-shadow:none;outline-color:rgba(255,255,255,.5)}
+#dk.drg #hm .tl:not(.drag) .edc{opacity:.38}
+#dk.ed #hm .tl.drag{z-index:6;background:#3a3f43;outline-color:transparent;box-shadow:0 26px 60px rgba(0,0,0,.6),inset 0 0 0 2px rgba(255,255,255,.4);transition:width .32s var(--ease),height .32s var(--ease),background .2s,box-shadow .2s}
+#dk.ed #hm .tl.drag .edc .eh{background:rgba(255,255,255,.34);color:#fff}
+#hm .slot{position:absolute;width:286px;height:286px;border-radius:22px;outline:2.5px dashed rgba(255,255,255,.32);outline-offset:-2.5px;opacity:0;pointer-events:none;transition:opacity .25s,left .32s var(--ease),top .32s var(--ease)}
+#dk.drg #hm .slot{opacity:1}
+#hm .slot.tgt{outline-color:rgba(255,255,255,.7);background:rgba(255,255,255,.04);transition:opacity .2s,left .32s var(--ease),top .32s var(--ease),width .32s var(--ease),height .32s var(--ease)}
+.edc .e1{position:absolute;left:22px;top:24px;font-size:29px;color:#fff}
+.edc .e2{position:absolute;left:22px;top:66px;font-size:22px;color:rgba(255,255,255,.6)}
+.edc .eh{position:absolute;left:18px;bottom:18px;width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.85);pointer-events:auto;touch-action:none;transition:background .2s,transform .2s var(--ease)}
 .edc .er{position:absolute;right:16px;bottom:22px;color:#fff;display:flex}
 
 /* 2×2 camera tile */
 .tl{transition:left .38s var(--ease),top .38s var(--ease),width .38s var(--ease),height .38s var(--ease)}
 .tl.big{width:604px;height:604px}
 .ct.big .im{width:100%;height:550px}
-#dk.ed #hm .tl{transition:left .32s var(--ease),top .32s var(--ease),width .32s var(--ease),height .32s var(--ease),transform .2s,outline-color .2s}
-#dk.ed #hm .tl.drag{transition:width .32s var(--ease),height .32s var(--ease)}
 .edc .er{pointer-events:auto;padding:14px;margin:-14px;border-radius:50%}
 #dk.ed #hm .tl.big .edc .e1{font-size:34px}
 
@@ -615,6 +621,7 @@ const shNR=(sz=56)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 48 48"><path
 const EYE=(o,sz=46)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 23c4.5-7.6 11-11.6 19-11.6S37.5 15.4 42 23c-4.5 7.6-11 11.6-19 11.6S8.5 30.6 4 23Z"/><circle cx="23" cy="23" r="6.4"/>${o?'':'<path d="M9 37 37 9"/>'}</svg>`;
 const RARR=(sz=34)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="8" height="8" rx="1.4" fill="currentColor"/><rect x="13" y="7" width="8" height="8" rx="1.4"/><rect x="3" y="17" width="8" height="8" rx="1.4"/><rect x="13" y="17" width="8" height="8" rx="1.4"/><rect x="23" y="7" width="8" height="18" rx="1.4"/></svg>`;
 const DOTS=`<svg width="40" height="20" viewBox="0 0 40 20" fill="currentColor">${[6,15,24,33].map(x=>`<circle cx="${x}" cy="6" r="2"/><circle cx="${x}" cy="14" r="2"/>`).join('')}</svg>`;
+const RSZIN=`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 17 8 8M17 17h-7M17 17v-7M23 23l9 9M23 23h7M23 23v7"/></svg>`;
 const RSZ=`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M8 8l9 9M8 8h7M8 8v7M32 32l-9-9M32 32h-7M32 32v-7"/></svg>`;
 const DEVS=[['front','Front door','Lock','lk'],['garage','Garage door','Garage','gd'],['db','Doorbell','Doorbell Camera','cam'],['fy','Front yard','Outdoor Camera Pro','cam'],['bd','Back door','Spotlight Pro','cam'],['hall','Hallway','Thermostat','th'],['down','Downstairs','Thermostat','th']];
 const openN=()=>(S.garage==='open'?1:0)+(S.win||0);
@@ -678,6 +685,7 @@ function darkHTML(){ return `
     <div class="gr">${[['drive','Driveway'],['porch','Front porch'],['living','Living room'],['kitchen','Kitchen'],['office','Office'],['patio','Patio']].map(([k,n])=>`<div class="lc" data-lc="${k}"><div class="n">${n}</div><div class="s"></div><button class="bl tap" data-act="light" data-k="${k}">${IC.bulb(40)}</button><div class="dim" data-dim="${k}"><i></i></div></div>`).join('')}</div>
   </div>
 
+  <div class="edgeL" aria-hidden="true"></div>
   <div id="nvD">
     <button class="hm tap" data-act="tab" data-tab="home">${IC.homeMint(40)}</button>
     <div class="sc"><div class="row">
@@ -959,7 +967,7 @@ function onClick(e){
   const ch=t.closest('[data-chime]'); if(ch){ S.chime=ch.dataset.chime; $$('[data-chime]').forEach(r=>r.querySelector('.v').innerHTML=S.chime===r.dataset.chime?IC.check(28):''); $$('[data-chv]').forEach(x=>x.textContent=S.chime); return; }
   const gon=t.closest('[data-go]'); if(gon){ const id=gon.dataset.go; if(dyn(id)) push(id); return; }
   const pk=t.closest('[data-pin]'); if(pk){ pinKey(pk.dataset.pin); return; }
-  if(S.open==='sv' && !t.closest('.rh')){ if(svSw){ svSw=false; return; } closeOv(); clearTimeout(pdT); clearInterval(svT); return; }
+  if(S.open==='sv' && !t.closest('.rh')){ if(svSw){ svSw=false; return; } svSlide(false); return; }
   const pp=t.closest('[data-pop]'); if(pp){ openPop(pp.dataset.pop, pp); return; }
   if(!t.closest('#pop')) closePop();
   const a=t.closest('[data-act]'); if(!a) return;
@@ -990,8 +998,8 @@ function onClick(e){
     case 'close': closeOv(); break;
     case 'lock': { const k=a.dataset.lk; if(a.classList.contains('busy')) break; a.classList.add('busy'); setTimeout(()=>{ a.classList.remove('busy'); S.locks[k]=!S.locks[k]; renderLocks(); if(k==='front') doorOpened(); },700); break; }
     case 'garage': { if(a.classList.contains('busy')) break; const open=S.garage==='open'; a.classList.add('busy'); $('#gT').textContent=open?'Closing…':'Opening…'; setTimeout(()=>{ a.classList.remove('busy'); S.garage=open?'closed':'open'; $('#gT').textContent=open?'Closed':'Open'; a.querySelector('.ico').innerHTML=open?ICX.garage(44):ICX.garageO(44); a.classList.toggle('on',!open); renderArm(); },1600); break; }
-    case 'sv': openSV(); break;
-    case 'svx': closeSV(); break;
+    case 'sv': svSlide(true); break;
+    case 'svx': svSlide(false); break;
     case 'pdlock': S.locks.front=!S.locks.front; renderLocks(); renderPD(); toast(S.locks.front?'Front door locked':'Front door unlocked'); doorOpened(); break;
     case 'pdmute': PD.mute=!PD.mute; renderPD(); break;
     case 'pdtalk': a.classList.toggle('on'); break;
@@ -1046,13 +1054,7 @@ function build(){
   window.addEventListener('pointerup', onUp); window.addEventListener('pointercancel', onUp);
   // tap outside arm menu pills closes it
   $('#arm').addEventListener('click', e=>{ if(e.target.id==='arm'||e.target.classList.contains('bgx')) closeOv(); });
-  { let hx=null; $('#hm').addEventListener('pointerdown',e=>{ const p=UI.loc(e); hx=p&&p.x<60?p.x:null; }); $('#hm').addEventListener('pointerup',e=>{ const p=UI.loc(e); if(hx!=null&&p&&p.x-hx>90) openSV(); hx=null; }); }
-  // swipe in from the left edge of the screen (anywhere in the dark UI) → status view
-  { let ex=null; $('#dk').addEventListener('pointerdown',e=>{ const p=UI.loc(e); ex=(p&&p.x<46&&!S.open)?p.x:null; }, true);
-    $('#dk').addEventListener('pointerup',e=>{ const p=UI.loc(e); if(ex!=null&&p&&p.x-ex>90){ openSV(); svSw=true; setTimeout(()=>svSw=false,60); } ex=null; }, true); }
-  // swipe left/right inside the status view flips its two pages
-  { let sx=null; $('#sv').addEventListener('pointerdown',e=>{ const p=UI.loc(e); sx=p?p.x:null; });
-    $('#sv').addEventListener('pointerup',e=>{ const p=UI.loc(e); if(sx!=null&&p&&Math.abs(p.x-sx)>80){ svSw=true; if(sx>1220&&p.x<sx) closeSV(); else { svPage(p.x<sx?'b':'a'); svCycle(); } } sx=null; }); }
+  swipes();
   // swipe-from-left-edge closes live view
   let sx=null; $('#live').addEventListener('pointerdown',e=>{ const p=UI.loc(e); sx=p&&p.x<120?p.x:null; });
   $('#live').addEventListener('pointerup',e=>{ const p=UI.loc(e); if(sx!=null&&p&&p.x-sx>120) closeOv(); sx=null; });
@@ -1068,27 +1070,95 @@ function pack(){ const occ=[]; const free=(c,r)=>!(occ[c]&&occ[c][r]); const tak
   ORDER.forEach(k=>{ const t=tileOf(k); if(!t) return; t.classList.toggle('hid',!!HID[k]); if(HID[k]) return; const big=BIG.has(k); t.classList.toggle('big',big);
     for(let c=0;;c++){ if(big){ if(free(c,0)&&free(c,1)&&free(c+1,0)&&free(c+1,1)){ take(c,0);take(c,1);take(c+1,0);take(c+1,1); place(t,c,0); maxC=Math.max(maxC,c+2); break; } }
       else { let done=false; for(let r=0;r<2;r++) if(free(c,r)){ take(c,r); place(t,c,r); maxC=Math.max(maxC,c+1); done=true; break; } if(done) break; } } });
-  const st=$('#hm .strip'); if(st) st.style.width=(GX0+maxC*GS+4)+'px'; }
+  const st=$('#hm .strip'); if(!st) return;
+  $$('#hm .tl[data-dev]').forEach(t=>{ const e=t.querySelector('.er'); if(e){ const b=t.classList.contains('big'); if(e.dataset.b!==String(b)){ e.dataset.b=b; e.innerHTML=b?RSZIN:RSZ; } } });
+  /* the slots: every free cell up to two columns past the last card (only seen while a card is held) */
+  const cols=maxC+2, want=[]; for(let c=0;c<cols;c++) for(let r=0;r<2;r++) if(free(c,r)) want.push([c,r]);
+  const have=$$('#hm .slot:not(.tgt)'); while(have.length<want.length){ const d=document.createElement('div'); d.className='slot'; st.appendChild(d); have.push(d); }
+  have.forEach((d,i)=>{ const w=want[i]; d.style.display=w?'':'none'; if(w){ d.style.left=(GX0+w[0]*GS)+'px'; d.style.top=(38+w[1]*GS)+'px'; } });
+  st.style.width=(GX0+(ED&&$('#dk').classList.contains('drg')?cols:maxC)*GS+4)+'px'; }
 function place(t,c,r){ t.style.left=(GX0+c*GS)+'px'; t.style.top=(38+r*GS)+'px'; }
 function cmOpen(){ closePop(); $('#dk').classList.add('cm'); }
 function cmClose(){ $('#dk').classList.remove('cm','sh'); }
 function tagTiles(){ $('#dk').dataset.tab=S.tab; $$('#hm .strip>.tl').forEach((t,i)=>{ const d=DEVS[i]; if(!d) return; t.dataset.dev=d[0];
   t.insertAdjacentHTML('beforeend',`<div class="edc"><div class="e1">${d[1]}</div><div class="e2">${d[2]}</div><span class="eh">${DOTS}</span>${d[3]==='cam'?`<span class="er" data-er="${d[0]}">${RSZ}</span>`:''}</div>`); }); pack(); }
 function edStart(){ ED={order:ORDER.slice(), big:new Set(BIG)}; $('#dk').classList.add('ed'); }
-function edEnd(keep){ if(!ED) return; if(!keep){ ORDER=ED.order; BIG.clear(); ED.big.forEach(k=>BIG.add(k)); } ED=null; $('#dk').classList.remove('ed'); $$('#hm .tl.lift').forEach(t=>t.classList.remove('lift')); pack(); if(keep) toast('Layout saved'); }
-function edDrag(){ let D=null; const hm=$('#hm');
-  hm.addEventListener('pointerdown',e=>{ if(!ED) return; const er=e.target.closest('.er');
-    if(er){ e.stopPropagation(); const k=er.dataset.er; BIG.has(k)?BIG.delete(k):BIG.add(k); $$('#hm .tl.lift').forEach(x=>x.classList.remove('lift')); tileOf(k).classList.add('lift'); pack(); return; }   // resize arrows: 1×1 ⇄ 2×2
-    const t=e.target.closest('.tl[data-dev]'); if(!t||t.classList.contains('hid')) return; e.stopPropagation(); const p=UI.loc(e);
-    D={t,k:t.dataset.dev,x:p.x,y:p.y,l:parseFloat(t.style.left),tp:parseFloat(t.style.top),w:t.offsetWidth}; $$('#hm .tl.lift').forEach(x=>x.classList.remove('lift')); t.classList.add('lift','drag'); try{ t.setPointerCapture(e.pointerId); }catch(_){} },true);
-  hm.addEventListener('pointermove',e=>{ if(!D) return; const p=UI.loc(e); D.t.style.transform=`translate(${p.x-D.x}px,${p.y-D.y}px) scale(1.04)`;
-    /* live reflow: the others slide out of the way as the tile passes over them */
-    const cx=D.l+D.w/2+(p.x-D.x), cy=D.tp+D.w/2+(p.y-D.y); let best=null, bd=1e9;
-    ORDER.forEach(k=>{ if(k===D.k||HID[k]) return; const o=tileOf(k), ow=o.offsetWidth, ox=parseFloat(o.style.left)+ow/2, oy=parseFloat(o.style.top)+ow/2, dd=Math.hypot(ox-cx,oy-cy); if(dd<bd&&dd<ow*.6){ bd=dd; best=k; } });
-    if(best){ const i=ORDER.indexOf(D.k), j=ORDER.indexOf(best); ORDER.splice(i,1); ORDER.splice(j,0,D.k); const l0=parseFloat(D.t.style.left), t0=parseFloat(D.t.style.top); pack();
-      const l1=parseFloat(D.t.style.left), t1=parseFloat(D.t.style.top); D.x+=l1-l0; D.y+=t1-t0; D.l=l1; D.tp=t1; D.t.style.transform=`translate(${p.x-D.x}px,${p.y-D.y}px) scale(1.04)`; } });
-  const up=()=>{ if(!D) return; const d=D; D=null; d.t.classList.remove('drag'); d.t.style.transform=''; pack(); };
-  hm.addEventListener('pointerup',up); hm.addEventListener('pointercancel',up); }
+function edEnd(keep){ if(!ED) return; if(!keep){ ORDER=ED.order; BIG.clear(); ED.big.forEach(k=>BIG.add(k)); } ED=null; $('#dk').classList.remove('ed','drg'); $$('#hm .tl.lift').forEach(t=>t.classList.remove('lift')); pack(); if(keep) toast('Layout saved'); }
+function edDrag(){ const hm=$('#hm'), dk=$('#dk'); let D=null, P=null, raf=0, last=null;
+  const sp=p=>({x:p.x+hm.scrollLeft, y:p.y});
+  const mark=()=>{ let m=$('#hm .slot.tgt'); if(!m){ m=document.createElement('div'); m.className='slot tgt'; $('#hm .strip').appendChild(m); } m.style.left=D.t.style.left; m.style.top=D.t.style.top; m.style.width=m.style.height=D.t.offsetWidth+'px'; };
+  const follow=()=>{ if(!D||!last) return; const q=sp(last), l=parseFloat(D.t.style.left), tp=parseFloat(D.t.style.top); mark();
+    D.t.style.transform=`translate(${q.x-D.ox-l}px,${q.y-D.oy-tp}px) scale(1.04)`;
+    /* live reflow: the others slide out of the way as the card passes over them */
+    const w=D.t.offsetWidth, cx=q.x-D.ox+w/2, cy=q.y-D.oy+w/2; let best=null, bd=1e9, maxR=0;
+    ORDER.forEach(k=>{ if(HID[k]) return; const o=tileOf(k); if(!o) return; const ow=o.offsetWidth, ox=parseFloat(o.style.left)+ow/2, oy=parseFloat(o.style.top)+ow/2; maxR=Math.max(maxR,parseFloat(o.style.left)+ow);
+      if(k===D.k) return; const dd=Math.hypot(ox-cx,oy-cy); if(dd<bd&&dd<Math.max(ow,w)*.55){ bd=dd; best=k; } });
+    const i=ORDER.indexOf(D.k); let j=best?ORDER.indexOf(best):(cx>maxR+20?ORDER.length-1:-1);
+    if(j>=0&&j!==i){ ORDER.splice(i,1); ORDER.splice(j,0,D.k); pack(); const l2=parseFloat(D.t.style.left), t2=parseFloat(D.t.style.top); D.t.style.transform=`translate(${q.x-D.ox-l2}px,${q.y-D.oy-t2}px) scale(1.04)`; mark(); } };
+  /* near either edge the row scrolls by itself, carrying the held card */
+  const edge=()=>{ raf=0; if(!D||!last) return; const v=last.x<130?-(130-last.x)/6:last.x>1150?(last.x-1150)/6:0;
+    if(v){ const s0=hm.scrollLeft; hm.scrollLeft=Math.max(0,Math.min(hm.scrollWidth-hm.clientWidth,s0+v)); if(hm.scrollLeft!==s0) follow(); }
+    raf=requestAnimationFrame(edge); };
+  const lift=(t,p)=>{ clearTimeout(P&&P.h); P=null; const q=sp(p); $$('#hm .tl.lift').forEach(x=>x.classList.remove('lift')); t.classList.remove('press');
+    D={t,k:t.dataset.dev,ox:q.x-parseFloat(t.style.left),oy:q.y-parseFloat(t.style.top)}; last=p; t.classList.add('lift','drag'); dk.classList.add('drg'); pack(); follow(); if(!raf) raf=requestAnimationFrame(edge); };
+  hm.addEventListener('pointerdown',e=>{ if(!ED) return; e.stopPropagation(); const p=UI.loc(e); if(!p) return; const er=e.target.closest('.er');
+    if(er){ const k=er.dataset.er; BIG.has(k)?BIG.delete(k):BIG.add(k); $$('#hm .tl.lift').forEach(x=>x.classList.remove('lift')); tileOf(k).classList.add('lift'); pack(); return; }   // resize arrows: 1×1 ⇄ 2×2
+    const t=e.target.closest('.tl[data-dev]'); if(t&&t.classList.contains('hid')) return;
+    if(t&&e.target.closest('.eh')){ lift(t,p); return; }
+    P={x:p.x,s:hm.scrollLeft,t,v:0,lx:p.x,lt:performance.now(),moved:false}; if(t){ t.classList.add('press'); P.h=setTimeout(()=>{ if(P&&!P.moved) lift(t,last||p); },380); } },true);
+  window.addEventListener('pointermove',e=>{ if(!ED||(!D&&!P)) return; const p=UI.loc(e); if(!p) return; last=p;
+    if(D){ follow(); return; }
+    const dx=p.x-P.x; if(Math.abs(dx)>9&&!P.moved){ P.moved=true; if(P.t) P.t.classList.remove('press'); }
+    if(P.moved){ hm.scrollLeft=P.s-dx; const now=performance.now(); P.v=(P.lx-p.x)/Math.max(1,now-P.lt); P.lx=p.x; P.lt=now; } });
+  const up=()=>{ if(P){ clearTimeout(P.h); if(P.t) P.t.classList.remove('press');
+      if(P.moved&&Math.abs(P.v)>.2){ let v=P.v*16; const glide=()=>{ hm.scrollLeft+=v; v*=.93; if(Math.abs(v)>.5&&ED) requestAnimationFrame(glide); }; requestAnimationFrame(glide); }   // flick: the row coasts
+      if(P.moved){ const cap=ev=>{ ev.stopPropagation(); ev.preventDefault(); }; window.addEventListener('click',cap,{capture:true,once:true}); setTimeout(()=>window.removeEventListener('click',cap,{capture:true}),60); }
+      P=null; }
+    if(!D) return; const d=D; D=null; cancelAnimationFrame(raf); raf=0; d.t.classList.remove('drag'); d.t.style.transform=''; dk.classList.remove('drg'); pack(); };
+  window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up); }
+/* ---- swipes that follow the finger (as on the real hub): the status view's two pages slide over each other as cards,
+   the status view slides off to the left to show Home, and an edge swipe on Home pulls it back in ---- */
+const EZ='cubic-bezier(.22,.8,.24,1)', SWT=`transform .48s ${EZ},opacity .48s ${EZ},border-radius .48s ${EZ}`;
+function sty(el,tr,op,rad,tran){ if(!el) return; el.style.transition=tran||'none'; el.style.transform=tr; if(op!=null) el.style.opacity=op; if(rad!=null) el.style.borderRadius=rad; }
+function clr(el){ if(!el) return; el.style.transition='none'; el.style.transform=el.style.opacity=el.style.borderRadius=''; void el.offsetWidth; el.style.transition=''; }
+const homeEls=()=>[$('#dk .tabv.on'),$('#nvD')].filter(Boolean);
+/* k = 1: status view fully in; 0: Home fully in */
+function svHome(k,tran){ const sv=$('#sv');
+  sty(sv,`translateX(${-(1-k)*1280}px) scale(${.9+.1*k})`,1,`${Math.round((1-k)*44)}px`,tran);
+  homeEls().forEach(e=>sty(e,`translateX(${k*360}px) scale(${1-.08*k})`,1-.65*k,null,tran)); }
+let svBusy=false;
+function svSlide(open,from){ if(svBusy) return; svBusy=true; const k0=from==null?(open?0:1):from;
+  if(from==null) svHome(k0); if(open) renderSV(); requestAnimationFrame(()=>{ svHome(open?1:0,SWT);
+  setTimeout(()=>{ const sv=$('#sv'); sv.style.transition='none'; if(open){ openSV(); svSw=true; setTimeout(()=>svSw=false,80); } else closeSV();
+    clr(sv); homeEls().forEach(clr); svBusy=false; },500); }); }
+function svPageTo(k,to,tran){ const sv=$('#sv'), cur=sv.dataset.p, A=sv.querySelector('.svp.a'), B=sv.querySelector('.svp.b');
+  const inc=to==='b'?B:A, out=to==='b'?A:B, sg=to==='b'?1:-1;   // the next page comes in from the right, the first from the left
+  sty(inc,`translateX(${sg*(1-k)*62}%) scale(${.84+.16*k})`,Math.min(1,k*2.4),`${Math.round((1-k)*40)}px`,tran);
+  sty(out,`translateX(${-sg*k*28}%) scale(${1-.07*k})`,1-.75*k,`${Math.round(k*30)}px`,tran); return {inc,out,cur}; }
+function swipes(){ const sv=$('#sv'), dk=$('#dk'); let G=null;
+  const start=(e,kind)=>{ const p=UI.loc(e); if(!p) return; G={kind,x:p.x,y:p.y,lx:p.x,lt:performance.now(),v:0,mode:null,k:0}; };
+  dk.querySelector('.edgeL').addEventListener('pointerdown',e=>{ if(S.open||ED||svBusy) return; e.stopPropagation(); start(e,'home'); });
+  sv.addEventListener('pointerdown',e=>{ if(S.open!=='sv'||svBusy||e.target.closest('.ov:not(#sv)')) return; start(e,'sv'); });
+  window.addEventListener('pointermove',e=>{ if(!G) return; const p=UI.loc(e); if(!p) return; const dx=p.x-G.x, dy=p.y-G.y, now=performance.now();
+    G.v=(p.x-G.lx)/Math.max(1,now-G.lt); G.lx=p.x; G.lt=now;
+    if(!G.mode){ if(Math.abs(dx)<10||Math.abs(dx)<Math.abs(dy)) return;
+      if(G.kind==='home'){ if(dx<0){ G=null; return; } G.mode='open'; renderSV(); svPage('a'); }
+      else { clearInterval(svT); clearTimeout(pdT); const pg=sv.dataset.p;
+        G.mode=(G.x>1180&&dx<0)||(pg==='b'&&dx<0)?'close':pg==='a'&&dx<0?'b':pg==='b'&&dx>0?'a':'rub'; } }
+    const f=Math.max(0,Math.min(1,Math.abs(dx)/1100));
+    if(G.mode==='open'){ G.k=f; svHome(f); }
+    else if(G.mode==='close'){ G.k=f; svHome(1-f); }
+    else if(G.mode==='rub'){ sty(sv.querySelector('.svp.a'),`translateX(${Math.min(120,dx*.25)}px)`); }
+    else { G.k=f; svPageTo(f,G.mode); } });
+  const end=()=>{ if(!G) return; const g=G; G=null; if(!g.mode) return; svSw=true; setTimeout(()=>svSw=false,80);
+    const flick=Math.abs(g.v)>.45, go=g.k>.3||(flick&&(g.mode==='close'||g.mode==='b'?g.v<0:g.v>0));
+    if(g.mode==='open'){ if(go) svSlide(true,g.k); else { svHome(0,SWT); setTimeout(()=>{ clr(sv); homeEls().forEach(clr); },500); } return; }
+    if(g.mode==='close'){ if(go) svSlide(false,1-g.k); else { svHome(1,SWT); setTimeout(()=>{ clr(sv); homeEls().forEach(clr); svCycle(); },500); } return; }
+    if(g.mode==='rub'){ const a=sv.querySelector('.svp.a'); sty(a,'translateX(0)',null,null,SWT); setTimeout(()=>clr(a),500); svCycle(); return; }
+    const {inc,out}=svPageTo(go?1:0,g.mode,SWT);
+    setTimeout(()=>{ if(go) svPage(g.mode); [inc,out].forEach(clr); svCycle(); },500); };
+  window.addEventListener('pointerup',end); window.addEventListener('pointercancel',end);
+  dk.querySelector('.edgeL').addEventListener('click',e=>{ e.stopPropagation(); if(!svSw&&!S.open) svSlide(true); }); }
 function demo(m){ cmClose(); edEnd(false); clearTimeout(pdT); clearInterval(svT); clearInterval(cdT); $('#arm').classList.remove('cd'); scr.classList.remove('set'); closeOv(); closePop();
   const home=()=>{ setTab('home'); $('#hm').scrollTo({left:0}); };
   if(m===0){ S.alarm=false; S.arm='dis'; if(S.garage==='open'){ S.garage='closed'; const g=$('#gB'); $('#gT').textContent='Closed'; g.querySelector('.ico').innerHTML=ICX.garage(44); g.classList.remove('on'); } renderArm(); home(); }

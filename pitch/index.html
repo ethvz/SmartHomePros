@@ -2508,7 +2508,7 @@ body.hd3 #gTitle{opacity:0!important}
         <div class="strip"><div class="hbpane" id="hbCall"></div><div class="hbpane" id="hbSpec"></div></div>
         <div class="fsp spill" style="left:578px;top:869px;width:220px;height:60px"><i class="ind"></i><button class="on" data-fs="f">Hardware</button><button data-fs="s">Specs</button></div>
       </div>
-      <div id="emuLayer" class="in"><div class="st"><iframe id="emuF" class="emuf" title="Smart Hub Pro 2" allow="autoplay" data-src="assets/emu/index.html?v=13"></iframe><div class="tf"></div></div></div>
+      <div id="emuLayer" class="in"><div class="st"><iframe id="emuF" class="emuf" title="Smart Hub Pro 2" allow="autoplay" data-src="assets/emu/index.html?v=14"></iframe><div class="tf"></div></div></div>
       <div class="otab hb" data-t="hist"><div class="hx3" id="hbX"><div class="hbpane" id="hbHist"></div><div class="hbpane" id="hbNew"></div><div class="hbpane" id="hbOut"></div></div><div class="hb3pill" id="hb3"><i class="ind"></i><button class="on" data-hb3="0">Historical</button><button data-hb3="1">What’s New</button><button data-hb3="2">Internet Outage</button></div></div>
       <div class="otab hb" data-t="cmp"><div id="hbCmp"></div></div>
       <div class="otab tall hb" data-t="videos" hidden><div id="hbVlib"></div></div>
@@ -4988,7 +4988,7 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
 { const pg=$('#p-home'), pill=$('#hmode'), box=$('#tour3d');
   const set=m=>{ const d3=m==='3d'; pg.classList.toggle('d3',d3); pill.classList.toggle('d3',d3); document.body.classList.toggle('hd3',d3);
     pill.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.hm===m));
-    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=40&fb=76';   /* (SHP app: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
+    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=41&fb=76';   /* (SHP app: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
   /* keep the pill halfway between the logo and the category pill (both move with the layout) */
