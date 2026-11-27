@@ -232,3 +232,5 @@ html.ipp #p-hub #hbScroll #hbHist .hbt .c{min-height:40px!important}
 html.ipp #prScroll .psec>.tip{z-index:7}
 /* Which smoke: on shorter iPads the cards drop the long description so the bullets and button keep clear */
 @media (min-aspect-ratio:72/100){ html.ipp #prScroll .smk-c>p{display:none!important} html.ipp #prScroll .smk-c{padding-top:32px!important} }
+/* picture sections: paint stays inside the section (a scaled, clipped artwork layer left a striped sliver under the footer) */
+html.ipp #prScroll>.psec:has(>.ipart){contain:paint;isolation:isolate}
