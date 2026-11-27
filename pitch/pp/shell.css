@@ -201,9 +201,11 @@ html.pp #lpT{transform:translate(220px,7px)}
 /* camera pages (OCP / DBCP tabs): headings that start in the corner band flow around it (a float the height of the band),
    or start below it */
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h::before{content:"";float:left;width:206px;height:50px}
-html.pp #ocScroll .ocpk h2::before,html.pp #dbScroll .dbc-h::before{content:"";float:left;width:194px;height:40px}
+/* Compare: its heading moves into the corner band, right of the corner, one line (the cards below keep their places) */
+html.pp #stage #ocScroll .ocpk h2,html.pp #stage #dbScroll .dbc-h{left:240px!important;top:26px!important;font-size:34px!important;letter-spacing:-.8px!important;white-space:nowrap;width:auto!important;right:auto!important}
 html.pp #stage #ocArlo h2,html.pp #stage #dbVs .dbvs-h{top:calc(var(--ppNavT) + 4px)!important}
 /* the corner glyph: 26 CSS px on a 390-wide phone, as in the other apps (stage px = CSS px / .65) */
 html.pp #burger .ic,html.pp #burger svg{width:40px!important;height:40px!important}
 html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx>.fsp-pane{padding-top:calc(var(--ppNavT) + 4px)!important}
 html.pp #stage #ocHist.hx{padding-top:calc(var(--ppNavT) + 2px)!important}
+
