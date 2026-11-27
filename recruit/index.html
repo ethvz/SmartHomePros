@@ -4236,7 +4236,10 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
       if (sc.__stopSpring) sc.__stopSpring();
       if (X) { tip = rail.querySelector(':scope > .frtip') || rail.appendChild(Object.assign(document.createElement('span'), { className: 'frtip' })); tip.classList.add('on'); }
       update(e); }
-    function update(e) { const M = S.map; { const d = mid(M[0].b) - S.a0; if (Math.abs(d) > 1) { M.forEach(m => { m.c += d; }); S.a0 += d; S.r0 += d; } }
+    // (the page may re-draw its rail while scrolling: items are found again by their link, and if the rail itself moved the
+    // finger mapping moves with it)
+    const fresh = b => (o.fresh && o.fresh(b)) || b;
+    function update(e) { const M = S.map; { const f = fresh(M[0].b); if (f && f.isConnected) { M[0].b = f; const d = mid(f) - S.a0; if (Math.abs(d) > 1 && Math.abs(d) < 400) { M.forEach(m => { m.c += d; }); S.a0 += d; S.r0 += d; } } }
       const ly = Math.max(M[0].c, Math.min(M[M.length - 1].c, along(e))); S.ly = ly;
       let i = 0; while (i < M.length - 2 && ly > M[i + 1].c) i++; const a = M[i], b = M[i + 1], t = Math.max(0, Math.min(1, (ly - a.c) / (b.c - a.c)));
       const near = t < .5 ? a : b; if (S.near !== near) { if (S.near) { try { haptic('select'); } catch (_) {} } S.near = near; }
@@ -4248,7 +4251,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
       rail.classList.add('frsettle'); css.textContent = ''; if (tip) tip.classList.remove('on');
       if (Math.abs(sc.scrollTop - st.y) > 0.5) sc.scrollTop = st.y;
       setTimeout(() => { if (!S) rail.classList.remove('frscrub', 'frsettle'); }, 380);
-      sc.__scrub = false; const L = o.layer(); if (L) L.__scrubbing = false; st.near.a.click();
+      sc.__scrub = false; const L = o.layer(); if (L) L.__scrubbing = false; { const la = st.near.a, live = (la && la.isConnected) ? la : (o.fresh && o.fresh(la)) || (o.link && o.link(fresh(st.near.b))) || la; live.click(); }
       if (L && L._vupdate) setTimeout(() => L._vupdate(), 60);   // (sections flown past load now, once the finger is off)
       if (L && L._inst && pstackOn() && !PHONE && st.map.indexOf(st.near) >= 0) { const i = L._inst; setTimeout(() => { try { if (i.state.navOpen !== false) withOwner(null, () => i.setState({ navOpen: false })); } catch (_) {} }, 250); } }
     // moves are read from both pointer and touch events at window level, so iPad Safari can't swallow them on the way to the rail
@@ -4272,7 +4275,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     const rail = layer.querySelector('.board nav'); if (!rail || rail.__dock) return;
     const its = () => [...rail.querySelectorAll('a[href^="#sec-"]')].filter(a => a.offsetHeight);
     const off = dock({ rail, ax: 'y', layer: () => layer,
-      items: its, link: a => a, sel: a => `.board nav.frscrub a[href="${a.getAttribute('href')}"]`,   // (by its link: the page re-draws the rail and drops added attributes)
+      items: its, link: a => a, fresh: a => rail.querySelector(`a[href="${a.getAttribute('href')}"]`), sel: a => `.board nav.frscrub a[href="${a.getAttribute('href')}"]`,   // (by its link: the page re-draws the rail and drops added attributes)
       active: () => { if (!layer.isConnected || (current && current.layer !== layer)) return false; const r = rail.getBoundingClientRect(), g = getComputedStyle(rail);
         return r.height > 40 && g.visibility !== 'hidden' && parseFloat(g.opacity) > 0.5 && FR.get('ui') === 'none'; } });
     if (off) (layer._off = layer._off || []).push(off);
@@ -4281,7 +4284,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
   function phDock(pg) {
     const links = () => { const CL = current && current.layer; return CL ? [...CL.querySelectorAll('.board nav a')].filter(x => !CL._keep || CL._keep.has((x.getAttribute('href') || '').slice(5))).sort((p, q) => (parseFloat(p.style.top) || 0) - (parseFloat(q.style.top) || 0)) : []; };
     dock({ rail: pg, ax: 'x', layer: () => current && current.layer,
-      items: () => [...pg.querySelectorAll('b')], link: b => links()[+b.dataset.i], sel: b => `#phdr .ph-prog.frscrub b[data-i="${b.dataset.i}"]`,
+      items: () => [...pg.querySelectorAll('b')], link: b => links()[+b.dataset.i], fresh: b => pg.querySelector(`b[data-i="${b.dataset.i}"]`), sel: b => `#phdr .ph-prog.frscrub b[data-i="${b.dataset.i}"]`,
       active: () => pphOn() && !pg.hidden && !!phdr && !phdr.classList.contains('idle') && !phdr.classList.contains('navopen') && FR.get('ui') === 'none' });
   }
 
