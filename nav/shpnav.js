@@ -259,7 +259,9 @@
         if (y - ly > 6 && y > 40 && y < max - 4) away = true; else if (ly - y > 6 || y <= 40 || y >= max - 4) away = false;
         if (Math.abs(y - ly) > 6 || y <= 40 || y >= max - 4) el.__shpnY = y;
         if (H.classList.contains('shpn-away') !== away) H.classList.toggle('shpn-away', away); };
-      document.addEventListener('scroll', function (e) { var t = e.target; if (!t || t.nodeType !== 1 || t.clientHeight < 200) return; fe = t; if (!fq) fq = requestAnimationFrame(fscr); }, { capture: true, passive: true });
+      var fidle = 0;   /* at rest (no scrolling for a moment, e.g. after a section snaps into place) the corner always comes back */
+      document.addEventListener('scroll', function (e) { var t = e.target; if (!t || t.nodeType !== 1 || t.clientHeight < 200) return; fe = t; if (!fq) fq = requestAnimationFrame(fscr);
+        clearTimeout(fidle); fidle = setTimeout(function () { if (H.classList.contains('shpn-away')) H.classList.remove('shpn-away'); }, 500); }, { capture: true, passive: true });
       var d0 = document.querySelector('.dw'); if (d0) frDecorate(d0);
     } else {
       /* SHP page (owner): no corner and no menu here. The page's own header (SHP title, announcements bell, settings gear) floats
