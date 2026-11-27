@@ -296,6 +296,17 @@ body.focus #cFeats.on .feat{animation:none!important}
   #card .c-name{font-size:15px;max-width:38vw}
 }
 @media (prefers-reduced-motion:reduce){ body.focus #cFeats.on .feat{animation:none} }
+/* product view (owner): the product pill sits just above the carousel, and the benefit tiles circle the product slowly on a ring
+   (the top of the ring is the far side: smaller and dimmer). layoutFocus() sets --cardB/--featB, orbitFeats() moves the tiles.
+   Moving glass gets no backdrop blur (Safari re-blurs it every frame over WebGL and runs out of memory on iPad). */
+html.fl #card{bottom:var(--cardB)!important}
+html.fl #cFeats{bottom:var(--featB)!important}
+#cFeats.orb .feat{left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;margin:0!important;animation:none!important;
+  transition:opacity .3s linear!important;will-change:transform,opacity;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04) 55%,rgba(255,255,255,.08)),rgba(16,20,24,.8)!important}
+#cFeats.orb .feat{width:min(280px,25vw)}
+@media (max-width:760px), (max-aspect-ratio:1/1){ #cFeats.orb .feat{width:min(250px,34vw)} }
+@media (max-width:520px){ #cFeats.orb .feat{width:38vw} }
 </style>
 <script>
 (()=>{ if(window.parent===window) return; document.documentElement.classList.add('emb');
@@ -1561,7 +1572,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 28;
+const TOURV = 29;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1685,7 +1696,7 @@ function fitDist(p){
     if(b.isEmpty()){ p.R = p.d*.25; p.bc = p.center.clone(); } else { const sp = b.getBoundingSphere(new THREE.Sphere()); p.R = sp.radius; p.bc = sp.center; } }
   const W = innerWidth, H = innerHeight, phone = W <= 520, sheet = sheetMQ.matches;
   const cf = document.getElementById('cFeats').getBoundingClientRect(), freeH = cf.height || H*.55;
-  const fv = sheet ? (phone ? .62 : .68) : .9, fw = sheet ? (phone ? 1.05 : .72) : .44;   // the bounding sphere runs past the visible face, so these exceed the look   // share of free height / of screen width
+  const fv = sheet ? (phone ? .62 : .68) : .5, fw = sheet ? (phone ? .8 : .6) : .36;   // portrait: narrow enough that the orbiting boxes pass beside it   // the bounding sphere runs past the visible face, so these exceed the look   // share of free height / of screen width
   const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov)/2);
   const av = Math.atan(tv * freeH*fv / H), ah = Math.atan(tv * W/H * fw);
   return THREE.MathUtils.clamp(p.R / Math.sin(Math.min(av, ah)), p.d*.2, p.d*1.8);
@@ -1801,6 +1812,7 @@ function focus(p){
   PRODUCTS.forEach(q => q.chip.setAttribute('aria-current', String(q===p)));
   railTo(p.chip);
   state.focus = p; fillCard(p); card.classList.remove('away');
+  layoutFocus();
   $('#back').hidden = false;
   const pose = focusPose(p);
   flyTo(pose, {lim:pose.lim});
@@ -1892,6 +1904,35 @@ function updateSpots(){
   }
 }
 
+/* product view: the pill sits just above the carousel's visible content; the benefit boxes get the space above it */
+function layoutFocus(){
+  const de = document.documentElement; let top = Infinity;
+  document.querySelectorAll('#railIn .grp:not([hidden])').forEach(g => { const r = g.getBoundingClientRect(); if(r.height && r.right > 0 && r.left < innerWidth) top = Math.min(top, r.top); });
+  if(!isFinite(top) || top < innerHeight*.45){ de.classList.remove('fl'); return; }
+  const fb = parseFloat(getComputedStyle(de).getPropertyValue('--fb')) || 0, H = innerHeight, ch = card.offsetHeight || 56;
+  const cb = Math.round(H - top + 12 - fb) + 'px', fbt = Math.round(H - (top - 12 - ch) + 10) + 'px';
+  if(de.style.getPropertyValue('--cardB') !== cb) de.style.setProperty('--cardB', cb);
+  if(de.style.getPropertyValue('--featB') !== fbt) de.style.setProperty('--featB', fbt);
+  de.classList.add('fl'); orb.sz = null;
+}
+/* the three benefit boxes circle the product on a ring, one turn a minute; each comes in with a short fade */
+const orb = {a:-.5, t0:0, k:null, sz:null};
+function orbitFeats(now, dt){
+  const cf = document.getElementById('cFeats'), els = cf.children, on = state.focus && cf.classList.contains('on') && els.length;
+  if(!on){ if(orb.k){ orb.k = null; for(const el of els) el.style.opacity = '0'; } return; }
+  if(orb.k !== els[0]){ orb.k = els[0]; orb.t0 = now; orb.sz = null; cf.classList.add('orb'); }
+  if(!orb.sz){ const r = cf.getBoundingClientRect(); let w = 0, h = 0; for(const el of els){ w = Math.max(w, el.offsetWidth); h = Math.max(h, el.offsetHeight); }
+    orb.sz = {rx:Math.max(0, r.width/2 - w/2 - 12), ry:Math.max(0, r.height/2 - h/2 - 8)}; }
+  if(!reduceMotion) orb.a += dt * Math.PI/30;
+  const n = els.length;
+  for(let i = 0; i < n; i++){ const el = els[i], th = orb.a + i*2*Math.PI/n, f = (1 - Math.cos(th))/2;   // f: 0 far side (top), 1 near side (bottom)
+    const ramp = THREE.MathUtils.clamp((now - orb.t0 - 250 - i*150)/650, 0, 1), e = 1 - Math.pow(1 - ramp, 3);
+    const x = orb.sz.rx*Math.sin(th), y = -orb.sz.ry*Math.cos(th), sc = (.9 + .1*f)*(.86 + .14*e);
+    el.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${sc.toFixed(3)})`;
+    el.style.opacity = ((.72 + .28*f)*e).toFixed(3); el.style.zIndex = String(Math.round(f*10)); }
+}
+addEventListener('resize', () => { if(state.focus) layoutFocus(); orb.sz = null; });
+
 /* keep the focused product centred in the space the detail card leaves free */
 const vo = {x:0, y:0};
 function updateViewOffset(dt){
@@ -1920,7 +1961,7 @@ function frame(now){
     if(!state.focus && !reduceMotion && now - state.idleAt > 8000){ controls.autoRotate = true; controls.autoRotateSpeed = .35; }
     controls.update();
   }
-  updateViewOffset(dt); updateSpots();
+  updateViewOffset(dt); updateSpots(); orbitFeats(now, dt);
   { const want = state.focus && state.focus.k==='garage' ? .1 : 1; const m = GDM.door;
     if(Math.abs(m.opacity-want) > .004){ const o = m.opacity + (want-m.opacity)*Math.min(1,dt*5);
       for(const q of [GDM.door, GDM.groove]){ q.opacity = o; const tr = o < .995; if(q.transparent!==tr){ q.transparent = tr; q.depthWrite = !tr; q.needsUpdate = true; } } } }
