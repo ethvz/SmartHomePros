@@ -38,7 +38,7 @@ const sph = new THREE.Spherical();
 function setFly(f, pos, tg){ f.t0.copy(tg); f.t1.copy(tg); sph.setFromVector3(tmpF.copy(pos).sub(tg)); f.s0.copy(sph); f.s1.copy(sph); f.r0 = f.r1 = Math.log(sph.radius); f.bump = 0; f.dTheta = 0; }
 const tmpF = new THREE.Vector3();
 function fly(pose, dur){ return new Promise(res => {
-  if(SKIP.on){ res(); return; }
+  if(SKIP.on){ pipLand(); res(); return; }
   const p0 = camera.position.clone(), t0 = controls.target.clone(), p1 = pose.pos.clone(), t1 = pose.target.clone(), dist = p0.distanceTo(p1);
   if(dur == null) dur = THREE.MathUtils.clamp(1.15 + dist*.075, 1.3, 2.5);
   const i0 = inside(p0), i1 = inside(p1); let W;
@@ -48,7 +48,7 @@ function fly(pose, dur){ return new Promise(res => {
   else if(i1) W = V(p1.x, p1.y + .5 + dist*.04, 7.2);
   else { W = p0.clone().lerp(p1, .5); W.y += dist*.12; W.z = Math.max(W.z, Math.max(p0.z, p1.z) + dist*.08); }
   const bz = e => { const u = 1 - e; return V(0,0,0).addScaledVector(p0, u*u*u).addScaledVector(W, 3*u*e).addScaledVector(p1, e*e*e); };   // C1 = C2 = W
-  flyTo(pose, { dur:1e6, done:() => { controls.enabled = !MODE.lockCam; res(); } });
+  flyTo(pose, { dur:1e6, done:() => { controls.enabled = !MODE.lockCam; pipLand(); res(); } });
   const f = state.fly, start = performance.now(), D = dur*1000*(reduce ? .5 : 1), tg = V(0,0,0);
   if(!f){ res(); return; }
   setFly(f, p0, t0);
@@ -496,15 +496,26 @@ function dockStep(){ if(!EMU.docked) return; const m = dockMatrix(); if(!m){ hub
   if(MODE.kind !== 'panel' && !MODE.run){ const r = hubEl.getBoundingClientRect(), b = P('hub').model.localToWorld(V(0, -.085, .02)).project(camera), by = (1 - b.y)/2*innerHeight; tryEl.style.transform = `translate3d(${(r.left + r.right)/2 - tryEl.offsetWidth/2}px,${by + 10}px,0)`; } }
 function showDock(on){ if(on){ emu(); EMU.docked = true; hubEl.classList.remove('pip'); hubEl.style.transition = ''; perFrame.add(dockStep); kick(); }
   else { perFrame.delete(dockStep); hubEl.classList.remove('vis', 'live'); tryEl.classList.remove('vis'); } }
-async function toPip(){ if(!hubEl.classList.contains('vis')) { hubEl.style.transition = 'none'; hubEl.style.transform = pipMatrix(); hubEl.classList.add('pip'); void hubEl.offsetWidth; hubEl.style.transition = ''; hubEl.classList.add('vis'); EMU.docked = false; perFrame.delete(dockStep); return; }
-  EMU.docked = false; perFrame.delete(dockStep); hubEl.classList.remove('live'); hubEl.classList.add('pip');
-  hubEl.style.transition = 'transform .8s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = pipMatrix(); EMU.mx = ''; await wait(.8); }
+/* to the corner: the screen never slides off its device. It stays on the glass while the camera leaves, and once the camera lands
+   on the device that acts it fades out there and fades back in as the corner picture-in-picture (pipLand, called by fly). */
+async function toPip(){ if(SKIP.on){ snapPip(hubEl, pipMatrix(), on => hubEl.classList.toggle('vis', on)); EMU.docked = false; perFrame.delete(dockStep); EMU.mx = ''; return; }
+  hubEl.classList.remove('live'); EMU.pipWant = true; }
+function snapPip(el, mx, vis){ clearTimeout(el._pt); el.style.transition = 'none'; el.style.transform = mx; el.classList.add('pip'); void el.offsetWidth; el.style.transition = ''; vis(true); }
+function fadePip(el, mx, stop, vis){ stop(); clearTimeout(el._pt);
+  if(SKIP.on){ snapPip(el, mx(), vis); return; }
+  const was = el.classList.contains('vis'); vis(false);
+  el._pt = setTimeout(() => snapPip(el, mx(), vis), was ? 650 : 250); }   // the device acts first, then its screen appears in the corner
+function pipLand(){
+  if(EMU.pipWant){ EMU.pipWant = false; fadePip(hubEl, pipMatrix, () => { EMU.docked = false; perFrame.delete(dockStep); EMU.mx = ''; }, on => hubEl.classList.toggle('vis', on)); }
+  if(APP.pipWant){ APP.pipWant = false; fadePip(appEl, appPip, () => { APP.docked = false; perFrame.delete(appDockStep); APP.mx = ''; }, appVis); } }
+/* coming back to a device whose screen never left: just keep it there */
+function pipCancel(el, S){ clearTimeout(el._pt); if(S.pipWant){ S.pipWant = false; return S.docked; } return false; }
 /* end of an automation: pull back to the whole home, unless we are about to return to the hub or a product anyway */
 function finale(){ const b = MODE.back; return b && (b.kind || b.focus) ? wait(.4) : fly(SH.home()); }
-async function atHub(){ await fly(SH.hub()); if(!SKIP.on && !(MODE.viaApp && !EMU.S)) await toDock(); }   // from the app with the hub never opened: its 3D glass shows the arm state (one emulator in memory)
+async function atHub(){ pipCancel(hubEl, EMU); await fly(SH.hub()); if(!SKIP.on && !(MODE.viaApp && !EMU.S)) await toDock(); }   // from the app with the hub never opened: its 3D glass shows the arm state (one emulator in memory)
 async function offHub(){ if(MODE.viaApp){ hubEl.classList.remove('vis'); perFrame.delete(dockStep); if(!SKIP.on) await wait(.3); return; }   // the app is already the floating screen
   if(EMU.docked && !SKIP.on) await toPip(); }
-async function toDock(){ const m = dockMatrix(); if(!m){ showDock(false); return; }
+async function toDock(){ if(pipCancel(hubEl, EMU)){ kick(); return; } const m = dockMatrix(); if(!m){ showDock(false); return; }
   hubEl.style.transition = 'transform .75s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = m; EMU.mx = m; await wait(.75);
   hubEl.classList.remove('pip'); hubEl.style.transition = ''; EMU.docked = true; perFrame.add(dockStep); kick(); }
 
@@ -538,17 +549,16 @@ function appDockStep(){ if(!APP.docked) return; const m = appMatrix(); if(!m){ a
     tryApp.style.transform = `translate3d(${cx - tryApp.offsetWidth/2}px,${by + 14}px,0)`; } }
 function appShowDock(on){ if(on){ app(); APP.docked = true; appEl.classList.remove('pip'); appEl.style.transition = ''; perFrame.add(appDockStep); kick(); }
   else { perFrame.delete(appDockStep); appVis(false); appEl.classList.remove('live'); tryApp.classList.remove('vis'); } }
-async function appToPip(){ if(!appEl.classList.contains('vis')){ appEl.style.transition = 'none'; appEl.style.transform = appPip(); appEl.classList.add('pip'); void appEl.offsetWidth; appEl.style.transition = ''; appVis(true); APP.docked = false; perFrame.delete(appDockStep); return; }
-  APP.docked = false; perFrame.delete(appDockStep); appEl.classList.remove('live'); appEl.classList.add('pip');
-  appEl.style.transition = 'transform .8s cubic-bezier(.2,.75,.2,1), opacity .45s'; appEl.style.transform = appPip(); APP.mx = ''; await wait(.8); }
-async function appToDock(){ const m = appMatrix(); if(!m){ appShowDock(false); return; }
+async function appToPip(){ if(SKIP.on){ snapPip(appEl, appPip(), appVis); APP.docked = false; perFrame.delete(appDockStep); APP.mx = ''; return; }
+  appEl.classList.remove('live'); APP.pipWant = true; }   // stays on the phone until the camera lands (pipLand)
+async function appToDock(){ if(pipCancel(appEl, APP)){ kick(); return; } const m = appMatrix(); if(!m){ appShowDock(false); return; }
   appEl.style.transition = 'transform .75s cubic-bezier(.2,.75,.2,1), opacity .45s'; appEl.style.transform = m; APP.mx = m; await wait(.75);
   appEl.classList.remove('pip'); appEl.style.transition = ''; APP.docked = true; perFrame.add(appDockStep); kick(); }
 /* the close-up: look down at the phone from just past its bottom edge, so the screen reads upright */
 function appPose(){ const sc = appScr(), q = appQuat(), c = sc.obj.localToWorld(V(0, 0, sc.z)), n = V(0, 0, 1).applyQuaternion(q), dn = V(0, -1, 0).applyQuaternion(q);
   const s = P('app').model.scale.x, d = fitDist(sc.w*s, sc.h*s, .8, aspect() < 1 ? .74 : .8), dir = n.clone().addScaledVector(dn, .14).normalize();
   return { pos:c.clone().addScaledVector(dir, d), target:c }; }
-async function enterApp(back){ if(MODE.run) return; await app(); quietTour(); MODE.kind = 'app'; MODE.lockCam = true; doneB.hidden = false; tryApp.classList.remove('vis'); hudOn();
+async function enterApp(back){ if(MODE.run) return; await app(); pipCancel(appEl, APP); quietTour(); MODE.kind = 'app'; MODE.lockCam = true; doneB.hidden = false; tryApp.classList.remove('vis'); hudOn();
   const shown = APP.docked && appEl.classList.contains('vis');   // already on the glass: it rides along; otherwise it fades in on arrival (never drawn over a wall mid-flight)
   if(!shown && APP.docked) appShowDock(false);
   await fly(appPose(), back ? 1.5 : 1.3); controls.enabled = false; if(MODE.kind !== 'app') return;
@@ -716,7 +726,7 @@ function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async
   if(wasApp){ await app(); await appToPip(); }   // started on the phone: the app floats, the hub only shows when the camera is at it
   else { appShowDock(false); if(withHub){ await emu(); if(wasPanel && EMU.docked) await toPip(); else if(!hubEl.classList.contains('pip') || !hubEl.classList.contains('vis')) await toPip(); } }
   try { await body(); } catch(e){ console.warn('demo', name, e); }
-  const wasSkip = SKIP.on; SKIP.on = false; flushAll(); settle();
+  const wasSkip = SKIP.on; SKIP.on = false; flushAll(); settle(); EMU.pipWant = APP.pipWant = false;   // never carried into the next flight
   await wait(wasSkip ? .2 : 1.1); capEl.classList.add('off'); runShield.hidden = true; MODE.run = null; MODE.viaApp = false; MODE.lockCam = false; MODE.kind = null; hudOn(); reconcile();
   if(wasPanel){ await restore({ kind:'panel' }); }
   else { hubEl.classList.remove('vis'); setTimeout(() => { if(MODE.kind !== 'panel' && !MODE.run && !(state.focus && state.focus.k === 'hub')){ hubEl.classList.remove('pip'); showDock(false); } }, 500); await restore(back); }
