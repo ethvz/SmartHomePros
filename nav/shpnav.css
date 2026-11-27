@@ -64,6 +64,9 @@ html.shp-sheet .shpn-corner, html.frplay .shpn-corner, .shpn-corner.off { opacit
 html.shp-sheet .shpn-corner > button, html.frplay .shpn-corner > button, .shpn-corner.off > button { pointer-events: none; }
 /* Fast Recruit: under its own overlays (pages opened over a page, section menus); above them only while its menu is open */
 html.shpn-recruit .shpn-corner { z-index: 95; }
+/* Recruit's full-screen sheets (FAQs, section menus, the guide) cover the corner: it steps out of their way */
+html.shpn-recruit:has(.navmenu, .pguide) .shpn-corner { opacity: 0; pointer-events: none; }
+html.shpn-recruit:has(.navmenu, .pguide) .shpn-corner > button { pointer-events: none; }
 /* menu open: the corner sits under the menu's dimmed backdrop in every app (as Fast Pitch's footer does); tapping there closes */
 html.shpn-open .shpn-corner { z-index: 99999; }
 .shpn-corner:not(.off) { transition: opacity .25s ease, transform .35s var(--shpn-e); }
