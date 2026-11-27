@@ -17,6 +17,18 @@ addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault()},{passive:f
 addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&/^(\+|=|-|_|0)$/.test(e.key))e.preventDefault()});})();</script>
 
 <title>Smart Home Pros</title>
+<meta name="description" content="Fast Pitch, Fast Recruit, Pulse and Conveyour in one app.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Smart Home Pros">
+<meta property="og:title" content="Smart Home Pros">
+<meta property="og:description" content="Fast Pitch, Fast Recruit, Pulse and Conveyour in one app.">
+<meta property="og:url" content="https://ethvz.github.io/SmartHomePros/">
+<meta property="og:image" content="https://ethvz.github.io/SmartHomePros/connect/og.jpg?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Smart Home Pros">
+<meta name="twitter:image" content="https://ethvz.github.io/SmartHomePros/connect/og.jpg?v=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -79,7 +91,8 @@ button { font: inherit; color: inherit; }
 @media (max-width: 700px) { .brand .t b { font-size: 23px; } .brand .t .mk { height: calc(23px * .73); } .brand .news { display: none; } .brand .annb { margin-left: auto; } }
 .brand .t .ts { display: none; }
 /* SHP mark (the rep silhouette badge, owner 2026-11-27): taller than the title's capitals, like a badge */
-.brand .t .mk.shpm { height: calc(clamp(26px, 3.9vmin, 38px) * 1.25) !important; width: auto; filter: drop-shadow(0 2px 10px rgba(0,0,0,.35)); }
+.brand .t .mk.shpm { height: calc(clamp(26px, 3.9vmin, 38px) * 1.25) !important; width: auto; box-sizing: border-box; border: 2px solid #fff; border-radius: 24% / 14%; padding: 0;
+  filter: drop-shadow(0 2px 10px rgba(0,0,0,.35)); }   /* silhouette image; the rounded frame is a CSS border so it is even on every side */
 @media (max-width: 700px) { .brand .t .mk.shpm { height: 30px !important; } }
 @media (max-width: 700px) and (orientation: portrait) { .brand .t .mk.shpm { height: 36px !important; } }
 @media (max-width: 700px) and (orientation: portrait) { .brand .t .tl { display: none; } .brand .t .ts { display: inline; font-size: 30px; letter-spacing: .02em; } .brand .t .mk { height: calc(30px * .73); } }
@@ -171,7 +184,6 @@ button { font: inherit; color: inherit; }
 .more { position: relative; border-radius: 30px 30px 0 0; background: rgba(13,17,20,.84); -webkit-backdrop-filter: blur(30px) saturate(1.3); backdrop-filter: blur(30px) saturate(1.3);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 -30px 60px -20px rgba(0,0,0,.6);
   padding: 10px calc(var(--sar) + var(--pad)) calc(var(--sab) + 40px) calc(var(--sal) + var(--pad)); opacity: 0; animation: in .8s var(--ease) .55s forwards; transform: translateY(20px); }
-.more .grab { display: block; width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.28); margin: 0 auto 6px; border: 0; padding: 0; cursor: pointer; }
 .more .in { max-width: 1240px; margin: 0 auto; }
 .sec { padding-top: clamp(16px, 2.6vmin, 26px); }
 .sec h2 { margin: 0 0 12px; font-size: clamp(18px, 2.3vmin, 22px); font-weight: 700; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 10px; }
@@ -545,7 +557,7 @@ body.rearr .more .in > .sec > :not(.rov) { opacity: .08; transition: opacity .3s
 body.rearr .more .in > .sec + .sec { margin-top: 12px; }
 body.rearr .more .in { padding-top: 12px; padding-bottom: 90px; }
 body.rearr .card { animation: none; opacity: 1; transform: none; }
-body.rearr .brand, body.rearr .more .grab { pointer-events: none; opacity: .45; transition: opacity .3s; }
+body.rearr .brand { pointer-events: none; opacity: .45; transition: opacity .3s; }
 .drag { z-index: 20; position: relative; transition: none !important; }
 .card.drag, .sec.drag { box-shadow: 0 30px 70px -10px rgba(0,0,0,.8); }
 .drag .rov { background: rgba(8,10,12,.62); box-shadow: inset 0 0 0 2px rgb(var(--g)), 0 0 0 4px rgba(var(--g), .2); }
@@ -575,9 +587,12 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 .hscene::before { top: 0; height: calc(var(--sat) + clamp(120px, 16vmin, 170px)); background: linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.16) 60%, rgba(0,0,0,0)); }   /* header stays readable */
 .hscene::after { top: var(--ft, 52%); bottom: 0; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.62) 12%, rgba(0,0,0,.92) 30%, #000 48%); }   /* no hard edge into the sections */
 .more { background: #000; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; border-radius: 0; }
+/* the pinned header (nav/shpnav.css, shpn-float) lives inside the hero, whose isolation makes it a stacking context: lift the whole
+   hero above the sections below, or they paint over the header once it scrolls past the app tiles */
+.hero { z-index: 2; }
 /* at rest only the grab handle peeks; the first heading starts just below the fold, leaving the bottom-left corner
    (shared Vivint logo + menu) clear. The peek is .hero's --peek: clamp(64px, 9vh, 92px). */
-.more .grab { margin-bottom: max(6px, calc(clamp(64px, 9vh, 92px) - 14px - clamp(16px, 2.6vmin, 26px))); }
+.more { padding-top: calc(21px + max(6px, calc(clamp(64px, 9vh, 92px) - 14px - clamp(16px, 2.6vmin, 26px)))); }   /* the room the old grab handle took */
 /* Conveyour: the presenter (40% across the square clip) centred in the tile at any tile shape */
 .card.book .ph { background: #1a1410; container-type: size; }
 .card.book .ph .pv { --s: max(124cqw, 150cqh);   /* 150%: the clip's name caption (78-90% down the frame) falls below the tile at every tile shape */ inset: auto; width: var(--s); height: var(--s); left: calc(50cqw - .405 * var(--s)); top: clamp(100cqh - var(--s), 40cqh - .36 * var(--s), 0px); }
@@ -604,7 +619,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 <main class="app">
   <div class="hero">
   <header class="brand">
-    <div class="t" role="heading" aria-level="1" aria-label="Smart Home Pros"><img class="mk shpm" src="connect/shp-mark.png?v=2" alt="" draggable="false"><b><span class="tl">Smart Home Pros</span><span class="ts">SHP</span></b></div>
+    <div class="t" role="heading" aria-level="1" aria-label="Smart Home Pros"><img class="mk shpm" src="connect/shp-mark.png?v=3" alt="" draggable="false"><b><span class="tl">Smart Home Pros</span><span class="ts">SHP</span></b></div>
     <nav class="news" aria-label="New announcements"></nav>
     <button class="gear" aria-label="Settings" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1z"/></svg></button>
   </header>
@@ -652,7 +667,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
   </div>
 
   <section class="more" aria-label="More">
-    <button class="grab" aria-label="Show more"></button>
     <div class="in">
       <div class="sec" data-k="links" data-n="Quick links" id="secLinks"><h2>Quick links</h2><div class="links"></div></div>
       <div class="sec" data-k="calls" data-n="Who to call" id="secCalls"><h2>Who to call <small>All hours MST</small><button class="mcb" type="button" data-more-contacts aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></svg>More<span class="s"> contacts</span></button></h2><div class="calls"></div></div>
@@ -1290,7 +1304,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 
   /* ---------- the panel: grab handle scrolls it up; the street dims as it rises ---------- */
   var app = $('.app'), bg = $('.bg'), more = $('.more');
-  $('.grab').addEventListener('click', function () { app.scrollTo({ top: app.scrollTop < 40 ? more.offsetTop - 12 : 0, behavior: 'smooth' }); });
   var dimRaf = 0; app.addEventListener('scroll', function () { if (dimRaf) return; dimRaf = requestAnimationFrame(function () { dimRaf = 0; bg.style.setProperty('--dim', Math.min(.7, app.scrollTop / (innerHeight * 1.1)).toFixed(3)); }); }, { passive: true });
 })();
 </script>

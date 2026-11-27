@@ -5693,6 +5693,7 @@ html.pp #p-psa .psa-side>h2.t2,html.pp #p-playback .pbx>h2,html.pp #p-nrg .ng-h>
 html.pp #hbScroll .hbh-top{left:var(--ppLx)!important;right:28px!important;text-align:left!important}
 html.pp #hbScroll .hbh-top>*{text-align:left!important}
 html.pp #ocScroll .och-txt{left:var(--ppLx)!important;width:calc(var(--ppRx) - var(--ppLx))!important}
+html.pp #ocScroll .och-txt h1{font-size:47px}   /* first line stops short of the AI orb (x 512-576) */
 /* NRG: the second line must stop short of the nrg logo (x 468-572) */
 html.pp #p-nrg .ng-h>h1{font-size:41px}
 /* Monitoring hero: its headline is baked into a crop of the slide (pp/protect.js). Pin the first letter (3.84% into the crop) to the
@@ -5700,6 +5701,11 @@ html.pp #p-nrg .ng-h>h1{font-size:41px}
 html.pp #p-monitoring .ppg[data-k=mon_hero]>.ppc:first-child{left:var(--ppLx)!important;transform-origin:3.84% 0;transform:translateX(-3.84%) scale(.905)}
 /* Compatibility: its title leaves the corner band and becomes the headline below it */
 html.pp #stage #cmPP h2{left:var(--ppLx)!important;top:calc(var(--ppNavT,84px) + 8px)!important}
+/* short phones: the card rows start at y 112 (pp/prodB.js), so the title shrinks a little and the rows step down to clear it */
+@media (min-aspect-ratio:1/2){
+  html.pp #stage #cmPP h2{top:calc(var(--ppNavT,84px) + 4px)!important;font-size:28px!important}
+  html.pp #cmPP .cmR{margin-top:14px}
+}
 </style>
 <!-- iPad portrait layouts (html.ipp), one file per section group -->
 <link rel="stylesheet" href="ipp/shell.css?v=1"><script src="ipp/shell.js?v=1" defer></script>
