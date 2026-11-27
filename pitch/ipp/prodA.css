@@ -173,7 +173,7 @@ html.ipp #p-hub #hbCall>.hbln,html.ipp #p-hub #hbCall>.hbdot{display:none!import
 html.ipp #p-hub #hbCall>.hbco{position:relative!important;left:auto!important;top:auto!important;width:auto!important;text-align:left!important;font-size:15px;line-height:21px;padding-left:24px}
 html.ipp #p-hub #hbCall>.hbco b{font-size:20px;line-height:24px;margin-bottom:8px}
 html.ipp #p-hub #hbCall>.hbco::before{content:"";position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:50%;background:var(--vg,#05E5AF);box-shadow:0 0 10px rgba(5,229,175,.6)}
-html.ipp #p-hub #hbSpec .hbspec{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 580px)!important}
+html.ipp #p-hub #hbSpec .hbspec{left:var(--ipL)!important;right:var(--ipR)!important;width:auto!important;top:calc(var(--ipTop) + 620px)!important}
 html.ipp #p-hub #hbScroll .otab.fb>.fsp{top:auto!important;bottom:calc(var(--ipBot) + 40px)!important}
 /* History / What's New / Outage: each pane is one 1032-wide screen; panes sit 1376 apart because the pill slides by 1376 */
 html.ipp #p-hub #hbX .hbpane{width:1032px!important;height:var(--H)!important;margin-right:344px}
@@ -234,3 +234,8 @@ html.ipp #prScroll .psec>.tip{z-index:7}
 @media (min-aspect-ratio:72/100){ html.ipp #prScroll .smk-c>p{display:none!important} html.ipp #prScroll .smk-c{padding-top:32px!important} }
 /* the landscape footer-band fill (last rows of the artwork stretched along the section bottom) does not apply to the re-cropped upright layouts */
 html.ipp :is(#prScroll,#hbScroll,#thScroll)>[style*="data:image"]{background-image:none!important}
+/* Lock / Key Fob heroes: the photo sits lower (fading in from black at the top) so the headline above it never covers the product */
+html.ipp #prScroll .lhero .lh-ph:is([src*="ph/lock3"],[src*="ph/fob."]){top:auto!important;bottom:0!important;height:80%!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16%);mask-image:linear-gradient(180deg,transparent 0,#000 16%)}
+/* Smart Hub gallery photo 1: the Hub is wider than the upright crop, so that photo sits a little smaller, low, fading in at the top */
+html.ipp #hbScroll .hgl figure:has(img[src*="gal/hub_0"]){position:relative}
+html.ipp #hbScroll .hgl img[src*="gal/hub_0"]{position:absolute;left:0;bottom:0;height:86%!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14%);mask-image:linear-gradient(180deg,transparent 0,#000 14%)}
