@@ -21,8 +21,9 @@
   }
   function aiLayout() {
     const w = Q('#aiPP'); if (!w || !isPP()) return;
-    const H = avail(), W = 600, R = H < 1080 ? 62 : 68, cx = W / 2, cy = H / 2 + 4;
-    const rx = W / 2 - R - 14, ry = H / 2 - R - 26;
+    /* T: the ellipse's top edge sits below the top corner band (burger + logo, --ppNavT 84), so no bubble runs under it */
+    const H = avail(), W = 600, R = H < 1080 ? 62 : 68, T = 84, cx = W / 2, cy = (T + H - 22) / 2;
+    const rx = W / 2 - R - 14, ry = (H - 22 - T) / 2 - R;
     w.style.height = H + 'px';
     /* equal arc-length spacing round the ellipse, clockwise from the top */
     const N = 720, pts = []; let L = 0, prev = null;

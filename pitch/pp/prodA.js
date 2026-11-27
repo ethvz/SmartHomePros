@@ -175,11 +175,24 @@
       if(pp&&m&&CARDI[m[1]]){ im.dataset.ppc=u; im.src='assets/'+CARDI[m[1]]+'?v=208'; }
       else if(!pp&&im.dataset.ppc){ im.src=im.dataset.ppc; delete im.dataset.ppc; } }); }
 
-  function run(){ strips(); art(); therm(); hub(); appEmu(); focal(); bleed(); cards(); title(); }
+  /* Smart Actions: the "Tap any action…" note sits at the section bottom, but when the rules run long (short screens, two-line
+     rules) it follows the list instead (20px below it), and if even then it would reach the scroll chevron above the footer
+     it steps aside. Inline styles only, written only when they change. */
+  function xaFoot(){ const pp=isPP();
+    BOX.concat(['#ocScroll','#dbScroll']).forEach(q=>document.querySelectorAll(q+'>.xs .xa-foot').forEach(f=>{ const sec=f.parentNode, l=sec.querySelector('.xa-list');
+      let top='', hide='';
+      if(pp&&l&&sec.offsetHeight){ const H=sec.offsetHeight, fh=f.offsetHeight||48, lb=l.offsetTop+l.offsetHeight;
+        /* nb: the note's own (CSS) distance from the section bottom, read while no inline top is set; it may sink 10px below that */
+        if(!f.style.getPropertyValue('top')) f.__nb=H-f.offsetTop-fh; const nb=f.__nb||190, nat=H-nb-fh, lim=H-nb+10;
+        if(lb+20>nat){ if(lb+20+fh<=lim) top=(lb+20)+'px'; else hide='1'; } }
+      if(f.style.getPropertyValue('top')!==top){ if(top) f.style.setProperty('top',top,'important'); else f.style.removeProperty('top'); }
+      if(f.style.getPropertyValue('bottom')!==(top?'auto':'')){ if(top) f.style.setProperty('bottom','auto','important'); else f.style.removeProperty('bottom'); }
+      if(f.style.getPropertyValue('visibility')!==(hide?'hidden':'')){ if(hide) f.style.setProperty('visibility','hidden','important'); else f.style.removeProperty('visibility'); } })); }
+  function run(){ strips(); art(); therm(); hub(); appEmu(); focal(); bleed(); cards(); title(); xaFoot(); }
   window.__ppA=run;
   let t=0, busy=false; const later=()=>{ if(busy) return; cancelAnimationFrame(t); t=requestAnimationFrame(()=>{ busy=true; try{ run(); }catch(e){ window.__ppAerr=String(e&&e.stack||e); } finally{ setTimeout(()=>busy=false,0); } }); };
   BOX.forEach(q=>{ const b=$(q); if(b) new MutationObserver(later).observe(b,{childList:true,subtree:true}); });
   new MutationObserver(later).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
-  addEventListener('resize',later); addEventListener('orientationchange',()=>setTimeout(later,300)); later();
+  addEventListener('resize',later); addEventListener('orientationchange',()=>setTimeout(later,300)); later(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(later);
   }catch(e){ window.__ppAerr=String(e&&e.stack||e); }
 })();

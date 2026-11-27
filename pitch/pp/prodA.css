@@ -40,7 +40,9 @@ html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-ar{display:none}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-tog{grid-column:3;grid-row:1/3;align-self:center}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .xa+.xa:before{left:24px;right:24px}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-v{font-size:21px}
-html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-foot{left:36px!important;right:36px!important;top:auto!important;bottom:190px!important;font-size:17px;flex-wrap:wrap}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-foot{left:36px!important;right:36px!important;top:auto!important;bottom:190px!important;font-size:17px;flex-wrap:nowrap;align-items:flex-start;line-height:1.35}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-foot svg{flex:none;margin-top:1px}
+html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-foot span{min-width:0}
 /* Works With: picker on top, the pair side by side, reasons stacked */
 html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-pick{left:20px!important;right:20px!important;top:272px!important;gap:8px}
 html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-pick button{flex:1 1 0;min-width:0;height:68px;padding:0 10px 0 8px;font-size:16px;gap:8px}
@@ -226,8 +228,11 @@ html.pp #prScroll .icm .ocm-cap{display:none!important}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-why{top:668px!important;gap:8px!important}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-why div{height:56px}
   html.pp :is(#prScroll,#hbScroll,#thScroll) .xw-foot{display:none!important}
-  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa{padding:16px 22px!important;row-gap:8px}
-  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-list{top:270px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa{padding:13px 22px!important;row-gap:6px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-v{font-size:19px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-k{margin-bottom:4px}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-list{top:262px!important}
+  html.pp :is(#prScroll,#hbScroll,#thScroll) .xa-foot{font-size:15px}
   html.pp #p-hub #hbScroll .hb3pill{bottom:88px!important}
   html.pp #p-hub #hbScroll .hbnew{top:140px!important}
   html.pp #p-hub #hbScroll .hbnew .th img{width:120px}

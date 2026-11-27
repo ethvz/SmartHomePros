@@ -2843,7 +2843,7 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 /* ---------- scale stage ---------- */
 let HW=1376; window.FPV='v412';
 /* iPhone portrait layout: on by default; ?pp=0 turns it off on this device (remembered), ?pp=1 back on */
-const IPPON=(()=>{ try{ const q=new URLSearchParams(location.search).get('ipp'); if(q==='1') localStorage.setItem('fp_ipp','1'); if(q==='0') localStorage.removeItem('fp_ipp'); return /^(localhost|127\.0\.0\.1)$/.test(location.hostname)||localStorage.getItem('fp_ipp')==='1'; }catch(e){ return false; } })(); /* IPP-WIP: iPad portrait layouts under construction; the lead removes this gate when they pass review */
+const IPPON=(()=>{ try{ const q=new URLSearchParams(location.search).get('ipp'); if(q==='0') localStorage.setItem('fp_ipp','0'); if(q==='1') localStorage.removeItem('fp_ipp'); return localStorage.getItem('fp_ipp')!=='0'; }catch(e){ return true; } })();   /* iPad portrait layout: on for everyone; ?ipp=0 opts this device out, ?ipp=1 back in */
 const PPON=(()=>{ try{ const q=new URLSearchParams(location.search).get('pp'); if(q==='0') localStorage.setItem('fp_pp','0'); if(q==='1') localStorage.removeItem('fp_pp'); return localStorage.getItem('fp_pp')!=='0'; }catch(e){ return true; } })(); /* iPhone portrait layout: on everywhere (?pp=0 turns it off on this device, ?pp=1 back on) */ if(Math.min(screen.width||0,screen.height||0)<500) document.documentElement.classList.add('phn');
 function safeBox(){ let pr=document.getElementById('safeProbe'); if(!pr){ pr=document.createElement('div'); pr.id='safeProbe';
   pr.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;visibility:hidden;pointer-events:none;z-index:-1'; document.documentElement.appendChild(pr); }
@@ -5484,7 +5484,7 @@ window.USMAP={w:1000,h:620,ut:[222.1, 266.2],c:[[72.8,371.6,9],[907.0,214.8,9],[
 { const pg=$('#p-home'), pill=$('#hmode'), box=$('#tour3d');
   const set=m=>{ const d3=m==='3d'; pg.classList.toggle('d3',d3); pill.classList.toggle('d3',d3); document.body.classList.toggle('hd3',d3);
     pill.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.hm===m));
-    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=29&fb=76';   /* (SHP app: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
+    if(d3&&!box.firstChild){ const f=document.createElement('iframe'); f.src='assets/tour/index.html?v=30&fb=76';   /* (SHP app: full screen, the footer's 76px kept clear) */ f.title='3D home tour'; f.setAttribute('allow','fullscreen'); box.appendChild(f); } };
   pill.addEventListener('click',e=>{ const b=e.target.closest('[data-hm]'); if(b){ e.stopPropagation(); set(b.dataset.hm); } });
   window.HOMEVIEW=set;
   /* keep the pill halfway between the logo and the category pill (both move with the layout) */
@@ -6154,12 +6154,12 @@ document.addEventListener('click',e=>{ const t=e.target.closest&&e.target.closes
 </script>
 <!-- iPhone portrait layouts (html.pp), one file per section group -->
 <style>html.pp #stage{height:var(--H)}</style>
-<link rel="stylesheet" href="pp/shell.css?v=13"><script src="pp/shell.js?v=6" defer></script>
-<link rel="stylesheet" href="pp/prodA.css?v=1"><script src="pp/prodA.js?v=1" defer></script>
-<link rel="stylesheet" href="pp/prodB.css?v=1"><script src="pp/prodB.js?v=1" defer></script>
+<link rel="stylesheet" href="pp/shell.css?v=14"><script src="pp/shell.js?v=7" defer></script>
+<link rel="stylesheet" href="pp/prodA.css?v=2"><script src="pp/prodA.js?v=2" defer></script>
+<link rel="stylesheet" href="pp/prodB.css?v=2"><script src="pp/prodB.js?v=2" defer></script>
 <link rel="stylesheet" href="pp/sales.css?v=1"><script src="pp/sales.js?v=1" defer></script>
 <link rel="stylesheet" href="pp/protect.css?v=1"><script src="pp/protect.js?v=1" defer></script>
-<link rel="stylesheet" href="pp/brand.css?v=1"><script src="pp/brand.js?v=1" defer></script>
+<link rel="stylesheet" href="pp/brand.css?v=2"><script src="pp/brand.js?v=1" defer></script>
 <!-- iPad portrait layouts (html.ipp), one file per section group -->
 <link rel="stylesheet" href="ipp/shell.css?v=1"><script src="ipp/shell.js?v=1" defer></script>
 <link rel="stylesheet" href="ipp/brand.css?v=1"><script src="ipp/brand.js?v=1" defer></script>

@@ -94,7 +94,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmTry.vis{opacity:1}
 #dmTry b{width:8px;height:8px;border-radius:50%;background:var(--vg);box-shadow:0 0 10px var(--vg);animation:dmBlink 1.6s infinite}
 #dmDone{position:fixed;z-index:11;top:calc(env(safe-area-inset-top,0px) + 18px);left:max(18px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:8px;height:48px;padding:0 18px 0 12px;border-radius:24px;font-weight:600;font-size:16px;transition:opacity .3s}
-.emb #dmDone{top:22px}
+.emb #dmDone{top:max(22px,var(--ft,0px))}   /* --ft: set by the host when its nav corner sits at the top (upright iPhone) */
 #dmDone svg{width:22px;height:22px}
 #dmDone[hidden]{display:none}
 /* code dots for the lock / keypad close-up */

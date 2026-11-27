@@ -56,6 +56,15 @@
 
   /* ---- top corner shade: content scrolling under the burger + logo (top left) never fights them ---- */
   if (!$('#ppTopShade')) { const sh = document.createElement('div'); sh.id = 'ppTopShade'; sh.setAttribute('aria-hidden', 'true'); st.appendChild(sh); }
+  /* once a page's content scrolls under the corner, the band turns into a frosted backdrop (.up, written only when it changes);
+     it clears at the top of the scroller and whenever the page changes. Free-scrolling pages only (Awards, Videos, What's New..):
+     the snapped product pages lay their own headings into the corner band, so they keep the light fade. */
+  const shade = $('#ppTopShade'); let sq = 0, se = null;
+  const setSh = on => { if (shade && shade.classList.contains('up') !== on) shade.classList.toggle('up', on); };
+  st.addEventListener('scroll', e => { const t = e.target; if (!t || t.nodeType !== 1 || t.clientHeight < 200) return;
+    if (t.__ppSnap === undefined) t.__ppSnap = (getComputedStyle(t).scrollSnapType || 'none') !== 'none'; se = t.__ppSnap ? null : t;
+    if (!sq) sq = requestAnimationFrame(() => { sq = 0; setSh(PP() && !!se && se.scrollTop > 8 && !!se.closest('.page.on')); }); }, { capture: true, passive: true });
+  const _show = window.show; if (typeof _show === 'function') window.show = function () { setSh(false); return _show.apply(this, arguments); };
 
   /* ---- section nav: along the footer instead of a side rail ---- */
   let busy = false;
@@ -120,7 +129,10 @@
     const f = $('#tour3d iframe'); if (!f) return;
     try { const d = f.contentDocument && f.contentDocument.documentElement; if (!d) return;
       if (PP()) d.style.setProperty('--fb', (parseFloat(getComputedStyle(st).getPropertyValue('--ppHomeFoot')) || 160) + 'px');
-      else d.style.setProperty('--fb', '76px'); } catch (e) {}
+      else d.style.setProperty('--fb', '76px');
+      /* --ft: the tour's top controls (Back, Done) start below our top corner (burger + logo, --ppNavT) on an upright iPhone */
+      const ft = PP() ? ((parseFloat(getComputedStyle(st).getPropertyValue('--ppNavT')) || 84) + 6) + 'px' : '';
+      if (d.style.getPropertyValue('--ft') !== ft) { if (ft) d.style.setProperty('--ft', ft); else d.style.removeProperty('--ft'); } } catch (e) {}
   }
   const t3 = $('#tour3d');
   if (t3) new MutationObserver(() => { const f = $('#tour3d iframe'); if (f && !f.__pp) { f.__pp = 1; f.addEventListener('load', tourInset); } tourInset(); }).observe(t3, { childList: true });

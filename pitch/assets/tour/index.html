@@ -299,7 +299,7 @@ body.focus #cFeats.on .feat{animation:none!important}
 </style>
 <script>
 (()=>{ if(window.parent===window) return; document.documentElement.classList.add('emb');
-  const st=document.createElement('style'); st.textContent='.emb #brand{display:none}.emb #top{padding-top:22px}#cOpen{margin:14px 0 6px;height:44px;padding:0 18px;border-radius:22px;background:var(--mint);color:var(--ink);font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px}';
+  const st=document.createElement('style'); st.textContent='.emb #brand{display:none}.emb #top{padding-top:max(22px,var(--ft,0px))}#cOpen{margin:14px 0 6px;height:44px;padding:0 18px;border-radius:22px;background:var(--mint);color:var(--ink);font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px}';
   document.head.appendChild(st);
   addEventListener('DOMContentLoaded',()=>{ const b=document.createElement('button'); b.id='cOpen'; b.textContent='See full product'; const body=document.querySelector('#card .c-body'); body&&body.appendChild(b);
     b.addEventListener('click',()=>{ const k=document.body.dataset.fk; if(k) parent.postMessage({fpTour:'open',k},'*'); }); });
@@ -1561,7 +1561,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 27;
+const TOURV = 28;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1879,8 +1879,11 @@ function updateSpots(){
   const hit = r => rects.some(q => r[0]<q[2] && r[2]>q[0] && r[1]<q[3] && r[3]>q[1]);
   for(const s of onScr.sort((a,b)=>a.y-b.y)){
     if(s.crowd){ s.p.el.classList.add('nolbl'); continue; }
-    const w = s.p.lblW || (s.p.lblW = s.p.el.querySelector('.lbl').offsetWidth || 150);
-    const R = [s.x+24, s.y-15, s.x+24+w, s.y+15], L = [s.x-24-w, s.y-15, s.x-24, s.y+15];
+    /* the label's real box: names wrap to two or three lines (max-width), so the height counts too. Measured once while it
+       is laid out (a hidden label measures 0: keep the fallback until it can be measured) */
+    if(!s.p.lblH){ const lb = s.p.el.querySelector('.lbl'), ow = lb.offsetWidth, oh = lb.offsetHeight; if(ow && oh){ s.p.lblW = ow; s.p.lblH = oh; } }
+    const w = s.p.lblW || 150, hh = (s.p.lblH || 46) / 2 + 3;
+    const R = [s.x+24, s.y-hh, s.x+24+w, s.y+hh], L = [s.x-24-w, s.y-hh, s.x-24, s.y+hh];
     const pref = s.p.side==='l' ? [L,'l',R,'r'] : [R,'r',L,'l'];
     let side = null;
     if(!hit(pref[0]) && pref[0][0]>4 && pref[0][2]<W-4){ side = pref[1]; rects.push(pref[0]); }

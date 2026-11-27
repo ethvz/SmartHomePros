@@ -195,10 +195,16 @@ html.pp #stage #p-whatsnew .wnl{top:calc(var(--ppNavT) + 92px)}
 #ppTopShade{display:none}
 html.pp #ppTopShade{display:block;position:absolute;left:0;right:0;top:0;height:calc(var(--ppNavT) + 16px);z-index:19;pointer-events:none;
   background:linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.5) 55%,rgba(0,0,0,0) 100%)}
+/* content scrolled under the corner (.up, pp/shell.js): a frosted backdrop fades in behind the corner band, solid down to the
+   corner's bottom edge, then feathering out, so nothing reads through the burger, logo or page name */
+html.pp #ppTopShade::after{content:"";position:absolute;left:0;right:0;top:0;height:calc(var(--ppNavT,84px) + 40px);opacity:0;transition:opacity .3s ease;
+  background:linear-gradient(180deg,rgba(6,8,10,.96) 0,rgba(6,8,10,.92) 70%,rgba(6,8,10,0) 100%);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);
+  -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+html.pp #ppTopShade.up::after{opacity:1}
 /* the Home page's pinned title overlay (#lpT, its eyebrow): right of the top corner */
 html.pp #lpT{transform:translate(220px,7px)}
-/* short phones: these headings start in the corner band; nudge them below it */
-@media (max-height:700px){ html.pp #p-history .hy2-h,html.pp #p-videos .vl2-h{margin-top:30px!important} }
+/* (History / Videos / About / Awards headings: below the corner band via --bt, pp/brand.css) */
 /* camera pages (OCP / DBCP tabs): headings that start in the corner band flow around it (a float the height of the band),
    or start below it */
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h::before{content:"";float:left;width:226px;height:58px}
