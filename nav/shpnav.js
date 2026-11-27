@@ -176,12 +176,32 @@
   function pitchReserve() {
     var st = document.getElementById('stage'); if (!st) return;
     if (!document.getElementById('shpnFoot')) { var f = document.createElement('div'); f.id = 'shpnFoot'; f.setAttribute('aria-hidden', 'true'); st.appendChild(f); }
+    var H2 = document.documentElement;
+    var spacer = function (el) {   /* a spacer the footer's height after the scroller's last content (absolute when its content is absolute) */
+      if (el.__shpnPad) return; el.__shpnPad = 1;
+      var sp = document.createElement('div'); sp.className = 'shpn-endpad'; sp.setAttribute('aria-hidden', 'true');
+      var last = el.lastElementChild, flow = last && /^(static|relative|sticky)$/.test(getComputedStyle(last).position);
+      if (!flow) { if (getComputedStyle(el).position === 'static') el.style.position = 'relative'; sp.style.position = 'absolute'; sp.style.left = '0'; sp.style.top = el.scrollHeight + 'px'; }
+      el.appendChild(sp);
+    };
     var pad = function (pg) {
+      var found = false;
       [pg].concat([].slice.call(pg.querySelectorAll('*'))).forEach(function (el) {
-        if (el.__shpnPad || el.classList.contains('shpn-endpad')) return;
-        var cs = getComputedStyle(el); if (!/(auto|scroll)/.test(cs.overflowY) || el.clientHeight < 200 || el.scrollHeight <= el.clientHeight + 4) return;
-        el.__shpnPad = 1; var sp = document.createElement('div'); sp.className = 'shpn-endpad'; sp.setAttribute('aria-hidden', 'true'); el.appendChild(sp);
+        if (el.classList.contains('shpn-endpad') || el.clientHeight < 200) return;
+        var cs = getComputedStyle(el); if (!/(auto|scroll)/.test(cs.overflowY) || el.scrollHeight <= el.clientHeight + 4) return;
+        found = true; spacer(el);
       });
+      /* upright layouts: a page whose content runs a little past the footer, with nothing that scrolls, may scroll now */
+      if (!found && (H2.classList.contains('pp') || H2.classList.contains('ipp')) && !pg.__shpnPad && pg.id !== 'p-home') {
+        var st = document.getElementById('stage'), z = st.getBoundingClientRect().height / st.offsetHeight || 1, pr = pg.getBoundingClientRect();
+        var nf = parseFloat(getComputedStyle(st).getPropertyValue('--navFoot')) || 84, bottom = 0;
+        [].forEach.call(pg.querySelectorAll('img, video, canvas, h1, h2, h3, p, li, span, b, a, button, small'), function (e) {
+          var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.height > pr.height * .6) return; var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || +cs.opacity === 0) return;
+          bottom = Math.max(bottom, (r.bottom - pr.top) / z); });
+        var over = bottom - (pg.clientHeight - nf);
+        if (over > 2 && over < 420) { pg.style.overflowY = 'auto'; pg.style.overscrollBehavior = 'contain'; pg.__shpnPad = 1;
+          var sp = document.createElement('div'); sp.className = 'shpn-endpad'; sp.setAttribute('aria-hidden', 'true'); sp.style.position = 'absolute'; sp.style.left = '0'; sp.style.top = Math.ceil(bottom) + 'px'; pg.appendChild(sp); }
+      }
     };
     var pages = document.querySelectorAll('#stage .page');
     var mo = new MutationObserver(function (recs) { recs.forEach(function (r) { var pg = r.target; if (pg.classList.contains('on') && !pg.__shpnSeen) { pg.__shpnSeen = 1; setTimeout(function () { pad(pg); pg.__shpnSeen = 0; }, 700); } }); });

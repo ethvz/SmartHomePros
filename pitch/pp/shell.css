@@ -187,7 +187,8 @@ html.pp #p-home #tour3d{inset:0!important;border-radius:0!important}
 html.pp #allTiles .ht img.cp.big{top:40%!important;height:60%!important}
 
 /* ---------- top corner (burger + logo, --ppNavT): the two sections whose own big heading starts in that band move down ---------- */
-html.pp #stage #cmPP{top:48px}
+/* Compatibility: its heading goes into the corner band (right of the corner, one line); the cards keep their places */
+html.pp #stage #cmPP h2{left:240px!important;top:26px!important;font-size:34px!important;letter-spacing:-.8px!important;white-space:nowrap}
 html.pp #stage #p-whatsnew h2{top:calc(var(--ppNavT) + 4px)}
 html.pp #stage #p-whatsnew .wnl{top:calc(var(--ppNavT) + 92px)}
 /* a soft dark band behind the top corner so section content scrolling under it stays out of its way (pp/shell.js adds the element) */
