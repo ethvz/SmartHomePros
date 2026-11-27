@@ -12,7 +12,9 @@ self.addEventListener('activate', e => e.waitUntil((async () => {
   await self.clients.claim();
 })()));
 
-const isPage = req => req.mode === 'navigate' || (req.destination === 'document');
+/* Fast Pitch's own page only: frames it embeds (3D home, hub and app emulators) are documents too, but must never be stored as the
+   page; they go through the asset path below (precached from offline.json, exact copy). */
+const isPage = req => (req.mode === 'navigate' || req.destination === 'document') && [SCOPE, SCOPE + 'index.html'].includes(bare(req.url));
 const bare = url => { const u = new URL(url); u.search = ''; u.hash = ''; return u.href; };
 
 async function rangeFrom(res, req) {

@@ -484,6 +484,7 @@ const OCPM = await (async()=>{ try{ if(!__PK['mdl/ocp.bin']) return null; const 
 
 /* ------------------------------------------------------------------ data */
 const FEATS = {"dbcp": [["Smart Deter™", "AI quickly identifies any packages delivered to your doorstep and can automatically toggle on Smart Deter to proactively protect your packages."], ["180° Field of View", "See your full porch with the widest field of view so you can clearly see your deliveries on your doorstep."], ["Pre-Roll Recording", "Captures the 8–10 seconds leading up to the event, giving full context of what happened before, not just during."]], "lock": [["Up to 50 Unique Codes", "Grant access and always know who is coming and going with up to 50 unique access codes that could be shared with friends, family, and others."], ["Control from Anywhere", "Control your lock remotely with the Vivint app, no matter where you are."], ["Battery Powered", "Even during a power outage, the lock stays online, powered by four AA batteries with quick, easy access for hassle-free replacement."]], "ocp": [["Smart Deter™", "AI filters out false alerts, detects real threats, then proactively deters them with lights and sounds to stop crimes before they happen."], ["Improved 4K Sensor", "A 4K image sensor with 5.3x HD zoom and proprietary picture tuning optimizes for clarity in all light conditions, especially at night."], ["Weather Anything", "IP65 weather-resistant and built to last for years of reliable performance with an automotive grade camera housing."]], "ocspot": [["Intelligent Person Tracking", "The industry’s only spotlight that tracks lurkers as they move."], ["Up to 1800-lumens", "A powerful spotlight floods the area with bright light so you can see clearly and deter unwanted visitors."], ["Controllable Lighting Zones", "Customize your coverage by toggling lighting zones on or off, so light hits the areas that matter."]], "therm": [["Dynamic Temperature Control", "Smart temperature control automatically adjusts to your preferred settings."], ["Easy-to-Use Display", "Touch-display illuminates on approach to show target and current temperatures (requires C-wire)."], ["Side Button Control", "A simple, single button control to change thermostat settings."]], "icp": [["150° HD Field of View", "A 150 degree field of view with an HD lens means your indoor camera captures a wide, crystal clear picture of any room."], ["Privacy Mode", "Privacy mode disables all video and audio recording so you stay in control of your privacy, while keeping your camera ready to switch back on the moment you need it."], ["Full Motion Hinge Base", "A full motion hinge and base system gives you the flexibility to mount and angle your indoor camera exactly where you need it, so you always get the perfect view of any room."]], "window": [["Versatile Installation", "Vivint Door and Window Sensors can also be used on cabinets and safes, so you can minimize the risk of children accessing harmful substances, and maximize the protection of valuables in your home."], ["24/7 monitoring", "Whether you’re at home or away, if a door sensor is tripped or window alarm sounds, you will be connected to a smart home security specialist who can help."], ["Audible Panel Alerts", "Customizable audible alerts let you know the moment a door or window opens, giving you real-time awareness of activity throughout your home without ever having to check a screen."]], "motion": [["Pet Sensitivity", "The built-in pet sensitivity toggle can help lead to fewer false alerts in pet-friendly homes."], ["Long Battery Life", "Long battery life means your motion sensors keep watching over your home without interruption, so a dead battery never leaves a room unprotected."], ["24/7 monitoring", "24/7 professional monitoring means someone is always ready to respond the moment your motion sensor triggers while your system is armed, giving you peace of mind around the clock."]], "smokeco": [["Smoke & CO Detection", "Get peace of mind and double the safety with a smoke and CO detector that protects against both fire and carbon monoxide."], ["System Integration", "When your Smoke & CO Combo Detector triggers, your system responds automatically by shutting off the HVAC to slow the spread of flames and unlocking doors so your family can get out fast and first responders can get in."], ["24/7 monitoring", "24/7 professional monitoring means the moment your smoke or CO detector triggers, a response is already in motion so your family and home are never left to face an emergency alone."]], "water": [["Freeze Detection", "The built-in low temperature sensor detects freezing conditions before they become a problem, giving you a heads up in time to prevent frozen pipes and the damage they can cause."], ["Instant Alerts", "Instant alerts through the Smart Hub Pro 2, a direct phone call, and the Vivint app mean you are notified the moment water is detected, so you can act fast before a small leak turns into a costly problem."], ["Small Design", "Designed to fit in tight places and to go unnoticed to help protect your home from leaks."]]};
+FEATS.app = [["Your Whole Home in Your Pocket","Arm, lock, close the garage and set the temperature from anywhere."],["Live Video, Two-Way Talk","See every camera live and talk to whoever is at the door."],["One-Tap Shortcuts","Arriving, Bedtime and Leaving run the whole house at once."]];
 FEATS.hub = [["Always-Ready Command Center","Control, monitor, and get help from one place."],["Security Sensor Alerts","Audible notifications for opened doors and windows."],["Always Connected","Cellular and battery backup."]];
 const PRODUCTS = [
   {k:'ysign',  name:'Yard Sign',             where:'Front lawn',            img:'ysign',     side:'r'},
@@ -492,6 +493,7 @@ const PRODUCTS = [
   {k:'lock',   name:'Smart Lock',            where:'Front door',            img:'lock',      side:'l'},
   {k:'dbcp',   name:'Doorbell Camera Pro',   where:'Front door',            img:'dbcp',      side:'r'},
   {k:'hub',    name:'Smart Hub Pro 2',       where:'Great room',            img:'shp2_home', side:'r'},
+  {k:'app',    name:'Vivint App',            where:'Kitchen island',        img:'app',       side:'r'},
   {k:'chime',  name:'Chime Extender',        where:'Great room outlet',     img:'chime',     side:'r'},
   {k:'motion', name:'Motion Sensor',         where:'Great room corner',     img:'motion',    side:'r'},
   {k:'smokeco',name:'Smoke & CO Detector',   where:'Great room',            img:'smokeco',   side:'r'},
@@ -508,8 +510,8 @@ const PRODUCTS = [
   {k:'ocp',    name:'Outdoor Camera Pro 3',  where:'Side tower',            img:'ocp',       side:'r'},
 ];
 /* which products each Fast Pitch home tab shows (matches the grid categories) */
-const CATS = {cams:['hub','ocp','ocspot','dbcp','icp'], smart:['hub','lock','garage','therm','plug'],
-  sensors:['hub','keypad','motion','glass','window','water','smokeco','fire','pendant','fob','chime']};
+const CATS = {cams:['hub','app','ocp','ocspot','dbcp','icp'], smart:['hub','app','lock','garage','therm','plug'],
+  sensors:['hub','app','keypad','motion','glass','window','water','smokeco','fire','pendant','fob','chime']};
 FEATS.glass = [["Whole-Room Protection","One sensor listens for breaking glass across the entire room."],["Layers of Protection","Cameras deter outside first; glass break backs them up inside."],["Alarm the Moment Glass Breaks","24/7 monitoring responds, with two-way talk through the hub."]];
 FEATS.fire = [["Monitors Your Existing Alarms","Listens for the smoke alarms you already have and reports them to Vivint."],["Help Is Sent","Our monitoring team calls, then dispatches help if you can’t answer."],["Every Door Unlocks","A fire alarm unlocks the smart locks for a clear way out and in."]];
 FEATS.pendant = [["Help Is One Press Away","Call for help from anywhere in the house."],["Responders Get In Fast","A press can unlock the front door, so there’s no broken door."],["Family Is Notified","Check on loved ones from anywhere with the Vivint app."]];
@@ -1558,6 +1560,37 @@ const MODELS = {
     add(g, cyl(.0075,.72,mat(0x5f6366,{r:.35,m:.85}),20),0,.36,-.0115);           // single centre stake
     return g; },
 };
+/* Vivint App: an iPhone (77.6 x 163 x 8.3 mm) lying face up on the island, top end away from the stools. Titanium frame,
+   black glass, side buttons and a camera plateau on the back that tips it ~1.5 deg. The glass shows a small lock screen;
+   demo.js docks the live app (../appemu) on it. userData.screen = {obj, w, h, z}: the screen rectangle in obj's space
+   (x across, y toward the phone's top, face +z). */
+MODELS.app = () => { const g = G(), W = .0776, Hh = .163, D = .0083, R = .0125, body = G();
+  const ti = phys(0x4a4b4d, {r:.32, m:.85, x:{clearcoat:.4, clearcoatRoughness:.3}});
+  add(body, rslab(W, Hh, D, R, .0016, ti), 0, 0, D/2);                                   // frame + back
+  add(body, rslab(W-.0007, Hh-.0007, .0009, R-.0004, .0004, PM.gloss), 0, 0, D-.0002);  // front glass
+  const sw = .0716, sh = sw*956/440, sr = sw*55/440, s = rrShape(sw, sh, sr), sg = new THREE.ShapeGeometry(s, 12), uv = sg.attributes.uv, ps = sg.attributes.position;
+  for(let i=0;i<uv.count;i++) uv.setXY(i, ps.getX(i)/sw + .5, ps.getY(i)/sh + .5);
+  const c = document.createElement('canvas'); c.width = 220; c.height = 478; const x = c.getContext('2d'), t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const draw = () => { const F = '"Vivint Sans",-apple-system,Helvetica,Arial,sans-serif', gr = x.createLinearGradient(0, 0, 0, 478);
+    gr.addColorStop(0, '#0d2a24'); gr.addColorStop(.55, '#06120f'); gr.addColorStop(1, '#020404'); x.fillStyle = gr; x.fillRect(0, 0, 220, 478);
+    x.fillStyle = '#000'; x.beginPath(); x.roundRect(78, 6, 64, 19, 9.5); x.fill();                                   // dynamic island
+    x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = '500 13px ' + F; x.fillStyle = 'rgba(255,255,255,.8)'; x.fillText(new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }), 110, 66);
+    x.font = '600 62px ' + F; x.fillStyle = '#fff'; x.fillText('6:30', 110, 124);
+    x.fillStyle = 'rgba(255,255,255,.16)'; x.beginPath(); x.roundRect(12, 300, 196, 52, 14); x.fill();                 // a Vivint notification
+    x.fillStyle = '#05e5af'; x.beginPath(); x.roundRect(20, 310, 32, 32, 8); x.fill();
+    x.fillStyle = '#04110d'; x.beginPath(); x.moveTo(36, 316); x.lineTo(46, 320); x.lineTo(46, 327); x.quadraticCurveTo(45, 334, 36, 337); x.quadraticCurveTo(27, 334, 26, 327); x.lineTo(26, 320); x.closePath(); x.fill();
+    x.textAlign = 'left'; x.fillStyle = '#fff'; x.font = '600 11px ' + F; x.fillText('Vivint', 60, 322); x.font = '400 11px ' + F; x.fillStyle = 'rgba(255,255,255,.85)'; x.fillText('Package delivered', 60, 338);
+    x.fillStyle = 'rgba(255,255,255,.7)'; x.beginPath(); x.roundRect(70, 462, 80, 4, 2); x.fill();                      // home bar
+    t.needsUpdate = true; };
+  draw(); document.fonts && document.fonts.ready.then(draw);
+  const scr = add(body, new THREE.Mesh(sg, new THREE.MeshBasicMaterial({map:t, toneMapped:false})), 0, 0, D+.0003); scr.userData.noRS = true;
+  for(const [y, h, side] of [[.034, .012, -1], [.017, .017, -1], [-.004, .017, -1], [.016, .026, 1], [-.03, .016, 1]])   // action / volume / side / camera control
+    add(body, rslab(.0016, h, .0035, .0008, .0005, ti), side*(W/2+.0004), y, D/2);
+  add(body, rslab(.04, .042, .0018, .011, .0007, phys(0x3b3c3e,{r:.2, m:.6, x:{clearcoat:1}})), -W/2+.0235, Hh/2-.0235, -.0006);   // camera plateau (back)
+  for(const [cx, cy] of [[-.0095, .0095], [-.0095, -.0095], [.0095, 0]]) add(body, cyl(.0072, .0016, PM.gloss, 28), -W/2+.0235+cx, Hh/2-.0235+cy, -.0018).rotation.x = Math.PI/2;
+  body.rotation.x = -Math.PI/2 + .019; body.position.y = .0016;   // face up, top toward -z; it rests on the plateau at the top end
+  g.add(body); g.userData.screen = { obj:body, w:sw, h:sh, z:D+.00032 };
+  return g; };
 const PHT = {};
 function photoTex(k){ if(PHT[k]) return PHT[k]; const t = texLoader.load(PK('ph/'+k+'.webp')); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, maxAniso); return PHT[k] = t; }
 /* a plain house key, lying flat (blade along +x) */
@@ -1572,7 +1605,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 29;
+const TOURV = 30;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1591,9 +1624,9 @@ scene.add(prodLight, prodLight.target);
 
 
 /* ------------------------------------------------------------------ product placement */
-const RAILG = [['Smart Hub & Mobile App',['hub']],['Cameras',['ocp','ocspot','dbcp','icp']],['Smart Home',['lock','garage','therm','plug']],
+const RAILG = [['Smart Hub & Mobile App',['hub','app']],['Cameras',['ocp','ocspot','dbcp','icp']],['Smart Home',['lock','garage','therm','plug']],
   ['Sensors',['keypad','motion','glass','window','water','smokeco','fire','pendant','fob','chime']],['Yard Sign',['ysign']]];
-const RLAB = {hub:'Smart Hub Pro 2',ocp:'Outdoor Camera Pro',ocspot:'Outdoor Camera + Spotlight',dbcp:'Doorbell Camera Pro',icp:'Indoor Camera Pro',lock:'Smart Lock',garage:'Garage Control',therm:'Smart Thermostat',plug:'Smart Plug',keypad:'Keypad',motion:'Motion Sensor',glass:'Glass Break',window:'Door & Window',water:'Water Sensor',smokeco:'Smoke & CO Detector',fire:'Smoke/CO Monitor',pendant:'Panic Pendant',fob:'Key Fob',chime:'Chime Extender',ysign:'Yard Sign'};
+const RLAB = {hub:'Smart Hub Pro 2',app:'Vivint App',ocp:'Outdoor Camera Pro',ocspot:'Outdoor Camera + Spotlight',dbcp:'Doorbell Camera Pro',icp:'Indoor Camera Pro',lock:'Smart Lock',garage:'Garage Control',therm:'Smart Thermostat',plug:'Smart Plug',keypad:'Keypad',motion:'Motion Sensor',glass:'Glass Break',window:'Door & Window',water:'Water Sensor',smokeco:'Smoke & CO Detector',fire:'Smoke/CO Monitor',pendant:'Panic Pendant',fob:'Key Fob',chime:'Chime Extender',ysign:'Yard Sign'};
 { const ORD = RAILG.flatMap(g=>g[1]); PRODUCTS.sort((a,b)=>(ORD.indexOf(a.k)+99*(ORD.indexOf(a.k)<0))-(ORD.indexOf(b.k)+99*(ORD.indexOf(b.k)<0))); }
 const PLACE = {
   ysign: {pos:V(-5.6,.06,6.15),        view:V(.25,0,1),  stand:true, s:1, d:1.5, ay:1.0},
@@ -1606,6 +1639,7 @@ const PLACE = {
   motion:{pos:V(.05,FL+2.72,GR.z0+.01), view:V(0,-.3,1),       d:.72},
   smokeco:{pos:V(-1.05,4.5,GR.z0+.01),  view:V(0,0,1),          d:.9},
   water: {pos:V(.56,FL+.012,GR.z0+.62), view:V(.3,.55,.78), flat:true, d:.62},   // 3/4 view, nothing overhead
+  app:   {pos:V(.1,FL+.94,-4.22),    view:V(.12,.85,.5),  flat:true, s:1.25, d:.55, ay:.7},   // lying on the island, top end away from the stools; ring lifted clear of the Key Fob's
   fob:   {pos:V(-.9,FL+.945,-4.05),  view:V(.15,.8,.6),  flat:true, s:1.2, d:.5},
   pendant:{pos:V(GR.x1-.035,FL+1.62,-.45), view:V(-1,0,0), s:1.25, d:.82},
   icp:   {pos:V(3.5,FL+2.13,GR.cz-.15), view:V(.25,0,1), stand:true, s:1.1, d:.6},
@@ -1746,7 +1780,7 @@ for(const p of PRODUCTS){
   spotsEl.appendChild(b); p.el = b;
   const c = document.createElement('button');
   c.className = 'pi'; c.dataset.k = p.k; c.setAttribute('aria-current','false');
-  c.innerHTML = `<img src="${PK('cat/'+(p.k==='hub'?'shp2_home':p.k)+'.webp')}" alt="">${RLAB[p.k]||p.name}`;
+  c.innerHTML = `<img src="${PK(p.k==='app'?'chip/app.webp':'cat/'+(p.k==='hub'?'shp2_home':p.k)+'.webp')}" alt="">${RLAB[p.k]||p.name}`;
   c.addEventListener('click', () => focus(p));
   p.chip = c;
 }

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=440,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Vivint App</title>
+<style id="appLock">/* app, not a website: no text selection, callouts, image dragging or browser zoom */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y}
+*,*::before,*::after{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+input,textarea,select,[contenteditable]:not([contenteditable="false"]),[contenteditable]:not([contenteditable="false"]) *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,svg,video,canvas,a{-webkit-user-drag:none;user-drag:none}</style>
+<script id="appLockJs">(function(){var no=function(e){e.preventDefault()},ed=function(t){return t&&t.closest&&t.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])')};
+['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,no,{passive:false})});
+document.addEventListener('dragstart',function(e){if(!(e.target.closest&&e.target.closest('[draggable="true"]')))e.preventDefault()},true);
+document.addEventListener('selectstart',function(e){if(!ed(e.target))e.preventDefault()},true);
+document.addEventListener('contextmenu',function(e){if(!ed(e.target))e.preventDefault()},true);
+addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault()},{passive:false});
+addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&/^(\+|=|-|_|0)$/.test(e.key))e.preventDefault()});})();</script>
+<style>
+@font-face{font-family:"Vivint Sans";src:url(../fonts/VivintSans-Regular.woff) format("woff");font-weight:400;font-display:swap}
+@font-face{font-family:"Vivint Sans";src:url(../fonts/VivintSans-Medium.woff) format("woff");font-weight:500 600;font-display:swap}
+@font-face{font-family:"Vivint Sans";src:url(../fonts/VivintSans-Bold.woff) format("woff");font-weight:700;font-display:swap}
+html,body{margin:0;width:440px;height:956px;overflow:hidden;background:#f3f3f3;overscroll-behavior:none}
+#app{position:fixed;left:0;top:0;width:440px;height:956px;overflow:hidden}
+#app .ae-app{transform:none}
+</style>
+<link rel="stylesheet" href="appemu.css?v=1">
+</head><body>
+<!-- the Vivint app on its own, 440 x 956 pt, full frame: the 3D Home docks this page onto the phone on the kitchen island -->
+<div id="app"></div>
+<script src="appemu.js?v=1"></script>
+<script>AppEmu.mount(document.getElementById('app')); window.__appReady = true;</script>
+</body></html>

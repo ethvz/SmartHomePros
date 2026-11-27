@@ -89,6 +89,18 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 #dmHub.pip{z-index:10}
 #dmHub.pip iframe{border-radius:44px;box-shadow:0 0 0 10px #0c0d0d,0 0 0 13px #d9dbd8,0 40px 90px rgba(0,0,0,.6)}
 #dmShield{position:absolute;inset:0;cursor:pointer}
+/* Vivint App emulator: one iframe, docked on the 3D phone's glass on the island (homography) or floating as picture-in-picture */
+#dmApp{position:fixed;left:0;top:0;width:440px;height:956px;transform-origin:0 0;z-index:4;pointer-events:none;opacity:0;transition:opacity .45s;border-radius:55px;overflow:hidden}
+#dmApp.vis{opacity:1}
+#dmApp.live{pointer-events:auto}
+#dmApp iframe{position:absolute;inset:0;width:440px;height:956px;border:0;background:#f3f3f3;display:block}
+#dmApp.pip{z-index:10;overflow:visible}
+#dmApp.pip iframe{border-radius:55px;box-shadow:0 0 0 12px #0c0d0d,0 0 0 15px #5d5e60,0 40px 90px rgba(0,0,0,.6)}
+#dmAppShield{position:absolute;inset:0;cursor:pointer}
+#dmApp.live #dmAppShield{display:none}
+#dmTryApp{position:fixed;z-index:5;left:0;top:0;padding:6px 11px 6px 9px;border-radius:16px;font-size:12px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity .35s}
+#dmTryApp.vis{opacity:1}
+#dmTryApp b{width:8px;height:8px;border-radius:50%;background:var(--vg);box-shadow:0 0 10px var(--vg);animation:dmBlink 1.6s infinite}
 #dmHub.live #dmShield{display:none}
 #dmTry{position:fixed;z-index:5;left:0;top:0;padding:6px 11px 6px 9px;border-radius:16px;font-size:12px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:8px;pointer-events:none;opacity:0;transition:opacity .35s}
 #dmTry.vis{opacity:1}
@@ -164,7 +176,7 @@ const css = document.createElement('style'); css.id = 'demoCss'; css.textContent
 @keyframes dmRedP{50%{opacity:.35}}
 #dmShieldRun[hidden]{display:none}
 /* while a close-up or automation plays, the tour's own chrome steps aside */
-body.dmMode #rail,body.dmMode #spots,body.dmMode #card,body.dmMode #cFeats,body.dmMode #back,body.dmMode #brand,body.dmMode #hint,body.dmMode #dmAct,body.dmMode #dmTry{opacity:0!important;pointer-events:none!important}
+body.dmMode #rail,body.dmMode #spots,body.dmMode #card,body.dmMode #cFeats,body.dmMode #back,body.dmMode #brand,body.dmMode #hint,body.dmMode #dmAct,body.dmMode #dmTry,body.dmMode #dmTryApp{opacity:0!important;pointer-events:none!important}
 body.dmMode #dmHud{opacity:0;pointer-events:none;transform:translateY(-10px)}
 #rail,#spots,#brand{transition:opacity .4s}
 @media (max-width:760px), (max-aspect-ratio:1/1){
@@ -187,6 +199,7 @@ body.dmMode #dmHud{opacity:0;pointer-events:none;transform:translateY(-10px)}
 
 const IC = {
   hub:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2.2"/><path d="M3 13.2h18M8.5 19.5h7"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="6.5" y="2.8" width="11" height="18.4" rx="2.6"/><path d="M10.5 5.6h3" stroke-linecap="round"/></svg>',
   spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/></svg>',
   shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/></svg>',
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 11L12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>',
@@ -208,12 +221,15 @@ const IC = {
 const el = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); for(const k in attrs) e.setAttribute(k, attrs[k]); e.innerHTML = html; document.body.appendChild(e); return e; };
 const hud = el('div', { id:'dmHud' }, `<div id="dmArm" class="glass"><i></i><span>Disarmed</span></div>
   <button class="dmPill glass" id="dmHubB" aria-label="Use the Smart Hub">${IC.hub}<span>Smart Hub</span></button>
+  <button class="dmPill glass" id="dmAppB" aria-label="Use the Vivint App">${IC.phone}<span>App</span></button>
   <button class="dmPill glass lbl" id="dmScB" aria-label="Scenes">${IC.spark}<span>Scenes</span></button>`);
 const SCN = [['away','Arm Away','Leaving home', IC.shield, '#ff9a3c'], ['welcome','Welcome Home','Code at the door', IC.home, '#05E5AF'],
   ['night','Goodnight','Lock up for bed', IC.moon, '#8fa8ff'], ['smoke','Smoke Alarm','Fire safety', IC.fire, '#ff5a4a']];
 const scenesEl = el('div', { id:'dmScenes', class:'glass off' }, '<h3>Automations</h3>' + SCN.map(([k, t, s, i, c]) =>
   `<button class="dmSc" data-sc="${k}" style="--c:${c}"><i>${i}</i><span>${t}<small>${s}</small></span></button>`).join(''));
 const hubEl = el('div', { id:'dmHub' }, '<div id="dmShield"></div>');
+const appEl = el('div', { id:'dmApp' }, '<div id="dmAppShield"></div>');
+const tryApp = el('div', { id:'dmTryApp', class:'glass' }, '<b></b>Tap the phone');
 const tryEl = el('div', { id:'dmTry', class:'glass' }, '<b></b>Tap the screen');
 const doneB = el('button', { id:'dmDone', class:'glass', hidden:'' }, IC.back + '<span>Done</span>');
 const padEl = el('div', { id:'dmPad', class:'glass', hidden:'' }, '<div class="dots"><i></i><i></i><i></i><i></i></div><div class="cd">Code<b>1234</b></div><div class="ks"></div>');
@@ -374,13 +390,15 @@ const SMOKE = (() => { const p = P('smokeco'); if(!p) return { on(){}, off(){} }
 
 /* ------------------------------------------------------------------ the Smart Hub emulator (same-origin iframe) */
 const EMU = { frame:null, w:null, doc:null, UI:null, S:null, ready:null, driving:false, docked:true, mx:'' };
+/* the emulators show the demo time (6:30 pm), like the 3D hub glass and the phone's lock screen */
+function pinTime(f, re){ const pin = () => { try { const w = f.contentWindow, d = f.contentDocument; if(!w || !d || !re.test(d.URL)){ setTimeout(pin, 4); return; } if(w.__demoTime) return;
+    const RD = w.Date, fixed = () => { const n = new RD(); n.setHours(DEMO_TIME.h, DEMO_TIME.m, 0, 0); return n.getTime(); };
+    w.Date = class extends RD { constructor(...a){ if(a.length) super(...a); else super(fixed()); } static now(){ return fixed(); } }; w.__demoTime = true; } catch(e){ setTimeout(pin, 8); } };
+  pin(); }
 function emu(){ if(EMU.ready) return EMU.ready;
   EMU.ready = new Promise(res => { const f = document.createElement('iframe'); f.title = 'Smart Hub Pro 2'; f.setAttribute('allow', 'autoplay');
     f.src = '../emu/index.html?flat&v=' + (T.TOURV || 1); hubEl.insertBefore(f, hubEl.firstChild); EMU.frame = f;
-    const pin = () => { try { const w = f.contentWindow, d = f.contentDocument; if(!w || !d || !/emu/.test(d.URL)){ setTimeout(pin, 4); return; } if(w.__demoTime) return;
-      const RD = w.Date, fixed = () => { const n = new RD(); n.setHours(DEMO_TIME.h, DEMO_TIME.m, 0, 0); return n.getTime(); };
-      w.Date = class extends RD { constructor(...a){ if(a.length) super(...a); else super(fixed()); } static now(){ return fixed(); } }; w.__demoTime = true; } catch(e){ setTimeout(pin, 8); } };
-    pin();
+    pinTime(f, /emu/);
     f.addEventListener('load', () => { const poll = () => { try { const d = f.contentDocument, u = f.contentWindow.eval('UI');
         if(!d || !u || !d.getElementById('gB')) return setTimeout(poll, 80);
         EMU.w = f.contentWindow; EMU.doc = d; EMU.UI = u; EMU.S = u.S; hookEmu(); res(EMU); } catch(e){ setTimeout(poll, 120); } }; poll(); }); });
@@ -406,7 +424,7 @@ const lockBusy = () => !!q('[data-act="lock"][data-lk="front"].busy');
    lock before arming. The hub's lock and garage buttons flip after a delay, so this runs again shortly after. */
 function syncEmu(){ if(!EMU.S || MODE.run) return; const S = EMU.S; S.th.cur = M.th.cur; HUBDO.therm();
   if(M.arm === 'dis') HUBDO.arm('dis'); HUBDO.lock(M.locked); HUBDO.garage(M.garageOpen); if(M.arm !== 'dis' && !M.garageOpen) HUBDO.arm(M.arm); }
-function reconcile(){ syncEmu(); clearTimeout(reconcile.t); reconcile.t = setTimeout(() => { syncEmu(); reconcile.t = setTimeout(syncEmu, 1900); }, 900); }
+function reconcile(){ syncApp(); syncEmu(); clearTimeout(reconcile.t); reconcile.t = setTimeout(() => { syncEmu(); reconcile.t = setTimeout(syncEmu, 1900); }, 900); }
 /* what the presenter last touched on the hub: only a real tap there may change the house (stale reads never do) */
 const USER = { lock:0, arm:0 };
 const recent = (t, ms) => performance.now() - t < ms;
@@ -436,7 +454,7 @@ function paintArm(){ const a = $('#dmArm'); a.classList.toggle('armed', M.arm !=
 const SCR = { c:V(-.0032, .01555, .0227), w:.1513, h:.1513*750/1280 };
 function screenCorners(){ const g = P('hub').model; g.updateMatrixWorld(); const { c, w, h } = SCR;
   return [[-w/2, h/2], [w/2, h/2], [w/2, -h/2], [-w/2, -h/2]].map(([x, y]) => g.localToWorld(V(c.x + x, c.y + y, c.z))); }
-function homog(pts){ const [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = pts, W = 1280, H = 750;
+function homog(pts, W = 1280, H = 750){ const [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = pts;
   const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
   let a, b, c, d, e, f, g = 0, h = 0;
   if(Math.abs(dx3) < 1e-9 && Math.abs(dy3) < 1e-9){ a = x1 - x0; b = x2 - x1; c = x0; d = y1 - y0; e = y2 - y1; f = y0; }
@@ -461,19 +479,86 @@ async function toPip(){ if(!hubEl.classList.contains('vis')) { hubEl.style.trans
   hubEl.style.transition = 'transform .8s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = pipMatrix(); EMU.mx = ''; await wait(.8); }
 /* end of an automation: pull back to the whole home, unless we are about to return to the hub or a product anyway */
 function finale(){ const b = MODE.back; return b && (b.kind || b.focus) ? wait(.4) : fly(SH.home()); }
-async function atHub(){ await fly(SH.hub()); if(!SKIP.on) await toDock(); }
-async function offHub(){ if(EMU.docked && !SKIP.on) await toPip(); }
+async function atHub(){ await fly(SH.hub()); if(!SKIP.on && !(MODE.viaApp && !EMU.S)) await toDock(); }   // from the app with the hub never opened: its 3D glass shows the arm state (one emulator in memory)
+async function offHub(){ if(MODE.viaApp){ hubEl.classList.remove('vis'); perFrame.delete(dockStep); if(!SKIP.on) await wait(.3); return; }   // the app is already the floating screen
+  if(EMU.docked && !SKIP.on) await toPip(); }
 async function toDock(){ const m = dockMatrix(); if(!m){ showDock(false); return; }
   hubEl.style.transition = 'transform .75s cubic-bezier(.2,.75,.2,1), opacity .45s'; hubEl.style.transform = m; EMU.mx = m; await wait(.75);
   hubEl.classList.remove('pip'); hubEl.style.transition = ''; EMU.docked = true; perFrame.add(dockStep); kick(); }
+
+/* ------------------------------------------------------------------ the Vivint App emulator on the phone (../appemu, same-origin iframe)
+   Works like the hub: docked on the phone's glass with a homography, live in a close-up looking down at the island, floating as
+   picture-in-picture while the house plays what was tapped. Loaded on first use of the phone. */
+const APP = { frame:null, w:null, api:null, ready:null, docked:true, mx:'' };
+function app(){ if(APP.ready) return APP.ready;
+  APP.ready = new Promise(res => { const f = document.createElement('iframe'); f.title = 'Vivint App'; f.setAttribute('allow', 'autoplay');
+    f.src = '../appemu/index.html?v=' + (T.TOURV || 1); appEl.insertBefore(f, appEl.firstChild); APP.frame = f; pinTime(f, /appemu/);
+    f.addEventListener('load', () => { const poll = () => { try { const w = f.contentWindow; if(!w || !w.__appReady || !w.AppEmu) return setTimeout(poll, 80);
+        APP.w = w; APP.api = w.AppEmu; APP.api.on(fromApp); syncApp(); res(APP); } catch(e){ setTimeout(poll, 120); } }; poll(); }); });
+  return APP.ready; }
+const appScr = () => P('app').model.userData.screen;
+const appQuat = () => appScr().obj.getWorldQuaternion(new THREE.Quaternion());
+function appCorners(){ const sc = appScr(); sc.obj.updateMatrixWorld();
+  return [[-sc.w/2, sc.h/2], [sc.w/2, sc.h/2], [sc.w/2, -sc.h/2], [-sc.w/2, -sc.h/2]].map(([x, y]) => sc.obj.localToWorld(V(x, y, sc.z))); }
+function appMatrix(){ camera.updateMatrixWorld(); const W = innerWidth, H = innerHeight, pts = [];
+  if(tmpV.copy(camera.position).sub(P('app').center).dot(V(0, 0, 1).applyQuaternion(appQuat())) < .02) return null;
+  for(const p of appCorners()){ const v = p.project(camera); if(v.z > 1 || v.z < -1) return null; pts.push([(v.x + 1)/2*W, (1 - v.y)/2*H]); }
+  return homog(pts, 440, 956); }
+function appPip(){ const W = innerWidth, H = innerHeight, s = Math.min(300, H*.4, W*.3*956/440)/956, top = (document.documentElement.classList.contains('emb') ? 22 : 18) + 18;
+  return `matrix3d(${s},0,0,0,0,${s},0,0,0,0,1,0,${W - 440*s - 30},${top},0,1)`; }
+let appHideT = 0;
+function appVis(on){ clearTimeout(appHideT); if(on){ appEl.style.visibility = ''; if(!appEl.classList.contains('vis')) appEl.classList.add('vis'); }
+  else { appEl.classList.remove('vis'); appHideT = setTimeout(() => { if(!appEl.classList.contains('vis')) appEl.style.visibility = 'hidden'; }, 500); } }   // hidden: the app's own animations stop painting
+function appDockStep(){ if(!APP.docked) return; const m = appMatrix(); if(!m){ appVis(false); return; }
+  if(m !== APP.mx){ APP.mx = m; appEl.style.transform = m; }
+  if(!appEl.classList.contains('vis')) appVis(true);
+  if(MODE.kind !== 'app' && !MODE.run){ const c = appCorners(), a = c[2].clone().project(camera), b = c[3].clone().project(camera), cx = ((a.x + b.x)/2 + 1)/2*innerWidth, by = (1 - Math.min(a.y, b.y))/2*innerHeight;
+    tryApp.style.transform = `translate3d(${cx - tryApp.offsetWidth/2}px,${by + 14}px,0)`; } }
+function appShowDock(on){ if(on){ app(); APP.docked = true; appEl.classList.remove('pip'); appEl.style.transition = ''; perFrame.add(appDockStep); kick(); }
+  else { perFrame.delete(appDockStep); appVis(false); appEl.classList.remove('live'); tryApp.classList.remove('vis'); } }
+async function appToPip(){ if(!appEl.classList.contains('vis')){ appEl.style.transition = 'none'; appEl.style.transform = appPip(); appEl.classList.add('pip'); void appEl.offsetWidth; appEl.style.transition = ''; appVis(true); APP.docked = false; perFrame.delete(appDockStep); return; }
+  APP.docked = false; perFrame.delete(appDockStep); appEl.classList.remove('live'); appEl.classList.add('pip');
+  appEl.style.transition = 'transform .8s cubic-bezier(.2,.75,.2,1), opacity .45s'; appEl.style.transform = appPip(); APP.mx = ''; await wait(.8); }
+async function appToDock(){ const m = appMatrix(); if(!m){ appShowDock(false); return; }
+  appEl.style.transition = 'transform .75s cubic-bezier(.2,.75,.2,1), opacity .45s'; appEl.style.transform = m; APP.mx = m; await wait(.75);
+  appEl.classList.remove('pip'); appEl.style.transition = ''; APP.docked = true; perFrame.add(appDockStep); kick(); }
+/* the close-up: look down at the phone from just past its bottom edge, so the screen reads upright */
+function appPose(){ const sc = appScr(), q = appQuat(), c = sc.obj.localToWorld(V(0, 0, sc.z)), n = V(0, 0, 1).applyQuaternion(q), dn = V(0, -1, 0).applyQuaternion(q);
+  const s = P('app').model.scale.x, d = fitDist(sc.w*s, sc.h*s, .8, aspect() < 1 ? .74 : .8), dir = n.clone().addScaledVector(dn, .14).normalize();
+  return { pos:c.clone().addScaledVector(dir, d), target:c }; }
+async function enterApp(back){ if(MODE.run) return; await app(); quietTour(); MODE.kind = 'app'; MODE.lockCam = true; doneB.hidden = false; tryApp.classList.remove('vis'); hudOn();
+  const shown = APP.docked && appEl.classList.contains('vis');   // already on the glass: it rides along; otherwise it fades in on arrival (never drawn over a wall mid-flight)
+  if(!shown && APP.docked) appShowDock(false);
+  await fly(appPose(), back ? 1.5 : 1.3); controls.enabled = false; if(MODE.kind !== 'app') return;
+  if(APP.docked && !shown) appShowDock(true);
+  if(!APP.docked) await appToDock();
+  if(MODE.kind === 'app') appEl.classList.add('live'); }
+/* house -> app: the app shows what the house (or the hub) just did, without echoing it back */
+function syncApp(){ if(!APP.api || MODE.run) return; const t = M.th;
+  APP.api.apply({ sec:M.alarm ? null : M.arm, lock:{ front:M.locked }, gar:{ main:M.garageOpen }, th:{ hall:{ set:t.sp, cur:t.cur, mode:t.mode === 'off' ? 'off' : t.mode === 'heat' ? 'heat' : 'cool' } }, lights:M.lights > .5 }); }
+/* app -> house: a tap in the app plays the same 3D sequences the hub triggers */
+let appTh = null;
+function fromApp(type, d){ if(MODE.run) return;
+  if(type === 'lock' && d.k === 'front'){ if(M.locked !== d.lock) device('lock', d.lock); }
+  if(type === 'gar' && d.k === 'main'){ if(M.garageOpen !== d.open) device('garage', d.open); }
+  if(type === 'sec'){ if(d.k !== M.arm) automation(d.k === 'dis' ? 'disarm' : d.k, { from:'app' }); }
+  if(type === 'th' && d.k === 'hall'){ clearTimeout(appTh); appTh = setTimeout(() => { appTh = null; if(d.mode === 'off'){ if(M.th.mode !== 'off') sequence('dev-therm', async () => { caption('Thermostat', 'Off', ['temp']); await fly(SH.therm()); await TH.to(M.th.sp, 'off'); HUDO_therm(); capDone('Thermostat off'); await wait(.6); }); return; }
+      if(d.set !== M.th.sp || d.mode !== M.th.mode){ M.th.mode = d.mode; device('therm', d.set); } }, 900); }
+  if(type === 'light'){ const S = APP.api.state, on = !!(S.light[3] || S.light[4]); if(on === (M.lights > .5)) return;
+    sequence('dev-lights', async () => { caption('Lights', on ? 'Lights on' : 'Lights off', ['bulb']); await fly(SH.great()); await LIT.to(on ? 1 : .15, 1.4); capDone(on ? 'Lights on' : 'Lights off'); await wait(.5); }); }
+  if(type === 'sc') automation(d.k === 'leave' ? 'away' : d.k === 'bed' ? 'night' : 'welcome', d.k === 'arrive' ? { typed:true } : {});
+}
+const HUDO_therm = () => HUBDO.therm();
+appEl.querySelector('#dmAppShield').addEventListener('click', () => enterApp());
 
 /* ------------------------------------------------------------------ modes: hub panel, lock keypad, keypad close-ups */
 const tour = { card:$('#card'), back:$('#back') };
 function quietTour(){ state.focus = null; document.body.classList.remove('focus'); document.body.classList.add('dmMode'); tour.card.classList.add('away'); tour.back.hidden = true;
   PRODUCTS.forEach(q => q.chip && q.chip.setAttribute('aria-current', 'false')); state.idleAt = performance.now() + 1e9; controls.autoRotate = false; scenesEl.classList.add('off'); }
-function context(){ if(MODE.kind === 'panel') return { kind:'panel' }; if(MODE.kind && PAD.k) return { focus:PAD.k }; if(state.focus) return { focus:state.focus.k }; return {}; }
+function context(){ if(MODE.kind === 'panel') return { kind:'panel' }; if(MODE.kind === 'app') return { kind:'app' }; if(MODE.kind && PAD.k) return { focus:PAD.k }; if(state.focus) return { focus:state.focus.k }; return {}; }
 async function restore(c){ document.body.classList.remove('dmMode'); setFill(0); state.idleAt = performance.now();
   if(c && c.kind === 'panel') return enterPanel(true);
+  if(c && c.kind === 'app') return enterApp(true);
   if(c && c.focus){ state.focus = null; T.focus(c.focus); return; }
   T.overview(); }
 function panelPose(){ const p = P('hub'), g = p.model, c = g.localToWorld(SCR.c.clone()), n = V(0, 0, 1).applyQuaternion(g.getWorldQuaternion(new THREE.Quaternion()));
@@ -495,9 +580,9 @@ async function enterPad(k){ if(MODE.run) return; emu(); quietTour(); MODE.kind =
   padEl.classList.remove('bad', 'ok'); padEl.hidden = false; doneB.hidden = false;
   padEl.querySelector('.ks').innerHTML = k === 'keypad' ? '<button data-k="away">Away</button><button data-k="stay">Stay</button>' : '';
   await fly(padPose(k)); controls.enabled = false; }
-function leaveMode(){ const k = MODE.kind, pk = PAD.k; MODE.kind = null; setTimeout(hudOn, 0); MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hubEl.classList.remove('live');
+function leaveMode(){ const k = MODE.kind, pk = PAD.k; MODE.kind = null; setTimeout(hudOn, 0); MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hubEl.classList.remove('live'); appEl.classList.remove('live');
   controls.enabled = true; document.body.classList.remove('dmMode');
-  if(k === 'panel'){ state.focus = null; T.focus('hub'); } else if(pk){ state.focus = null; T.focus(pk); } else T.overview(); }
+  if(k === 'panel'){ state.focus = null; T.focus('hub'); } else if(k === 'app'){ state.focus = null; T.focus('app'); } else if(pk){ state.focus = null; T.focus(pk); } else T.overview(); }
 doneB.addEventListener('click', () => { if(MODE.run) return; leaveMode(); });
 hubEl.querySelector('#dmShield').addEventListener('click', () => enterPanel());
 padEl.querySelector('.ks').addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; const kp = parts('keypad'); pressKey(kp[b.dataset.k], GREEN);
@@ -528,11 +613,12 @@ window.__tapHook = (ray, e) => {
   if(MODE.kind === 'keypad'){ const kp = parts('keypad'); const n = nearestKey([...(kp.keys || []), kp.stay, kp.away, kp.clear].filter(Boolean), e);
     if(n){ if(n.m === kp.stay || n.m === kp.away){ pressKey(n.m); setTimeout(() => automation(n.m === kp.away ? 'away' : 'stay', { from:'keypad' }), 300); }
       else if(n.m === kp.clear){ pressKey(n.m); PAD.code = ''; padDots(); } else padKey(n.m); } return true; }
-  if(MODE.kind === 'panel') return true;
+  if(MODE.kind === 'panel' || MODE.kind === 'app') return true;
   const f = state.focus && state.focus.k;
   if(f === 'lock' && hits(P('lock').model, ray)){ enterPad('lock'); return true; }
   if(f === 'keypad' && hits(P('keypad').model, ray)){ enterPad('keypad'); return true; }
   if(f === 'hub' && hits(P('hub').model, ray)){ enterPanel(); return true; }
+  if(f === 'app' && hits(P('app').model, ray)){ enterApp(); return true; }
   if(f === 'garage'){ const b = parts('garage').buttons || []; const n = nearestKey(b, e); if(n){ const i = b.indexOf(n.m); if(i === 1){ pressKey(n.m, LIME); return true; } device('garage', i === 2); return true; } }
   if(f === 'therm' && hits(P('therm').model, ray)){ const c = P('therm').center.clone().project(camera), y = (1 - c.y)/2*innerHeight; device('therm', M.th.sp + (e.clientY < y ? 1 : -1)); return true; }
   return false; };
@@ -545,8 +631,8 @@ function adoptTherm(){ const p = parts('therm'); if(!p.getState) return; const s
   if(st.mode) M.th.mode = st.mode; if(st.setpoint != null) M.th.sp = st.setpoint; if(st.current != null) M.th.cur = st.current; }
 const T_ = s => `<span class="t">${s}</span>`;
 function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.focus.k : null;
-  const want = ['lock', 'garage', 'therm', 'keypad', 'hub'].includes(f) ? f : null;
-  if(!want){ if(actK){ actEl.classList.add('off'); tour.card.classList.remove('dmHas'); actK = null; } showTry(false); return; }
+  const want = ['lock', 'garage', 'therm', 'keypad', 'hub', 'app'].includes(f) ? f : null;
+  if(!want){ if(actK){ actEl.classList.add('off'); tour.card.classList.remove('dmHas'); actK = null; } showTry(false); showTryApp(false); return; }
   if(want === 'therm') adoptTherm();
   const a = TH.active(), lab = a === 'cool' ? 'Cooling' : a === 'heat' ? 'Heating' : M.th.mode === 'off' ? 'Off' : 'Idle';
   let H = {
@@ -555,18 +641,20 @@ function syncAct(){ const f = !MODE.kind && !MODE.run && state.focus ? state.foc
     therm:`<button class="rnd" data-a="tdn" aria-label="Cooler">${IC.down}</button><div class="tv">${M.th.sp}°<small class="${a || ''}">${lab}</small></div><button class="rnd" data-a="tup" aria-label="Warmer">${IC.up}</button>`,
     keypad:`<button class="pri" data-a="kpad" aria-label="Enter code">${IC.keys}${T_('Enter code')}</button><button data-a="away">Away</button><button data-a="stay">Stay</button>`,
     hub:`<button class="pri" data-a="panel">${IC.hub}${T_('Use the hub')}</button>`,
+    app:`<button class="pri" data-a="app">${IC.phone}${T_('Use the app')}</button>`,
   }[want];
-  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', keypad:'Keypad', hub:'Smart Hub' }[want]}</span>` + H;
+  H = `<span class="nm">${{ lock:'Lock', garage:'Garage', therm:'Thermostat', keypad:'Keypad', hub:'Smart Hub', app:'Vivint App' }[want]}</span>` + H;
   if(want === 'therm' && actEl.dataset.k === 'therm' && actEl.querySelector('.tv')){ const tv = actEl.querySelector('.tv'), t = H.match(/<div class="tv">(.*?)<\/div>/)[1]; if(tv.innerHTML !== t) tv.innerHTML = t; }   // keep the buttons under the finger
   else if(actEl.dataset.h !== H){ actEl.innerHTML = H; actEl.dataset.h = H; }
   actEl.dataset.k = want;
   const nx = tour.card.querySelector('#next'); if(actEl.parentNode !== tour.card || actEl.nextSibling !== nx) tour.card.insertBefore(actEl, nx);
   actK = want; actEl.classList.remove('off'); tour.card.classList.add('dmHas'); tour.card.dataset.dm = want;
-  showTry(want === 'hub'); }
+  showTry(want === 'hub'); showTryApp(want === 'app'); }
 { const p = parts('therm'); if(p.setState){ const set0 = p.setState; p.setState = o => { const r = set0(o); if(actK === 'therm') queueMicrotask(syncAct); return r; }; } }
+function showTryApp(on){ if(on){ appShowDock(true); tryApp.classList.add('vis'); } else { tryApp.classList.remove('vis'); if(!MODE.kind && !MODE.run && APP.docked) appShowDock(false); } }
 function showTry(on){ if(on){ showDock(true); tryEl.classList.add('vis'); } else { tryEl.classList.remove('vis'); if(!MODE.kind && !MODE.run && EMU.docked) showDock(false); } }
 actEl.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; const a = b.dataset.a;
-  if(a === 'pad') enterPad('lock'); if(a === 'kpad') enterPad('keypad'); if(a === 'panel') enterPanel();
+  if(a === 'pad') enterPad('lock'); if(a === 'kpad') enterPad('keypad'); if(a === 'panel') enterPanel(); if(a === 'app') enterApp();
   if(a === 'lock') device('lock', !M.locked); if(a === 'gar') device('garage', !M.garageOpen);
   if(a === 'tup') device('therm', Math.min(90, M.th.sp + 1)); if(a === 'tdn') device('therm', Math.max(50, M.th.sp - 1));
   if(a === 'away' || a === 'stay') automation(a, { from:'keypad' }); });
@@ -580,21 +668,22 @@ function caption(kicker, title, steps, alarm){ capEl.querySelector('small').text
 function capStep(i, title){ const st = [...capEl.querySelectorAll('.st i')]; st.forEach((s, j) => { s.classList.toggle('done', j < i); s.classList.toggle('cur', j === i); }); if(title) capEl.querySelector('b').textContent = title; }
 function capDone(title){ capEl.querySelectorAll('.st i').forEach(s => { s.classList.add('done'); s.classList.remove('cur'); }); if(title) capEl.querySelector('b').textContent = title; }
 function skip(){ if(!MODE.run || SKIP.on) return; if(performance.now() - MODE.runT0 < 800){ nudgeSkip(); return; } SKIP.on = true;
-  hubEl.style.transition = 'none'; if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix();   // no half-way hub UI left floating
+  hubEl.style.transition = 'none'; if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix(); appEl.style.transition = 'none'; if(appEl.classList.contains('pip')) appEl.style.transform = appPip();   // no half-way hub UI left floating
   flushAll(); }
 function nudgeSkip(){ const b = $('#dmSkip'); b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge'); }
 $('#dmSkip').addEventListener('click', e => { e.stopPropagation(); skip(); }); runShield.addEventListener('click', nudgeSkip); capEl.addEventListener('click', nudgeSkip);
 let queue = Promise.resolve();
 /* run one sequence at a time; `body(ctx)` does the moves; `withHub` floats the hub UI as picture-in-picture */
 function sequence(name, body, { withHub = true } = {}){ queue = queue.then(async () => {
-  const back = MODE.run ? null : context(), wasPanel = back && back.kind === 'panel'; MODE.back = back;
+  const back = MODE.run ? null : context(), wasPanel = back && back.kind === 'panel', wasApp = back && back.kind === 'app'; MODE.back = back; MODE.viaApp = wasApp;
   MODE.run = name; MODE.runT0 = performance.now(); MODE.lockCam = true; PAD.k = null; padEl.hidden = true; doneB.hidden = true; quietTour(); actEl.classList.add('off'); runShield.hidden = false; setFill(1.6);
-  if(withHub){ await emu(); if(wasPanel && EMU.docked) await toPip(); else if(!hubEl.classList.contains('pip') || !hubEl.classList.contains('vis')) await toPip(); }
+  if(wasApp){ await app(); await appToPip(); }   // started on the phone: the app floats, the hub only shows when the camera is at it
+  else { appShowDock(false); if(withHub){ await emu(); if(wasPanel && EMU.docked) await toPip(); else if(!hubEl.classList.contains('pip') || !hubEl.classList.contains('vis')) await toPip(); } }
   try { await body(); } catch(e){ console.warn('demo', name, e); }
   const wasSkip = SKIP.on; SKIP.on = false; flushAll(); settle();
-  await wait(wasSkip ? .2 : 1.1); capEl.classList.add('off'); runShield.hidden = true; MODE.run = null; MODE.lockCam = false; MODE.kind = null; hudOn(); reconcile();
+  await wait(wasSkip ? .2 : 1.1); capEl.classList.add('off'); runShield.hidden = true; MODE.run = null; MODE.viaApp = false; MODE.lockCam = false; MODE.kind = null; hudOn(); reconcile();
   if(wasPanel){ await restore({ kind:'panel' }); }
-  else { hubEl.classList.remove('vis'); setTimeout(() => { if(!MODE.kind && !MODE.run && !(state.focus && state.focus.k === 'hub')){ hubEl.classList.remove('pip'); showDock(false); } }, 500); await restore(back); }
+  else { hubEl.classList.remove('vis'); setTimeout(() => { if(MODE.kind !== 'panel' && !MODE.run && !(state.focus && state.focus.k === 'hub')){ hubEl.classList.remove('pip'); showDock(false); } }, 500); await restore(back); }
   syncAct(); }); return queue; }
 /* make every device match the model in one go (after a skip) */
 function settle(){ GAR.place(M.garage = M.garageOpen ? 1 : 0); GAR.leds(0); const t = parts('lock').turn; if(t) t.rotation.z = M.locked ? 0 : -Math.PI/2;
@@ -679,12 +768,14 @@ scenesEl.addEventListener('click', e => { const b = e.target.closest('[data-sc]'
   if(MODE.kind && MODE.kind !== 'panel') leaveModeQuiet(); automation(b.dataset.sc); });
 addEventListener('pointerdown', e => { if(!scenesEl.classList.contains('off') && !e.target.closest('#dmScenes,#dmScB')){ scenesEl.classList.add('off'); $('#dmScB').classList.remove('on'); } }, true);
 $('#dmHubB').addEventListener('click', () => { if(MODE.run) return; if(MODE.kind === 'panel') return leaveMode(); if(MODE.kind) leaveModeQuiet(); enterPanel(); });
-function leaveModeQuiet(){ MODE.kind = null; MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hudOn(); }
-function hudOn(){ $('#dmHubB').classList.toggle('on', MODE.kind === 'panel'); }
+$('#dmAppB').addEventListener('click', () => { if(MODE.run) return; if(MODE.kind === 'app') return leaveMode(); if(MODE.kind) leaveModeQuiet(); enterApp(); });
+function leaveModeQuiet(){ hubEl.classList.remove('live'); appEl.classList.remove('live'); MODE.kind = null; MODE.lockCam = false; padEl.hidden = true; doneB.hidden = true; hudOn(); }
+function hudOn(){ $('#dmHubB').classList.toggle('on', MODE.kind === 'panel'); $('#dmAppB').classList.toggle('on', MODE.kind === 'app'); }
 addEventListener('keydown', e => { if(e.key === 'Escape'){ if(MODE.run) skip(); else if(MODE.kind) leaveMode(); } });
-addEventListener('resize', () => { if(MODE.kind === 'panel' && !MODE.run){ const p = panelPose(); camera.position.copy(p.pos); controls.target.copy(p.target); camera.lookAt(p.target); kick(); }
+addEventListener('resize', () => { if((MODE.kind === 'panel' || MODE.kind === 'app') && !MODE.run){ const p = MODE.kind === 'app' ? appPose() : panelPose(); camera.position.copy(p.pos); controls.target.copy(p.target); camera.lookAt(p.target); kick(); }
+  if(appEl.classList.contains('pip')) appEl.style.transform = appPip();
   if(hubEl.classList.contains('pip')) hubEl.style.transform = pipMatrix(); });
 
 /* ------------------------------------------------------------------ boot */
 DOOR.init(); GAR.init(); TH.paint(); paintArm(); syncAct();
-window.__demo = { stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, automation, device, enterPanel, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };
+window.__demo = { stats:() => ({ anims:anims.size, perFrame:perFrame.size, raf }), M, MODE, EMU, APP, automation, device, enterPanel, enterApp, appMatrix, appPip, enterPad, leaveMode, skip, GAR, DOOR, TH, LOCK, padKey, PAD, parts, SH, fly, pipMatrix, dockMatrix };
