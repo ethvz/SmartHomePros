@@ -66,8 +66,10 @@
           const tops=[...pn.children].filter(c=>!c.matches('img,svg')&&c.offsetHeight).map(c=>c.offsetTop), tTop=tops.length?Math.min(...tops):H-F-300;
           const free=Math.max(200,tTop-56-(T+30)); k=Math.min(600/gw,free/gh,cap); X=(L+W-R)/2-gw*k/2; Y=T+30+(free-gh*k)/2; }
         else {
-          const colW=420, tog=pn.closest('.psec')&&pn.closest('.psec').querySelector('.hl .dwseg')?100:0, free=Math.min(560,H-T-F-210-tog); k=Math.min(Math.sqrt(400*460/(gw*gh)),colW/gw,free/gh,cap); X=L+(colW-gw*k)/2; Y=T+40+(free-gh*k)/2;
-          const th=fst.offsetHeight; setI(fst,'left',(L+colW+56)+'px'); setI(fst,'width',(W-R-(L+colW+56))+'px'); setI(fst,'top',Math.max(T+60,Math.round(Y+gh*k/2-th/2+20))+'px'); }
+          const colW=440, tog=pn.closest('.psec')&&pn.closest('.psec').querySelector('.hl .dwseg')?100:0, y0=T+40, y1=H-F-140-tog, free=y1-y0;
+          k=Math.min(Math.sqrt(420*480/(gw*gh)),colW/gw,Math.min(600,free)/gh,cap); X=L+(colW-gw*k)/2;
+          setI(fst,'left',(L+colW+48)+'px'); setI(fst,'width',(W-R-(L+colW+48))+'px'); const th=fst.offsetHeight, cy=y0+free/2;
+          Y=cy-gh*k/2; setI(fst,'top',Math.round(Math.max(y0+40,cy-th/2+24))+'px'); }
         ims.forEach((im,i)=>{ const r=R0[i]; setI(im,'left',(X+(r[0]-gx)*k).toFixed(1)+'px'); setI(im,'top',(Y+(r[1]-gy)*k).toFixed(1)+'px'); setI(im,'width',(r[2]*k).toFixed(1)+'px'); setI(im,'height',(r[3]*k).toFixed(1)+'px'); });
         if(svg){ setI(svg,'transform-origin','0 0'); setI(svg,'transform',`translate(${(X-gx*k).toFixed(1)}px,${(Y-gy*k).toFixed(1)}px) scale(${k.toFixed(4)})`); }
       }); }); }
@@ -81,8 +83,8 @@
     'lock:lock':{mode:'stack',crops:[[70,200,820,590],[930,190,420,610]],w:[1,.8]},
     'lock:lock:2':{crops:[[176,150,930,654]]},
     'lock:lock:3':{crops:[[462,8,496,776]]},
-    'lock:colors':{mode:'stack',crops:[[56,220,700,480],[636,220,684,480]],fade:['r','l']},
-    'garage:garage':{mode:'stack',crops:[[80,130,500,720],[560,200,730,690]],w:[.8,1]},
+    'lock:colors':{mode:'grid',crops:[[66,222,296,420],[368,222,288,420],[661,222,295,420],[960,222,344,420]],labels:['Bronze','Nickel','Brass','Matte Black']},
+    'garage:garage':{mode:'stack',crops:[[80,130,500,720],[576,226,714,664]],w:[.8,1],tipAt:[270,732]},
     'garage:gphone':{keep:1,crops:[[200,30,900,900]]},
     'app:hero':{mode:'stack',crops:[[40,96,690,210],[60,390,640,320],[716,0,660,964]],w:[1,1,.86],fade:['','','lrb']},
     'app:phone':{crops:[[90,60,700,840]]}};
@@ -123,7 +125,7 @@
       const tip=sec.querySelector(':scope>.tip'); let tipT=''; if(w.querySelector(':scope>.tip')) sec.appendChild(w.querySelector(':scope>.tip'));
       const top0=T+24, bot=F+(n?36:110), gap=ctlH?36:0, avail=H-top0-bot-ctlH-gap;
       const used=new Set([0]); let blockH=0;
-      if(Ly.mode==='grid'){ const lh=48, gx=24, gy=20, cw=(CW-gx)/2, x0=L; let k=Math.min(CAPK,...cr.map(r=>cw/r[2]),...cr.map(r=>(avail-2*lh-gy)/2/r[3]));
+      if(Ly.mode==='grid'){ const lh=48, gx=28, gy=28, cw=(CW-gx)/2, x0=L; let k=Math.min(CAPK,...cr.map(r=>cw/r[2]),...cr.map(r=>(avail-2*lh-gy)/2/r[3]));
         const ch=Math.max(...cr.map(r=>r[3]*k)); blockH=2*(ch+lh)+gy; const y0=top0+Math.max(0,(avail-blockH)/2);
         cr.forEach((r,i)=>{ const col=i%2, row=i>>1, x=x0+col*(cw+gx)+(cw-r[2]*k)/2, y=y0+row*(ch+lh+gy); const el=i?ghost(sec,w,i):w; used.add(i); place(el,r,k,x,y);
           let lb=sec.querySelector(':scope>.iplab[data-i="'+i+'"]'); if(!lb){ lb=document.createElement('div'); lb.className='iplab'; lb.dataset.i=i; sec.appendChild(lb); }
@@ -133,7 +135,8 @@
         let k=Math.min(CAPK,...cr.map((r,i)=>maxW/(r[2]*ws[i])), (avail-sg*(cr.length-1))/cr.reduce((a,r,i)=>a+r[3]*ws[i],0));
         blockH=cr.reduce((a,r,i)=>a+r[3]*k*ws[i],0)+sg*(cr.length-1); let y=top0+Math.max(0,(avail-blockH)/2);
         cr.forEach((r,i)=>{ const kk=k*ws[i], el=i?ghost(sec,w,i):w; used.add(i); const x=CX-r[2]*kk/2; place(el,r,kk,x,y); fadeEdge(el,r,(Ly.fade||[])[i]);
-          if(!i&&tip){ const tl=parseFloat(tip.style.left)||0, tt=parseFloat(tip.style.top)||0, th=tip.offsetHeight||0; tipT=`${(x+(tl-r[0])*kk-tl).toFixed(1)}px ${(y+(tt-r[1])*kk-th*(1-kk)-tt).toFixed(1)}px`; }
+          if(!i&&tip&&Ly.tipAt){ const tl=parseFloat(tip.style.left)||0, tt=parseFloat(tip.style.top)||0, th=tip.offsetHeight||0, dx=x+(Ly.tipAt[0]-r[0])*kk, dy=y+(Ly.tipAt[1]-r[1])*kk;
+            tipT=`${(dx+44-tl).toFixed(1)}px ${(dy-th/2-tt).toFixed(1)}px`; }
           y+=r[3]*kk+sg; }); }
       if(tip&&tip.style.translate!==tipT) tip.style.translate=tipT;
       sec.querySelectorAll(':scope>.ipart.ipx,:scope>.iplab').forEach(x=>{ if(!used.has(+x.dataset.i)||(x.classList.contains('iplab')&&Ly.mode!=='grid')){ const v=x.querySelector('video'); if(v) v.pause(); x.remove(); } });

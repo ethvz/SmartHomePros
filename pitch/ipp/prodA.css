@@ -239,3 +239,8 @@ html.ipp #prScroll .lhero .lh-ph:is([src*="ph/lock3"],[src*="ph/fob."]){top:auto
 /* Smart Hub gallery photo 1: the Hub is wider than the upright crop, so that photo sits a little smaller, low, fading in at the top */
 html.ipp #hbScroll .hgl figure:has(img[src*="gal/hub_0"]){position:relative}
 html.ipp #hbScroll .hgl img[src*="gal/hub_0"]{position:absolute;left:0;bottom:0;height:86%!important;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14%);mask-image:linear-gradient(180deg,transparent 0,#000 14%)}
+/* garage tip: lifted out of the artwork at full size, beside its hotspot (ipp/prodA.js), sized to its text */
+html.ipp #prScroll .psec>.tip{width:400px!important;min-height:0!important;height:auto!important;padding:22px 56px 22px 24px!important;box-sizing:border-box}
+html.ipp #prScroll .psec>.tip .tt{font-size:17px!important;line-height:1.4!important}
+/* Indoor Camera "Listening for Danger": the photo's right edge fades out instead of ending in a hard line mid-screen */
+html.ipp #prScroll .icm.solo .ocm-card{-webkit-mask-image:linear-gradient(90deg,#000 72%,transparent 100%)!important;mask-image:linear-gradient(90deg,#000 72%,transparent 100%)!important}
