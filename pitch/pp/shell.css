@@ -138,7 +138,7 @@ html.pp #allTiles .ht .cl[data-pps]::after{content:attr(data-pps);font-size:16px
 html.pp #allTiles .ht img.cp:not(.big):not(.pp-ocp):not(.pp-ocspot){top:41%!important;height:54%!important}
 /* category panes: header up top, then a grid that fills the rest (the landscape rows of 5 would be needle-thin upright).
    The rows are flattened (display:contents) so the tiles can re-grid; the flip animation measures tiles, so it follows. */
-html.pp #homeTrack .hcat{display:grid!important;padding:50px 16px 10px!important;gap:12px!important}
+html.pp #homeTrack .hcat{display:grid!important;padding:var(--ppNavT) 16px 10px!important;gap:12px!important}   /* below the top corner */
 html.pp .hcat .hrow{display:contents!important}
 html.pp .hcat .ht{min-height:0;flex:none!important}
 html.pp .hcat .ht .cl{font-size:16px;line-height:1.15;padding:0 4px}
@@ -205,3 +205,5 @@ html.pp #ocScroll .ocpk h2::before,html.pp #dbScroll .dbc-h::before{content:"";f
 html.pp #stage #ocArlo h2,html.pp #stage #dbVs .dbvs-h{top:calc(var(--ppNavT) + 4px)!important}
 /* the corner glyph: 26 CSS px on a 390-wide phone, as in the other apps (stage px = CSS px / .65) */
 html.pp #burger .ic,html.pp #burger svg{width:40px!important;height:40px!important}
+html.pp :is(#ocScroll,#dbScroll)>[data-t=specs] .strip.fsx>.fsp-pane{padding-top:calc(var(--ppNavT) + 4px)!important}
+html.pp #stage #ocHist.hx{padding-top:calc(var(--ppNavT) + 2px)!important}

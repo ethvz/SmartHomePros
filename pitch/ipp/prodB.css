@@ -100,7 +100,7 @@ html.ipp :is(#ocScroll,#dbScroll) .dbwell{width:150px!important;height:calc(100%
 
 /* OCP vs Arlo: the split clip shown whole across the content width (as in landscape; a second synced copy halved the frame rate),
    each side labelled, the reasons below */
-html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vh:calc(var(--vw) * 358 / 1276);--vt:calc(var(--bT) + 210px + max(0px,(var(--H) - var(--bT) - var(--bF) - 210px - var(--vh) - 320px) / 2))}
+html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vh:calc(var(--vw) * 358 / 1276);--vt:calc(var(--bT) + 210px + max(0px,(var(--H) - var(--bT) - var(--bF) - 210px - var(--vh) - 320px) / 3))}
 html.ipp #ocArlo h2{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important;font-size:58px!important;gap:22px!important}
 html.ipp #ocArlo h2 i{width:90px!important}
 html.ipp #ocArlo .ocar-back{left:calc(var(--gx) + 44px)!important;right:auto!important;top:calc(var(--bT) + 116px)!important}
