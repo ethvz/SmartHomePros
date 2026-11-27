@@ -278,7 +278,8 @@ function shot(target, from, dist){ const d = from.clone().normalize().multiplySc
 const SH = {
   door:    () => shot(V(-3.95, 1.25, 3.7), V(.55, .28, 1), 3.6),
   doorIn:  () => shot(V(-3.75, 1.2, 3.86), V(.45, .15, -1), 1.25),
-  lock:    () => { const p = P('lock'); return shot(p.center.clone(), V(.35, .12, 1), .62); },
+  lock:    () => { const p = P('lock'); return shot(p.center.clone().setZ(3.84).add(V(0, -.08, 0)), V(.3, .1, -1), .95); },   // from INSIDE (entry cutaway): the thumb-turn is what moves
+  lockOut: () => { const p = P('lock'); return shot(p.center.clone(), V(.35, .12, 1), .62); },
   garage:  () => shot(V(-8.4, 1.55, 3.6), V(.42, .26, 1), 7.2),
   therm:   () => { const p = P('therm'); return shot(p.center.clone().add(V(0, -.08, 0)), V(.28, .05, 1), .85); },
   hub:     () => { const p = P('hub'); return shot(p.center.clone().add(V(0, -.05, 0)), V(1, .08, .3), 1.05); },

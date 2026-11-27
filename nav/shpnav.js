@@ -267,12 +267,44 @@
   }
   topMode(); addEventListener('resize', topMode); addEventListener('orientationchange', function () { setTimeout(topMode, 200); });
 
+  /* Fast Recruit: the corner (logo + hamburger) at exactly Fast Pitch's size and place. Pitch draws its corner in stage px on a canvas
+     scaled to the screen (pitch/index.html fit()): iPad landscape = stage 1032 tall, 1376-1600 wide; iPad upright (ipp) = 1032 wide;
+     iPhone upright (pp) = 600 wide. The same scale is worked out here (--shpn-k, plus where that stage sits: --shpn-x0 / -y0 / -b0) and
+     nav/shpnav.css sizes Recruit's corner in Pitch's stage px. iPhone held sideways: Pitch shows its 4:3 stage letterboxed (its corner
+     is ~13px there), so Recruit keeps its own corner size (no html.shpn-pk). */
+  var pkProbe = null;
+  function pitchFit() {
+    if (!pkProbe) { pkProbe = document.createElement('div');
+      pkProbe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;visibility:hidden;pointer-events:none;z-index:-1';
+      H.appendChild(pkProbe); }
+    var cs = getComputedStyle(pkProbe), t = parseFloat(cs.paddingTop) || 0, l = parseFloat(cs.paddingLeft) || 0, r = parseFloat(cs.paddingRight) || 0;
+    var hh = Math.max(innerHeight, pkProbe.getBoundingClientRect().height || 0, (window.visualViewport && visualViewport.height) || 0);
+    var vw = innerWidth - l - r, vh = hh - t, mn = Math.min(vw, vh);
+    var pp = vh > vw * 1.15 && mn < 500, ipp = !pp && vh > vw * 1.05 && mn >= 500, tab = vw > vh && mn >= 500;
+    var on = pp || ipp || tab;
+    if (on) {
+      var W = pp ? 600 : ipp ? 1032 : Math.round(Math.min(1600, Math.max(1376, 1032 * vw / vh))), SH = pp ? Math.round(600 * vh / vw) : ipp ? Math.round(1032 * vh / vw) : 1032;
+      var k = Math.min(vw / W, vh / SH), top = t + vh / 2 - SH * k / 2;
+      H.style.setProperty('--shpn-k', k.toFixed(5));
+      H.style.setProperty('--shpn-x0', (l + vw / 2 - W * k / 2).toFixed(2) + 'px');
+      H.style.setProperty('--shpn-y0', top.toFixed(2) + 'px');
+      H.style.setProperty('--shpn-b0', (innerHeight - (top + SH * k)).toFixed(2) + 'px');
+      H.style.setProperty('--shpn-pb', ipp ? '28px' : '8px');   /* Pitch lifts its iPad-upright footer clear of the home indicator */
+    }
+    if (H.classList.contains('shpn-pk') !== on) H.classList.toggle('shpn-pk', on);
+  }
+  if (APP === 'recruit') {
+    pitchFit(); addEventListener('resize', pitchFit); addEventListener('orientationchange', function () { setTimeout(pitchFit, 250); });
+    addEventListener('pageshow', pitchFit); if (window.visualViewport) visualViewport.addEventListener('resize', pitchFit);
+  }
+
   function init() {
     if (APP === 'pitch') {
       if (!mountPitch()) { var n = 0, iv = setInterval(function () { if (mountPitch() || ++n > 40) clearInterval(iv); }, 250); }
       pitchReserve();
     } else if (APP === 'recruit') {
-      makeCorner(frMenu, frHome, 'Fast Recruit home'); frWatch();
+      /* (the logo drawn in the same frame as Fast Pitch's logo image, pitch/assets/logo.svg, so the two match exactly) */
+      makeCorner(frMenu, frHome, 'Fast Recruit home', LOGO.replace('viewBox="20 4 1620 380"', 'viewBox="0 0 1639.26 387.61" preserveAspectRatio="none"')); frWatch();
       /* iPad / sideways: the bottom corner steps aside while a page scrolls down, back on the way up or at either end */
       var fq = 0, fe = null, fscr = function () { fq = 0; var el = fe; if (!el || H.classList.contains('shpn-top')) return;
         var y = el.scrollTop, ly = el.__shpnY || 0, max = el.scrollHeight - el.clientHeight, away = H.classList.contains('shpn-away');

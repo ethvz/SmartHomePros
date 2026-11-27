@@ -173,6 +173,22 @@ html.shpn-recruit #pfoot { left: calc(var(--shpn-l) + 146px) !important; right: 
 /* phone: the corner sits level with the page tabs (#pfoot: bottom var(--sab) + 10px, 60px tall) */
 html.shpn-recruit.shpn-top #pfoot { left: max(12px, calc(env(safe-area-inset-left, 0px) + 4px)) !important; }
 html.shpn-recruit .shpn-corner .shpn-logo svg { height: 18px; }
+/* the corner at exactly Fast Pitch's size and place (html.shpn-pk, set by shpnav.js pitchFit on iPads and upright iPhones): Pitch's
+   stage px x --shpn-k. iPad (both ways): hamburger box 52, glyph 34, logo 110 x 26 starting 22 after the box, box 14 from the left
+   and 8 from the bottom (28 on an upright iPad). Upright iPhone: box 68, glyph 40, logo 131 x 31 starting 8 after it, 18 / 11 from
+   the left / top. The variables also move everything that keeps clear of the corner (menu card, shade, last section). */
+html.shpn-recruit.shpn-pk { --shpn-l: calc(var(--shpn-x0, 0px) + 14px * var(--shpn-k)); --shpn-b: calc(var(--shpn-b0, 0px) + var(--shpn-pb, 8px) * var(--shpn-k));
+  --shpn-hit: calc(52px * var(--shpn-k)); --shpn-sh: drop-shadow(0 calc(1px * var(--shpn-k)) calc(4px * var(--shpn-k)) rgba(0, 0, 0, .6)); }
+html.shpn-recruit.shpn-pk.shpn-top { --shpn-l: calc(var(--shpn-x0, 0px) + 18px * var(--shpn-k)); --shpn-hit: calc(68px * var(--shpn-k)); --shpn-top0: calc(var(--shpn-y0, 0px) + 11px * var(--shpn-k)); }
+html.shpn-recruit.shpn-pk .shpn-corner { gap: 0; }
+html.shpn-recruit.shpn-pk .shpn-corner .shpn-burger svg { width: calc(34px * var(--shpn-k)); height: calc(34px * var(--shpn-k)); stroke-width: 1.75; filter: var(--shpn-sh); }
+html.shpn-recruit.shpn-pk .shpn-corner .shpn-logo { padding: 0; margin-left: calc(22px * var(--shpn-k)); }
+html.shpn-recruit.shpn-pk .shpn-corner .shpn-logo svg { width: calc(109.95px * var(--shpn-k)); height: calc(26px * var(--shpn-k)); margin-top: 0; filter: var(--shpn-sh); }
+html.shpn-recruit.shpn-pk.shpn-top .shpn-corner .shpn-burger svg { width: calc(40px * var(--shpn-k)); height: calc(40px * var(--shpn-k)); }
+html.shpn-recruit.shpn-pk.shpn-top .shpn-corner .shpn-logo { margin-left: calc(8px * var(--shpn-k)); }
+html.shpn-recruit.shpn-pk.shpn-top .shpn-corner .shpn-logo svg { width: calc(131.09px * var(--shpn-k)); height: calc(31px * var(--shpn-k)); margin-top: calc(-1px * var(--shpn-k)); }
+/* upright iPhone: the header's pills (FAQs, Guide, Onboard) start just past the logo */
+html.shpn-recruit.shpn-pk.shpn-top #phdr .ph-scroll { padding-left: calc(var(--shpn-x0, 0px) + 225.1px * var(--shpn-k)); }
 /* its menu: the same card as the others (solid, 30px corners), above the corner, opening out of the hamburger */
 html.shpn-recruit .dw.shpn .dw-panel { height: auto !important; bottom: calc(var(--shpn-foot) + 8px) !important; border-radius: 30px; background: #121212; -webkit-backdrop-filter: none; backdrop-filter: none;
   border-color: rgba(255, 255, 255, .08); }

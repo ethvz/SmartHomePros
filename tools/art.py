@@ -24,6 +24,7 @@ for _c in __import__('glob').glob(os.path.join(ROOT, 'pitch', 'pp', '*.css')) + 
 def files_under(d):
     for dp, _, fs in os.walk(d):
         for f in fs:
+            if re.search(r' \d+\.[^.]+$', f) or f == '.DS_Store': continue   # Finder/iCloud duplicates ("x 2.webp"), gitignored
             yield os.path.relpath(os.path.join(dp, f), d)
 
 

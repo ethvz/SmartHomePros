@@ -883,6 +883,45 @@ scene.add(moon, moon.target);
 const warm = 0xffc58c;                          // ~2800 K
 const LIGHTS = {interior:[], porch:[], lantern:null, garage:null};   // exposed as __tour.house.lights (note: the house is lit by its bake; these drive furniture/products live)
 const pl = (x,y,z,i,d=9) => { const l = new THREE.PointLight(warm, i, d, 2); l.position.set(x,y,z); scene.add(l); LIGHTS.interior.push(l); return l; };
+/* entry cutaway (owner 2026-11-27): the solid entry block is opened between the great room and the front hall, and on to the
+   front window, so the inside of the front door (Smart Lock thumb-turn) and of the window (Door & Window Sensor) can be seen.
+   The house shell is clipped away inside ENTRY_CUT (renderer.localClippingEnabled; planes put on every shell material once the
+   house loads) and this room's inside faces are built here: floor, ceiling, back and left walls, and the inside of the front
+   wall with the door and window openings. Plain meshes, not slab(), so the baked interior lightmap's packing is unchanged. */
+const ENTRY = {x0:-6.45, x1:-2.3, z0:1.5, z1:3.8, y1:FL+2.7};
+const ENTRY_CUT = [[1,0,0,-(ENTRY.x0-.01)],[-1,0,0,ENTRY.x1+.05],[0,1,0,-(FL-.03)],[0,-1,0,ENTRY.y1+.02],[0,0,1,-(ENTRY.z0-.02)],[0,0,-1,ENTRY.z1]]
+  .map(([x,y,z,c]) => new THREE.Plane(new THREE.Vector3(-x,-y,-z), -c));   // normals out of the box: with clipIntersection only what is inside all six is cut
+renderer.localClippingEnabled = true;
+{ const E = ENTRY, wuv = (g, f) => { const P = g.attributes.position, uv = new Float32Array(P.count*2); for(let i=0;i<P.count;i++){ const [u,v] = f(P.getX(i),P.getY(i),P.getZ(i)); uv[2*i]=u; uv[2*i+1]=v; } g.setAttribute('uv', new THREE.BufferAttribute(uv,2)); return g; };
+  const add = (g, m) => { const x = new THREE.Mesh(g, m); x.receiveShadow = true; x.userData.entryRoom = true; scene.add(x); return x; };
+  const quad = (pts) => { const g = new THREE.BufferGeometry(); g.setFromPoints(pts.map(a=>V(...a))); g.setIndex([0,1,2,0,2,3]); g.computeVertexNormals(); return g; };   // CCW from the side it faces
+  add(wuv(quad([[E.x0,FL,E.z1],[E.x1,FL,E.z1],[E.x1,FL,E.z0],[E.x0,FL,E.z0]]), (x,y,z)=>[x/2.2,-z/2.2]), M.floor);                          // floor (faces up)
+  add(wuv(quad([[E.x0,E.y1,E.z0],[E.x1,E.y1,E.z0],[E.x1,E.y1,E.z1],[E.x0,E.y1,E.z1]]), (x,y,z)=>[x,z]), M.ceil);                          // ceiling (faces down)
+  add(wuv(quad([[E.x0,FL,E.z0],[E.x1,FL,E.z0],[E.x1,E.y1,E.z0],[E.x0,E.y1,E.z0]]), (x,y,z)=>[x,y]), M.paint);                             // back wall (faces +z)
+  add(wuv(quad([[E.x0,FL,E.z1],[E.x0,FL,E.z0],[E.x0,E.y1,E.z0],[E.x0,E.y1,E.z1]]), (x,y,z)=>[z,y]), M.paint);                             // left wall (faces +x)
+  /* inside of the front wall, facing -z, with the door (-4.35..-3.4) and ground-floor window (-6.3..-5.05) openings */
+  const sh = new THREE.Shape([[E.x1,FL],[-3.4,FL],[-3.4,FL+2.35],[-4.35,FL+2.35],[-4.35,FL],[E.x0,FL],[E.x0,E.y1],[E.x1,E.y1]].map(([x,y])=>new THREE.Vector2(-x,y)));   // x mirrored: the shape is turned to face -z; the door is a notch from the floor
+  const hole = (a,b,lo,hi) => new THREE.Path([[-a,lo],[-a,hi],[-b,hi],[-b,lo]].map(([x,y])=>new THREE.Vector2(x,y)));
+  sh.holes.push(hole(-6.3,-5.05,FL+1.1,FL+2.3));
+  const fg = new THREE.ShapeGeometry(sh); fg.rotateY(Math.PI); fg.translate(0,0,E.z1);
+  add(wuv(fg, (x,y,z)=>[-x,y]), M.paint);
+  /* the window opening's reveal between this face and the frame (3.8 .. 3.88), and a sill board */
+  for(const [a,b,lo,hi] of [[-6.3,-5.05,FL+1.1,FL+2.3]]){ const d = .085, rv = (w,h,x,y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), M.paint); m.position.set(x,y,E.z1+d/2); m.userData.entryRoom = true; scene.add(m); };
+    rv(b-a,.01,(a+b)/2,hi+.005); rv(.01,hi-lo,a-.005,(lo+hi)/2); rv(.01,hi-lo,b+.005,(lo+hi)/2);
+    const sill = new THREE.Mesh(new THREE.BoxGeometry(b-a+.12,.025,.16), M.trim); sill.position.set((a+b)/2, lo-.012, E.z1+.02); sill.userData.entryRoom = true; scene.add(sill); }
+  pl(-4.6, FL+2.45, 2.6, 5, 6); }
+/* clip every piece of architecture that reaches into the cutaway (house shell, the page's interior wall boxes); the door, the
+   products and this room's own faces are left whole. Materials are cloned per use so shared ones stay unclipped elsewhere. */
+function entryClip(){
+  const zone = new THREE.Box3(V(ENTRY.x0-.01, FL-.03, ENTRY.z0-.02), V(ENTRY.x1+.05, ENTRY.y1+.02, ENTRY.z1)), keep = new Set(), bb = new THREE.Box3(), clones = new Map();
+  for(const p of PRODUCTS) p.model && p.model.traverse(o => keep.add(o));
+  FRONT_DOOR && FRONT_DOOR.traverse(o => keep.add(o));
+  scene.updateMatrixWorld(true);
+  scene.traverse(o => { if(!o.isMesh || keep.has(o) || o.userData.entryRoom || !o.geometry) return;
+    bb.setFromObject(o); if(!bb.intersectsBox(zone)) return;
+    const one = m => { if(!m || m.clippingPlanes) return m; if(!clones.has(m)){ const c = m.clone(); c.clippingPlanes = ENTRY_CUT; c.clipIntersection = true; clones.set(m, c); } return clones.get(m); };
+    o.material = Array.isArray(o.material) ? o.material.map(one) : one(o.material); });
+  return clones.size; }
 pl(-.1,3.3,-4.2,28,11);                         // over the island
 pl(.6,3.2,2.0,20,12);                           // living
 pl(0,3.0,-1.9,15,10);                           // dining
@@ -1608,7 +1647,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 37;
+const TOURV = 38;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1649,7 +1688,7 @@ const PLACE = {
   fire:  {pos:V(1.52,5.55,GR.z0+.01), view:V(0,0,1),           d:.75},
   keypad:{pos:V(-6.93,FL+1.35,-.32),   view:V(-1,0,0), xray:true, d:.7},
   therm: {pos:V(3.1,FL+1.45,GR.cz+.01), view:V(0,0,1),          d:.66},
-  window:{pos:V(-5.35,1.2935,4.030), view:V(0,0,1), s:1.15,    d:.5},   // seated on the bottom rail (rail y 1.25-1.31, face z 4.03)
+  window:{pos:V(-5.35,1.2935,3.880), view:V(0,0,-1), s:1.15, xray:true, d:.5},   // on the INSIDE of the front window: bottom rail (y 1.25-1.31), inner frame face z 3.88
   glass: {pos:V(GR.x1-.01,FL+2.75,1.8), view:V(-1,0,0),        d:.7},
   plug:  {pos:V(4.6,FL+.32,GR.cz+.01), view:V(-.3,0,1).normalize(),         d:.65},
   ocp:   {pos:V(6.3,4.3,3.02),       view:V(.3,0,1),            d:.95},
@@ -2069,7 +2108,7 @@ function capTextures(max0, maxLight = max0){ const seen = new Set();
             get(){ if(ver !== t.source.version){ ver = t.source.version; cache = small(); } return cache; } });
         } else { const c = small(); if(im.close) im.close(); t.image = c; }   // loaded images never change: swap once, free the big one
         t.needsUpdate = true; } catch(e){} } }); }
-Promise.all([assetsReady, ...MODEL_P]).then(() => { if(PHONE || LITE) capTextures(512, 1024); else if(TOUCH) capTextures(1024, 2048); }).then(() => { window.__ld && __ld.p(2, 0); return Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))]); }).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => (window.__ld ? __ld.finish : f => f())(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }), 120));
+Promise.all([assetsReady, ...MODEL_P]).then(() => { entryClip(); if(PHONE || LITE) capTextures(512, 1024); else if(TOUCH) capTextures(1024, 2048); }).then(() => { window.__ld && __ld.p(2, 0); return Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))]); }).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => (window.__ld ? __ld.finish : f => f())(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }), 120));
 
 /* offline lighting bake: export the static house (no products, no overlays) plus its lights for Blender */
 if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(async () => {
