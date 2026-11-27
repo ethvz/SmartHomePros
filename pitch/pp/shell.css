@@ -5,7 +5,7 @@
      --ppHomeFoot  same on the Home page, where the footer has two rows
    Every footer control is 68 stage px (44pt on a 390-wide phone) tall; round buttons are 68 wide. */
 
-html.pp #stage{--ppB:8px;--ppFoot:84px;--ppHomeFoot:160px;--ppNavT:84px;--ppE:cubic-bezier(.2,.8,.2,1)}
+html.pp #stage{--ppB:8px;--ppFoot:84px;--ppHomeFoot:84px;--ppNavT:84px;--ppE:cubic-bezier(.2,.8,.2,1)}
 /* --ppNavT: the top band kept by the shared corner (burger + Vivint logo, top left, 8-76) on every section: content left of
    x 240 must start below it; the floating page name (#gTitle) sits right of the corner in that band */
 
@@ -13,9 +13,9 @@ html.pp #stage{--ppB:8px;--ppFoot:84px;--ppHomeFoot:160px;--ppNavT:84px;--ppE:cu
 html.pp #bar{height:calc(var(--ppB) + 68px)!important;padding:0 12px var(--ppB)!important;box-sizing:border-box;gap:4px!important;align-items:center}
 /* the corner: burger + Vivint logo at the TOP left of the stage (the stage starts below the status bar / Dynamic Island), as in every
    app on an upright iPhone. #bar sits at the stage bottom, so top = 8px measured from the stage top. */
-html.pp #burger{position:absolute!important;left:12px!important;top:calc(8px + var(--ppB) + 68px - var(--H))!important;width:68px!important;height:68px!important;flex:none;margin:0!important;z-index:32;transition:transform 80ms var(--ppE)}
+html.pp #burger{position:absolute!important;left:12px!important;top:calc(11px + var(--ppB) + 68px - var(--H))!important;width:68px!important;height:68px!important;flex:none;margin:0!important;z-index:32;transition:transform 80ms var(--ppE)}
 html.pp #burger:active{transform:scale(.9)}
-html.pp #barlogo,html.pp #bar.home #barlogo{position:absolute!important;left:82px!important;top:calc(8px + var(--ppB) + 68px - var(--H))!important;z-index:32;flex:none!important;height:30px!important;width:auto!important;margin:0!important;padding:19px 8px!important;box-sizing:content-box!important;transition:transform 80ms var(--ppE)}
+html.pp #barlogo,html.pp #bar.home #barlogo{position:absolute!important;left:82px!important;top:calc(11px + var(--ppB) + 68px - var(--H))!important;z-index:32;flex:none!important;height:31px!important;width:auto!important;margin:0!important;padding:18px 8px 19px!important;box-sizing:content-box!important;transition:transform 80ms var(--ppE)}
 html.pp #barlogo:active{transform:scale(.94)}
 /* all footer pills: one height (68), readable labels, a press state */
 html.pp #bar #hmode,html.pp #bar #homeX,html.pp #barRight.pnav{bottom:var(--ppB)!important;padding:5px!important;gap:2px!important}
@@ -28,13 +28,13 @@ html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barR
   html.pp #burger,html.pp #bar #hmode button,html.pp #bar #homeX .bbtn,html.pp #barRight.pnav .bbtn,html.pp #bar #prodBtn,html.pp #bar #amtBtn{transition:opacity .2s ease,color .15s ease!important}
   html.pp #burger:active,html.pp #bar #hmode button:active,html.pp #bar #homeX .bbtn:active,html.pp #barRight.pnav .bbtn:active,html.pp #bar #prodBtn:active,html.pp #bar #amtBtn:active{transform:none}}
 
-/* Home: two rows. Upper row = what the page shows (Tiles | 3D Home on the left, the four categories on the right);
-   lower row = About / Videos / Yard Sign across the footer (burger + logo are at the top) */
-html.pp #bar #hmode{left:12px!important;right:auto!important;transform:none!important;bottom:calc(var(--ppB) + 76px)!important}
+/* Home: one row = Tiles | 3D Home on the left (12-178), the four categories on the right (188-588). Burger + logo are at the top;
+   About / Videos / Yard Sign live in the menu only (the old #homeX pill is gone, nav/shpnav.css) */
+html.pp #bar #hmode{left:12px!important;right:auto!important;transform:none!important;bottom:var(--ppB)!important}
 html.pp #bar #hmode button{width:78px!important}
 html.pp #bar #hmode i{top:5px!important;left:5px!important;width:78px!important;height:58px!important;border-radius:29px!important}
 html.pp #bar #hmode.d3 i{transform:translateX(80px)!important}
-html.pp #bar.home #barRight.pnav{left:auto!important;right:12px!important;transform:none!important;bottom:calc(var(--ppB) + 76px)!important;width:calc(100% - 24px)!important;box-sizing:border-box;justify-content:space-between}
+html.pp #bar.home #barRight.pnav{left:auto!important;right:12px!important;transform:none!important;bottom:var(--ppB)!important;width:calc(100% - 12px - 12px - 166px - 10px)!important;box-sizing:border-box;justify-content:space-between}
 html.pp #bar.home #barRight.pnav .bbtn{flex:1 1 0!important;width:auto!important;min-width:0}
 html.pp #bar #homeX{left:auto!important;right:12px!important;transform:none!important}
 html.pp #bar #homeX .bbtn{width:84px!important}
@@ -203,3 +203,5 @@ html.pp #lpT{transform:translate(220px,7px)}
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h::before{content:"";float:left;width:206px;height:50px}
 html.pp #ocScroll .ocpk h2::before,html.pp #dbScroll .dbc-h::before{content:"";float:left;width:194px;height:40px}
 html.pp #stage #ocArlo h2,html.pp #stage #dbVs .dbvs-h{top:calc(var(--ppNavT) + 4px)!important}
+/* the corner glyph: 26 CSS px on a 390-wide phone, as in the other apps (stage px = CSS px / .65) */
+html.pp #burger .ic,html.pp #burger svg{width:40px!important;height:40px!important}

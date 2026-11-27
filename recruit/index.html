@@ -119,6 +119,10 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
   /* while scrubbing, the side rail holds still where the finger found it, with every title showing (a collapsed rail opens up) */
   .board nav.frscrub { transform: var(--frT) !important; top: var(--frTop) !important; left: var(--frLeft) !important; opacity: 1 !important; visibility: visible !important; transition: none !important; }
   .board nav.frscrub a > span:last-child { max-width: 420px !important; opacity: 1 !important; }
+  /* ...on a dark panel of its own, so the titles read over whatever the page shows behind them */
+  .board nav.frscrub::before { content: ''; position: absolute; left: 6px; top: 30px; width: 250px; bottom: 26px; border-radius: 26px; background: rgba(12,14,14,.88); box-shadow: 0 18px 50px rgba(0,0,0,.55); z-index: -1; pointer-events: none; animation: frPanel .18s ease-out both; }
+  html.pph .board nav.frscrub::before { display: none; }   /* (the iPhone section menu has its own panel) */
+  @keyframes frPanel { from { opacity: 0; } to { opacity: 1; } }
   .board nav.frscrub a, .board nav.frscrub a > span, #phdr .ph-prog.frscrub b { transition: translate .12s cubic-bezier(.2,.8,.2,1), scale .12s cubic-bezier(.2,.8,.2,1), color .15s ease !important; }
   .board nav.frsettle a, .board nav.frsettle a > span, #phdr .ph-prog.frsettle b { transition: translate .35s cubic-bezier(.2,.8,.2,1), scale .35s cubic-bezier(.2,.8,.2,1), color .3s ease !important; }
   #phdr .ph-prog .frtip { position: absolute; top: 16px; left: 0; translate: -50% 0; padding: 7px 13px; border-radius: 15px; background: rgba(20,22,22,.92); border: 1px solid rgba(5,229,175,.45);
@@ -3361,7 +3365,7 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
     const PENI = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10.5-10.5-4-4L4 16z M13.5 6.5l4 4"/></svg>';
     const m = document.createElement('div'); m.className = 'dw' + (opts.edit ? ' edit' : ''); m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Menu');
     m.innerHTML = '<div class="dw-scrim"></div><div class="dw-panel"><div class="dw-head">'
-      + '<button type="button" class="dw-pill dw-home' + (curFn === 'Main.dc.html' ? ' on' : '') + '">' + DW_ICON.home + 'Home</button>'
+      + '<button type="button" class="dw-pill dw-home' + (curFn === 'Main.dc.html' ? ' on' : '') + '">' + DW_ICON.home + 'Recruit home</button>'
       + (FLOW ? '<button type="button" class="dw-pill dw-flow dw-allsec">All Sections' + '<svg class="dw-chev" viewBox="0 0 9 15" aria-hidden="true"><path d="M1.6 1.6 7.4 7.5 1.6 13.4"/></svg>' + '</button></div>'   // (in the flow: back to every page, staying where you are)
               : validFavs().length ? '<button type="button" class="dw-pill dw-flow">' + DW_ICON.star + 'Custom flow' + '<svg class="dw-chev" viewBox="0 0 9 15" aria-hidden="true"><path d="M1.6 1.6 7.4 7.5 1.6 13.4"/></svg>' + '</button></div>'
               : '<button type="button" class="dw-pill dw-flow dw-create">Create Custom Flow<svg class="dw-plus" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 1.8v8.4M1.8 6h8.4"/></svg></button></div>')
@@ -3410,8 +3414,9 @@ try { const sim = new URLSearchParams(location.search).get('sim'); if (sim ? sim
       m.classList.add('port'); m.classList.toggle('sm', small); m.classList.toggle('short', H < 500);
       Object.assign(pn.style, { left: left0 + g + 'px', top: top0 + g + 'px', width: Math.round(w) + 'px', height: (H - 2 * g) + 'px' });
       const d = small ? 38 : 42, pad = H < 500 ? 12 : small ? 14 : 18, hh = small ? 32 : 36, cy = pad + d / 2;
-      Object.assign(X.style, { left: pad + 'px', top: pad + 'px', width: d + 'px', height: d + 'px' });
-      Object.assign(head.style, { left: (pad + d + 10) + 'px', right: pad + 'px', top: (cy - hh / 2) + 'px', height: hh + 'px' });
+      // close button on the right (the shared corner menu sits on the left), the pills to its left
+      Object.assign(X.style, { left: 'auto', right: pad + 'px', top: pad + 'px', width: d + 'px', height: d + 'px' });
+      Object.assign(head.style, { left: pad + 'px', right: (pad + d + 10) + 'px', top: (cy - hh / 2) + 'px', height: hh + 'px' });
       inn.style.top = Math.round(pad + d + (H < 500 ? 10 : 14)) + 'px';
       const iw = inn.clientWidth - (small ? 28 : 44), ph = Math.min(iw * 9 / 16, (H - 2 * g) * (H < 500 ? 0.3 : 0.32));
       pv.style.width = Math.round(ph * 16 / 9) + 'px'; pv.style.height = Math.round(ph) + 'px';

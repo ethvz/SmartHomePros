@@ -15,7 +15,7 @@
     const sc = (st.getBoundingClientRect().width / st.offsetWidth) || 1, sab = probe.offsetHeight / sc;
     const B = Math.round(Math.max(8, 6 + sab * 0.6)), sig = B + '';
     if (sig === geo) return; geo = sig;
-    st.style.setProperty('--ppB', B + 'px'); st.style.setProperty('--ppFoot', (B + 76) + 'px'); st.style.setProperty('--ppHomeFoot', (B + 152) + 'px');
+    st.style.setProperty('--ppB', B + 'px'); st.style.setProperty('--ppFoot', (B + 76) + 'px'); st.style.setProperty('--ppHomeFoot', (B + 76) + 'px');   /* Home footer: one row now */
     tourInset();
   }
 
