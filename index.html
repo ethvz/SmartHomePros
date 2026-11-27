@@ -134,7 +134,6 @@ button { font: inherit; color: inherit; }
 .card .ph .pv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .card.recruit .ph { background-image: url(recruit/a_470ace19f4f41e262a08af30291d0034.webp); background-position: 38% 40%; }
 .card .sh { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,.2) 46%, rgba(0,0,0,.88) 100%); }
-.card .ic { position: absolute; top: clamp(12px, 1.8vmin, 18px); left: clamp(12px, 1.8vmin, 18px); width: clamp(40px, 5.4vmin, 52px); height: clamp(40px, 5.4vmin, 52px); border-radius: 24%; box-shadow: 0 0 0 1px rgba(255,255,255,.14), 0 8px 20px rgba(0,0,0,.45); }
 .card .bd { position: absolute; left: 0; right: 0; bottom: 0; padding: clamp(14px, 2.2vmin, 22px); display: flex; align-items: flex-end; gap: 10px; }
 .card .tx { flex: 1; min-width: 0; }
 .card .ey { display: block; font-size: clamp(13px, 1.6vmin, 15px); font-weight: 700; }
@@ -160,11 +159,6 @@ button { font: inherit; color: inherit; }
 .card.pulse .art { background: radial-gradient(90% 70% at 70% 30%, rgba(var(--pk), .26), transparent 70%); }
 .card.book .ph { background: #1a1410 url(connect/conveyour.jpg?v=1) 50% 30%/cover; }   /* Conveyour: muted training clip, this tile only */
 .card.book .ph .pv { object-position: 50% 30%; }
-.card.mini .ic { display: grid; place-items: center; }
-.card.mini .ic svg { width: 54%; height: 54%; fill: none; stroke: #000; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.card.pulse .ic { background: #000; }   /* Pulse app icon: white mark on black */
-.card.mini.pulse .ic svg { width: 60%; height: 60%; fill: #fff; stroke: none; }
-.card.book .ic { background: linear-gradient(135deg, #ffad6e, rgb(var(--or)) 55%, #e6743e); }
 .card.book.nope { animation: nope .45s var(--ease); }
 .pl-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.6s var(--ease) .7s forwards; }
 .pb-route { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.4s var(--ease) .9s forwards; }
@@ -612,7 +606,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 @media (max-width: 834px) { .annb { width: clamp(44px, 5.6vmin, 50px); padding: 0; justify-content: center; } .annb .t { display: none; } .annb i { left: auto; right: -4px; top: -3px; } }
 .brand .news { padding-left: 14px; padding-right: 14px; margin: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); }
 </style>
-<link rel="stylesheet" href="nav/shpnav.css?v=4f9ffbb2">
+<link rel="stylesheet" href="nav/shpnav.css?v=9c79131d">
 </head>
 <body>
 <div class="bg" aria-hidden="true"><i></i></div>
@@ -627,7 +621,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
   <section class="cards" aria-label="Apps">
     <button class="card pitch" data-k="pitch" data-app="pitch" aria-label="Open Fast Pitch">
       <span class="ph"><video class="pv" src="pitch/assets/vl/imagine_loop.mp4?v=1" poster="pitch/assets/vl/imagine.webp?v=1" muted playsinline loop autoplay preload="auto" aria-hidden="true"></video></span><span class="sh"></span>
-      <img class="ic" src="pitch/assets/icon-192.png" alt="">
       <span class="last"><i></i>Last used</span>
       <span class="bd">
         <span class="tx"><span class="ey">Sell</span><span class="nm">Fast Pitch</span><span class="ln">Win the door. Build the package.</span></span>
@@ -636,7 +629,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
     </button>
     <button class="card recruit" data-k="recruit" data-app="recruit" aria-label="Open Fast Recruit">
       <span class="ph"><video class="pv" src="connect/recruit_ho.mp4?v=1" poster="connect/recruit_ho.jpg?v=1" muted playsinline loop autoplay preload="auto" disablepictureinpicture aria-hidden="true"></video></span><span class="sh"></span>
-      <img class="ic" src="recruit/icon.png" alt="">
       <span class="last"><i></i>Last used</span>
       <span class="bd">
         <span class="tx"><span class="ey">Recruit</span><span class="nm">Fast Recruit</span><span class="ln">Show them the opportunity.</span></span>
@@ -646,7 +638,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
     <a class="card mini pulse" data-k="pulse" href="https://pulse.vivint.com" target="_blank" rel="noopener" aria-label="Open Pulse (pulse.vivint.com)">
       <span class="art"><svg viewBox="0 0 300 120" preserveAspectRatio="none" fill="none"><path class="pl-line" pathLength="1" d="M0 92 L48 84 L78 88 L104 60 L122 74 L142 30 L160 96 L178 52 L204 64 L236 34 L268 42 L300 18" stroke="rgb(255,102,204)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 92 L48 84 L78 88 L104 60 L122 74 L142 30 L160 96 L178 52 L204 64 L236 34 L268 42 L300 18 V120 H0Z" fill="url(#plg)" opacity=".5"/><defs><linearGradient id="plg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgb(255,102,204)" stop-opacity=".45"/><stop offset="1" stop-color="rgb(255,102,204)" stop-opacity="0"/></linearGradient></defs></svg></span>
       <span class="sh"></span>
-      <span class="ic"><svg viewBox="-12 -10 194 207" aria-hidden="true"><path d="M9 0H101Q107 0 111 4L166 59Q170 63 170 69V76Q170 90 156 90H90L4 4Q0 0 9 0Z"/><path d="M90 95V172Q90 187 75 187H15Q0 187 0 172V110Q0 95 15 95Z"/></svg></span>
       <span class="tag">pulse.vivint.com</span>
       <span class="bd">
         <span class="tx"><span class="ey">Track</span><span class="nm">Pulse</span><span class="ln">Your numbers, your team, the leaderboard.</span></span>
@@ -656,7 +647,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
     <a class="card mini book" data-k="book" href="https://dthvivinttraining.conveyour.com/ui/portal/" target="_blank" rel="noopener" aria-label="Open Conveyour, the video training library">
       <span class="ph"><video class="pv" src="connect/conveyour.mp4?v=1" poster="connect/conveyour.jpg?v=1" muted playsinline loop autoplay preload="auto" disablepictureinpicture aria-hidden="true"></video></span>
       <span class="sh"></span>
-      <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3.5"/><path d="M10.2 9.2v5.6l4.6-2.8z"/></svg></span>
       <span class="tag">Video library</span>
       <span class="bd">
         <span class="tx"><span class="ey">Train</span><span class="nm">Conveyour</span><span class="ln">Every training video, any time.</span></span>
@@ -787,7 +777,7 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
   document.querySelectorAll('.card[data-app]').forEach(function (card) {
     card.addEventListener('click', function () {
       if (busy) return; busy = true;
-      var app = card.dataset.app; try { localStorage.setItem('shpc_last', app); } catch (e) {}
+      var app = card.dataset.app; try { localStorage.setItem('shpc_last', app); sessionStorage.setItem('shp_asm', String(Date.now())); } catch (e) {}   // the app assembles its first screen on arrival (nav/shpnav.js)
       var r = card.getBoundingClientRect(), z = document.createElement('div'), ph = card.querySelector('.ph');
       z.className = 'zoom'; z.innerHTML = '<div class="ph"></div><div class="sh"></div>';
       z.firstChild.style.backgroundImage = getComputedStyle(ph).backgroundImage; z.firstChild.style.backgroundPosition = getComputedStyle(ph).backgroundPosition;
@@ -1459,6 +1449,6 @@ body.rearr .toast { bottom: calc(var(--sab) + 86px); }
 <script src="connect/hero/hero.js?v=5" defer></script>
 <script src="connect/contacts.js?v=1" defer></script>
 <!-- shared navigation (corner logo + menu with the app selector): same in all three apps -->
-<script src="nav/shpnav.js?v=4f9ffbb2" data-app="home" defer></script>
+<script src="nav/shpnav.js?v=9c79131d" data-app="home" defer></script>
 </body>
 </html>

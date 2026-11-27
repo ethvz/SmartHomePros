@@ -343,6 +343,50 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
+  /* Opened from an app card on the SHP page: the app's first screen assembles itself. Each visible piece (tile, heading,
+     button, bar) flies in from just outside its spot and snaps into place, top-left first, in well under a second.
+     The SHP page leaves a timestamp in sessionStorage (shp_asm) when a card is tapped. */
+  (function assemble() {
+    var t = 0; try { t = +sessionStorage.getItem('shp_asm') || 0; sessionStorage.removeItem('shp_asm'); } catch (e) {}
+    if (APP === 'home' || !t || Date.now() - t > 6000 || !Element.prototype.animate) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    H.style.opacity = '0';
+    var go = function () { if (go.done) return; go.done = 1;
+      var W = innerWidth, VH = innerHeight, VA = W * VH, picked = [];
+      var walk = function (el, depth) {
+        for (var c = el.firstElementChild; c && picked.length < 40; c = c.nextElementSibling) {
+          if (/^(SCRIPT|STYLE|LINK|META|TEMPLATE|NOSCRIPT|BR)$/.test(c.tagName)) continue;
+          var cs = getComputedStyle(c); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+          var r = c.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2) { if (depth < 14) walk(c, depth + 1); continue; }   // empty wrappers around fixed pieces
+          if (r.bottom < 0 || r.top > VH || r.right < 0 || r.left > W || +cs.opacity < .05) continue;
+          var a = r.width * r.height / VA;
+          if (a > .4) { if (depth < 14) walk(c, depth + 1); continue; }   // a screen-sized layer: its pieces assemble, it just fades in
+          if (a < .0012) continue;
+          picked.push({ el: c, r: r, op: cs.opacity });
+        }
+      };
+      walk(document.body, 0);
+      H.style.transition = 'opacity .16s ease-out'; H.style.opacity = '1';
+      setTimeout(function () { H.style.transition = ''; H.style.opacity = ''; }, 220);
+      var cx = W / 2, cy = VH / 2;
+      picked.sort(function (a, b) { return (a.r.top + a.r.left * .6) - (b.r.top + b.r.left * .6); });
+      picked.forEach(function (p, i) {
+        var r = p.r, mx = r.left + r.width / 2 - cx, my = r.top + r.height / 2 - cy, d = Math.sqrt(mx * mx + my * my) || 1,
+            push = 36 + Math.min(110, d * .16), dx = (mx / d * push).toFixed(1), dy = (my / d * push + 16).toFixed(1),
+            o = { duration: 360, delay: Math.min(280, i * 20), easing: 'cubic-bezier(.2,.85,.25,1.08)', fill: 'backwards' };
+        try {
+          p.el.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.86)' }, { transform: 'translate(0,0) scale(1)' }], Object.assign({ composite: 'add' }, o));
+          p.el.animate([{ opacity: 0 }, { opacity: p.op }], Object.assign({}, o, { duration: 240, easing: 'ease-out' }));
+        } catch (e) {}
+      });
+      /* the apps size themselves from measured boxes; anything measured mid-flight is redone once every piece has landed */
+      setTimeout(function () { try { dispatchEvent(new Event('resize')); } catch (e) {} }, Math.min(280, picked.length * 20) + 400);
+    };
+    var ready = function () { requestAnimationFrame(function () { requestAnimationFrame(go); }); };
+    if (document.readyState === 'complete') ready(); else { addEventListener('load', ready); setTimeout(ready, 1400); }
+  })();
+
   window.SHPNav = { app: APP, root: ROOT, selector: selector, close: close, toast: toast, sheet: sheet,
     open: function () { if (APP === 'home') shpOpen(); else if (APP === 'recruit') frMenu(); else if (typeof window.openMenu === 'function') window.openMenu(); } };
 })();
