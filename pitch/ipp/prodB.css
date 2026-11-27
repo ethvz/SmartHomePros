@@ -33,7 +33,7 @@ html.ipp #ocHeroHot .ocb[data-whistle]{left:auto!important;right:124px;top:calc(
 
 /* ---------- DBCP hero: the season video fills the screen (cropped round the doorbell), words low on the left ---------- */
 html.ipp #dbScroll .dbh-vid{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px)!important}
-html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px);background:linear-gradient(180deg,rgba(0,0,0,.62) 0,rgba(0,0,0,.35) 8%,transparent 16%,transparent 70%,#000 100%)!important}
+html.ipp #dbScroll .dbh-scrim{left:0!important;width:1032px!important;height:calc(var(--H) - var(--bF) - 330px);background:linear-gradient(180deg,rgba(0,0,0,.78) 0,rgba(0,0,0,.5) 9%,transparent 20%,transparent 70%,#000 100%)!important}
 html.ipp #dbScroll .dbh-txt{left:calc(var(--gx) + 48px)!important;width:720px!important;top:auto!important;bottom:calc(var(--bF) + 120px);margin:0!important}
 html.ipp #dbScroll .dbh-txt p{max-width:560px}
 html.ipp #dbScroll .dbai{top:calc(var(--bT) - 24px)!important;right:40px!important}
@@ -68,7 +68,7 @@ html.ipp #ocScroll .ocm-phone{left:calc(var(--gx) / 2 + 516px - 460px * var(--ph
 html.ipp #ocScroll .ocm-phone.port{left:calc(var(--gx) / 2 + 516px - 278px * var(--phs))!important;top:var(--mt)!important}
 html.ipp #ocScroll .ocm:has(.ocm-phone.port) .ocm-card{opacity:0}
 html.ipp #ocScroll .ocm-svw{left:calc(var(--gx) + 10px)!important;right:auto!important;width:calc(1032px - var(--gx) - 30px);top:var(--mt)!important;bottom:auto!important;height:calc(var(--mh) - var(--phh) + 40px);-webkit-mask-image:none!important;mask-image:none!important}
-html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important;transform-origin:50% 100%;scale:1.6}
+html.ipp #ocScroll .ocm-sv{left:0!important;top:0!important;width:100%!important;height:100%!important;object-fit:contain!important;transform-origin:50% 100%;scale:1.25}
 /* per-state product scale: exploded 4K view stays clear of the phone; radar clip shown whole */
 html.ipp #ocScroll .ocm-card img[data-im="ocm/sensor"]{height:calc(100% - 80px)!important}
 html.ipp #ocScroll .ocm-bv video{object-fit:contain!important}
@@ -100,7 +100,7 @@ html.ipp :is(#ocScroll,#dbScroll) .dbwell{width:150px!important;height:calc(100%
 
 /* OCP vs Arlo: the split clip shown whole across the content width (as in landscape; a second synced copy halved the frame rate),
    each side labelled, the reasons below */
-html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vh:calc(var(--vw) * 358 / 1276);--vt:calc(var(--bT) + 210px + max(0px,(var(--H) - var(--bT) - var(--bF) - 210px - var(--vh) - 320px) / 3))}
+html.ipp #ocArlo{--vw:calc(1032px - var(--gx) - 66px);--vh:calc(var(--vw) * .36);--vt:calc(var(--bT) + 210px + max(0px,(var(--H) - var(--bT) - var(--bF) - 210px - var(--vh) - 320px) / 4))}
 html.ipp #ocArlo h2{left:calc(var(--gx) + 44px)!important;top:calc(var(--bT) + 24px)!important;font-size:58px!important;gap:22px!important}
 html.ipp #ocArlo h2 i{width:90px!important}
 html.ipp #ocArlo .ocar-back{left:calc(var(--gx) + 44px)!important;right:auto!important;top:calc(var(--bT) + 116px)!important}
