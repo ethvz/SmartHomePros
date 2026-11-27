@@ -262,16 +262,18 @@
       document.addEventListener('scroll', function (e) { var t = e.target; if (!t || t.nodeType !== 1 || t.clientHeight < 200) return; fe = t; if (!fq) fq = requestAnimationFrame(fscr); }, { capture: true, passive: true });
       var d0 = document.querySelector('.dw'); if (d0) frDecorate(d0);
     } else {
-      makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); toTop(); }, 'Smart Home Pros: back to top', SHPW);
-      addEventListener('keydown', function (e) { if (e.key === 'Escape' && dw && dw.classList.contains('on')) shpClose(); });
-      /* scrolled: frosted corner (and on an upright iPhone, a dark strip behind the status bar + corner); class written only on change */
-      var strip = document.createElement('div'); strip.className = 'shpn-strip'; strip.setAttribute('aria-hidden', 'true'); document.body.appendChild(strip);
-      var app = document.querySelector('.app'), sq = 0, lastY = 0, scr = function () { sq = 0;
-        var y = Math.max(window.scrollY || 0, app ? app.scrollTop : 0), on = y > 8, max = app ? app.scrollHeight - app.clientHeight : 0;
-        if (H.classList.contains('shpn-scrolled') !== on) H.classList.toggle('shpn-scrolled', on);
-        var away = H.classList.contains('shpn-away'); if (y - lastY > 6 && y > 80 && y < max - 4) away = true; else if (lastY - y > 6 || y <= 80 || y >= max - 4) away = false;
-        if (Math.abs(y - lastY) > 6 || y <= 80 || y >= max - 4) lastY = y;
-        if (H.classList.contains('shpn-away') !== away) H.classList.toggle('shpn-away', away); };
+      /* SHP page (owner): no corner and no menu here. The page's own header (SHP title, announcements bell, settings gear) floats
+         at the top instead: pinned while scrolling, frosted once the page moves, clear of the Dynamic Island (nav/shpnav.css).
+         A spacer keeps the header's place in the hero so nothing below moves. */
+      var brand = document.querySelector('.hero .brand');
+      if (brand) {
+        var sp = document.createElement('div'); sp.className = 'shpn-hdrsp'; sp.setAttribute('aria-hidden', 'true'); brand.parentNode.insertBefore(sp, brand);
+        var fitH = function () { var h = brand.offsetHeight + 'px'; if (sp.style.height !== h) sp.style.height = h; };
+        H.classList.add('shpn-float'); fitH(); if (window.ResizeObserver) new ResizeObserver(fitH).observe(brand); addEventListener('resize', fitH);
+      }
+      var app = document.querySelector('.app'), sq = 0, scr = function () { sq = 0;
+        var on = Math.max(window.scrollY || 0, app ? app.scrollTop : 0) > 8;
+        if (H.classList.contains('shpn-scrolled') !== on) H.classList.toggle('shpn-scrolled', on); };
       var onS = function () { if (!sq) sq = requestAnimationFrame(scr); };
       addEventListener('scroll', onS, { passive: true }); if (app) app.addEventListener('scroll', onS, { passive: true }); scr();
       /* the SHP page's Settings sheet: hide the corner while it is up (attribute writes only when the state differs) */

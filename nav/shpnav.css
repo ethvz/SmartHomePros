@@ -203,9 +203,7 @@ html.shpn-top .shpn-toast { bottom: calc(max(12px, env(safe-area-inset-bottom, 0
 html.shpn-top .shpn-corner.off, html.shpn-top.shp-sheet .shpn-corner { transform: translateY(-10px); }
 /* SHP page: its title moves right of the corner */
 /* SHP page, upright iPhone: the corner IS the SHP title (the header's own title gives way); the bottom peek shrinks to the grab handle */
-html.shpn-top.shpn-home .brand .t { visibility: hidden; }
-html.shpn-top.shpn-home .hero { --peek: clamp(40px, 6vh, 54px); }
-html.shpn-top.shpn-home .more .grab { margin-bottom: 6px !important; }
+
 /* Fast Recruit: its menu card hangs from the corner */
 html.shpn-recruit.shpn-top .dw.shpn .dw-panel { top: var(--shpn-head) !important; bottom: max(12px, calc(var(--sab, 0px) + 8px)) !important; }
 
@@ -225,7 +223,6 @@ html.shpn-away:not(.shpn-top) .shpn-corner > button { pointer-events: none; }
 html.shpn-top .shpn-strip { display: block; }
 html.shpn-top.shpn-scrolled .shpn-strip { opacity: 1; }
 html.shpn-open .shpn-strip { opacity: 0; }
-html.shpn-home:not(.shpn-top) .more .in::after { content: ''; display: block; height: calc(var(--shpn-foot) + 16px); }
 
 /* SHP wordmark (the SHP page's corner and menu header instead of the Vivint logo) */
 .shpn-word { display: inline-flex; align-items: center; gap: 6px; color: #fff; font: 700 22px/1 'Vivint Sans', Helvetica, Arial, sans-serif; letter-spacing: -.02em; }
@@ -240,8 +237,8 @@ html.shpn-home:not(.shpn-top) .more .in::after { content: ''; display: block; he
 #stage { --navFoot: 84px; }
 html.pp #stage { --navFoot: calc(var(--ppFoot, 84px) + 8px); }
 html.ipp #stage { --navFoot: calc(var(--ippFoot, 104px) + 4px); }
-#shpnFoot { position: absolute; left: 0; right: 0; bottom: 0; height: var(--navFoot); z-index: 15; pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, #000 18px, #000 100%); }
+#shpnFoot { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--navFoot) + 24px); z-index: 15; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .78) 100%); }   /* a soft fade only: content runs to the bottom edge (owner: no black bar) */
 .shpn-endpad { display: block; flex: none; grid-column: 1 / -1; width: 1px; height: var(--navFoot); pointer-events: none; visibility: hidden; }
 html.pp #stage #ppTopShade { z-index: 15 !important; height: calc(var(--ppNavT) + 14px) !important; background: linear-gradient(180deg, #000 0, #000 calc(100% - 18px), rgba(0, 0, 0, 0) 100%) !important; }
 html.pp #stage #lpT { z-index: 16; }
@@ -249,3 +246,16 @@ html.pp #stage #lpT { z-index: 16; }
 html.pp #stage :is(#hbScroll, #thScroll, #prScroll) .nxa { bottom: calc(var(--navFoot) + 8px) !important; }
 /* the page name beside the corner: two lines at most, never past the right edge */
 html.pp #stage #gTitle span { white-space: normal !important; display: -webkit-box !important; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.25; max-width: 100% !important; }
+
+/* ======================= SHP page (html.shpn-home): floating header instead of a corner + menu (owner) ======================= */
+/* .brand (SHP title, bell, gear) is pinned at the top: same place as before at rest (shpnav.js puts a spacer where it was),
+   frosted once the page scrolls, below the status bar / Dynamic Island. Sheets and viewers (z 30+) still cover it. */
+html.shpn-home.shpn-float .hero .brand { position: fixed; z-index: 25; top: 0; left: 0; right: 0; margin: 0;
+  padding: calc(var(--sat, env(safe-area-inset-top, 0px)) + var(--pad)) calc(var(--sar, 0px) + var(--pad)) 10px calc(var(--sal, 0px) + var(--pad));
+  transition: background-color .3s ease, padding .3s var(--shpn-e), box-shadow .3s ease; }
+html.shpn-home.shpn-float .hero { padding-top: 0; }
+html.shpn-home.shpn-float .hero .shpn-hdrsp { flex: none; margin-bottom: -10px; }   /* = the header incl. its top inset, minus its bottom padding */
+html.shpn-home.shpn-float.shpn-scrolled .hero .brand { background-color: rgba(8, 10, 12, .86); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .06); }
+/* upright iPhone: the hero runs to the bottom edge (no black peek band); its tiles stay clear of the home indicator */
+html.shpn-home.shpn-top .hero { --peek: 0px; padding-bottom: max(var(--gap), calc(env(safe-area-inset-bottom, 0px) * .5)); }

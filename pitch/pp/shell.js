@@ -13,7 +13,7 @@
   function setGeo() {
     if (!PP()) { if (geo) { ['--ppB', '--ppFoot', '--ppHomeFoot'].forEach(k => st.style.removeProperty(k)); geo = ''; } return; }
     const sc = (st.getBoundingClientRect().width / st.offsetWidth) || 1, sab = probe.offsetHeight / sc;
-    const B = Math.round(Math.max(8, 6 + sab * 0.6)), sig = B + '';
+    const B = Math.round(Math.max(8, 4 + sab * 0.42)), sig = B + '';   /* just clear of the home indicator (owner: no black bar below the tabs) */
     if (sig === geo) return; geo = sig;
     st.style.setProperty('--ppB', B + 'px'); st.style.setProperty('--ppFoot', (B + 76) + 'px'); st.style.setProperty('--ppHomeFoot', (B + 76) + 'px');   /* Home footer: one row now */
     tourInset();
