@@ -188,7 +188,7 @@ html.pp #allTiles .ht img.cp.big{top:40%!important;height:60%!important}
 
 /* ---------- top corner (burger + logo, --ppNavT): the two sections whose own big heading starts in that band move down ---------- */
 /* Compatibility: its heading goes into the corner band (right of the corner, one line); the cards keep their places */
-html.pp #stage #cmPP h2{left:240px!important;top:26px!important;font-size:34px!important;letter-spacing:-.8px!important;white-space:nowrap}
+html.pp #stage #cmPP h2{left:240px!important;top:26px!important;font-size:34px!important;letter-spacing:-.8px!important;white-space:nowrap;z-index:16}
 html.pp #stage #p-whatsnew h2{top:calc(var(--ppNavT) + 4px)}
 html.pp #stage #p-whatsnew .wnl{top:calc(var(--ppNavT) + 92px)}
 /* a soft dark band behind the top corner so section content scrolling under it stays out of its way (pp/shell.js adds the element) */
@@ -203,7 +203,7 @@ html.pp #lpT{transform:translate(220px,7px)}
    or start below it */
 html.pp :is(#ocScroll,#dbScroll)>.dbm .dbm-h::before{content:"";float:left;width:226px;height:58px}
 /* Compare: its heading moves into the corner band, right of the corner, one line (the cards below keep their places) */
-html.pp #stage #ocScroll .ocpk h2,html.pp #stage #dbScroll .dbc-h{left:240px!important;top:26px!important;font-size:34px!important;letter-spacing:-.8px!important;white-space:nowrap;width:auto!important;right:auto!important}
+html.pp #stage #ocScroll .ocpk h2,html.pp #stage #dbScroll .dbc-h{left:240px!important;top:26px!important;font-size:34px!important;letter-spacing:-.8px!important;white-space:nowrap;width:auto!important;right:auto!important;z-index:16}
 html.pp #stage #ocArlo h2,html.pp #stage #dbVs .dbvs-h{top:calc(var(--ppNavT) + 4px)!important}
 /* the corner glyph: 26 CSS px on a 390-wide phone, as in the other apps (stage px = CSS px / .65) */
 html.pp #burger .ic,html.pp #burger svg{width:40px!important;height:40px!important}

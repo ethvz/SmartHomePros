@@ -192,7 +192,7 @@
         found = true; spacer(el);
       });
       /* upright layouts: a page whose content runs a little past the footer, with nothing that scrolls, may scroll now */
-      if (!found && (H2.classList.contains('pp') || H2.classList.contains('ipp')) && !pg.__shpnPad && pg.id !== 'p-home') {
+      if (!found && !pg.__shpnPad && pg.id !== 'p-home') {
         var st = document.getElementById('stage'), z = st.getBoundingClientRect().height / st.offsetHeight || 1, pr = pg.getBoundingClientRect();
         var nf = parseFloat(getComputedStyle(st).getPropertyValue('--navFoot')) || 84, bottom = 0;
         [].forEach.call(pg.querySelectorAll('img, video, canvas, h1, h2, h3, p, li, span, b, a, button, small'), function (e) {
