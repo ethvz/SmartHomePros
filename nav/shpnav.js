@@ -272,6 +272,10 @@
         var sp = document.createElement('div'); sp.className = 'shpn-hdrsp'; sp.setAttribute('aria-hidden', 'true'); brand.parentNode.insertBefore(sp, brand);
         var fitH = function () { var h = brand.offsetHeight + 'px'; if (sp.style.height !== h) sp.style.height = h; };
         H.classList.add('shpn-float'); fitH(); if (window.ResizeObserver) new ResizeObserver(fitH).observe(brand); addEventListener('resize', fitH);
+        /* the hero scene (connect/hero/hero.js) measures the header to place its coin counter, and re-measures when the hero resizes:
+           nudge the hero by half a pixel for one frame (twice: now and after the header's entrance animation) so it re-measures */
+        var hero = brand.parentNode, nudge = function () { hero.style.minHeight = (hero.offsetHeight + .5) + 'px'; requestAnimationFrame(function () { requestAnimationFrame(function () { hero.style.minHeight = ''; }); }); };
+        requestAnimationFrame(nudge); setTimeout(nudge, 900);
       }
       var app = document.querySelector('.app'), sq = 0, scr = function () { sq = 0;
         var on = Math.max(window.scrollY || 0, app ? app.scrollTop : 0) > 8;
