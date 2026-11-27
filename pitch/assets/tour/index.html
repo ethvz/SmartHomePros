@@ -519,8 +519,16 @@ const canvas = document.getElementById('scene');
    page; after a second loss this session, come back in a lighter mode (no MSAA, 1x pixels). Touch devices render at <= 1.4x. */
 const SS = (k, v) => { try{ if(v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); }catch(e){ return null; } };
 const LITE = SS('tourLite') === '1', TOUCH = navigator.maxTouchPoints > 1;
+/* After 3 losses this session, stop reloading (an endless reload loop was seen on iPad) and offer one manual retry instead. */
 canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); const n = +(SS('tourLost') || 0) + 1; SS('tourLost', String(n)); if(n >= 2) SS('tourLite', '1');
-  document.documentElement.style.background = '#0d1014'; setTimeout(() => location.reload(), 350); }, false);
+  document.documentElement.style.background = '#0d1014';
+  if(n < 3){ setTimeout(() => location.reload(), 350); return; }
+  if(document.getElementById('lostBox')) return;
+  const b = document.createElement('div'); b.id = 'lostBox';
+  b.style.cssText = 'position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0d1014;color:#fff;font:600 17px/1.3 "Vivint Sans",system-ui,sans-serif;text-align:center;padding:24px';
+  b.innerHTML = '<div>The 3D home needs more memory than this device has free.<br><span style="opacity:.6;font-weight:400">Close other apps or tabs, then try again.</span></div><button type="button" style="font:inherit;padding:12px 26px;border:0;border-radius:999px;background:rgb(5,229,175);color:#000">Try again</button>';
+  b.querySelector('button').onclick = function(){ this.textContent = 'Loading…'; SS('tourLost', '2'); location.reload(); };
+  document.body.appendChild(b); }, false);
 const SMALL = TOUCH && Math.min(screen.width, screen.height) < 500;   // phone: no MSAA buffers (its screen is already dense)
 const renderer = new THREE.WebGLRenderer({canvas, antialias:!LITE && !SMALL, powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, /still/.test(location.search) || LITE ? 1 : TOUCH ? 1.4 : 1.6));
@@ -1553,7 +1561,7 @@ function keyMesh(mat){ const s = new THREE.Shape(); s.absarc(0,0,.012,0,Math.PI*
 /* Each product's model lives in its own module, prod/<key>.js: `export default H => group` (back on the wall at z=0, face +z;
    floor/table products base at y=0). H is the shared toolkit below. A product without a module keeps its inline model above.
    Bump TOURV when a module changes (offline copies and browser caches key on it). */
-const TOURV = 26;
+const TOURV = 27;
 const H = { THREE, V, G, add, faceZ, cyl, torus, rbox, rslab, rring, rrShape, dome, decal, lens, loft, sqPt, roundBack, splitMat, pocketBody,
   rr4, ext, printPlane, weaveTex, grilleMat, dec, mat, PM, DEC, hubRim, hubGlass, hubDot, hubTex, __hf, __hfT, texLoader, PK, maxAniso,
   photoTex, keyMesh, ocpHead, OCPM, HUB, legacy: {...MODELS} };
@@ -1947,7 +1955,7 @@ function capTextures(max0, maxLight = max0){ const seen = new Set();
             get(){ if(ver !== t.source.version){ ver = t.source.version; cache = small(); } return cache; } });
         } else { const c = small(); if(im.close) im.close(); t.image = c; }   // loaded images never change: swap once, free the big one
         t.needsUpdate = true; } catch(e){} } }); }
-Promise.all([assetsReady, ...MODEL_P]).then(() => { if(PHONE) capTextures(512, 1024); else if(LITE) capTextures(1024); }).then(() => { window.__ld && __ld.p(2, 0); return Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))]); }).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => (window.__ld ? __ld.finish : f => f())(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }), 120));
+Promise.all([assetsReady, ...MODEL_P]).then(() => { if(PHONE || LITE) capTextures(512, 1024); else if(TOUCH) capTextures(1024, 2048); }).then(() => { window.__ld && __ld.p(2, 0); return Promise.race([renderer.compileAsync(scene, camera), new Promise(r => setTimeout(r, 8000))]); }).catch(() => {}).then(() => { window.__warm = true; }).then(() => setTimeout(() => (window.__ld ? __ld.finish : f => f())(() => { $('#loading').classList.add('done'); if(!STUDIO) overview(true); setTimeout(()=>setHint('Drag to look around · Pinch to zoom · Tap a ring'), 1400); }), 120));
 
 /* offline lighting bake: export the static house (no products, no overlays) plus its lights for Blender */
 if(/bakeexport/.test(location.search)) Promise.all([assetsReady, ...MODEL_P]).then(async () => {
