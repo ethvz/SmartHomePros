@@ -253,6 +253,13 @@
       pitchReserve();
     } else if (APP === 'recruit') {
       makeCorner(frMenu, frHome, 'Fast Recruit home'); frWatch();
+      /* iPad / sideways: the bottom corner steps aside while a page scrolls down, back on the way up or at either end */
+      var fq = 0, fe = null, fscr = function () { fq = 0; var el = fe; if (!el || H.classList.contains('shpn-top')) return;
+        var y = el.scrollTop, ly = el.__shpnY || 0, max = el.scrollHeight - el.clientHeight, away = H.classList.contains('shpn-away');
+        if (y - ly > 6 && y > 40 && y < max - 4) away = true; else if (ly - y > 6 || y <= 40 || y >= max - 4) away = false;
+        if (Math.abs(y - ly) > 6 || y <= 40 || y >= max - 4) el.__shpnY = y;
+        if (H.classList.contains('shpn-away') !== away) H.classList.toggle('shpn-away', away); };
+      document.addEventListener('scroll', function (e) { var t = e.target; if (!t || t.nodeType !== 1 || t.clientHeight < 200) return; fe = t; if (!fq) fq = requestAnimationFrame(fscr); }, { capture: true, passive: true });
       var d0 = document.querySelector('.dw'); if (d0) frDecorate(d0);
     } else {
       makeCorner(shpOpen, function () { if (dw && dw.classList.contains('on')) shpClose(); toTop(); }, 'Smart Home Pros: back to top', SHPW);
