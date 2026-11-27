@@ -283,7 +283,7 @@ const SH = {
   smoke:   () => { const p = P('smokeco'); return shot(p.center.clone().add(V(0, -.9, 0)), V(.2, -.25, 1), 3.1); },
   great:   () => shot(V(1.2, 1.6, -1.5), V(.15, .35, 1), 8.5),
   home:    () => { const HV = T.homeView(); return T.poseFor(HV); },
-  front:   () => { const port = aspect() < 1, tg = port ? V(-3.3, 1.5, 5.6) : V(-1.6, 1.7, 5.4), d = fitDist(port ? 12 : 15.6, 5.8, .92, .74);   // the whole street front: cones, door, visitor
+  front:   () => { const port = aspect() < 1, tg = port ? V(-3.4, 2.2, 5.6) : V(-1.6, 1.7, 5.4), d = fitDist(port ? 11 : 15.6, 5.8, .92, .74);   // the whole street front: cones, door, visitor
     return { pos:tg.clone().addScaledVector(V(0, .44, 1).normalize(), d), target:tg }; },
 };
 
@@ -811,7 +811,7 @@ const RING = { m:{},
     return (this.m[k] = a); },
   set(k, f){ for(const x of this.mats(k)){ const v = x.userData.ei0*f; if(x.emissiveIntensity !== v) x.emissiveIntensity = v; } } };
 const GY = .055;                                                         // the yard's surface
-const DCFG = { dbcp:{ reach:3.4, amp:.6, per:7.2, ph:0, yaw:.05 }, ocp:{ reach:6.6, amp:.5, per:8.6, ph:2.1, yaw:-.35 }, ocspot:{ reach:6.2, amp:.5, per:6.4, ph:4.2, yaw:.3 } };
+const DCFG = { dbcp:{ reach:2.3, amp:.6, per:7.2, ph:0, yaw:.05 }, ocp:{ reach:4.4, amp:.5, per:8.6, ph:2.1, yaw:-.35 }, ocspot:{ reach:4.1, amp:.5, per:6.4, ph:4.2, yaw:.3 } };
 const CONE_VS = `varying float vT; varying float vF; varying float vD;
 void main(){ vT = position.z; vec4 mv = modelViewMatrix*vec4(position, 1.); vec3 n = normalize(normalMatrix*normal); vF = abs(dot(n, normalize(-mv.xyz))); vD = -mv.z; gl_Position = projectionMatrix*mv; }`;
 const CONE_FS = `uniform vec3 uC; uniform float uO; varying float vT; varying float vF; varying float vD;
@@ -892,10 +892,13 @@ function dtStep(now){ const dt = Math.min(.05, (now - (DT.last || now))/1000); D
   for(const k of DCAM){ const c = DT.cones[k], want = M.deter[k] && !(k === 'ocspot' && DT.spotOn) ? 1 : 0;   // the Spotlight Pro's own beam takes over from its red cone
     if(c){ c.vis += (want - c.vis)*Math.min(1, dt*(want ? 3 : 5)); if(Math.abs(want - c.vis) < .004) c.vis = want;
       const cf = DCFG[k]; let y, p, rate;
-      if(DT.track && want){ tmpD.copy(DT.track).sub(c.A); y = Math.atan2(tmpD.x, tmpD.z); p = Math.atan2(-tmpD.y, Math.hypot(tmpD.x, tmpD.z)); rate = 8; }
+      let sees = false;   // a camera only locks on when the person is inside its own sweep (else its cone would cut through the house)
+      if(DT.track && want){ tmpD.copy(DT.track).sub(c.A); y = Math.atan2(tmpD.x, tmpD.z); let d = y - c.base; d = Math.atan2(Math.sin(d), Math.cos(d));
+        sees = Math.abs(d) <= Math.max(cf.amp*1.35, .45); if(sees){ y = c.base + d; p = Math.atan2(-tmpD.y, Math.hypot(tmpD.x, tmpD.z)); rate = 8; } }
+      if(sees){}
       else { y = c.base + (reduce ? 0 : cf.amp*Math.sin(t*2*Math.PI/cf.per + cf.ph)); p = c.p0; rate = 2.2; }
       const s = SKIP.on ? 1 : 1 - Math.exp(-dt*rate); c.yaw += (y - c.yaw)*s; c.pitch += (p - c.pitch)*s;
-      placeCone(c, DT.track && want ? c.A.distanceTo(DT.track) + .45 : k === 'dbcp' ? 6 : 9);   // locked on: the cone ends on the person
+      placeCone(c, sees ? c.A.distanceTo(DT.track) + .45 : k === 'dbcp' ? 6 : 9);   // locked on: the cone ends on the person
       if(c.vis > 0 || want) busy = true; else if(!M.deter[k]){ dropCone(c); delete DT.cones[k]; } }
     const al = DT.alert[k] > now; if(al) busy = true;
     RING.set(k, al ? blink : M.deter[k] ? 0 : 1); }
