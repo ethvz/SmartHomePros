@@ -541,8 +541,11 @@ button { font: inherit; color: inherit; }
   background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.035)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 34px -16px rgba(0,0,0,.7); }
 .wg[data-sz="m"] { grid-column: span 4; }
 .wg[data-sz="l"] { grid-column: span 4; grid-row: span 4; }
-.wg[data-sz="xl"] { grid-column: span 8; grid-row: span 4; }
-@media (max-width: 600px) { .wg[data-sz="xl"] { grid-column: span 4; } }   /* phones: as wide as the screen allows */
+/* full: the whole section right in the tile (what the enlarge button shows), full width, as tall as it needs (--rows, set by the engine) */
+.wg[data-sz="xl"] { grid-column: 1 / -1; grid-row: span var(--rows, 4); }
+.wg[data-sz="xl"] > .wf, .wg[data-sz="xl"] > .wbig { display: none; }
+.wg[data-sz="xl"] > .wx { display: block; padding: clamp(16px, 2.6vmin, 24px) clamp(16px, 3vmin, 28px) clamp(18px, 3vmin, 28px); }
+body.wedit .wg > .wx { pointer-events: none; }
 .wg > .wx { display: none; }
 .wf { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; padding: clamp(12px, 7cqmin, 20px); display: flex; flex-direction: column; }
 .wf.nw { animation: wfIn .45s var(--ease); } @keyframes wfIn { from { opacity: 0; } }
@@ -618,13 +621,6 @@ button { font: inherit; color: inherit; }
 .md.td span { background: rgb(var(--g)); color: #000; font-weight: 700; }
 .md i { position: absolute; left: 50%; bottom: 2%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: rgb(var(--c)); }
 .wg[data-sz="l"] .nl { flex: none; }
-/* wide calendar: the month on the left, what's coming up on the right */
-.cx { flex: 1; min-height: 0; display: flex; gap: clamp(14px, 4cqmin, 28px); }
-.cxm, .cxl { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
-.cxl { padding-left: clamp(14px, 4cqmin, 28px); box-shadow: inset 1px 0 0 rgba(255,255,255,.08); }
-.cxl .wt { margin-right: 34px; } .cxl .nl { gap: clamp(8px, 2.4cqmin, 12px); } .cxl .ne b { font-size: clamp(13px, 3.6cqmin, 17px); } .cxl .ne small { font-size: clamp(11px, 3cqmin, 14px); }
-.cxm .wt { margin-right: 0; }
-@container (max-width: 640px) { .cx { flex-direction: column; gap: 8px; } .cxl { flex: none; padding-left: 0; box-shadow: none; } .cxl .wt { display: none; } .cxl .nl { max-height: 84px; } }
 /* size menu: tap a widget's corner in edit mode */
 .wsm { position: fixed; z-index: 36; display: flex; gap: 4px; padding: 6px; border-radius: 24px; background: rgba(32,36,39,.9); -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 24px 60px rgba(0,0,0,.65); animation: wsmIn .26s var(--ease); }
@@ -658,7 +654,7 @@ body.wedit .card { opacity: 1; transform: none; }
 body.wedit .brand { pointer-events: none; opacity: .45; transition: opacity .3s; }
 body.wedit .more .in { padding-bottom: 96px; }
 @keyframes jig { from { rotate: calc(-1 * var(--ja, 1deg)); } to { rotate: var(--ja, 1deg); } }
-.wg[data-sz="m"] { --ja: .55deg; } .wg[data-sz="l"] { --ja: .38deg; } .wg[data-sz="xl"] { --ja: .22deg; }
+.wg[data-sz="m"] { --ja: .55deg; } .wg[data-sz="l"] { --ja: .38deg; } .wg[data-sz="xl"] { --ja: .16deg; }
 .card:nth-child(2n), .wg:nth-child(2n) { --jd: -.13s; } .card:nth-child(3n), .wg:nth-child(3n) { --jd: -.07s; } .card:nth-child(4n), .wg:nth-child(4n) { --jd: -.19s; }
 .wg.drag { background-color: rgb(24,28,31); }
 .wg.drag, .card.drag { z-index: 20; animation: none !important; scale: 1.05; box-shadow: 0 34px 80px -12px rgba(0,0,0,.9); transition: scale .25s var(--ease), box-shadow .25s !important; }
@@ -674,7 +670,7 @@ body.wdrag, body.wdrag * { cursor: grabbing !important; }
   background: rgba(22,26,29,.96); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 40px 100px rgba(0,0,0,.7); }
 .wov .wb { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: clamp(16px, 2.6vmin, 24px) clamp(16px, 3vmin, 28px) clamp(18px, 3vmin, 28px); }
 .wov .wx > h2:first-child, .wov .wx > .calhd:first-child { padding-right: 52px; min-height: 44px; }
-.wov .ongo { margin-left: 0; margin-right: 0; padding: 0; }
+.wx .ongo { margin-left: 0; margin-right: 0; padding: 0; }
 .wov .x { position: absolute; z-index: 2; top: clamp(14px, 2.4vmin, 22px); right: clamp(14px, 2.4vmin, 22px); width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255,255,255,.12); display: grid; place-items: center; cursor: pointer; transition: transform .2s var(--ease); }
 .wov .x:active { transform: scale(.9); }
 .wov .x svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
@@ -1457,7 +1453,6 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
       if (sz === 's') return dayBlock() + '<div class="nl">' + evRows(2) + '</div>';
       if (sz === 'm') return '<div class="cm">' + dayBlock() + '<div class="nl">' + evRows(3) + '</div></div>';
       var t = dt(TODAY), mo = wt('cal', MONL[t.getUTCMonth()] + ' ' + t.getUTCFullYear()) + mini();
-      if (sz === 'xl') return '<div class="cx"><div class="cxm">' + mo + '</div><div class="cxl">' + wt('arrow', 'Coming up') + '<div class="nl">' + evRows(7) + '</div></div></div>';
       return mo + '<div class="nl">' + evRows(2) + '</div>';
     },
     fb: function (sz) {
@@ -1467,6 +1462,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
   var SHPW = window.SHPW = {
     render: function (el) {
       var f = el.querySelector(':scope > .wf'), k = el.dataset.k, sz = el.dataset.sz || 's'; if (!f || !FACE[k]) return;
+      if (sz === 'xl') { f.dataset.sz = sz; f.innerHTML = ''; if (k === 'cal') calRender(0); if (window.shpcFit) shpcFit(); return; }
       if (f.dataset.sz && f.dataset.sz !== sz) { f.classList.remove('nw'); void f.offsetWidth; f.classList.add('nw'); }
       f.dataset.sz = sz; f.innerHTML = FACE[k](sz);
     }
@@ -1518,7 +1514,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
      Tiles wiggle; drag one to move it (the others make room), pull a widget's corner to resize it (a tap on the corner
      steps s > m > l). The 4 app tiles reorder among themselves. Order in shpc_order, widget sizes in shpc_wsz. ---- */
   var cards = $('.cards'), grid = $('.more .in'), rbar = $('.rbar');
-  var SZ = { s: [2, 2], m: [4, 2], l: [4, 4], xl: [8, 4] }, SZN = { s: 'Small', m: 'Medium', l: 'Large', xl: 'Wide' }, cols = 8, gap = 14, u = 128, edit = false, eat = 0;
+  var SZ = { s: [2, 2], m: [4, 2], l: [4, 4], xl: [8, 4] }, SZN = { s: 'Small', m: 'Medium', l: 'Large', xl: 'Full' }, cols = 8, gap = 14, u = 128, edit = false, eat = 0;
   function items(box) { return $$(':scope > [data-k]', box); }
   function keys(box) { return items(box).map(function (x) { return x.dataset.k; }); }
   function sizes() { var o = {}; items(grid).forEach(function (w) { o[w.dataset.k] = w.dataset.sz; }); return o; }
@@ -1529,7 +1525,18 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
     var cs = getComputedStyle(grid); cols = cs.gridTemplateColumns.split(' ').length || 8; gap = parseFloat(cs.columnGap) || 12;
     u = Math.max(40, (grid.clientWidth - gap * (cols - 1)) / cols); grid.style.setProperty('--u', u.toFixed(2) + 'px');
   }
-  measure(); if (window.ResizeObserver) new ResizeObserver(measure).observe(grid); else addEventListener('resize', measure);
+  /* a full-size widget is as tall as its section, in whole grid units */
+  function fit() {
+    items(grid).forEach(function (w) {
+      if (w.dataset.sz !== 'xl') { if (w.style.getPropertyValue('--rows')) w.style.removeProperty('--rows'); return; }
+      var x = $(':scope > .wx', w); if (!x) return;
+      var n = String(Math.max(1, Math.ceil((x.offsetHeight + gap) / (u + gap)))); if (w.style.getPropertyValue('--rows') !== n) w.style.setProperty('--rows', n);
+    });
+  }
+  window.shpcFit = fit;
+  measure(); fit();
+  if (window.ResizeObserver) { new ResizeObserver(function () { measure(); fit(); }).observe(grid); var ro = new ResizeObserver(fit); $$(':scope > .wg > .wx', grid).forEach(function (x) { ro.observe(x); }); }
+  else addEventListener('resize', function () { measure(); fit(); });
 
   /* animate any layout change (FLIP): tiles glide (and grow or shrink) from where they were */
   function flip(boxes, change, skip) {
@@ -1589,7 +1596,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
 
   /* resize: tap the corner for a menu of sizes, or pull it; the widget snaps to whichever size is nearest the finger.
      The calendar also goes wide (8 x 4), on screens with room for it. */
-  function fits(el) { return Object.keys(SZ).filter(function (k) { return k !== 'xl' || (el.dataset.k === 'cal' && cols >= 8); }); }
+  function fits() { return Object.keys(SZ); }
   var M = null;
   function closeSize() { if (!M) return; var m = M.box; M = null; m.classList.add('out'); setTimeout(function () { m.remove(); }, 200); }
   function sizeMenu(el) {
@@ -1655,6 +1662,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
   document.addEventListener('contextmenu', function (e) { if (edit || T) e.preventDefault(); }, true);
   /* the click that ends a hold or a drag does nothing; in edit mode taps on tiles do nothing and a tap on empty space is Done */
   document.addEventListener('click', function (e) {
+    if (M && M.box.contains(e.target)) return;   /* the size menu always answers */
     if (Date.now() < eat) { eat = 0; e.preventDefault(); e.stopPropagation(); return; }
     if (!edit || rbar.contains(e.target) || !app.contains(e.target)) return;
     e.preventDefault(); e.stopPropagation();
@@ -1679,6 +1687,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
   function seen(a) { return a.width && a.bottom > 0 && a.top < innerHeight; }
   function openOv(k) {
     if (edit || cur) return; var el = grid.querySelector(':scope > [data-k="' + k + '"]'); if (!el) return;
+    if (el.dataset.sz === 'xl') { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }   /* already full size: just go to it */
     var wx = $(':scope > .wx', el); if (!wx) return;
     cur = { el: el, wx: wx, from: document.activeElement };
     wov.setAttribute('aria-label', el.dataset.n || k); wb.appendChild(wx); wb.scrollTop = 0;
