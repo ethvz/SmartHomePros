@@ -39,10 +39,10 @@ addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&/^(\+|=|-|_|0)
 <link rel="icon" type="image/png" href="favicon-32.png?v=4">
 <link rel="stylesheet" href="connect/contacts.css?v=1">
 <script>
-/* launch: reopen the app used last; "?pick" (the in-app Switch app button) shows the picker */
+/* launch: the SHP page unless Settings says otherwise; "?pick" (the in-app Switch app button) shows the picker */
 (function () {
-  /* launch setting (Settings → Open on launch): 'last' (default), 'home', or an app */
-  var last = null, mode = 'last'; try { last = localStorage.getItem('shpc_last'); mode = localStorage.getItem('shpc_launch') || 'last'; } catch (e) {}
+  /* launch setting (Settings → Open on launch): 'home' (default: the SHP page), 'last', or an app */
+  var last = null, mode = 'home'; try { last = localStorage.getItem('shpc_last'); mode = localStorage.getItem('shpc_launch') || 'home'; } catch (e) {}
   var to = mode === 'last' ? last : mode;
   if (!/[?&]pick\b/.test(location.search) && (to === 'pitch' || to === 'recruit')) {
     document.documentElement.style.background = '#000';
@@ -904,7 +904,7 @@ body.wedit .toast { bottom: calc(var(--sab) + 86px); }
   });
   /* settings sheet */
   var sh = document.querySelector('.sheet'), NAMES = { pitch: 'Fast Pitch', recruit: 'Fast Recruit' };
-  function mode() { try { return localStorage.getItem('shpc_launch') || 'last'; } catch (e) { return 'last'; } }
+  function mode() { try { return localStorage.getItem('shpc_launch') || 'home'; } catch (e) { return 'home'; } }
   function paint() { var m = mode(); sh.querySelectorAll('.opt[data-v]').forEach(function (o) { o.setAttribute('aria-checked', String(o.dataset.v === m)); });
     var l = null; try { l = localStorage.getItem('shpc_last'); } catch (e) {} document.getElementById('stLast').textContent = NAMES[l] ? 'Right now: ' + NAMES[l] : 'Whichever app you had open'; }
   function open() { paint(); sh.classList.add('on'); setTimeout(function () { var c = sh.querySelector('.opt[aria-checked="true"]'); (c || sh.querySelector('.x')).focus(); }, 50); }
