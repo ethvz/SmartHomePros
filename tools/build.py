@@ -67,6 +67,9 @@ GRID = ('<svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" 
 
 
 def patch_recruit():
+    # the Smart Home Pros icon (tools/shp-icon-master.png) replaces Fast Recruit's own
+    for f in ('icon.png', 'apple-touch-icon.png'):
+        shutil.copy2(os.path.join(ROOT, 'icon-512.png' if f == 'icon.png' else 'apple-touch-icon.png'), os.path.join(ROOT, 'recruit', f))
     p = os.path.join(ROOT, 'recruit/index.html'); s = open(p, encoding='utf-8').read()
     s = sub(s, '<link rel="manifest" href="manifest.webmanifest">', '<link rel="manifest" href="../manifest.webmanifest">', 'fr manifest')
     s = sub(s, '<link rel="apple-touch-icon" href="apple-touch-icon.png">', '<link rel="apple-touch-icon" href="../apple-touch-icon.png">', 'fr touch icon')
